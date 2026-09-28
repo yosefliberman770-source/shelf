@@ -145,6 +145,7 @@ function Connections({ idx }: { idx: LibraryIndex }) {
 // ── Historical timeline ────────────────────────────────────────────────
 
 function Timeline({ idx }: { idx: LibraryIndex }) {
+  const nav = useNavigate();
   const items = idx.itemList().filter((i) => i.histStart !== undefined);
   const events = idx.snap.concepts.filter((c) => c.start !== undefined && (c.kind === 'event' || c.kind === 'period' || c.kind === 'person'));
   const [showPub, setShowPub] = useState(false);
@@ -200,7 +201,7 @@ function Timeline({ idx }: { idx: LibraryIndex }) {
           <g transform="translate(20,0)">
             {ticks.map((t) => <g key={t}><line x1={X(t)} x2={X(t)} y1={24} y2={H} stroke="var(--grid)" /><text x={X(t)} y={16} textAnchor="middle" fontSize={11} fill="var(--text-3)" fontFamily="var(--sans)">{formatYear(t)}</text></g>)}
             {evPlaced.map(({ e, x0, x1, y }) => (
-              <a key={e.id} href={`/knowledge/concept/${e.id}`}>
+              <a key={e.id} style={{ cursor: 'pointer' }} onClick={() => nav(`/knowledge/concept/${e.id}`)}>
                 {x1 > x0 ? <rect x={x0} y={y - 4} width={x1 - x0} height={8} rx={4} fill="var(--s3)" opacity={0.4} /> : <circle cx={x0} cy={y} r={5} fill="var(--s3)" stroke="var(--surface)" strokeWidth={2} />}
                 <text x={x0 + 8} y={y + 4} fontSize={10.5} fill="var(--text-2)" fontFamily="var(--sans)">{formatYear(e.start)} — {e.name}</text>
                 <title>{e.name}: {formatYear(e.start)}{e.end !== undefined ? ` – ${formatYear(e.end)}` : ''}</title>
@@ -210,7 +211,7 @@ function Timeline({ idx }: { idx: LibraryIndex }) {
               const y = top + lane * 30;
               return (
                 <g key={i.id}>
-                  <a href={`/item/${i.id}`}>
+                  <a style={{ cursor: 'pointer' }} onClick={() => nav(`/item/${i.id}`)}>
                     <rect x={x0} y={y} width={x1 - x0} height={14} rx={4} fill={i.status === 'read' ? 'var(--s1)' : i.status === 'reading' ? 'var(--s2)' : 'var(--seq-2)'}><title>{i.title}: subject {formatYear(i.histStart)}–{formatYear(i.histEnd ?? i.histStart)}; published {formatYear(i.publishedYear)}</title></rect>
                     <text x={x1 + 5} y={y + 11} fontSize={11.5} fill="var(--text)" fontFamily="var(--sans)">{i.title}</text>
                   </a>

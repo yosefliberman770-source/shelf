@@ -119,7 +119,7 @@ function Shell() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <UIProvider>
         <ErrorBoundary>
         <LibraryProvider fallback={<div className="empty" style={{ marginTop: '30vh' }}>Opening your library…</div>}>

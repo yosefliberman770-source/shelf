@@ -79,7 +79,7 @@ export function useNotifications(idx: LibraryIndex) {
       for (const r of dueReminders(idx)) {
         if (sent.has(r.key)) continue;
         try {
-          new Notification(r.title, { body: r.body, tag: r.key, icon: '/favicon.svg' });
+          new Notification(r.title, { body: r.body, tag: r.key, icon: `${import.meta.env.BASE_URL}icon-192.png` });
         } catch {
           /* some browsers only allow notifications from a service worker */
         }
