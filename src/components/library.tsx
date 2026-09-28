@@ -84,7 +84,7 @@ function isAncestor(idx: LibraryIndex, folderId: string, selected?: string): boo
 
 export type ViewMode = 'list' | 'grid' | 'compact';
 
-export function ItemViews({ idx, items, mode, selected, onToggle }: { idx: LibraryIndex; items: Item[]; mode: ViewMode; selected: Set<string>; onToggle: (id: string) => void }) {
+export function ItemViews({ idx, items, mode, selected = new Set(), onToggle }: { idx: LibraryIndex; items: Item[]; mode: ViewMode; selected?: Set<string>; onToggle?: (id: string) => void }) {
   const drag = (e: React.DragEvent, it: Item) => {
     const ids = selected.has(it.id) ? [...selected] : [it.id];
     e.dataTransfer.setData('application/x-items', JSON.stringify(ids));
@@ -96,9 +96,9 @@ export function ItemViews({ idx, items, mode, selected, onToggle }: { idx: Libra
         const p = progressOf(idx, it);
         return (
           <div key={it.id} className="cover-tile" draggable onDragStart={(e) => drag(e, it)} style={{ position: 'relative' }}>
-            <label style={{ position: 'absolute', top: 4, left: 4, zIndex: 2, opacity: selected.size ? 1 : undefined }} className="check" onClick={(e) => e.stopPropagation()}>
+            {onToggle && <label style={{ position: 'absolute', top: 4, left: 4, zIndex: 2, opacity: selected.size ? 1 : undefined }} className="check" onClick={(e) => e.stopPropagation()}>
               <input type="checkbox" checked={selected.has(it.id)} onChange={() => onToggle(it.id)} aria-label="Select" />
-            </label>
+            </label>}
             <Link to={`/item/${it.id}`}><Cover item={it} width={mode === 'compact' ? 92 : 130} author={idx.authorLine(it)} showType /></Link>
             {it.status === 'reading' && p !== undefined && <ProgressBar value={p} thin />}
             <div className="ellipsis" style={{ fontWeight: 500, fontSize: mode === 'compact' ? 12 : 13.5 }} title={it.title}>{it.title}</div>
@@ -111,7 +111,7 @@ export function ItemViews({ idx, items, mode, selected, onToggle }: { idx: Libra
   );
 }
 
-function ListView({ idx, items, selected, onToggle, onDrag }: { idx: LibraryIndex; items: Item[]; selected: Set<string>; onToggle: (id: string) => void; onDrag: (e: React.DragEvent, it: Item) => void }) {
+function ListView({ idx, items, selected, onToggle, onDrag }: { idx: LibraryIndex; items: Item[]; selected: Set<string>; onToggle?: (id: string) => void; onDrag: (e: React.DragEvent, it: Item) => void }) {
   const nav = useNavigate();
   return (
     <div className="table-wrap card flat" style={{ padding: 0 }}>
@@ -128,7 +128,7 @@ function ListView({ idx, items, selected, onToggle, onDrag }: { idx: LibraryInde
             const folder = it.folderIds.map((id) => idx.folders.get(id)?.name).filter(Boolean);
             return (
               <tr key={it.id} draggable onDragStart={(e) => onDrag(e, it)} style={{ cursor: 'pointer' }} onClick={() => nav(`/item/${it.id}`)}>
-                <td onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={selected.has(it.id)} onChange={() => onToggle(it.id)} aria-label="Select" /></td>
+                <td onClick={(e) => e.stopPropagation()}><input type="checkbox" checked={selected.has(it.id)} onChange={() => onToggle?.(it.id)} aria-label="Select" /></td>
                 <td>
                   <div className="row">
                     <Cover item={it} width={30} />
