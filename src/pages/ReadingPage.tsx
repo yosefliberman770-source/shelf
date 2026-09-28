@@ -47,7 +47,7 @@ function NowTab({ idx, reading }: { idx: LibraryIndex; reading: Item[] }) {
         <div className="stat"><span className="label">Pages today</span><span className="value">{fmtNum(todaySessions.reduce((a, s) => a + (sessionPages(idx, s) ?? 0), 0))}</span></div>
         <div className="stat"><span className="label">Active books</span><span className="value">{reading.length}</span></div>
       </div>
-      <div className="card flat" style={{ padding: 0 }}>
+      <div className="card flat table-wrap" style={{ padding: 0 }}>
         <table className="table">
           <thead><tr><th>Item</th><th>Progress</th><th className="r">Today / target</th><th className="r">Pace</th><th>Est. finish</th><th>Deadline</th><th /></tr></thead>
           <tbody>
