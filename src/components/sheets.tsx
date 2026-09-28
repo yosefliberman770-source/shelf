@@ -482,8 +482,7 @@ function FreeEbooks({ folderId, onDone, onOpenFile }: { folderId?: string; onDon
           <div className="section-title" style={{ margin: '12px 0 0' }}>Project Gutenberg</div>
           <div className="small faint">Gutenberg doesn’t allow apps to download directly: tap Download, then come back and use <button className="btn xs" onClick={onOpenFile}>📄 Open ePub file</button> to pick it from your Downloads.</div>
           {pg === null ? <div className="small muted">Searching…</div> : pg.length === 0 ? <div className="small muted">No matches.</div> : pg.map((b) => <Row key={b.id} b={b} />)}
-          <a className="btn sm" href={https://oceanofpdf.com/?s=
-${encodeURIComponent(dq)}} target="_blank" rel="noreferrer">Search on Oceanofpdf↗</a>
+          <a className="btn sm" href={https://oceanofpdf.com/?s=${encodeURIComponent(dq)}} target="_blank" rel="noreferrer">Search on yechihamelech↗</a>
         </>
       )}
     </div>
