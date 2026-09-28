@@ -368,6 +368,8 @@ export interface Settings {
   notifications: NotificationPrefs;
   ai: AISettings;
   onboarded: boolean;
+  /** True while the optional sample library is loaded. */
+  sampleData?: boolean;
   createdAt: number;
 }
 

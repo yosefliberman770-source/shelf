@@ -151,3 +151,17 @@ export function relativeDays(key: DateKey, ref: DateKey = todayKey()): string {
   if (d === -1) return 'yesterday';
   return d > 0 ? `in ${d} days` : `${-d} days ago`;
 }
+
+/** Resolve a named date range to inclusive date keys (undefined = unbounded). */
+export function resolveRange(id: string, today: DateKey, custom?: { from: string; to: string }): { from?: DateKey; to?: DateKey } {
+  switch (id) {
+    case 'today': return { from: today, to: today };
+    case '7d': return { from: addDays(today, -6), to: today };
+    case '30d': return { from: addDays(today, -29), to: today };
+    case '90d': return { from: addDays(today, -89), to: today };
+    case 'month': return { from: startOfMonth(today), to: today };
+    case 'year': return { from: startOfYear(today), to: today };
+    case 'custom': return custom && isValidKey(custom.from) && isValidKey(custom.to) ? { from: custom.from, to: custom.to } : {};
+    default: return {};
+  }
+}

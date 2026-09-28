@@ -3,7 +3,8 @@
 // "Ask My Library" (the AI may also produce a LibraryQuery, which is then
 // validated and executed here — the AI never invents results).
 import type { ContentType, Item, Rule, SmartCollection, Status } from '../db/types';
-import { addDays, diffDays, type DateKey } from './dates';
+import type { DateKey } from '../db/types';
+import { addDays, diffDays } from './dates';
 import { itemForecast } from './forecast';
 import type { LibraryIndex } from './model';
 import { pagesOf, UNITS } from './units';
@@ -346,7 +347,7 @@ export function parseQuestion(text: string, idx?: LibraryIndex): ParsedQuestion 
   let s = ' ' + norm(text).replace(/[?!.,]/g, ' ') + ' ';
   const q: LibraryQuery = {};
   const understood: string[] = [];
-  let intent: ParsedQuestion['intent'] = 'list';
+  let intent = 'list' as ParsedQuestion['intent'];
   const take = (re: RegExp, fn: (m: RegExpMatchArray) => void) => {
     const m = s.match(re);
     if (m) {
