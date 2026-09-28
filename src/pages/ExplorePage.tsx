@@ -61,20 +61,26 @@ function Subjects({ idx }: { idx: LibraryIndex }) {
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   }, [idx]);
   const items = genre ? idx.itemList().filter((i) => i.genres.includes(genre)) : sel ? idx.itemsInFolder(sel) : [];
+  const resultsRef = useRef<HTMLDivElement>(null);
+  // On phones the results sit below the tree, so bring them into view.
+  const showResults = () => {
+    if (window.matchMedia('(max-width: 860px)').matches) setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
   if (!idx.snap.folders.length && !genres.length) return <div className="card"><Empty icon="🧭" title="Build your subject map" action={<Link className="btn" to="/library">Create folders</Link>}>Subjects are whatever you define — folders like History → Ancient → Rome, or genres and tags on your books.</Empty></div>;
   return (
-    <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 280px) minmax(0, 1fr)' }}>
+    <div className="grid subjects-grid" style={{ gridTemplateColumns: 'minmax(0, 280px) minmax(0, 1fr)' }}>
+      <style>{`@media (max-width: 860px) { .subjects-grid { grid-template-columns: 1fr !important; } }`}</style>
       <div className="card" style={{ alignSelf: 'start' }}>
         <div className="section-title" style={{ marginTop: 0 }}>Your subject hierarchy</div>
-        <FolderTree idx={idx} selected={genre ? undefined : sel} onSelect={(f) => { setSel(f.id); setGenre(''); }} />
-        {genres.length > 0 && <><div className="section-title">Genres</div><div className="row wrap gap-4">{genres.slice(0, 30).map(([g, n]) => <button key={g} className={`chip ${genre === g ? 'on' : ''}`} onClick={() => setGenre(g)}>{g} · {n}</button>)}</div></>}
+        <FolderTree idx={idx} selected={genre ? undefined : sel} onSelect={(f) => { setSel(f.id); setGenre(''); showResults(); }} />
+        {genres.length > 0 && <><div className="section-title">Genres</div><div className="row wrap gap-4">{genres.slice(0, 30).map(([g, n]) => <button key={g} className={`chip ${genre === g ? 'on' : ''}`} onClick={() => { setGenre(g); showResults(); }}>{g} · {n}</button>)}</div></>}
       </div>
-      <div style={{ minWidth: 0 }}>
+      <div style={{ minWidth: 0 }} ref={resultsRef}>
         {sel || genre ? (
           <>
             <div className="row between mb-16"><h2>{genre || idx.folderPath(sel!).map((f) => f.name).join(' / ')}</h2>{sel && !genre && <Link className="btn sm" to={`/library/folder/${sel}`}>Open folder</Link>}</div>
             {sel && !genre && (idx.childFolders.get(sel) ?? []).length > 0 && <div className="row wrap gap-4 mb-16">{(idx.childFolders.get(sel) ?? []).map((c) => <button key={c.id} className="chip" onClick={() => setSel(c.id)}>→ {c.name} · {idx.itemsInFolder(c.id).length}</button>)}</div>}
-            {items.length ? <ItemViews idx={idx} items={items} mode="compact" selected={new Set()} onToggle={() => {}} /> : <div className="small muted">No items here yet.</div>}
+            {items.length ? <ItemViews idx={idx} items={items} mode="compact" /> : <div className="small muted">No items here yet.</div>}
           </>
         ) : <div className="small muted">Pick a subject.</div>}
       </div>
@@ -402,7 +408,7 @@ function Discover({ idx }: { idx: LibraryIndex }) {
         <>
           <p className="small muted">Combine filters — e.g. History + under 300 pages + published before 1900 + unread.</p>
           <FilterPanel idx={idx} q={q} onChange={setQ} />
-          {libResults.length ? <ItemViews idx={idx} items={libResults} mode="compact" selected={new Set()} onToggle={() => {}} /> : <div className="small muted">No matches.</div>}
+          {libResults.length ? <ItemViews idx={idx} items={libResults} mode="compact" /> : <div className="small muted">No matches.</div>}
         </>
       ) : (
         <>
