@@ -31,12 +31,13 @@ npm test           # engine, data layer and provider tests
 npm run typecheck
 ```
 
-## The eight sections
+## The sections
 
 | Section | What it does |
 |---|---|
 | **🏠 Today** | Streak (with skip days), momentum vs. two weeks earlier, daily goal ring, reading challenge, active books with per-book daily targets, Log / Timer / Note / Quote / Pause, finish line, closest finishes (by reading *time*), goal forecast, up next, stale books, quote of the day, time budget. |
 | **📚 Library** | One item object per book, in any number of nested folders and shelves. Default shelves + custom shelves, unlimited folder nesting with icons, colors, descriptions, tags, notes, goals and deadlines ("No deadline yet" is first-class). Cover / compact / list views, zoomable library map, combinable filters, sorting, bulk actions, drag-and-drop filing, smart collections, Goodreads import with preview. |
+| **📱 Ebooks** | Every book with an ePub file, the one you were last reading up top. A Kindle-style reader: fonts, text size, page colours (white / sepia / green / dark / black), brightness, line spacing, margins, alignment; page numbers and time left in the chapter or book, learned from your own page-turn speed; bookmarks, highlights and notes (saved to Knowledge), dictionary look-up, search inside the book, and "back to where you were" after jumps. Pages always fit the screen, and your place is kept through rotation and setting changes. |
 | **📖 Reading** | Active books, drag-and-drop NOW / NEXT / LATER / PAUSED / FINISHED queue, and a searchable journal (day / week / month / year). |
 | **🧮 Plan** | Goals (daily → annual; pages, minutes, books, units, sessions), projects (books from any folder), plan simulator (A/B/C schedules compared visually, never applied until you press *Apply plan*), What-If Lab with ripple effects, library mathematics with complex weekly schedules, time budget, and an AI plain-language planner. |
 | **📊 Insights** | Overview, books, habits (hour × weekday), progress, Reading Brain, forecast, Reading DNA, Hall of Fame and reading balance. Charts switch between bar / line / area / table and take date ranges. Progressive: nothing is shown until there's data to show. |

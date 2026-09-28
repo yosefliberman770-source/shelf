@@ -91,9 +91,21 @@ export interface Item {
   openLibraryKey?: string;
   /** Last reading position inside an attached ebook file (EPUB CFI). */
   readerLocation?: string;
+  /** Bookmarks inside an attached ebook file. */
+  bookmarks?: Bookmark[];
+  /** Length of the attached ebook in characters (for time-left estimates). */
+  ebookChars?: number;
   source: Source;
   createdAt: number;
   updatedAt: number;
+}
+
+export interface Bookmark {
+  cfi: string;
+  label: string;
+  /** Fraction of the book (0–1) when known. */
+  pct?: number;
+  createdAt: number;
 }
 
 /** A single reading of an item. Rereads create new instances; history is never overwritten. */
@@ -139,6 +151,8 @@ export interface Note {
   chapter?: string;
   section?: string;
   timestamp?: string;
+  /** Position inside the item's ebook file (EPUB CFI), for highlights. */
+  location?: string;
   tags: string[];
   conceptIds: ID[];
   source: Source;

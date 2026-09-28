@@ -21,7 +21,7 @@ export interface ConciergeContext {
 export type Sheet =
   | { kind: 'log'; itemId: string }
   | { kind: 'note'; itemId?: string; noteKind: 'note' | 'quote'; noteId?: string }
-  | { kind: 'add'; preset?: { status?: 'want' | 'reading'; folderId?: string; query?: string } }
+  | { kind: 'add'; preset?: { status?: 'want' | 'reading'; folderId?: string; query?: string; step?: 'epub' | 'free' } }
   | { kind: 'complete'; itemId: string }
   | { kind: 'timer-stop' }
   | { kind: 'search' }
