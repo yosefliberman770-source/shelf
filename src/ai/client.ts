@@ -35,6 +35,8 @@ export interface AIResponse {
   refused?: boolean;
 }
 
+const NO_SERVER = 'AI features need the Shelf server, which isn’t running here (for example on the phone/web-hosted copy). Everything else works normally.';
+
 export class AIError extends Error {
   kind: 'disabled' | 'unconfigured' | 'network' | 'provider' | 'refused' | 'parse';
   constructor(kind: AIError['kind'], message: string) {
@@ -44,8 +46,8 @@ export class AIError extends Error {
 }
 
 export async function fetchAIStatus(): Promise<{ providers: ProviderStatus[]; keyConfigAllowed: boolean }> {
-  const res = await fetch('/api/ai/status');
-  if (!res.ok) throw new AIError('network', 'The Shelf server is not reachable.');
+  const res = await fetch('/api/ai/status').catch(() => undefined);
+  if (!res?.ok || !(res.headers.get('content-type') ?? '').includes('json')) throw new AIError('network', NO_SERVER);
   return res.json();
 }
 
@@ -72,6 +74,7 @@ export async function complete(req: AIRequest, signal?: AbortSignal): Promise<AI
     if ((e as Error).name === 'AbortError') throw e;
     throw new AIError('network', 'Could not reach the Shelf server. Your library and reading tools still work offline.');
   }
+  if (res.status === 404 || res.status === 405) throw new AIError('network', NO_SERVER);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new AIError(res.status === 400 && /configured|base URL/i.test(data.error ?? '') ? 'unconfigured' : 'provider', data.error ?? `AI request failed (${res.status}).`);
   if (data.refused) throw new AIError('refused', 'The AI model declined this request.');

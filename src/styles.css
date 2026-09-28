@@ -412,3 +412,11 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .rabbit-node { text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .rabbit-node:hover { border-color: var(--border-strong); }
 .rabbit-node.on { border-color: var(--accent); background: var(--accent-soft); }
+
+/* Phone polish */
+.btn-group { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.btn-group button { white-space: nowrap; flex: none; }
+@media (max-width: 860px) {
+  .search-trigger .kbd { display: none; }
+  .fab { height: 40px; padding: 0 14px; }
+}

@@ -133,7 +133,7 @@ function AISettings() {
     <div className="col gap-16">
       <div className="card">
         <Row label="AI features" hint="Everything in Shelf works without AI. When on, AI adds recommendations, explanations, tutoring and more."><Switch checked={ai.enabled} onChange={(v) => set({ enabled: v })} /></Row>
-        {err && <div className="notice warn mt-8">{err} Start the Shelf server (<code>npm run dev</code> or <code>npm start</code>) to use AI.</div>}
+        {err && <div className="notice warn mt-8">{err}</div>}
         {status && (
           <>
             <Row label="Provider" hint="API keys stay on the Shelf server and are never sent to the browser.">
