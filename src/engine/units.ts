@@ -86,7 +86,7 @@ export function fmtNum(n: number | undefined, digits = 0): string {
 export function fmtUnits(item: Pick<Item, 'unit' | 'customUnit'>, base: number | undefined, digits?: number): string {
   if (base === undefined || !Number.isFinite(base)) return '—';
   const v = toDisplay(item, base);
-  const d = digits ?? (unitInfo(item).factor > 1 ? 1 : 0);
+  const d = digits ?? (unitInfo(item).factor > 1 || (item.unit === 'percent' && v > 0 && v < 10) ? 1 : 0);
   if (item.unit === 'percent') return `${fmtNum(v, d)}%`;
   return `${fmtNum(v, d)} ${unitLabel(item, round(v, d))}`;
 }

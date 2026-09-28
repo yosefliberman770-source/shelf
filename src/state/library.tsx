@@ -11,6 +11,7 @@ import { LibraryIndex, type Snapshot } from '../engine/model';
 interface LibraryState {
   idx: LibraryIndex;
   timer?: ActiveTimer;
+  ebookIds: Set<string>;
 }
 
 const Ctx = createContext<LibraryState | null>(null);
@@ -27,6 +28,8 @@ async function loadSnapshot(): Promise<Snapshot> {
 export function LibraryProvider({ children, fallback }: { children: ReactNode; fallback: ReactNode }) {
   const snap = useLiveQuery(loadSnapshot, []);
   const timer = useLiveQuery(() => db.timer.get('timer'), []);
+  const ebookKeys = useLiveQuery(() => db.files.orderBy('itemId').uniqueKeys(), []);
+  const ebookIds = useMemo(() => new Set((ebookKeys ?? []).map(String)), [ebookKeys]);
   const [today, setToday] = useState(todayKey());
   useEffect(() => {
     const t = setInterval(() => setToday(todayKey()), 60_000);
@@ -34,7 +37,7 @@ export function LibraryProvider({ children, fallback }: { children: ReactNode; f
   }, []);
   const idx = useMemo(() => (snap ? new LibraryIndex(snap, today) : null), [snap, today]);
   if (!idx) return <>{fallback}</>;
-  return <Ctx.Provider value={{ idx, timer }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ idx, timer, ebookIds }}>{children}</Ctx.Provider>;
 }
 
 export function useLibrary(): LibraryIndex {
@@ -45,4 +48,9 @@ export function useLibrary(): LibraryIndex {
 
 export function useTimer(): ActiveTimer | undefined {
   return useContext(Ctx)?.timer;
+}
+
+/** Ids of items that have an ebook file stored on this device. */
+export function useEbookIds(): Set<string> {
+  return useContext(Ctx)?.ebookIds ?? new Set();
 }

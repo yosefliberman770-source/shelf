@@ -19,6 +19,7 @@ const LibraryPage = lazy(() => import('./pages/LibraryPage'));
 const PlanPage = lazy(() => import('./pages/PlanPage'));
 const ReadingPage = lazy(() => import('./pages/ReadingPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const ReaderPage = lazy(() => import('./pages/ReaderPage'));
 
 export const NAV = [
   { to: '/', icon: '🏠', label: 'Today' },
@@ -90,6 +91,7 @@ function Shell() {
           <Route path="/" element={<TodayPage />} />
           <Route path="/library/*" element={<LibraryPage />} />
           <Route path="/item/:id" element={<ItemPage />} />
+          <Route path="/read/:id" element={<ReaderPage />} />
           <Route path="/author/:id" element={<AuthorPage />} />
           <Route path="/reading/*" element={<ReadingPage />} />
           <Route path="/plan/*" element={<PlanPage />} />

@@ -18,6 +18,7 @@ import type {
   SmartCollection,
   Tag,
   User,
+  EbookFile,
 } from './types';
 
 export class ShelfDB extends Dexie {
@@ -39,6 +40,7 @@ export class ShelfDB extends Dexie {
   links!: Table<Link, string>;
   ai!: Table<AIRecord, string>;
   timer!: Table<ActiveTimer, string>;
+  files!: Table<EbookFile, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -62,6 +64,8 @@ export class ShelfDB extends Dexie {
       ai: 'id, kind, createdAt',
       timer: 'id',
     });
+    // v2: ebook files stored on this device.
+    this.version(2).stores({ files: 'id, itemId' });
   }
 }
 

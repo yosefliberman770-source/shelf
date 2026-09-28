@@ -7,6 +7,7 @@ import { itemForecast } from '../engine/forecast';
 import { searchAll } from '../engine/query';
 import { CONTENT_TYPES, fmtDuration, fmtNum, fmtUnits, round, toBase, toDisplay, unitInfo, unitLabel, UNITS } from '../engine/units';
 import { fetchDescription, type MetaResult, searchBooks } from '../lib/openlibrary';
+import { downloadFreeBook, type FreeBook, importEpub, isEpub, searchGutenberg, searchStandardEbooks } from '../lib/ebooks';
 import { useLibrary, useTimer } from '../state/library';
 import { useUI } from '../state/ui';
 import { Cover, FolderPicker, Modal, Segmented, Stars, TagInput, useDebounced } from './common';
@@ -206,7 +207,7 @@ function AddSheet({ preset }: { preset?: { status?: 'want' | 'reading'; folderId
   const idx = useLibrary();
   const { close, toast } = useUI();
   const nav = useNavigate();
-  const [step, setStep] = useState<'search' | 'form'>(preset?.query === '' ? 'form' : 'search');
+  const [step, setStep] = useState<'search' | 'form' | 'epub' | 'free'>(preset?.query === '' ? 'form' : 'search');
   const [q, setQ] = useState(preset?.query ?? '');
   const dq = useDebounced(q, 350);
   const [results, setResults] = useState<MetaResult[] | null>(null);
@@ -301,9 +302,17 @@ function AddSheet({ preset }: { preset?: { status?: 'want' | 'reading'; folderId
     reader.readAsDataURL(file);
   };
 
+  const tabs = (
+    <div className="mb-16">
+      <Segmented value={step === 'form' ? 'search' : step} onChange={(v) => setStep(v)} options={[{ value: 'search', label: '🔎 Find a book' }, { value: 'epub', label: '📄 Open ePub file' }, { value: 'free', label: '🆓 Free ebooks' }]} />
+    </div>
+  );
+  if (step === 'epub') return <Modal title="Add to library" onClose={close} size="wide">{tabs}<OpenEpub folderId={preset?.folderId} onDone={(id) => { close(); nav(`/item/${id}`); }} /></Modal>;
+  if (step === 'free') return <Modal title="Add to library" onClose={close} size="wide">{tabs}<FreeEbooks folderId={preset?.folderId} onOpenFile={() => setStep('epub')} onDone={(id) => { close(); nav(`/item/${id}`); }} /></Modal>;
   if (step === 'search')
     return (
       <Modal title="Add to library" onClose={close} size="wide" footer={<><button className="btn" onClick={() => setStep('form')}>Enter manually</button></>}>
+        {tabs}
         <input autoFocus className="input" placeholder="Search by title, author or ISBN…" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="small faint mt-8">Metadata from Open Library. Articles, courses, podcasts and anything else can be added manually.</div>
         {err && <div className="notice warn mt-16">{err}</div>}
@@ -385,6 +394,97 @@ function AddSheet({ preset }: { preset?: { status?: 'want' | 'reading'; folderId
         </div>
       </div>
     </Modal>
+  );
+}
+
+function OpenEpub({ folderId, onDone }: { folderId?: string; onDone: (id: string) => void }) {
+  const { toast } = useUI();
+  const [busy, setBusy] = useState(false);
+  const [over, setOver] = useState(false);
+  const load = async (f?: File) => {
+    if (!f) return;
+    if (!isEpub(f)) return toast('Please choose an .epub file.', { error: true });
+    setBusy(true);
+    try {
+      const id = await importEpub(f, f.name, { folderIds: folderId ? [folderId] : [] });
+      toast('Added — tap Read to start');
+      onDone(id);
+    } catch {
+      toast('That file couldn’t be opened. Is it a valid ePub?', { error: true });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="col gap-12">
+      <label className={`drop-zone ${over ? 'over' : ''}`} style={{ display: 'block', cursor: 'pointer' }} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={(e) => { e.preventDefault(); setOver(false); load(e.dataTransfer.files[0]); }}>
+        {busy ? 'Reading the book…' : <>Tap to choose an <b>.epub</b> file from your phone<br /><span className="small faint">e.g. from Downloads or Google Drive</span></>}
+        <input type="file" accept=".epub,application/epub+zip" hidden disabled={busy} onChange={(e) => load(e.target.files?.[0])} />
+      </label>
+      <p className="small muted">The title, author and cover are read from the file. The book is saved on this phone so you can read it in Shelf, even offline. To add a file to a book that’s already in your library, open that book and tap “Attach ePub file”.</p>
+    </div>
+  );
+}
+
+function FreeEbooks({ folderId, onDone, onOpenFile }: { folderId?: string; onDone: (id: string) => void; onOpenFile: () => void }) {
+  const { toast } = useUI();
+  const [q, setQ] = useState('');
+  const dq = useDebounced(q, 450);
+  const [se, setSe] = useState<FreeBook[] | null>(null);
+  const [pg, setPg] = useState<FreeBook[] | null>(null);
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState<string | null>(null);
+  useEffect(() => {
+    if (dq.trim().length < 2) { setSe(null); setPg(null); return; }
+    const ac = new AbortController();
+    setErr('');
+    setSe(null);
+    setPg(null);
+    searchStandardEbooks(dq, ac.signal).then(setSe).catch((e) => { if (e.name !== 'AbortError') { setSe([]); setErr('Standard Ebooks search isn’t available right now.'); } });
+    searchGutenberg(dq, ac.signal).then(setPg).catch((e) => { if (e.name !== 'AbortError') setPg([]); });
+    return () => ac.abort();
+  }, [dq]);
+  const get = async (b: FreeBook) => {
+    setBusy(b.id);
+    try {
+      const id = await downloadFreeBook(b, folderId ? [folderId] : []);
+      toast(`Downloaded “${b.title}”`);
+      onDone(id);
+    } catch (e) {
+      toast((e as Error).message, { error: true });
+    } finally {
+      setBusy(null);
+    }
+  };
+  const Row = ({ b }: { b: FreeBook }) => (
+    <div className="book-row">
+      <Cover item={{ id: b.id, title: b.title, coverUrl: b.coverUrl, contentType: 'ebook' }} width={40} />
+      <div className="grow" style={{ minWidth: 0 }}>
+        <div className="book-title ellipsis" style={{ fontSize: 15 }}>{b.title}</div>
+        <div className="small muted ellipsis">{b.authors.join(', ') || 'Unknown author'}</div>
+      </div>
+      {b.epubUrl ? (
+        <button className="btn sm primary" disabled={!!busy} onClick={() => get(b)}>{busy === b.id ? 'Downloading…' : 'Get'}</button>
+      ) : (
+        <a className="btn sm" href={b.pageUrl} target="_blank" rel="noreferrer">Download ↗</a>
+      )}
+    </div>
+  );
+  return (
+    <div className="col gap-12">
+      <input autoFocus className="input" placeholder="Search free classics by title or author…" value={q} onChange={(e) => setQ(e.target.value)} />
+      <p className="small faint">Free, legal ebooks whose copyright has expired — mostly books published before about 1930.</p>
+      {err && <div className="notice warn">{err}</div>}
+      {dq.trim().length >= 2 && (
+        <>
+          <div className="section-title" style={{ margin: '8px 0 0' }}>Standard Ebooks — one tap</div>
+          {se === null ? <div className="small muted">Searching…</div> : se.length === 0 ? <div className="small muted">No matches.</div> : se.map((b) => <Row key={b.id} b={b} />)}
+          <div className="section-title" style={{ margin: '12px 0 0' }}>Project Gutenberg</div>
+          <div className="small faint">Gutenberg doesn’t allow apps to download directly: tap Download, then come back and use <button className="btn xs" onClick={onOpenFile}>📄 Open ePub file</button> to pick it from your Downloads.</div>
+          {pg === null ? <div className="small muted">Searching…</div> : pg.length === 0 ? <div className="small muted">No matches.</div> : pg.map((b) => <Row key={b.id} b={b} />)}
+        </>
+      )}
+    </div>
   );
 }
 

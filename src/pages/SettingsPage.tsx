@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AIError, fetchAIStatus, type ProviderStatus, saveProviderConfig } from '../ai/client';
+import { DEVICE_GEMINI, getGeminiKey, listGeminiModels, setGeminiKey } from '../ai/gemini';
 import { Modal, Segmented, Switch, Tabs } from '../components/common';
 import { deleteAllAIData, updateSettings } from '../db/actions';
 import { download, eraseEverything, exportBackup, restoreBackup, tableRowsForExport, toCSV, toSpreadsheetML, validateBackup } from '../db/portability';
@@ -133,12 +134,17 @@ function AISettings() {
     <div className="col gap-16">
       <div className="card">
         <Row label="AI features" hint="Everything in Shelf works without AI. When on, AI adds recommendations, explanations, tutoring and more."><Switch checked={ai.enabled} onChange={(v) => set({ enabled: v })} /></Row>
+      </div>
+      <GeminiDeviceCard />
+      <div className="card" style={status ? undefined : { display: 'none' }}>
         {err && <div className="notice warn mt-8">{err}</div>}
+        <div className="card-head"><h3>Advanced: AI through your own Shelf server</h3></div>
         {status && (
           <>
             <Row label="Provider" hint="API keys stay on the Shelf server and are never sent to the browser.">
               <select className="select sm" style={{ width: 240 }} value={ai.provider} onChange={(e) => { const p = status.providers.find((x) => x.id === e.target.value); set({ provider: e.target.value, model: p?.defaultModel ?? '' }); }}>
                 <option value="">Choose…</option>
+                <option value={DEVICE_GEMINI}>Gemini on this device</option>
                 {status.providers.map((p) => <option key={p.id} value={p.id}>{p.name}{p.configured ? ' ✓' : ' (not configured)'}</option>)}
               </select>
             </Row>
@@ -181,6 +187,76 @@ function AISettings() {
   );
 }
 
+function GeminiDeviceCard() {
+  const idx = useLibrary();
+  const { toast } = useUI();
+  const ai = idx.settings.ai;
+  const [key, setKey] = useState('');
+  const [saved, setSaved] = useState(!!getGeminiKey());
+  const [models, setModels] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const active = saved && ai.provider === DEVICE_GEMINI;
+  useEffect(() => {
+    const k = getGeminiKey();
+    if (k) listGeminiModels(k).then(setModels).catch(() => {});
+  }, [saved]);
+  const connect = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const list = await listGeminiModels(key.trim());
+      if (!list.length) throw new Error('This key works, but no Gemini model is available for it.');
+      setGeminiKey(key.trim());
+      setModels(list);
+      setSaved(true);
+      setKey('');
+      await updateSettings({ ai: { ...ai, enabled: true, provider: DEVICE_GEMINI, model: '' } });
+      toast('AI is ready ✓');
+    } catch (e) {
+      setError(e instanceof TypeError ? 'Couldn’t reach Google. Check your internet connection.' : (e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="card" style={{ borderColor: active ? 'var(--good)' : undefined }}>
+      <div className="card-head"><h3>✦ Free AI with Google Gemini</h3>{active && <span className="chip good">Connected</span>}</div>
+      {!saved ? (
+        <div className="col gap-12">
+          <ol className="small" style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            <li>Tap <b>Get a free key</b> below and sign in with your Google account.</li>
+            <li>Tap <b>Create API key</b> (if asked, pick or create any project), then tap the copy icon.</li>
+            <li>Come back here, paste the key in the box and tap <b>Connect</b>.</li>
+          </ol>
+          <a className="btn" href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">Get a free key ↗</a>
+          <div className="row">
+            <input className="input" type="password" autoComplete="off" placeholder="Paste your key here" value={key} onChange={(e) => setKey(e.target.value)} />
+            <button className="btn primary" disabled={busy || key.trim().length < 20} onClick={connect}>{busy ? 'Checking…' : 'Connect'}</button>
+          </div>
+          {error && <div className="notice bad">{error}</div>}
+        </div>
+      ) : (
+        <div className="col gap-12">
+          {!active && <button className="btn primary" onClick={() => set()}>Use Gemini for AI</button>}
+          <Row label="Model" hint="Picked automatically — change only if you want to.">
+            <select className="select sm" style={{ width: 220 }} value={ai.provider === DEVICE_GEMINI ? ai.model : ''} onChange={(e) => updateSettings({ ai: { ...ai, provider: DEVICE_GEMINI, model: e.target.value } })}>
+              <option value="">Automatic{models[0] ? ` (${models[0]})` : ''}</option>
+              {models.map((m) => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </Row>
+          <button className="btn sm danger" style={{ alignSelf: 'flex-start' }} onClick={async () => { setGeminiKey(null); setSaved(false); setModels([]); if (ai.provider === DEVICE_GEMINI) await updateSettings({ ai: { ...ai, provider: '', model: '' } }); toast('Key removed from this phone'); }}>Remove key from this phone</button>
+        </div>
+      )}
+      <p className="tiny faint mt-16">Your key is saved only in this browser on this device — it isn’t included in backups or sent anywhere except Google. On Google’s free plan, Google may use what AI features send (book titles, notes, stats) to improve its products; you can turn off sharing notes and reviews below.</p>
+    </div>
+  );
+
+  function set() {
+    return updateSettings({ ai: { ...ai, enabled: true, provider: DEVICE_GEMINI, model: '' } });
+  }
+}
+
 function KeyModal({ p, onClose, onSaved }: { p: ProviderStatus; onClose: () => void; onSaved: (s: ProviderStatus[]) => void }) {
   const [key, setKey] = useState('');
   const [base, setBase] = useState('');
@@ -217,7 +293,7 @@ function DataSettings() {
     <div className="col gap-16">
       <div className="card">
         <div className="card-head"><h3>Backup & restore</h3></div>
-        <p className="small muted">A full backup contains everything: library, folders, sessions, notes, goals, projects, plans, concepts, AI records and settings. Your data lives in this browser — back up regularly.</p>
+        <p className="small muted">A full backup contains everything: library, folders, sessions, notes, goals, projects, plans, concepts, AI records and settings. Your data lives in this browser — back up regularly. ePub book files aren’t included (they’re too large) — keep your original files, and re-attach them on a new phone.</p>
         <div className="row wrap mt-8">
           <button className="btn primary" onClick={async () => { download(`shelf-backup-${stamp}.json`, JSON.stringify(await exportBackup()), 'application/json'); toast('Backup downloaded'); }}>Download full backup</button>
           <label className="btn">Restore from backup…<input type="file" accept="application/json,.json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; try { const data = JSON.parse(await f.text()); if (!validateBackup(data)) throw new Error('Not a Shelf backup file.'); setRestore({ file: f.name, data }); } catch (err) { toast((err as Error).message, { error: true }); } e.target.value = ''; }} /></label>

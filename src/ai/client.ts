@@ -2,6 +2,7 @@
 // the API keys. When AI is disabled or unavailable, callers get a clear error
 // and the rest of the app keeps working.
 import { readSettings } from '../db/actions';
+import { DEVICE_GEMINI, geminiComplete } from './gemini';
 
 export interface ProviderStatus {
   id: string;
@@ -62,6 +63,18 @@ export async function complete(req: AIRequest, signal?: AbortSignal): Promise<AI
   const s = await readSettings();
   if (!s.ai.enabled) throw new AIError('disabled', 'AI features are turned off. You can enable them in Settings → AI.');
   if (!s.ai.provider) throw new AIError('unconfigured', 'Choose an AI provider in Settings → AI.');
+  if (s.ai.provider === DEVICE_GEMINI) {
+    try {
+      const r = await geminiComplete(req, s.ai.model, signal);
+      if (r.refused) throw new AIError('refused', 'The AI model declined this request.');
+      return { text: r.text, model: r.model, provider: DEVICE_GEMINI };
+    } catch (e) {
+      if (e instanceof AIError || (e as Error).name === 'AbortError') throw e;
+      if ((e as { kind?: string }).kind === 'unconfigured') throw new AIError('unconfigured', (e as Error).message);
+      if (e instanceof TypeError) throw new AIError('network', 'Couldn’t reach Google. Check your internet connection.');
+      throw new AIError('provider', (e as Error).message);
+    }
+  }
   let res: Response;
   try {
     res = await fetch('/api/ai/complete', {

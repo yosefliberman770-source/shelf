@@ -86,6 +86,7 @@ Everything numeric — progress, remaining units, current/average/required pace,
 
 * **Provider-independent**: `server/providers.ts` implements Anthropic (official SDK, default `claude-opus-5`), OpenAI, Google Gemini and any OpenAI-compatible server (e.g. Ollama, LM Studio) behind one interface.
 * **Keys never reach the browser.** Configure them with environment variables (or a `.env` file — see `.env.example`) (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `COMPATIBLE_BASE_URL`, `COMPATIBLE_API_KEY`) or from Settings → AI, which stores them server-side in `server/.data/ai-config.json` (mode 600). Set `SHELF_ALLOW_KEY_CONFIG=false` to disable the latter.
+* **Hosted without a server (e.g. GitHub Pages on a phone)**: Settings → AI & privacy offers *Free AI with Google Gemini*. The user pastes their own free Gemini key; it is stored only in that browser (never in backups) and requests go directly from the device to Google.
 * **Minimal context**: each feature sends only what it needs; privacy toggles control notes, reviews, ratings and reading history; every AI screen shows exactly what will be shared.
 * **AI proposes, you confirm.** AI never edits progress, dates, ratings, metadata, goals or statistics. Structured AI output (library queries, plans, paths, recommendations) is validated against real ids before use; results always come from the database.
 * **Labelled and removable**: AI output carries an "AI-generated" badge, AI graph edges are dashed, and Settings/AI notebook can delete all AI data.

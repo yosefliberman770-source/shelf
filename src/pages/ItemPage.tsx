@@ -12,7 +12,8 @@ import { formatKey, formatYear, isValidKey } from '../engine/dates';
 import { itemForecast } from '../engine/forecast';
 import type { LibraryIndex } from '../engine/model';
 import { CONTENT_TYPES, contentLabel, fmtDuration, fmtNum, fmtUnits, round, toBase, toDisplay, unitLabel, UNITS } from '../engine/units';
-import { useLibrary } from '../state/library';
+import { useEbookIds, useLibrary } from '../state/library';
+import { attachEpub, isEpub, removeEbookFile } from '../lib/ebooks';
 import { useUI } from '../state/ui';
 
 type Tab = 'overview' | 'notes' | 'sessions' | 'readings' | 'ai' | 'edit';
@@ -54,6 +55,8 @@ export default function ItemPage() {
 
 function Header({ idx, item }: { idx: LibraryIndex; item: Item }) {
   const { open, toast } = useUI();
+  const nav = useNavigate();
+  const hasFile = useEbookIds().has(item.id);
   const f = itemForecast(idx, item);
   const inst = idx.currentInstance(item);
   return (
@@ -82,7 +85,8 @@ function Header({ idx, item }: { idx: LibraryIndex; item: Item }) {
           </div>
         ) : <div className="small muted">Length unknown — add it in Edit to unlock forecasts.</div>}
         <div className="row wrap mt-8">
-          {item.status !== 'read' && <button className="btn primary" onClick={() => open({ kind: 'log', itemId: item.id })}>Log reading</button>}
+          {hasFile && <button className="btn accent" onClick={() => nav(`/read/${item.id}`)}>📖 {idx.position(item) > 0 ? 'Continue reading' : 'Read'}</button>}
+          {item.status !== 'read' && <button className={`btn ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: item.id })}>Log reading</button>}
           {item.status !== 'read' && <button className="btn" onClick={async () => { await startTimer(item.id); toast('Timer started'); }}>⏱ Timer</button>}
           <button className="btn" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'note' })}>✎ Note</button>
           <button className="btn" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'quote' })}>❝ Quote</button>
@@ -96,6 +100,20 @@ function Header({ idx, item }: { idx: LibraryIndex; item: Item }) {
             {(Object.keys(STATUS_LABEL) as Status[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
           </select>
           {item.status === 'read' && <button className="btn" onClick={async () => { await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}>↻ Reread</button>}
+        </div>
+        <div className="row wrap small">
+          <label className="btn xs ghost" style={{ cursor: 'pointer' }}>
+            {hasFile ? '↻ Replace ePub file' : '📎 Attach ePub file'}
+            <input type="file" accept=".epub,application/epub+zip" hidden onChange={async (e) => {
+              const f = e.target.files?.[0];
+              e.target.value = '';
+              if (!f) return;
+              if (!isEpub(f)) return toast('That isn’t an ePub file.', { error: true });
+              await attachEpub(item.id, f, f.name);
+              toast('ePub attached — tap Read to open it');
+            }} />
+          </label>
+          {hasFile && <button className="btn xs ghost" onClick={async () => { if (confirm('Remove the ePub file from this phone? Your progress and notes stay.')) { await removeEbookFile(item.id); toast('File removed'); } }}>Remove file</button>}
         </div>
       </div>
     </div>
@@ -305,7 +323,7 @@ function SessionsTab({ idx, item }: { idx: LibraryIndex; item: Item }) {
                   <td className="nowrap">{formatKey(s.date, idx.today, { short: true })}</td>
                   <td className="small faint">{new Date(s.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td className="r num">{fmtUnits(item, s.amount)}</td>
-                  <td className="small faint num">{s.from !== undefined && s.to !== undefined ? `${fmtNum(toDisplay(item, s.from))}–${fmtNum(toDisplay(item, s.to))}` : ''}</td>
+                  <td className="small faint num">{s.from !== undefined && s.to !== undefined ? `${fmtNum(toDisplay(item, s.from), 1)}–${fmtNum(toDisplay(item, s.to), 1)}` : ''}</td>
                   <td className="r num">{s.durationSec ? fmtDuration(s.durationSec) : '—'}</td>
                   <td className="r num small">{s.durationSec && s.durationSec >= 60 && s.amount ? `${fmtNum(toDisplay(item, s.amount / (s.durationSec / 3600)))}/h` : ''}</td>
                   <td className="small">#{idx.instances.get(s.instanceId)?.number ?? '?'}</td>

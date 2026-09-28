@@ -9,20 +9,22 @@ import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 import { AIError, type AIMessage, type AIRequest, type AIResponse, complete } from './client';
 import { BASE_SYSTEM, statsDigest } from './context';
+import { DEVICE_GEMINI, getGeminiKey } from './gemini';
 
 export function useAIReady(): boolean {
   const idx = useLibrary();
-  return idx.settings.ai.enabled && !!idx.settings.ai.provider;
+  const { enabled, provider } = idx.settings.ai;
+  return enabled && !!provider && (provider !== DEVICE_GEMINI || !!getGeminiKey());
 }
 
 export function AIOff({ compact }: { compact?: boolean }) {
   const idx = useLibrary();
-  const msg = !idx.settings.ai.enabled ? 'AI features are off.' : 'Choose an AI provider to use this feature.';
+  const msg = idx.settings.ai.enabled && idx.settings.ai.provider ? 'AI isn’t connected yet.' : 'Turn on free AI in a minute with a Google Gemini key.';
   return (
     <div className="notice ai">
       <div className="row between wrap">
         <span>✦ {msg} {!compact && 'Everything else in Shelf works without AI.'}</span>
-        <Link className="btn sm ai" to="/settings?tab=ai">AI settings</Link>
+        <Link className="btn sm ai" to="/settings?tab=ai">Set up AI</Link>
       </div>
     </div>
   );
