@@ -16,7 +16,8 @@ import type { LibraryIndex } from '../engine/model';
 import { activeDays, pagesByDay } from '../engine/stats';
 import { computeStreaks, momentum } from '../engine/streaks';
 import { fmtDuration, fmtNum, fmtUnits, toDisplay, unitLabel } from '../engine/units';
-import { useLibrary, useTimer } from '../state/library';
+import { useEbookIds, useLibrary, useTimer } from '../state/library';
+import { useNavigate } from 'react-router-dom';
 import { useUI } from '../state/ui';
 
 function greeting() {
@@ -224,6 +225,8 @@ function hashDay(k: string) {
 
 function ActiveCard({ item, f, idx }: { item: Item; f: ItemForecast; idx: LibraryIndex }) {
   const { open, toast } = useUI();
+  const nav = useNavigate();
+  const hasFile = useEbookIds().has(item.id);
   const timer = useTimer();
   const mine = timer?.itemId === item.id;
   useTick(!!mine && !!timer?.runningSince);
@@ -253,7 +256,8 @@ function ActiveCard({ item, f, idx }: { item: Item; f: ItemForecast; idx: Librar
         </div>
       </div>
       <div className="row wrap mt-16 gap-4">
-        <button className="btn sm primary" onClick={() => open({ kind: 'log', itemId: item.id })}>Log</button>
+        {hasFile && <button className="btn sm accent" onClick={() => nav(`/read/${item.id}`)}>📖 Read</button>}
+        <button className={`btn sm ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: item.id })}>Log</button>
         {mine ? (
           <button className="btn sm accent" onClick={() => open({ kind: 'timer-stop' })}>⏱ {fmtClock(timerElapsedMs(timer!))}</button>
         ) : (

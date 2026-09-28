@@ -293,7 +293,7 @@ function DataSettings() {
     <div className="col gap-16">
       <div className="card">
         <div className="card-head"><h3>Backup & restore</h3></div>
-        <p className="small muted">A full backup contains everything: library, folders, sessions, notes, goals, projects, plans, concepts, AI records and settings. Your data lives in this browser — back up regularly.</p>
+        <p className="small muted">A full backup contains everything: library, folders, sessions, notes, goals, projects, plans, concepts, AI records and settings. Your data lives in this browser — back up regularly. ePub book files aren’t included (they’re too large) — keep your original files, and re-attach them on a new phone.</p>
         <div className="row wrap mt-8">
           <button className="btn primary" onClick={async () => { download(`shelf-backup-${stamp}.json`, JSON.stringify(await exportBackup()), 'application/json'); toast('Backup downloaded'); }}>Download full backup</button>
           <label className="btn">Restore from backup…<input type="file" accept="application/json,.json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; try { const data = JSON.parse(await f.text()); if (!validateBackup(data)) throw new Error('Not a Shelf backup file.'); setRestore({ file: f.name, data }); } catch (err) { toast((err as Error).message, { error: true }); } e.target.value = ''; }} /></label>

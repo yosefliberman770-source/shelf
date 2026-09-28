@@ -43,6 +43,7 @@ export async function eraseEverything(): Promise<void> {
   await db.transaction('rw', ALL_TABLES.map((t) => db.table(t)), async () => {
     for (const t of ALL_TABLES) await db.table(t).clear();
   });
+  await db.files.clear();
   await db.settings.put(defaultSettings());
 }
 

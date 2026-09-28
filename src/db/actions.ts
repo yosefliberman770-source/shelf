@@ -171,8 +171,9 @@ export async function updateItemTags(id: string, names: string[]): Promise<void>
 }
 
 export async function deleteItem(id: string): Promise<void> {
-  await db.transaction('rw', [db.items, db.instances, db.sessions, db.notes, db.links, db.projects], async () => {
+  await db.transaction('rw', [db.items, db.instances, db.sessions, db.notes, db.links, db.projects, db.files], async () => {
     await db.items.delete(id);
+    await db.files.where('itemId').equals(id).delete();
     await db.instances.where('itemId').equals(id).delete();
     await db.sessions.where('itemId').equals(id).delete();
     await db.notes.where('itemId').equals(id).delete();
@@ -251,10 +252,11 @@ export async function logProgress(input: LogInput): Promise<LogResult | undefine
   } else if (input.to !== undefined) {
     to = input.to;
     amount = to - inst.position;
-    from = inst.position + 1;
+    // "Pages 120–145" style ranges only make sense for whole, countable units.
+    from = item.unit === 'pages' || item.unit === 'chapters' ? inst.position + 1 : inst.position;
   } else {
     amount = input.amount ?? 0;
-    from = inst.position + 1;
+    from = item.unit === 'pages' || item.unit === 'chapters' ? inst.position + 1 : inst.position;
     to = inst.position + amount;
   }
   if (!Number.isFinite(amount)) throw new Error('Invalid amount');

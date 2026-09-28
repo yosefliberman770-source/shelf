@@ -89,6 +89,8 @@ export interface Item {
   currentInstanceId?: ID;
   lastReadAt?: number;
   openLibraryKey?: string;
+  /** Last reading position inside an attached ebook file (EPUB CFI). */
+  readerLocation?: string;
   source: Source;
   createdAt: number;
   updatedAt: number;
@@ -377,4 +379,17 @@ export interface User {
   id: 'me';
   name: string;
   createdAt: number;
+}
+
+/** An ebook file (EPUB) stored on this device. Not included in JSON backups. */
+export interface EbookFile {
+  id: ID;
+  itemId: ID;
+  name: string;
+  size: number;
+  blob: Blob;
+  /** Cached epub.js locations (JSON) so percentages are instant next time. */
+  locations?: string;
+  source?: 'file' | 'standardebooks' | 'gutenberg';
+  addedAt: number;
 }
