@@ -45,6 +45,10 @@ export async function eraseEverything(): Promise<void> {
   });
   await db.files.clear();
   await db.settings.put(defaultSettings());
+  // Reading positions and the learned reading speed live in this browser too.
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith('shelf.readerPos.') || k === 'shelf.readingSpeed') localStorage.removeItem(k);
+  } catch { /* storage unavailable */ }
 }
 
 // ── CSV ────────────────────────────────────────────────────────────────────

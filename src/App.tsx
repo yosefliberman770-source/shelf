@@ -20,10 +20,12 @@ const PlanPage = lazy(() => import('./pages/PlanPage'));
 const ReadingPage = lazy(() => import('./pages/ReadingPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ReaderPage = lazy(() => import('./pages/ReaderPage'));
+const EbooksPage = lazy(() => import('./pages/EbooksPage'));
 
 export const NAV = [
   { to: '/', icon: '🏠', label: 'Today' },
   { to: '/library', icon: '📚', label: 'Library' },
+  { to: '/ebooks', icon: '📱', label: 'Ebooks' },
   { to: '/reading', icon: '📖', label: 'Reading' },
   { to: '/plan', icon: '🧮', label: 'Plan' },
   { to: '/insights', icon: '📊', label: 'Insights' },
@@ -92,6 +94,7 @@ function Shell() {
           <Route path="/library/*" element={<LibraryPage />} />
           <Route path="/item/:id" element={<ItemPage />} />
           <Route path="/read/:id" element={<ReaderPage />} />
+          <Route path="/ebooks" element={<EbooksPage />} />
           <Route path="/author/:id" element={<AuthorPage />} />
           <Route path="/reading/*" element={<ReadingPage />} />
           <Route path="/plan/*" element={<PlanPage />} />

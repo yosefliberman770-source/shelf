@@ -36,6 +36,8 @@ export default function TodayPage() {
   const goals = idx.snap.goals.filter((g) => g.active);
   const daily = goals.filter((g) => g.period === 'daily').map((g) => goalProgress(idx, g));
   const longer = goals.filter((g) => g.period !== 'daily').map((g) => goalProgress(idx, g));
+  const ebookIds = useEbookIds();
+  const lastEbook = idx.itemList().filter((i) => ebookIds.has(i.id) && i.readerLocation && i.status !== 'read').sort((a, b) => (b.lastReadAt ?? 0) - (a.lastReadAt ?? 0))[0];
 
   useConcierge('Today', ['What should I read today?', 'Which book should I prioritise to hit my deadlines?', 'Summarise my reading momentum.'], () =>
     reading.slice(0, 6).map((i) => itemContext(idx, i, s.ai.share)).join('\n\n'), [idx]);
@@ -74,6 +76,17 @@ export default function TodayPage() {
           <div className="sub">{WEEKDAYS_LONG[weekday(idx.today)]}, {formatKey(idx.today)}{idx.planningRules.weekdays.includes(weekday(idx.today)) ? ' · a non-reading day' : ''}</div>
         </div>
       </div>
+
+      {lastEbook && (
+        <Link to={`/read/${lastEbook.id}`} className="card row gap-12 mb-16" style={{ alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <Cover item={lastEbook} width={44} />
+          <div className="grow" style={{ minWidth: 0 }}>
+            <div className="small faint">Pick up where you left off</div>
+            <div className="book-title ellipsis">{lastEbook.title}</div>
+          </div>
+          <span className="btn accent sm">📖 Continue</span>
+        </Link>
+      )}
 
       <div className="grid c4">
         <div className="card">

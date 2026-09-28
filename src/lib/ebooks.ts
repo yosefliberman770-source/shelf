@@ -72,13 +72,21 @@ export function isEpub(file: File | Blob, name = (file as File).name ?? ''): boo
   return /\.epub$/i.test(name) || file.type === 'application/epub+zip';
 }
 
+/** Where the reader saves your place in a book on every page turn. */
+export const readerPosKey = (itemId: string) => `shelf.readerPos.${itemId}`;
+
+function forgetReaderPos(itemId: string) {
+  try { localStorage.removeItem(readerPosKey(itemId)); } catch { /* ignore */ }
+}
+
 /** Store an EPUB for an existing item (replacing any previous file). */
 export async function attachEpub(itemId: string, blob: Blob, name: string, source: EbookFile['source'] = 'file'): Promise<void> {
   await db.transaction('rw', db.files, async () => {
     await db.files.where('itemId').equals(itemId).delete();
     await db.files.add({ id: uid(), itemId, name, size: blob.size, blob, source, addedAt: Date.now() });
   });
-  await updateItem(itemId, { readerLocation: undefined });
+  forgetReaderPos(itemId);
+  await updateItem(itemId, { readerLocation: undefined, ebookChars: undefined });
 }
 
 /** Create a new library item from an EPUB and store the file with it. */
@@ -109,7 +117,8 @@ export async function getEbookFile(itemId: string): Promise<EbookFile | undefine
 
 export async function removeEbookFile(itemId: string): Promise<void> {
   await db.files.where('itemId').equals(itemId).delete();
-  await updateItem(itemId, { readerLocation: undefined });
+  forgetReaderPos(itemId);
+  await updateItem(itemId, { readerLocation: undefined, ebookChars: undefined });
 }
 
 // ── Free, legal ebook sources ─────────────────────────────────────────────

@@ -203,11 +203,11 @@ function NoteSheet({ itemId, kind: initialKind, noteId }: { itemId?: string; kin
 
 // ── Add content ────────────────────────────────────────────────────────
 
-function AddSheet({ preset }: { preset?: { status?: 'want' | 'reading'; folderId?: string; query?: string } }) {
+function AddSheet({ preset }: { preset?: { status?: 'want' | 'reading'; folderId?: string; query?: string; step?: 'epub' | 'free' } }) {
   const idx = useLibrary();
   const { close, toast } = useUI();
   const nav = useNavigate();
-  const [step, setStep] = useState<'search' | 'form' | 'epub' | 'free'>(preset?.query === '' ? 'form' : 'search');
+  const [step, setStep] = useState<'search' | 'form' | 'epub' | 'free'>(preset?.step ?? (preset?.query === '' ? 'form' : 'search'));
   const [q, setQ] = useState(preset?.query ?? '');
   const dq = useDebounced(q, 350);
   const [results, setResults] = useState<MetaResult[] | null>(null);
