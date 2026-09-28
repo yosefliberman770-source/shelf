@@ -33,7 +33,7 @@ export function useAfterLog() {
     if (!res) return;
     const item = idx.items.get(res.session.itemId);
     toast(label ?? `Logged ${item ? fmtUnits(item, res.session.amount) : res.session.amount}${res.session.durationSec ? ` · ${fmtDuration(res.session.durationSec)}` : ''}`, { undo: res.undo });
-    if (res.completed) open({ kind: 'complete', itemId: res.session.itemId });
+    if (res.completed && idx.settings.notifications.completion) open({ kind: 'complete', itemId: res.session.itemId });
   };
 }
 

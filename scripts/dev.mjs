@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process';
 
 const procs = [
-  spawn('node', ['--watch', 'server/index.ts'], { stdio: 'inherit' }),
+  spawn('node', ['--env-file-if-exists=.env', '--watch', 'server/index.ts'], { stdio: 'inherit' }),
   spawn('npx', ['vite'], { stdio: 'inherit' }),
 ];
 const stop = () => procs.forEach((p) => p.kill());

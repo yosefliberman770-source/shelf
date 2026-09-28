@@ -2,7 +2,7 @@
 // screen reads from. Any write anywhere re-renders dependent views.
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
-import { getSettings } from '../db/actions';
+import { readSettings } from '../db/actions';
 import { db } from '../db/db';
 import type { ActiveTimer } from '../db/types';
 import { todayKey } from '../engine/dates';
@@ -19,7 +19,7 @@ async function loadSnapshot(): Promise<Snapshot> {
   const [items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, settings] = await Promise.all([
     db.items.toArray(), db.instances.toArray(), db.sessions.toArray(), db.notes.toArray(), db.folders.toArray(), db.shelves.toArray(),
     db.tags.toArray(), db.authors.toArray(), db.goals.toArray(), db.projects.toArray(), db.plans.toArray(), db.collections.toArray(),
-    db.concepts.toArray(), db.links.toArray(), db.ai.toArray(), getSettings(),
+    db.concepts.toArray(), db.links.toArray(), db.ai.toArray(), readSettings(),
   ]);
   return { items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, settings };
 }

@@ -1,7 +1,7 @@
 // Browser-side AI client. It talks only to Shelf's own server, which holds
 // the API keys. When AI is disabled or unavailable, callers get a clear error
 // and the rest of the app keeps working.
-import { getSettings } from '../db/actions';
+import { readSettings } from '../db/actions';
 
 export interface ProviderStatus {
   id: string;
@@ -57,7 +57,7 @@ export async function saveProviderConfig(body: { provider: string; apiKey?: stri
 }
 
 export async function complete(req: AIRequest, signal?: AbortSignal): Promise<AIResponse> {
-  const s = await getSettings();
+  const s = await readSettings();
   if (!s.ai.enabled) throw new AIError('disabled', 'AI features are turned off. You can enable them in Settings → AI.');
   if (!s.ai.provider) throw new AIError('unconfigured', 'Choose an AI provider in Settings → AI.');
   let res: Response;

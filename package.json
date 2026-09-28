@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
-    "dev:server": "node --watch server/index.ts",
+    "dev:server": "node --env-file-if-exists=.env --watch server/index.ts",
     "build": "tsc -b && vite build",
-    "start": "node server/index.ts",
+    "start": "node --env-file-if-exists=.env server/index.ts",
     "test": "vitest run",
     "typecheck": "tsc -b"
   },

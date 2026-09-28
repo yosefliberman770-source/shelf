@@ -170,8 +170,19 @@ function Timeline({ idx }: { idx: LibraryIndex }) {
     lanes[lane] = x1 + Math.min(220, i.title.length * 6.2);
     return { i, x0, x1, lane };
   });
-  const evVisible = events.filter((e) => (e.end ?? e.start!) >= w0 && e.start! <= w1);
-  const H = 70 + lanes.length * 30 + 20;
+  const evVisible = events.filter((e) => (e.end ?? e.start!) >= w0 && e.start! <= w1).sort((a, b) => a.start! - b.start!);
+  const evLanes: number[] = [];
+  const evPlaced = evVisible.map((e) => {
+    const x0 = X(Math.max(w0, e.start!));
+    const x1 = e.end !== undefined && e.end !== e.start ? Math.max(x0 + 2, X(Math.min(w1, e.end))) : x0;
+    const labelEnd = x0 + 8 + (formatYear(e.start).length + e.name.length + 3) * 6.2;
+    let lane = evLanes.findIndex((end) => end < x0 - 6);
+    if (lane < 0) { lane = evLanes.length; evLanes.push(0); }
+    evLanes[lane] = Math.max(x1, labelEnd);
+    return { e, x0, x1, y: 30 + lane * 22 };
+  });
+  const top = 30 + evLanes.length * 22 + 14;
+  const H = top + lanes.length * 30 + 20;
   if (!items.length && !events.length) return <div className="card"><Empty icon="🕰" title="Place your books in history" action={<Link className="btn" to="/library">Open library</Link>}>On any book, set the period its <i>subject</i> covers (e.g. −509 to −27 for the Roman Republic). Events and people from your Knowledge library appear as markers. Works for any subject and era.</Empty></div>;
   return (
     <div className="col gap-16">
@@ -188,14 +199,15 @@ function Timeline({ idx }: { idx: LibraryIndex }) {
         <svg width={W + 40} height={H} style={{ display: 'block' }}>
           <g transform="translate(20,0)">
             {ticks.map((t) => <g key={t}><line x1={X(t)} x2={X(t)} y1={24} y2={H} stroke="var(--grid)" /><text x={X(t)} y={16} textAnchor="middle" fontSize={11} fill="var(--text-3)" fontFamily="var(--sans)">{formatYear(t)}</text></g>)}
-            {evVisible.map((e) => (
-              <g key={e.id}>
-                {e.end !== undefined && e.end !== e.start ? <rect x={X(Math.max(w0, e.start!))} y={28} width={Math.max(2, X(Math.min(w1, e.end)) - X(Math.max(w0, e.start!)))} height={8} rx={4} fill="var(--s3)" opacity={0.35} /> : <circle cx={X(e.start!)} cy={32} r={5} fill="var(--s3)" />}
-                <text x={X(Math.max(w0, e.start!)) + 4} y={50} fontSize={10.5} fill="var(--text-2)" fontFamily="var(--sans)"><a href={`/knowledge/concept/${e.id}`}>{formatYear(e.start)} — {e.name}</a></text>
-              </g>
+            {evPlaced.map(({ e, x0, x1, y }) => (
+              <a key={e.id} href={`/knowledge/concept/${e.id}`}>
+                {x1 > x0 ? <rect x={x0} y={y - 4} width={x1 - x0} height={8} rx={4} fill="var(--s3)" opacity={0.4} /> : <circle cx={x0} cy={y} r={5} fill="var(--s3)" stroke="var(--surface)" strokeWidth={2} />}
+                <text x={x0 + 8} y={y + 4} fontSize={10.5} fill="var(--text-2)" fontFamily="var(--sans)">{formatYear(e.start)} — {e.name}</text>
+                <title>{e.name}: {formatYear(e.start)}{e.end !== undefined ? ` – ${formatYear(e.end)}` : ''}</title>
+              </a>
             ))}
             {placed.map(({ i, x0, x1, lane }) => {
-              const y = 66 + lane * 30;
+              const y = top + lane * 30;
               return (
                 <g key={i.id}>
                   <a href={`/item/${i.id}`}>

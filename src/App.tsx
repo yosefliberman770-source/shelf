@@ -1,22 +1,24 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { Concierge } from './ai/ui';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sheets, TimerBar } from './components/sheets';
 import { useNotifications } from './lib/notifications';
-import AIPage from './pages/AIPage';
-import AuthorPage from './pages/AuthorPage';
-import ExplorePage from './pages/ExplorePage';
-import InsightsPage from './pages/InsightsPage';
-import ItemPage from './pages/ItemPage';
-import KnowledgePage from './pages/KnowledgePage';
-import LibraryPage from './pages/LibraryPage';
 import Onboarding from './pages/Onboarding';
-import PlanPage from './pages/PlanPage';
-import ReadingPage from './pages/ReadingPage';
-import SettingsPage from './pages/SettingsPage';
 import TodayPage from './pages/TodayPage';
 import { LibraryProvider, useLibrary } from './state/library';
 import { Toasts, UIProvider, useUI } from './state/ui';
+
+const AIPage = lazy(() => import('./pages/AIPage'));
+const AuthorPage = lazy(() => import('./pages/AuthorPage'));
+const ExplorePage = lazy(() => import('./pages/ExplorePage'));
+const InsightsPage = lazy(() => import('./pages/InsightsPage'));
+const ItemPage = lazy(() => import('./pages/ItemPage'));
+const KnowledgePage = lazy(() => import('./pages/KnowledgePage'));
+const LibraryPage = lazy(() => import('./pages/LibraryPage'));
+const PlanPage = lazy(() => import('./pages/PlanPage'));
+const ReadingPage = lazy(() => import('./pages/ReadingPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 export const NAV = [
   { to: '/', icon: '🏠', label: 'Today' },
@@ -82,6 +84,8 @@ function Shell() {
           <NavLink to="/settings" className="btn ghost icon" aria-label="Settings">⚙️</NavLink>
         </header>
         <TimerBar />
+        <ErrorBoundary resetKey={loc.pathname}>
+        <Suspense fallback={<div className="page faint">Loading…</div>}>
         <Routes>
           <Route path="/" element={<TodayPage />} />
           <Route path="/library/*" element={<LibraryPage />} />
@@ -96,6 +100,8 @@ function Shell() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<div className="page"><h1>Not found</h1></div>} />
         </Routes>
+        </Suspense>
+        </ErrorBoundary>
       </div>
       <nav className="mobile-nav">
         {NAV.map((n) => (
@@ -115,9 +121,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <UIProvider>
+        <ErrorBoundary>
         <LibraryProvider fallback={<div className="empty" style={{ marginTop: '30vh' }}>Opening your library…</div>}>
           <Shell />
         </LibraryProvider>
+        </ErrorBoundary>
       </UIProvider>
     </BrowserRouter>
   );

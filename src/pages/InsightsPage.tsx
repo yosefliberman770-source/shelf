@@ -375,7 +375,7 @@ function DNA({ idx }: { idx: LibraryIndex }) {
           <Tile k="Top category" v={dna.topCategory ?? '—'} />
           <Tile k="Top author" v={dna.topAuthor ?? '—'} />
         </div>
-        {dna.covers.length > 0 && <div className="cover-wall mt-24">{dna.covers.slice(0, 40).map((c) => <Cover key={c.id} item={{ id: c.id, title: c.title, coverUrl: c.cover, contentType: 'book' }} width={44} />)}</div>}
+        {dna.covers.length > 0 && <div className="cover-wall mt-24">{dna.covers.slice(0, 40).map((c, i) => <Cover key={`${c.id}-${i}`} item={{ id: c.id, title: c.title, coverUrl: c.cover, contentType: 'book' }} width={44} />)}</div>}
       </div>
       <div className="row">
         <button className="btn" onClick={async () => { try { await navigator.clipboard.writeText(text); alert('Copied your Reading DNA summary.'); } catch { download(`reading-dna-${dna.label}.txt`, text); } }}>Copy shareable summary</button>

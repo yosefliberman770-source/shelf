@@ -24,12 +24,21 @@ import type {
   Status,
 } from './types';
 
+/** Merge stored settings over defaults (safe inside read-only live queries). */
+export function withDefaults(s?: Settings): Settings {
+  const d = defaultSettings();
+  if (!s) return d;
+  return { ...d, ...s, notifications: { ...d.notifications, ...s.notifications }, ai: { ...d.ai, ...s.ai, share: { ...d.ai.share, ...s.ai?.share } } };
+}
+
+export async function readSettings(): Promise<Settings> {
+  return withDefaults(await db.settings.get('settings'));
+}
+
 export async function getSettings(): Promise<Settings> {
   const s = await db.settings.get('settings');
-  if (s) return { ...defaultSettings(), ...s, notifications: { ...defaultSettings().notifications, ...s.notifications }, ai: { ...defaultSettings().ai, ...s.ai, share: { ...defaultSettings().ai.share, ...s.ai?.share } } };
-  const d = defaultSettings();
-  await db.settings.put(d);
-  return d;
+  if (!s) await db.settings.put(defaultSettings());
+  return withDefaults(s);
 }
 
 export async function updateSettings(patch: Partial<Settings>): Promise<void> {

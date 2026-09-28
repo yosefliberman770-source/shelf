@@ -68,7 +68,8 @@ export async function loadSampleLibrary(): Promise<void> {
     const total = isAudio ? 12 * 60 : isCourse ? 24 : b.pages;
     const target = b.status === 'read' ? total : Math.round(total * (b.readPct ?? 0.3));
     let pos = 0;
-    let day = b.status === 'read' ? dayOffset : Math.min(40, dayOffset);
+    const perDay = isCourse ? 0.8 : isAudio ? 35 : 22;
+    let day = b.status === 'read' ? dayOffset : Math.max(3, Math.min(60, Math.round(target / perDay)));
     dayOffset = Math.max(20, dayOffset - 14);
     while (pos < target && day >= 0) {
       if (r() < 0.78) {

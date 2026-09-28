@@ -36,12 +36,22 @@ async function readJson(req: IncomingMessage): Promise<unknown> {
   }
 }
 
+// Browser origins allowed to call the API: the server's own origin, the Vite
+// dev server, and anything listed in SHELF_ALLOWED_ORIGINS (comma-separated).
+const ALLOWED_ORIGINS = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...(process.env.SHELF_ALLOWED_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+]);
+
 function sameOrigin(req: IncomingMessage): boolean {
-  // Block cross-site requests to the key-management endpoint.
+  // Block cross-site requests (a random website must not be able to spend your AI credits or replace keys).
   const origin = req.headers.origin;
   if (!origin) return true;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
   try {
-    return new URL(origin).host === req.headers.host;
+    const host = new URL(origin).host;
+    return host === req.headers.host || host === req.headers['x-forwarded-host'];
   } catch {
     return false;
   }

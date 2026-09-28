@@ -354,7 +354,7 @@ function ResultBlock({ r, compareTo }: { r: ScenarioResult; compareTo?: Scenario
       <dt>Completion</dt><dd><b>{r.remaining <= 0 ? 'Done' : r.finish ? formatKey(r.finish) : 'Never at this pace'}</b>{shift ? <span className={`small ${shift < 0 ? '' : ''}`}> ({shift < 0 ? `${-shift} days sooner` : `${shift} days later`})</span> : null}</dd>
       {r.deadline && <><dt>Deadline</dt><dd>{formatKey(r.deadline)} {r.meetsDeadline ? <span className="chip good">met</span> : <span className="chip warn">missed</span>}</dd></>}
       {r.requiredPace !== undefined && <><dt>Required pace</dt><dd>{fmtNum(r.requiredPace, 1)}/day</dd></>}
-      {r.totalTimeSec !== undefined && <><dt>Total time</dt><dd>{fmtDuration(r.totalTimeSec)}</dd></>}
+      {r.totalTimeSec !== undefined && <><dt>Reading time needed</dt><dd>{fmtDuration(r.totalTimeSec)}</dd></>}
     </dl>
   );
 }

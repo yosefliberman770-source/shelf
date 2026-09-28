@@ -289,7 +289,7 @@ export function aggregateForecast(idx: LibraryIndex, input: AggregateInput): Agg
   let estimatedFinish: DateKey | undefined;
   if (remaining <= 0 && total > 0) {
     readingDays = 0;
-  } else if (schedule) {
+  } else if (schedule && total > 0) {
     const p = project(remaining, schedule, start, rules);
     readingDays = p.reachable ? p.readingDays : undefined;
     estimatedFinish = p.date;

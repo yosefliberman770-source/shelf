@@ -394,7 +394,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
 .timeline { position: relative; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .stars { display: inline-flex; gap: 1px; color: var(--s4); font-size: 16px; line-height: 1; }
-.stars.input span { cursor: pointer; }
+.stars.editable span { cursor: pointer; }
 .stars .off { color: var(--surface-3); }
 
 .dna { background: linear-gradient(135deg, var(--accent-soft), var(--ai-soft)); border-radius: 18px; padding: 28px; border: 1px solid var(--border); }

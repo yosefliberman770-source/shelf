@@ -133,7 +133,6 @@ export function KnowledgeGraph({ idx, onOpen, focus, initialTypes = ['item', 'au
               <g key={n.id} transform={`translate(${n.x},${n.y})`} opacity={dim ? 0.2 : 1} style={{ cursor: 'pointer' }}
                 onPointerDown={(e) => { e.stopPropagation(); drag.current = { x: 0, y: 0, node: n }; (e.currentTarget.ownerSVGElement as Element).setPointerCapture(e.pointerId); }}
                 onDoubleClick={() => onOpen(n)}
-                onClick={(e) => { if (e.detail === 1) setTimeout(() => {}, 0); }}
               >
                 <circle r={radius(n)} fill={TYPE_COLOR[n.type]} stroke={hit?.has(n.id) ? 'var(--text)' : 'var(--surface)'} strokeWidth={2} />
                 {(n.weight >= 2 || view.k > 1.3 || hit?.has(n.id) || graph.nodes.length < 40) && <text className="node-label" x={radius(n) + 3} y={4}>{n.label.length > 28 ? n.label.slice(0, 27) + '…' : n.label}</text>}

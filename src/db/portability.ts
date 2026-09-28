@@ -1,6 +1,6 @@
 // Backup, restore, export and import. The user's data stays portable.
 import { isValidKey, keyFromMs } from '../engine/dates';
-import { addItem, authorIdsFor, createShelf, getSettings, type ItemDraft } from './actions';
+import { addItem, authorIdsFor, createShelf, type ItemDraft } from './actions';
 import { ALL_TABLES, db, defaultSettings, type TableName, uid } from './db';
 import type { Item, Status } from './types';
 
@@ -284,6 +284,5 @@ export async function commitImport(rows: ImportRow[]): Promise<{ added: number; 
       added++;
     }
   }
-  await getSettings();
   return { added, merged, skipped };
 }

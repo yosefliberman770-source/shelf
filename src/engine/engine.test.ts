@@ -188,6 +188,16 @@ describe('aggregate forecast', () => {
     expect(f.separate).toHaveLength(1);
   });
 
+  it('gives no estimate when nothing has a known length', () => {
+    const snap = emptySnapshot();
+    makeItem(snap, { title: 'Mystery', status: 'want' });
+    const idx = new LibraryIndex(snap, '2026-09-28');
+    const f = aggregateForecast(idx, { items: idx.itemList() });
+    expect(f.estimatedFinish).toBeUndefined();
+    expect(f.unknownLength).toHaveLength(1);
+    expect(evaluate(idx, resolveTarget(idx, { kind: 'library' })).finish).toBeUndefined();
+  });
+
   it('library pace table', () => {
     const snap = emptySnapshot();
     const idx = new LibraryIndex(snap, '2026-09-28');

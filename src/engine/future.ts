@@ -185,12 +185,16 @@ export function evaluate(idx: LibraryIndex, target: TargetInfo, scenario: Scenar
   const start = idx.today;
   let finish: DateKey | undefined;
   let readingDays: number | undefined;
-  if (schedule) {
+  if (schedule && remaining > 0) {
     const p = project(remaining, schedule, start, rules);
     finish = p.date;
     readingDays = p.reachable ? p.readingDays : undefined;
   }
-  const reqPace = deadline ? requiredPace(remaining, start, deadline, rules) : undefined;
+  if (remaining <= 0 && base.total > 0) {
+    finish = start;
+    readingDays = 0;
+  }
+  const reqPace = deadline && remaining > 0 ? requiredPace(remaining, start, deadline, rules) : undefined;
   const delta = deadline ? deadlineDelta(finish, deadline, rules) : undefined;
   return {
     remaining,

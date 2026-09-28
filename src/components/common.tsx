@@ -43,7 +43,7 @@ export function Stars({ value, onChange, size = 16 }: { value?: number; onChange
   const [hover, setHover] = useState<number | null>(null);
   const shown = hover ?? value ?? 0;
   return (
-    <span className={`stars ${onChange ? 'input' : ''}`} style={{ fontSize: size }} onMouseLeave={() => setHover(null)} role={onChange ? 'slider' : undefined} aria-label={`Rating ${value ?? 0} of 5`}>
+    <span className={`stars ${onChange ? 'editable' : ''}`} style={{ fontSize: size }} onMouseLeave={() => setHover(null)} role={onChange ? 'slider' : undefined} aria-label={`Rating ${value ?? 0} of 5`}>
       {[1, 2, 3, 4, 5].map((i) => {
         const full = shown >= i;
         const half = !full && shown >= i - 0.5;
