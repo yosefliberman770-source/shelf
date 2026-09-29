@@ -53,7 +53,7 @@ export function classify(status: number, body: string, headers?: Headers): Provi
   if (/quota|insufficient|credit|billing|daily limit|per day|exceeded your current|limit reached|out of free/.test(text) && (status === 429 || status === 402 || status === 403 || status === 400)) return new ProviderFailure('quota', 'Free allowance used up for now.', status, retryAfter);
   if (status === 429) return new ProviderFailure('rate_limit', 'Rate limit reached.', status, retryAfter);
   if (status === 402) return new ProviderFailure('quota', 'No credits left.', status, retryAfter);
-  if (status === 401 || status === 403) return new ProviderFailure('auth', 'The API key was rejected.', status);
+  if (status === 401 || status === 403 || /unauthenticated|invalid authentication|api key not valid|invalid api key|access_token_type_unsupported/.test(text)) return new ProviderFailure('auth', 'The API key was rejected.', status);
   if (status === 404 || /model.*(not found|does not exist|decommission|unknown)|no endpoints found/.test(text)) return new ProviderFailure('model', `Model unavailable (${short}).`, status);
   if (status >= 500 || status === 408) return new ProviderFailure('unavailable', 'The provider is temporarily unavailable.', status, retryAfter);
   if (/context length|too many tokens|maximum context|too long/.test(text)) return new ProviderFailure('bad_request', 'The request was too long for this model.', status);
