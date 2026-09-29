@@ -23,6 +23,8 @@ export interface ProviderSettings {
   billingEnabled?: boolean;
   accountId?: string;
   baseUrl?: string;
+  /** Models the provider refused for this key (retired, "not available to new users"). Never picked again. */
+  unavailable?: string[];
 }
 
 export interface AIConfig {
@@ -187,7 +189,9 @@ export function isConfigured(id: ProviderId, cfg = loadConfig()): boolean {
 export function modelsFor(id: ProviderId, cfg = loadConfig()): ModelInfo[] {
   const def = providerDef(id)!;
   const found = cfg.providers[id]?.models;
-  return found?.length ? found : def.models;
+  const gone = new Set(cfg.providers[id]?.unavailable ?? []);
+  const list = (found?.length ? found : def.models).filter((m) => !gone.has(m.id));
+  return list.length ? list : def.models.filter((m) => !gone.has(m.id));
 }
 
 /** Free, paid, local or unknown — as the app will treat it. */
@@ -319,11 +323,40 @@ function credsFor(id: ProviderId, cfg: AIConfig): Credentials {
 }
 
 /** Best model to use from a provider's live list: a known good one, else a stable "flash"-style one, else the first. */
-export function pickAvailable(id: ProviderId, list: ModelInfo[]): string | undefined {
+/** Version number in a model id ("gemini-3.8-flash" → 3.8), for preferring the newest. */
+const versionOf = (id: string) => { const m = /(\d+(?:\.\d+)?)/.exec(id); return m ? Number(m[1]) : 0; };
+
+/**
+ * Best model to use from a provider's live list: the newest stable "flash"-style
+ * model for Gemini (Google retires older ones for new users), otherwise a known
+ * good one, else a sensible default.
+ */
+export function pickAvailable(id: ProviderId, list: ModelInfo[], exclude: string[] = []): string | undefined {
+  const usable = list.filter((m) => !exclude.includes(m.id));
+  const stable = usable.filter((m) => !/preview|exp|tts|image|embed|vision|audio|guard|live|native|computer/i.test(m.id));
+  if (id === 'gemini') {
+    const flash = stable.filter((m) => /flash/.test(m.id) && !/lite/.test(m.id)).sort((a, b) => versionOf(b.id) - versionOf(a.id));
+    if (flash[0]) return flash[0].id;
+  }
   const known = providerDef(id)?.models.map((m) => m.id) ?? [];
-  for (const k of known) if (list.some((m) => m.id === k)) return k;
-  const stable = list.filter((m) => !/preview|exp|lite|tts|image|embed|vision|audio|guard/i.test(m.id));
-  return (stable.find((m) => /flash|instant|small|mini/i.test(m.id)) ?? stable[0] ?? list[0])?.id;
+  for (const k of known) if (usable.some((m) => m.id === k)) return k;
+  return (stable.find((m) => /flash|instant|small|mini/i.test(m.id)) ?? stable[0] ?? usable[0])?.id;
+}
+
+/** A replacement the provider suggests in its error ("…please use models/gemini-3.8-flash"). */
+export function suggestedModel(message: string): string | undefined {
+  const m = /use\s+(?:the\s+)?(?:models\/)?([a-z][\w.-]*\d[\w.-]*)/i.exec(message);
+  return m?.[1].replace(/[.,)]+$/, '');
+}
+
+/** Remember that a model was refused for this key, and move off it. */
+export function markUnavailable(id: ProviderId, model: string, suggestion?: string) {
+  const c = loadConfig();
+  const p = { enabled: true, ...c.providers[id] };
+  p.unavailable = [...new Set([...(p.unavailable ?? []), model])];
+  if (p.model === model || !p.model) p.model = suggestion && !p.unavailable.includes(suggestion) ? suggestion : pickAvailable(id, modelsFor(id, { ...c, providers: { ...c.providers, [id]: p } }), p.unavailable);
+  c.providers[id] = p;
+  saveConfig(c);
 }
 
 /**
@@ -337,7 +370,8 @@ export async function refreshModels(id: ProviderId): Promise<ModelInfo[]> {
   const c = loadConfig();
   const p = { enabled: true, ...c.providers[id] };
   p.models = list;
-  if (!p.model || !list.some((m) => m.id === p.model)) p.model = pickAvailable(id, list);
+  const gone = p.unavailable ?? [];
+  if (!p.model || !list.some((m) => m.id === p.model) || gone.includes(p.model)) p.model = pickAvailable(id, list, gone);
   c.providers[id] = p;
   saveConfig(c);
   clearCooldown(id);
@@ -367,7 +401,8 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
       // The model was retired or isn't offered to this key: find one that is, and try again.
       if (f.kind === 'model' && !model && def.transport !== 'server') {
         try {
-          await refreshModels(id);
+          markUnavailable(id, m, suggestedModel(f.message));
+          await refreshModels(id).catch(() => [] as ModelInfo[]);
           const next = loadConfig().providers[id]?.model;
           if (next && next !== m) {
             const res = await chat(id, next, { system: 'Reply with the single word: ok', messages: [{ role: 'user', content: 'ping' }], maxTokens: 300 }, credsFor(id, loadConfig()));
@@ -390,7 +425,7 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
 
 export function failureMessage(name: string, f: ProviderFailure): string {
   switch (f.kind) {
-    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.${name === 'Google Gemini' ? ' Gemini API keys come from Google AI Studio and start with “AIza”.' : ''}`;
+    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.${name === 'Google Gemini' ? ' Gemini API keys come from Google AI Studio (aistudio.google.com).' : ''}`;
     case 'rate_limit': return `${name} is rate-limiting requests right now.`;
     case 'quota': return `${name}’s free allowance is used up for now.`;
     case 'model': return `That model isn’t available on ${name}. Tap “Find models” and pick another one.${f.message ? ` (${name} said: ${f.message.replace(/^Model unavailable \((.*)\)\.$/, '$1').slice(0, 160)})` : ''}`;
@@ -455,7 +490,7 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
       if (f.kind === 'model') {
         coolDown(`${c.provider}:${c.model}`, f.kind, f.retryAfter);
         // Next time, use a model this key actually has.
-        if (def.transport !== 'server') void refreshModels(c.provider).catch(() => {});
+        if (def.transport !== 'server') { markUnavailable(c.provider, c.model, suggestedModel(f.message)); void refreshModels(c.provider).catch(() => {}); }
       }
       else if (f.kind !== 'bad_request' && f.kind !== 'refused') coolDown(c.provider, f.kind, f.retryAfter);
       if (f.kind === 'refused') throw f;

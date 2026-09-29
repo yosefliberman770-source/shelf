@@ -227,19 +227,41 @@ describe('retired default model', () => {
 });
 
 describe('keys pasted in the wrong place', () => {
-  it('warns about the wrong kind of key, but still asks the provider and reports its answer', async () => {
+  it('flags a key that clearly belongs to another provider, but accepts Google’s newer “AQ.” keys', async () => {
     const { keyMismatch } = await import('./providers/catalog');
-    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc')).toMatch(/AIza/);
-    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc', true)).toBeUndefined();
+    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc')).toBeUndefined();
     expect(keyMismatch('gemini', 'gsk_abc')).toMatch(/Groq key/);
-    expect(keyMismatch('gemini', 'AIzaSyabc')).toBeUndefined();
+    expect(keyMismatch('groq', 'AIzaSyabc')).toMatch(/Groq keys usually start/);
     expect(keyMismatch('groq', 'weird-key', true)).toBeUndefined();
+  });
+});
+
+describe('model retired for new users but still listed', () => {
+  it('stops using it, follows Google’s suggestion and connects', async () => {
     setKey('gemini', 'AQ.Ab8RN6abc');
-    setup({ gemini: { enabled: true } });
-    // What Google really returns for such a key.
-    mockFetch(() => status(401, '{"error":{"code":401,"message":"Request had invalid authentication credentials.","status":"UNAUTHENTICATED","details":[{"reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED"}]}}'));
+    setup({ gemini: { enabled: true, model: 'gemini-2.5-flash' } });
+    mockFetch((url) => {
+      if (url.includes('/models?')) return new Response(JSON.stringify({ models: [
+        { name: 'models/gemini-2.5-flash', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-3.8-flash', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-3.8-flash-lite', supportedGenerationMethods: ['generateContent'] },
+      ] }), { status: 200 });
+      if (url.includes('gemini-2.5-flash:')) return status(404, '{"error":{"code":404,"message":"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash instead.","status":"NOT_FOUND"}}');
+      return geminiOk('ok');
+    });
     const r = await testProvider('gemini');
-    expect(r.ok).toBe(false);
-    expect(r.message).toMatch(/didn’t accept the API key.*AIza/);
+    expect(r.ok).toBe(true);
+    const p = loadConfig().providers.gemini!;
+    expect(p.model).toBe('gemini-3.8-flash');
+    expect(p.unavailable).toContain('gemini-2.5-flash');
+    // Routing never picks the refused model again.
+    const { candidates } = await route('general');
+    expect(candidates.map((c) => c.model)).not.toContain('gemini-2.5-flash');
+  });
+
+  it('reads the suggested model from the error text', async () => {
+    const { suggestedModel } = await import('./manager');
+    expect(suggestedModel('… Please update your code to use models/gemini-3.8-flash instead.')).toBe('gemini-3.8-flash');
+    expect(suggestedModel('Model not found.')).toBeUndefined();
   });
 });

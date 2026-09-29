@@ -49,7 +49,9 @@ export function classify(status: number, body: string, headers?: Headers): Provi
   const text = body.toLowerCase();
   const ra = Number(headers?.get('retry-after'));
   const retryAfter = Number.isFinite(ra) && ra > 0 ? ra : undefined;
-  const short = body.replace(/\s+/g, ' ').slice(0, 200);
+  let detail = body;
+  try { const j = JSON.parse(body) as { error?: { message?: string } | string; message?: string }; detail = (typeof j.error === 'object' ? j.error?.message : j.error) ?? j.message ?? body; } catch { /* not JSON */ }
+  const short = String(detail).replace(/\s+/g, ' ').slice(0, 300);
   if (/quota|insufficient|credit|billing|daily limit|per day|exceeded your current|limit reached|out of free/.test(text) && (status === 429 || status === 402 || status === 403 || status === 400)) return new ProviderFailure('quota', 'Free allowance used up for now.', status, retryAfter);
   if (status === 429) return new ProviderFailure('rate_limit', 'Rate limit reached.', status, retryAfter);
   if (status === 402) return new ProviderFailure('quota', 'No credits left.', status, retryAfter);
