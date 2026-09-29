@@ -149,6 +149,9 @@ function safeBuild(build: () => AIRequest): AIRequest | null {
 
 const ANSWER_FORMAT = `Formatting: when you mention the reader's own books, notes or numbers, put that part under a heading "#### From your library". Put interpretations, ideas and books that are NOT in their library under "#### Suggestions". Leave out a heading if there is nothing for it. Keep answers short and friendly.`;
 
+/** One tap for a short, bullet-point overview of whatever you're looking at. */
+export const quickPrompt = (label?: string) => `⚡ Quick summary${label ? ` of ${label}` : ''}: give me the key points in 3–5 short bullets.`;
+
 const GENERAL = ['What should I read next?', 'How is my reading going this month?', 'What have I learned recently?'];
 
 const TOOLS: { to: string; icon: IconName; tone: Tone; label: string }[] = [
@@ -235,6 +238,7 @@ export function AskSheet() {
               {msgs.length === 0 && (
                 <div className="col gap-12">
                   <p className="qa-big" style={{ marginTop: 6 }}>What would you like to know?</p>
+                  <button className="btn accent lg block" onClick={() => send(quickPrompt(concierge?.label))}>⚡ Quick summary{concierge ? ` of ${concierge.label}` : ''}</button>
                   <div className="col" style={{ gap: 8 }}>
                     {suggestions.map((s) => (
                       <button key={s} className="rabbit-node" onClick={() => send(s)}>{s}<Icon name="arrowRight" className="faint" /></button>
@@ -251,7 +255,12 @@ export function AskSheet() {
               )}
               {msgs.map((m, i) => (
                 <div key={i} className={`msg ${m.role === 'user' ? 'user' : 'ai'}`}>
-                  {m.role === 'assistant' ? <><AIBadge /><div className="mt-8"><Markdown text={m.content} /></div></> : m.content}
+                  {m.role === 'assistant' ? (
+                    <>
+                      <AIBadge /><div className="mt-8"><Markdown text={m.content} /></div>
+                      {m.content.length > 500 && i === msgs.length - 1 && !loading && <button className="chip accent mt-8" onClick={() => send('⚡ Quick summary of that answer in 3 short bullet points.')}>⚡ Quick summary of this</button>}
+                    </>
+                  ) : m.content}
                 </div>
               ))}
               {loading && <div className="msg ai faint">Thinking…</div>}

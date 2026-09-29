@@ -19,6 +19,8 @@ const ItemPage = lazy(() => import('./pages/ItemPage'));
 const KnowledgePage = lazy(() => import('./pages/KnowledgePage'));
 const LibraryPage = lazy(() => import('./pages/LibraryPage'));
 const MorePage = lazy(() => import('./pages/MorePage'));
+const DiscoverPage = lazy(() => import('./pages/DiscoverPage'));
+const CurriculumPage = lazy(() => import('./pages/CurriculumPage'));
 const PlanPage = lazy(() => import('./pages/PlanPage'));
 const ReadingPage = lazy(() => import('./pages/ReadingPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
@@ -26,22 +28,23 @@ const ReaderPage = lazy(() => import('./pages/ReaderPage'));
 
 interface NavEntry { to: string; icon: IconName; label: string; sub?: string }
 
-/** Everyday places: what to do now, what you have, what you're reading. */
+/** Everyday places. Reading comes first: it's the heart of the app. */
 export const PRIMARY: NavEntry[] = [
-  { to: '/', icon: 'home', label: 'Today' },
+  { to: '/', icon: 'book', label: 'Reading' },
   { to: '/library', icon: 'library', label: 'Library' },
-  { to: '/reading', icon: 'book', label: 'Reading' },
+  { to: '/discover', icon: 'compass', label: 'Discover' },
 ];
 
 /** Deeper places, revealed when you want them. */
 export const DEEPER: NavEntry[] = [
   { to: '/plan', icon: 'target', label: 'Plan', sub: 'Goals & projects' },
   { to: '/insights', icon: 'chart', label: 'Insights', sub: 'Your reading, measured' },
-  { to: '/knowledge', icon: 'bulb', label: 'Knowledge', sub: 'Quotes, notes & ideas' },
-  { to: '/explore', icon: 'compass', label: 'Explore', sub: 'Connections & discovery' },
+  { to: '/knowledge', icon: 'map', label: 'Knowledge Atlas', sub: 'People, places, notes' },
+  { to: '/library/curricula', icon: 'layers', label: 'Curricula', sub: 'Learning paths you build' },
+  { to: '/explore', icon: 'bulb', label: 'Connections', sub: 'Timelines & rabbit holes' },
 ];
 
-const MORE_PATHS = ['/more', '/plan', '/insights', '/knowledge', '/explore', '/ai', '/settings', '/author', '/help'];
+const MORE_PATHS = ['/more', '/plan', '/insights', '/knowledge', '/explore', '/ai', '/settings', '/author', '/help', '/library/curricula', '/curriculum'];
 
 function useTheme() {
   const idx = useLibrary();
@@ -100,7 +103,7 @@ function Shell() {
       </aside>
       <div className="main">
         <header className="topbar">
-          <Link to="/" className="brand-mark mobile-brand" aria-label="Shelf — Today"><Icon name="book" /></Link>
+          <Link to="/" className="brand-mark mobile-brand" aria-label="Shelf — Reading"><Icon name="book" /></Link>
           <button className="search-trigger" onClick={() => open({ kind: 'search' })} aria-label="Search">
             <Icon name="search" /><span className="grow ellipsis" style={{ textAlign: 'left' }}>Search books, notes, authors…</span><span className="kbd">⌘K</span>
           </button>
@@ -124,22 +127,25 @@ function Shell() {
           <Route path="/knowledge/*" element={<KnowledgePage />} />
           <Route path="/explore/*" element={<ExplorePage />} />
           <Route path="/ai/*" element={<AIPage />} />
+          <Route path="/discover/*" element={<DiscoverPage />} />
+          <Route path="/curricula" element={<Navigate to="/library/curricula" replace />} />
+          <Route path="/curriculum/:id" element={<CurriculumPage />} />
           <Route path="/more" element={<MorePage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<div className="page"><h1>Not found</h1><Link className="btn mt-16" to="/">Back to Today</Link></div>} />
+          <Route path="*" element={<div className="page"><h1>Not found</h1><Link className="btn mt-16" to="/">Back to Reading</Link></div>} />
         </Routes>
         </Suspense>
         </ErrorBoundary>
       </div>
       <nav className="bottom-nav" aria-label="Main navigation">
-        <Tab to="/" icon="home" label="Today" active={loc.pathname === '/'} />
-        <Tab to="/library" icon="library" label="Library" active={loc.pathname.startsWith('/library')} />
+        <Tab to="/" icon="book" label="Reading" active={loc.pathname === '/' || loc.pathname.startsWith('/reading')} />
+        <Tab to="/library" icon="library" label="Library" active={loc.pathname.startsWith('/library') && !inMore} />
         <div className="ask-wrap">
           <button className="ask" onClick={() => open({ kind: 'ai' })} aria-label="Ask AI" aria-pressed={askOpen}><Icon name="sparkle" /></button>
           <span className="ask-label" aria-hidden>Ask AI</span>
         </div>
-        <Tab to="/reading" icon="book" label="Reading" active={loc.pathname.startsWith('/reading')} />
+        <Tab to="/discover" icon="compass" label="Discover" active={loc.pathname.startsWith('/discover')} />
         <Tab to="/more" icon="grid" label="More" active={inMore} />
       </nav>
       <Sheets />

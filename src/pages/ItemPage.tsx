@@ -115,6 +115,7 @@ function Header({ idx, item, onEdit }: { idx: LibraryIndex; item: Item; onEdit: 
           <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'quote' })}><Icon name="quote" />Quote</button>
           <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'note' })}><Icon name="pencil" />Note</button>
           <button className="btn sm" onClick={() => open({ kind: 'organize', itemId: item.id })}><Icon name="folder" />Organize</button>
+          <Link className="btn sm" to={`/discover/book/${item.id}`}><Icon name="compass" />Explore</Link>
           <button className="btn sm ghost" onClick={() => setMore(true)} aria-label="More actions"><Icon name="dots" />More</button>
         </div>
         {(item.folderIds.length > 0 || item.tagIds.length > 0 || item.shelfIds.length > 0) && (
@@ -127,6 +128,7 @@ function Header({ idx, item, onEdit }: { idx: LibraryIndex; item: Item; onEdit: 
       </div>
 
       <div className="chips-scroll mt-16" aria-label="Ask AI about this book">
+        <AskChip question={`⚡ Quick summary of “${item.title}”: what it's about and why it matters, in 3–5 short bullets. Avoid spoilers beyond where I am.`} label="⚡ Quick summary" className="chip accent" />
         {['What should I know before reading this?', 'What is the historical context?', 'Compare this with my other books'].map((q) => <AskChip key={q} question={q} />)}
       </div>
 

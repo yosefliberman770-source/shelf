@@ -4,7 +4,11 @@ import { completeJSON } from '../ai/client';
 import { BASE_SYSTEM, noteLine } from '../ai/context';
 import { AIErrorNotice, AIOff, AskChip, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { AIBadge, Cover, Empty, Modal, Segmented, Tabs } from '../components/common';
+import { Atlas } from '../components/atlas';
+import { AtlasHome, booksByConcept } from '../components/atlas-views';
+import { KIND_LABEL } from '../components/entity';
 import { KnowledgeGraph } from '../components/graph';
+import { EvidenceChip } from '../components/visual';
 import { NoteCard } from '../components/notes';
 import { deleteConcept, link, saveConcept, unlink, updateNote } from '../db/actions';
 import { download, tableRowsForExport, toCSV } from '../db/portability';
@@ -15,7 +19,7 @@ import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 import { NotesOrganizer } from './ItemPage';
 
-type Tab = 'notes' | 'library' | 'graph';
+type Tab = 'atlas' | 'notes' | 'library' | 'graph';
 const KINDS: ConceptKind[] = ['subject', 'concept', 'person', 'place', 'event', 'period', 'polity', 'organization', 'object', 'source'];
 const KIND_ICON: Record<ConceptKind, string> = { subject: '📂', concept: '◇', person: '👤', place: '📍', event: '⚡', period: '🕰', polity: '🏛', organization: '👥', object: '🏺', source: '📜' };
 
@@ -24,14 +28,15 @@ export default function KnowledgePage() {
   const loc = useLocation();
   const nav = useNavigate();
   const seg = loc.pathname.split('/')[2];
-  const tab: Tab = seg === 'library' || seg === 'concept' ? 'library' : seg === 'graph' ? 'graph' : 'notes';
+  const tab: Tab = seg === 'library' || seg === 'concept' ? 'library' : seg === 'graph' ? 'graph' : seg === 'notes' ? 'notes' : 'atlas';
   useConcierge('Knowledge', ['Organize these thoughts.', 'What themes keep coming up in my notes?', 'Which concepts connect my books?'], () => `CONCEPTS: ${idx.snap.concepts.map((c) => `${c.name} (${c.kind})`).join(', ') || 'none'}\n\nRECENT NOTES:\n${idx.settings.ai.share.notes ? [...idx.snap.notes].sort((a, b) => b.createdAt - a.createdAt).slice(0, 60).map(noteLine).join('\n') : '(notes not shared)'}`, [idx]);
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Knowledge</h1><div className="sub">Things you’ve learned — your quotes, notes and the topics that tie them together.</div></div><AskChip question="What themes keep coming up in my notes?" /></div>
-      <Tabs<Tab> value={tab} onChange={(t) => nav(`/knowledge/${t === 'notes' ? '' : t}`)} tabs={[{ id: 'notes', label: `Quotes & notes · ${idx.snap.notes.length}` }, { id: 'library', label: `Topics · ${idx.snap.concepts.length}` }, { id: 'graph', label: 'Map' }]} />
+      <div className="page-head"><div><h1>Knowledge Atlas</h1><div className="sub">Everyone, everywhere and everything you’ve met in your reading — plus your quotes and notes.</div></div><AskChip question="What themes keep coming up in my reading?" /></div>
+      <Tabs<Tab> value={tab} onChange={(t) => nav(`/knowledge/${t === 'atlas' ? '' : t}`)} tabs={[{ id: 'atlas', label: 'Atlas' }, { id: 'notes', label: `Quotes & notes · ${idx.snap.notes.length}` }, { id: 'library', label: `Topics · ${idx.snap.concepts.length}` }, { id: 'graph', label: 'Web' }]} />
       <Routes>
-        <Route index element={<NotesDB idx={idx} />} />
+        <Route index element={<AtlasHome idx={idx} />} />
+        <Route path="notes" element={<NotesDB idx={idx} />} />
         <Route path="library" element={<ConceptLibrary idx={idx} />} />
         <Route path="concept/:id" element={<ConceptPage />} />
         <Route path="graph" element={<KnowledgeGraph idx={idx} onOpen={(n) => nav(n.type === 'item' ? `/item/${n.refId}` : n.type === 'concept' ? `/knowledge/concept/${n.refId}` : n.type === 'author' ? `/author/${n.refId}` : n.type === 'folder' ? `/library/folder/${n.refId}` : n.type === 'tag' ? `/library?tag=${n.refId}` : '/knowledge')} />} />
@@ -209,6 +214,7 @@ function ConceptPage() {
           <button className="btn sm danger" onClick={async () => { if (confirm(`Delete “${c.name}”? Links are removed; books and notes stay.`)) { await deleteConcept(c.id); nav('/knowledge/library'); } }}>Delete</button>
         </div>
       </div>
+      <EntityOverview idx={idx} c={c} />
       <div className="grid c2">
         <div className="card">
           <div className="card-head"><h3>Books ({books.length})</h3><button className="btn xs" onClick={() => setAdding('book')}>＋ Link book</button></div>
@@ -251,6 +257,55 @@ function ConceptPage() {
             {adding === 'concept' && idx.snap.concepts.filter((x) => x.id !== c.id).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
           </select>
         </Modal>
+      )}
+    </div>
+  );
+}
+
+/** Reference facts, cross-book view, map and saved images for one entity. */
+function EntityOverview({ idx, c }: { idx: LibraryIndex; c: Concept }) {
+  const books = booksByConcept(idx).get(c.id) ?? [];
+  const media = idx.snap.media.filter((m) => m.conceptIds.includes(c.id));
+  const hasMap = c.lat !== undefined && c.lon !== undefined;
+  if (!c.summary && !c.imageUrl && books.length < 2 && !hasMap && !media.length) return null;
+  return (
+    <div className="col gap-16">
+      {(c.summary || c.imageUrl) && (
+        <div className="card">
+          <div className="row top gap-12">
+            {c.imageUrl && <img src={c.imageUrl} alt="" loading="lazy" style={{ width: 88, height: 108, objectFit: 'cover', borderRadius: 12, flex: 'none' }} onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />}
+            <div style={{ minWidth: 0 }}>
+              <div className="eyebrow">{KIND_LABEL[c.kind]}</div>
+              {c.summary && <p className="small" style={{ lineHeight: 1.55, margin: '4px 0 0' }}>{c.summary}</p>}
+              <div className="tiny faint mt-8">{c.wikidataId && <>Identity: <a href={`https://www.wikidata.org/wiki/${c.wikidataId}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Wikidata {c.wikidataId}</a>. </>}{c.summarySource?.startsWith('http') && <>Summary: <a href={c.summarySource} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Wikipedia</a> (CC BY-SA).</>}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      {books.length > 1 && (
+        <div className="card">
+          <div className="card-head"><h3>Met in {books.length} of your books</h3></div>
+          <div className="small muted">Different books can tell {c.name}’s story differently.</div>
+          <div className="row wrap gap-8 mt-8">
+            <AskChip question={`How do these books portray ${c.name}: ${books.map((b) => `"${b.title}"`).join(', ')}? Describe each account and where they differ or agree. Don't pick a winner, and say if you're unsure what a book says.`} label="Compare their accounts" />
+          </div>
+        </div>
+      )}
+      {hasMap && <div className="card"><div className="card-head"><h3>On the map</h3></div><Atlas concepts={[c]} focus={c} height={260} compact /></div>}
+      {media.length > 0 && (
+        <div className="card">
+          <div className="card-head"><h3>Images you saved</h3></div>
+          <div className="visual-grid">
+            {media.map((m) => (
+              <a key={m.id} className="visual-cell" href={m.sourceUrl} target="_blank" rel="noreferrer">
+                <img src={m.thumbUrl ?? m.imageUrl} alt="" loading="lazy" />
+                <span className="tiny ellipsis" style={{ fontWeight: 700 }}>{m.title}</span>
+                <span className="tiny faint ellipsis">{[m.date, m.institution].filter(Boolean).join(' · ')}</span>
+                <EvidenceChip e={m.evidence} />
+              </a>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

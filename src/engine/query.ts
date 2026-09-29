@@ -278,12 +278,14 @@ export interface SearchResults {
   projects: { id: string; name: string }[];
   timeline: { id: string; label: string; year?: number; kind: 'item' | 'concept' }[];
   tags: { id: string; name: string }[];
+  curricula: { id: string; name: string }[];
+  media: { id: string; title: string; sourceUrl: string; thumb?: string }[];
   total: number;
 }
 
 export function searchAll(idx: LibraryIndex, raw: string, limit = 12): SearchResults {
   const q = norm(raw.trim());
-  const empty: SearchResults = { items: [], authors: [], folders: [], notes: [], concepts: [], projects: [], timeline: [], tags: [], total: 0 };
+  const empty: SearchResults = { items: [], authors: [], folders: [], notes: [], concepts: [], projects: [], timeline: [], tags: [], curricula: [], media: [], total: 0 };
   if (!q) return empty;
   const has = (s?: string) => !!s && matchesText(norm(s), q);
   const items = idx
@@ -301,7 +303,9 @@ export function searchAll(idx: LibraryIndex, raw: string, limit = 12): SearchRes
     .map((a) => ({ id: a.id, name: a.name, count: idx.itemList().filter((i) => i.authorIds.includes(a.id)).length }));
   const folders = idx.snap.folders.filter((f) => has(f.name) || has(f.description)).map((f) => ({ id: f.id, name: f.name, path: idx.folderPath(f.id).map((x) => x.name).join(' / ') }));
   const notes = idx.snap.notes.filter((n) => has(n.text) || n.tags.some(has)).map((n) => ({ id: n.id, text: n.text, itemId: n.itemId, kind: n.kind }));
-  const concepts = idx.snap.concepts.filter((c) => has(c.name) || has(c.description)).map((c) => ({ id: c.id, name: c.name, kind: c.kind }));
+  const concepts = idx.snap.concepts.filter((c) => has(c.name) || has(c.description) || (c.aliases ?? []).some(has)).map((c) => ({ id: c.id, name: c.name, kind: c.kind }));
+  const curricula = idx.snap.curricula.filter((c) => has(c.name) || has(c.goal) || c.levels.some((l) => has(l.name) || l.resources.some((r) => has(r.title)))).map((c) => ({ id: c.id, name: c.name }));
+  const media = idx.snap.media.filter((m) => has(m.title) || has(m.creator) || has(m.description)).map((m) => ({ id: m.id, title: m.title, sourceUrl: m.sourceUrl, thumb: m.thumbUrl }));
   const projects = idx.snap.projects.filter((p) => has(p.name) || has(p.description)).map((p) => ({ id: p.id, name: p.name }));
   const tags = idx.snap.tags.filter((t) => has(t.name)).map((t) => ({ id: t.id, name: t.name }));
   const timeline = [
@@ -317,9 +321,11 @@ export function searchAll(idx: LibraryIndex, raw: string, limit = 12): SearchRes
     projects: projects.slice(0, limit),
     timeline: timeline.slice(0, limit),
     tags: tags.slice(0, limit),
+    curricula: curricula.slice(0, limit),
+    media: media.slice(0, limit),
     total: 0,
   };
-  res.total = items.length + authors.length + folders.length + notes.length + concepts.length + projects.length + tags.length;
+  res.total = items.length + authors.length + folders.length + notes.length + concepts.length + projects.length + tags.length + curricula.length + media.length;
   return res;
 }
 

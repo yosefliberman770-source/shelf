@@ -7,6 +7,7 @@ import { itemContext } from '../ai/context';
 import { useConcierge } from '../ai/ui';
 import { Ring } from '../components/charts';
 import { Cover, DeadlineChip, Empty, ProgressBar } from '../components/common';
+import { KIND_ICON } from '../components/entity';
 import { Icon, type IconName } from '../components/icons';
 import { fmtClock, useTick } from '../components/sheets';
 import { setStatus, startTimer, timerElapsedMs } from '../db/actions';
@@ -56,7 +57,7 @@ export default function TodayPage() {
   const [dismissed, setDismissed] = useState(() => loadDismissed(idx.today));
   const [busy, setBusy] = useState(false);
 
-  useConcierge('Today', ['What should I read today?', 'Which book should I focus on to hit my deadlines?', 'How is my reading going?'], () =>
+  useConcierge('Reading', ['What should I read today?', 'Which book should I focus on to hit my deadlines?', 'How is my reading going?'], () =>
     reading.slice(0, 6).map((i) => itemContext(idx, i, s.ai.share)).join('\n\n'), [idx]);
 
   const dateLine = `${WEEKDAYS_LONG[weekday(idx.today)]}, ${formatKey(idx.today)}`;
@@ -112,6 +113,13 @@ export default function TodayPage() {
           <span className="pill flame" title={`Longest streak: ${streak.longest} days`}><Icon name="flame" />{streak.current}-day streak</span>
         )}
       </div>
+      <div className="chips-scroll mb-16" role="navigation" aria-label="Reading">
+        <Link className="chip on" to="/">Now</Link>
+        <Link className="chip" to="/reading">All in progress{reading.length ? ` · ${reading.length}` : ''}</Link>
+        <Link className="chip" to="/reading/queue">Up next</Link>
+        <Link className="chip" to="/reading/ebooks">Ebooks{ebookIds.size ? ` · ${ebookIds.size}` : ''}</Link>
+        <Link className="chip" to="/reading/journal">Journal</Link>
+      </div>
 
       {current ? <ContinueHero item={current} f={forecasts.get(current.id)!} idx={idx} hasFile={ebookIds.has(current.id)} /> : (
         <div className="card">
@@ -129,6 +137,9 @@ export default function TodayPage() {
           </div>
         </>
       )}
+
+      <EbookShelf idx={idx} ebookIds={ebookIds} skip={current?.id} />
+      <Universe idx={idx} hasEbooks={ebookIds.size > 0} />
 
       <div className="section-title">Today</div>
       <div className="card">
@@ -174,7 +185,7 @@ export default function TodayPage() {
 
       <div className="grid c2 mt-24">
         <div className="card">
-          <div className="card-head"><h3 className="row"><Icon name="quote" /> Quote of the day</h3>{quotes.length > 0 && <Link className="small muted" to="/knowledge">All quotes</Link>}</div>
+          <div className="card-head"><h3 className="row"><Icon name="quote" /> Quote of the day</h3>{quotes.length > 0 && <Link className="small muted" to="/knowledge/notes">All quotes</Link>}</div>
           {qotd ? (
             <>
               <div className="quote">{qotd.text}</div>
@@ -366,6 +377,54 @@ function UpNext({ idx }: { idx: LibraryIndex }) {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+/** Your ebooks, one tap from reading. */
+function EbookShelf({ idx, ebookIds, skip }: { idx: LibraryIndex; ebookIds: Set<string>; skip?: string }) {
+  const { open } = useUI();
+  const books = [...ebookIds].map((id) => idx.items.get(id)).filter((i): i is Item => !!i && i.id !== skip && i.status !== 'read').sort((a, b) => (b.lastReadAt ?? 0) - (a.lastReadAt ?? 0)).slice(0, 12);
+  return (
+    <>
+      <div className="section-row"><h2 className="section-title">Your ebooks</h2><Link to="/reading/ebooks">See all</Link></div>
+      <div className="shelf-row">
+        {books.map((i) => {
+          const pct = i.total ? Math.round((idx.position(i) / i.total) * 100) : 0;
+          return (
+            <div key={i.id} className="cover-tile">
+              <div className="shelf-slot"><Link to={`/read/${i.id}`} aria-label={`Read ${i.title}`}><Cover item={i} width={96} author={idx.authorLine(i)} /></Link></div>
+              <div className="meta"><div className="small ellipsis" style={{ fontWeight: 700 }}>{i.title}</div><div className="tiny faint">{pct > 0 ? `${pct}% read` : 'Not started'}</div></div>
+            </div>
+          );
+        })}
+        <div className="cover-tile">
+          <button className="shelf-slot add-slot" onClick={() => open({ kind: 'add', preset: { step: 'epub' } })} aria-label="Open an ePub file">
+            <span style={{ width: 96, height: 144, borderRadius: 8, border: '2px dashed var(--border-strong)', display: 'grid', placeItems: 'center', color: 'var(--text-3)' }}><Icon name="plus" size={28} /></span>
+          </button>
+          <div className="meta"><div className="small" style={{ fontWeight: 700 }}>Open an ePub</div><div className="tiny faint">Read it here</div></div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** People, places and events you've met recently — your reading universe. */
+function Universe({ idx, hasEbooks }: { idx: LibraryIndex; hasEbooks: boolean }) {
+  const recent = idx.snap.concepts.filter((c) => c.kind !== 'subject').sort((a, b) => b.createdAt - a.createdAt).slice(0, 14);
+  if (!recent.length)
+    return hasEbooks ? (
+      <div className="nudge mt-16">
+        <span className="n-ico" style={{ background: 'var(--ai-soft)' }}><Icon name="sparkle" /></span>
+        <div className="small">While reading, tap the middle of the page for <b>Ask AI</b>, <b>Map</b>, <b>Images</b> and <b>Explore</b>. Names you look up get underlined in every book, and build your <Link to="/knowledge" style={{ textDecoration: 'underline' }}>Knowledge Atlas</Link>.</div>
+      </div>
+    ) : null;
+  return (
+    <>
+      <div className="section-row"><h2 className="section-title">Your reading universe</h2><Link to="/knowledge">Atlas</Link></div>
+      <div className="chips-scroll">
+        {recent.map((c) => <Link key={c.id} className="chip" to={`/knowledge/concept/${c.id}`}>{KIND_ICON[c.kind]} {c.name}</Link>)}
+      </div>
     </>
   );
 }

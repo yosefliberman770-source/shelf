@@ -17,8 +17,9 @@ export default function MorePage() {
   const tiles: { to: string; icon: IconName; tone: Tone; title: string; sub: string; meta?: string }[] = [
     { to: '/plan', icon: 'target', tone: 'green', title: 'Plan', sub: 'What you’re working towards — goals, projects and schedules.', meta: goals.length ? `${goals.length} goal${goals.length === 1 ? '' : 's'} · ${onPace} on pace` : idx.snap.projects.length ? `${idx.snap.projects.length} projects` : undefined },
     { to: '/insights', icon: 'chart', tone: 'terracotta', title: 'Insights', sub: 'What’s happening — time, pages, habits and records.', meta: idx.sessions.length ? `${idx.sessions.length} sessions logged` : undefined },
-    { to: '/knowledge', icon: 'bulb', tone: 'gold', title: 'Knowledge', sub: 'What you’ve learned — quotes, notes and ideas.', meta: idx.snap.notes.length ? `${quotes} quotes · ${idx.snap.notes.length - quotes} notes` : undefined },
-    { to: '/explore', icon: 'compass', tone: 'blue', title: 'Explore', sub: 'What to discover — connections, timelines and reading paths.' },
+    { to: '/knowledge', icon: 'map', tone: 'gold', title: 'Knowledge Atlas', sub: 'Everyone and everywhere you’ve met while reading — plus your quotes and notes.', meta: idx.snap.concepts.length || idx.snap.notes.length ? `${idx.snap.concepts.length} entries · ${quotes} quotes` : undefined },
+    { to: '/library/curricula', icon: 'layers', tone: 'green', title: 'Curricula', sub: 'Build your own course on any subject, level by level.', meta: idx.snap.curricula.length ? `${idx.snap.curricula.length} curricul${idx.snap.curricula.length === 1 ? 'um' : 'a'}` : undefined },
+    { to: '/explore', icon: 'compass', tone: 'blue', title: 'Connections', sub: 'How your books link up — timelines, maps and rabbit holes.' },
     { to: '/ai', icon: 'sparkle', tone: 'ai', title: 'AI tools', sub: 'Recommendations, quizzes and a search that understands questions.' },
     { to: '/reading/journal', icon: 'calendar', tone: 'brown', title: 'Reading journal', sub: 'Every day you’ve read, in a calendar.' },
   ];

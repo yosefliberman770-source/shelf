@@ -720,7 +720,7 @@ export default function ReaderPage() {
       ? { itemId: it.id, kind: 'note', text: `${note}\n\n“${selection.text}”`, chapter: chapter || undefined, page: p, location: selection.cfi }
       : { itemId: it.id, kind: 'quote', text: selection.text, chapter: chapter || undefined, page: p, location: selection.cfi });
     try { rendRef.current?.annotations.highlight(selection.cfi, { id: noteId }, () => {}, 'shelf-hl', { fill: '#eda100', 'fill-opacity': '0.3', 'mix-blend-mode': 'multiply' }); } catch { /* ignore */ }
-    toast(note ? 'Note saved to Knowledge' : 'Quote saved to your quotes', { action: { label: 'View', run: () => { flush(); nav('/knowledge'); } } });
+    toast(note ? 'Note saved to Knowledge' : 'Quote saved to your quotes', { action: { label: 'View', run: () => { flush(); nav('/knowledge/notes'); } } });
     clearSelection();
   };
 

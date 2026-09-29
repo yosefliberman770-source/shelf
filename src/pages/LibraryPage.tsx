@@ -11,6 +11,7 @@ import type { Folder, Rule, RuleField, RuleOp, SmartCollection, Status } from '.
 import { folderForecast } from '../engine/forecast';
 import type { LibraryIndex } from '../engine/model';
 import { evalCollection, type LibraryQuery, PRESET_COLLECTIONS, runQuery, type SortKey, sortItems } from '../engine/query';
+import { CurriculaList } from './CurriculumPage';
 import { useEbookIds, useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 import { STATUS_LABEL } from '../components/common';
@@ -33,6 +34,7 @@ export default function LibraryPage() {
             <Route path="collection/:id" element={<CollectionView />} />
             <Route path="map" element={<MapView />} />
             <Route path="import" element={<ImportView />} />
+            <Route path="curricula" element={<><LibraryChips /><div className="mt-16"><CurriculaList /></div></>} />
           </Routes>
         </div>
       </div>
@@ -175,6 +177,7 @@ function LibraryChips() {
     { to: '/library/status/want', label: 'Want to read', n: counts.want },
     { to: '/library/status/read', label: 'Read', n: counts.read },
     ...(ebookIds.size ? [{ to: '/library/ebooks', label: 'Ebooks', n: ebookIds.size }] : []),
+    { to: '/library/curricula', label: 'Curricula', n: idx.snap.curricula.length || undefined },
     ...(counts.paused ? [{ to: '/library/status/paused', label: 'Set aside', n: counts.paused }] : []),
     ...(counts.dnf ? [{ to: '/library/status/dnf', label: 'Didn’t finish', n: counts.dnf }] : []),
   ];

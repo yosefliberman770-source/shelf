@@ -833,6 +833,7 @@ function SearchPalette() {
       { label: 'Write a note', icon: 'pencil', match: /^(note|write)/, run: () => open({ kind: 'note', noteKind: 'note' }) },
       { label: 'Create a goal', icon: 'target', match: /^(goal|new goal|create goal)/, run: () => go('/plan/goals?new=1') },
       { label: 'Create a project', icon: 'layers', match: /^(project|new project|create project)/, run: () => go('/plan/projects?new=1') },
+      { label: `Discover books about “${q.trim()}”`, icon: 'compass', match: /.{3,}/, run: () => go(`/discover/topic/${encodeURIComponent(q.trim())}`) },
       { label: 'Import from Goodreads', icon: 'download', match: /^(import|goodreads)/, run: () => go('/library/import') },
       { label: 'Open settings', icon: 'settings', match: /^(settings|dark|theme|backup)/, run: () => go('/settings') },
     ];
@@ -878,10 +879,16 @@ function SearchPalette() {
             {res.folders.map((f) => <div key={f.id} className="palette-item" onClick={() => go(`/library/folder/${f.id}`)}>📁 <span className="grow">{f.path}</span></div>)}
           </Group>
           <Group title="Notes & quotes" show={res.notes.length > 0}>
-            {res.notes.map((n) => <div key={n.id} className="palette-item" onClick={() => go(n.itemId ? `/item/${n.itemId}?tab=notes` : '/knowledge')}>{n.kind === 'quote' ? '❝' : '✎'} <span className="ellipsis grow">{n.text}</span><span className="small faint ellipsis" style={{ maxWidth: '30%' }}>{n.itemId ? idx.items.get(n.itemId)?.title : ''}</span></div>)}
+            {res.notes.map((n) => <div key={n.id} className="palette-item" onClick={() => go(n.itemId ? `/item/${n.itemId}?tab=notes` : '/knowledge/notes')}>{n.kind === 'quote' ? '❝' : '✎'} <span className="ellipsis grow">{n.text}</span><span className="small faint ellipsis" style={{ maxWidth: '30%' }}>{n.itemId ? idx.items.get(n.itemId)?.title : ''}</span></div>)}
           </Group>
-          <Group title="Concepts" show={res.concepts.length > 0}>
+          <Group title="People, places & ideas" show={res.concepts.length > 0}>
             {res.concepts.map((c) => <div key={c.id} className="palette-item" onClick={() => go(`/knowledge/concept/${c.id}`)}>◇ <span className="grow">{c.name}</span><span className="small faint">{c.kind}</span></div>)}
+          </Group>
+          <Group title="Curricula" show={res.curricula.length > 0}>
+            {res.curricula.map((c) => <div key={c.id} className="palette-item" onClick={() => go(`/curriculum/${c.id}`)}>🪜 <span className="grow">{c.name}</span></div>)}
+          </Group>
+          <Group title="Saved images" show={res.media.length > 0}>
+            {res.media.map((m) => <a key={m.id} className="palette-item" href={m.sourceUrl} target="_blank" rel="noreferrer">🖼 <span className="grow ellipsis">{m.title}</span></a>)}
           </Group>
           <Group title="Projects" show={res.projects.length > 0}>
             {res.projects.map((p) => <div key={p.id} className="palette-item" onClick={() => go(`/plan/project/${p.id}`)}>🎯 <span className="grow">{p.name}</span></div>)}
