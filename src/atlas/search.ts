@@ -4,7 +4,7 @@
 // online separately (Wikidata / WHG) by the place service.
 import { allEvents, allWars } from './context';
 import { pack, type Pos } from './data';
-import { type GazPlace, loadGazetteer, normName } from './gazetteer';
+import { type GazPlace, normName, searchPlaces } from './gazetteer';
 import type { HistYear } from './time';
 
 export type SearchHit =
@@ -20,13 +20,13 @@ const has = (hay: string, k: string) => normName(hay).includes(k);
 export async function searchAtlas(query: string, limit = 12): Promise<SearchHit[]> {
   const k = normName(query);
   if (k.length < 2) return [];
-  const [g, events, wars, polities] = await Promise.all([
-    loadGazetteer().catch(() => undefined),
+  const [found, events, wars, polities] = await Promise.all([
+    searchPlaces(query, limit).catch(() => []),
     allEvents().catch(() => []),
     allWars().catch(() => []),
     pack<PolityName[]>('cliopatria/names.json').catch(() => []),
   ]);
-  const places: SearchHit[] = (g?.search(query, limit) ?? []).map((p) => {
+  const places: SearchHit[] = found.map(({ place: p }) => {
     const alt = normName(p.title).startsWith(k) ? undefined : p.names.find((n) => normName(n.name).startsWith(k))?.name;
     return { kind: 'place', key: p.key, title: p.title, matched: alt, place: p, pos: [p.lon, p.lat] };
   });

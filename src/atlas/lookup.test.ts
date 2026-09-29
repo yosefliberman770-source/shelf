@@ -2,55 +2,73 @@
 // places, what's here at a date, and historical search.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { eventsOfWar, linesNear, lookingAt, politiesAt } from './context';
-import { loadGazetteer, matchName, namesAround, relationLabel, type Gazetteer } from './gazetteer';
+import { getPlace, matchName, namesAround, nearbyPlaces, relationLabel, searchPlaces } from './gazetteer';
 import { searchAtlas } from './search';
 
-const PACK = join(__dirname, '../../public');
+const PUB = join(__dirname, '../../public');
+const fetched: string[] = [];
 vi.stubGlobal('fetch', async (url: string) => {
-  const path = join(PACK, url.replace(/^.*?\/atlas\//, 'atlas/'));
-  try { const body = readFileSync(path, 'utf8'); return { ok: true, status: 200, json: async () => JSON.parse(body) }; } catch { return { ok: false, status: 404, json: async () => ({}) }; }
+  const rel = url.replace(/^.*?\/(atlas|world)\//, '$1/');
+  fetched.push(rel);
+  try { const body = readFileSync(join(PUB, rel), 'utf8'); return { ok: true, status: 200, json: async () => JSON.parse(body) }; } catch { return { ok: false, status: 404, json: async () => ({}) }; }
 });
-
-let g: Gazetteer;
-beforeAll(async () => { g = await loadGazetteer(); }, 30000);
+const place = async (n: string, y?: number) => (await matchName(n, y)).place;
 
 describe('historical names', () => {
-  it('recognises ancient and modern names only where Pleiades links them', () => {
-    expect(matchName(g, 'Carthage', -218).place?.title).toBe('Carthago');
-    expect(matchName(g, 'Carthage', -218).matchedName).toMatchObject({ name: 'Carthage', isTitle: false });
-    expect(matchName(g, 'Eboracum').place?.title).toBe('Eburacum');
-    expect(matchName(g, 'York').place?.title).toBe('Eburacum');
-    expect(matchName(g, 'Lutetia').place?.title).toBe('Lutetia');
-    expect(matchName(g, 'Rome').place?.title).toBe('Roma');
-    expect(matchName(g, 'Cannae', -216).status).toBe('unique');
+  it('recognises ancient and modern names only where the dataset links them', async () => {
+    expect((await place('Carthage', -218))?.title).toBe('Carthago');
+    expect((await matchName('Carthage', -218)).matchedName).toMatchObject({ name: 'Carthage', isTitle: false });
+    expect((await place('Eboracum', 120))?.title).toBe('Eburacum');
+    expect((await place('York', 120))?.title).toBe('Eburacum');
+    expect((await place('Lutetia', 100))?.title).toBe('Lutetia');
+    expect((await place('Rome', -218))?.title).toBe('Roma');
+    expect((await matchName('Cannae', -216)).status).toBe('unique');
   });
-  it('keeps different places apart and follows recorded succession', () => {
-    const byz = matchName(g, 'Byzantium').place!;
-    const cp = matchName(g, 'Constantinople').place!;
+  it('does not guess between datasets: "Rome" is also a Mecklenburg village (Viabundus) when the date is unknown', async () => {
+    const m = await matchName('Rome');
+    expect(m.status).toBe('ambiguous');
+    expect(m.candidates.map((c) => c.gazetteer).sort()).toEqual(['pleiades', 'viabundus']);
+  });
+  it('keeps different places apart and follows recorded succession', async () => {
+    const byz = (await place('Byzantium', 300))!;
+    const cp = (await place('Constantinople', 500))!;
     expect(byz.key).not.toBe(cp.key);
-    const succ = cp.related.find((r) => r.key === byz.key)!;
-    expect(relationLabel(succ)).toBe('succeeds');
+    expect(relationLabel(cp.related.find((r) => r.key === byz.key)!)).toBe('succeeds');
     expect(relationLabel(byz.related.find((r) => r.key === cp.key)!)).toBe('succeeded by');
+    expect(relationLabel(byz.related.find((r) => r.title === 'Megara')!)).toBe('founded by');
     expect(cp.names.map((n) => n.name)).toContain('Istanbul');
+    expect((await getPlace(cp.key))?.title).toBe('Constantinopolis');
   });
-  it('does not guess when several places share a name', () => {
-    const m = matchName(g, 'Alexandria');
+  it('does not guess when several places share a name', async () => {
+    const m = await matchName('Alexandria');
     expect(m.status).toBe('ambiguous');
     expect(m.candidates.length).toBeGreaterThan(1);
-    expect(matchName(g, 'Xyzzyville').status).toBe('none');
+    expect((await matchName('Xyzzyville')).status).toBe('none');
   });
-  it('lists names by their recorded dates', () => {
-    const cp = matchName(g, 'Constantinople').place!;
+  it('uses the specialist gazetteer for the period: Viabundus for Hanseatic towns, al-Ṯurayyā for the early Islamic world', async () => {
+    const lub = await place('Lübeck', 1400);
+    expect(lub?.gazetteer).toBe('viabundus');
+    expect(lub?.roles?.some((r) => r[0] === 'town')).toBe(true);
+    expect((await searchPlaces('Baghdad')).length + (await searchPlaces('Bag')).length).toBeGreaterThan(0);
+  });
+  it('lists names by their recorded dates', async () => {
+    const cp = (await place('Constantinople', 500))!;
     expect(namesAround(cp).length).toBeGreaterThan(1);
+  });
+  it('only fetches the pieces a lookup needs', async () => {
+    fetched.length = 0;
+    await matchName('Capua', -216);
+    expect(fetched.length).toBeLessThanOrEqual(3);
+    expect(fetched.every((f) => f.startsWith('world/places/'))).toBe(true);
   });
 });
 
 describe('what is here', () => {
   const capua: [number, number] = [14.2528, 41.0845];
-  it('finds nearby places recorded around the year, nearest first', () => {
-    const near = g.nearby(capua, 40, { year: -218 });
+  it('finds nearby places recorded around the year, nearest first', async () => {
+    const near = await nearbyPlaces(capua, 40, { year: -218 });
     expect(near.length).toBeGreaterThan(3);
     for (let i = 1; i < near.length; i++) expect(near[i].km).toBeGreaterThanOrEqual(near[i - 1].km);
     expect(near.every((n) => n.km <= 40)).toBe(true);

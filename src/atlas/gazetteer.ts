@@ -1,19 +1,24 @@
-// Gazetteers: offline lookup of historical place names, by period.
+// Gazetteers: offline lookup of historical place names, by period and region.
 //
-// Each gazetteer covers a span of history. The reader asks every gazetteer
-// that covers the book's period; today that is Pleiades (the ancient world),
-// and later datasets (medieval, early modern…) plug in the same way. Names
-// are only linked to a place when the dataset itself records that name for
-// it — two places are never merged because their names look alike.
-import { km, type Pos, pack } from './data';
+// Several specialist gazetteers are built into one tiled index
+// (public/world/places): Pleiades for the ancient world, Viabundus for
+// northern Europe 1350–1650, al-Ṯurayyā for the early Islamic world. Each row
+// keeps its own source, identifier, dates and certainty. The app only ever
+// loads the name shard or map cells a question needs — never the whole
+// index. Names are linked to a place only when its dataset records that name
+// for it; places from different datasets are treated as the same place only
+// when they carry the name *and* lie within a few kilometres of each other.
+import { getJSON, km, type Pos } from './data';
 import type { HistYear } from './time';
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
+export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya';
+export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
 export interface GazPlace {
   /** "<gazetteer>:<id>", e.g. "pleiades:423025" */
   key: string;
   gazetteer: GazetteerId;
-  id: number;
+  id: number | string;
   title: string;
   lon: number;
   lat: number;
@@ -21,6 +26,8 @@ export interface GazPlace {
   types: string[];
   from?: HistYear;
   to?: HistYear;
+  /** The dates are the dataset's overall period (e.g. al-Ṯurayyā's 9th–10th c.), not this place's. */
+  datasetPeriod?: boolean;
   /** 0 certain, 1 less certain, 2 uncertain (the source's own rating). */
   uncertain: number;
   names: GazName[];
@@ -28,105 +35,179 @@ export interface GazPlace {
   partOf: string[];
   /** Other relationships the dataset records ("succeeds", "port of", "near"…), both directions. */
   related: Relation[];
+  /** Dated roles (Viabundus: town 1250–, toll 1400–1500…). */
+  roles?: [string, number | null, number | null][];
   url: string;
 }
 
-export type GazetteerId = 'pleiades';
-export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
+export interface GazetteerInfo {
+  id: GazetteerId; name: string; license: string; url: string;
+  coverage: [HistYear, HistYear];
+  /** Rough box [W, S, E, N] of where the dataset has records. */
+  box: [number, number, number, number];
+  describe: string;
+  record: (id: number | string) => string;
+}
 
-/** Pleiades connection types in plain words; reverse = seen from the other place. */
-const REL_LABEL: Record<string, [string, string]> = {
-  succeeds: ['succeeds', 'succeeded by'], same_as: ['same as', 'same as'], capital: ['capital of', 'has capital'], port_of: ['port of', 'has port'],
-  founded: ['founded', 'founded by'], near: ['near', 'near'], at: ['at', 'site of'], on: ['on', 'has on it'], crosses: ['crosses', 'crossed by'],
+/** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
+export const GAZETTEERS: GazetteerInfo[] = [
+  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], box: [-20, 5, 90, 60], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
+  { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
+  { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], box: [-10, 10, 80, 45], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
+];
+export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
+/** Gazetteers whose period covers the year (all of them when the year is unknown). */
+export const gazetteersFor = (year?: HistYear) => GAZETTEERS.filter((g) => year === undefined || (year >= g.coverage[0] && year <= g.coverage[1]));
+
+/** Lower-case, without accents or a leading "the", so "Lutétia" = "lutetia". Must match norm() in scripts/atlas-build/world.py. */
+export const normName = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/^the\s+/, '').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+/** Name-index shard for a normalised name. Must match shard() in world.py. */
+export function nameShard(n: string): string {
+  let out = '';
+  for (const ch of Array.from(n).slice(0, 2)) out += /[a-z0-9]/.test(ch) ? ch : `x${(ch.codePointAt(0)! % 16).toString(16)}`;
+  return out || '_';
+}
+
+const PLEIADES_REL: Record<string, [string, string]> = {
+  // Pleiades' own definitions (pleiades.stoa.org/vocabularies/relationship-types); reverse = seen from the other place.
+  succeeds: ['succeeds', 'succeeded by'], same_as: ['possibly the same as', 'possibly the same as'], capital: ['capital of', 'has as capital'], port_of: ['port of', 'has port'],
+  founded: ['founded by', 'founded'], near: ['near', 'near'], at: ['at', 'site of'], on: ['on', 'has on it'], crosses: ['crosses', 'crossed by'],
   flows_into: ['flows into', 'receives'], route_next: ['next on route to', 'next on route from'], abuts: ['borders', 'borders'], bounds: ['bounds', 'bounded by'],
   communicates: ['connected with', 'connected with'], related: ['related to', 'related to'],
 };
-export const relationLabel = (r: Relation) => (REL_LABEL[r.type] ?? [r.type.replace(/_/g, ' '), r.type.replace(/_/g, ' ')])[r.reverse ? 1 : 0];
-export interface GazetteerInfo { id: GazetteerId; name: string; license: string; url: string; coverage: [HistYear, HistYear]; describe: string }
-
-/** The registry. Add a dataset for another period here, with a loader below. */
-export const GAZETTEERS: GazetteerInfo[] = [
-  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], describe: 'Ancient places, their names and dates (Greek, Roman, Near Eastern, Late Antique and some medieval).' },
-];
-
-export const gazetteersFor = (year?: HistYear) => GAZETTEERS.filter((g) => year === undefined || (year >= g.coverage[0] && year <= g.coverage[1]));
-
-/** Lower-case, without accents or a leading "the", so "Lutétia" = "lutetia". */
-export const normName = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/^the\s+/, '').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+export const relationLabel = (r: Relation) => (PLEIADES_REL[r.type] ?? [r.type.replace(/_/g, ' '), r.type.replace(/_/g, ' ')])[r.reverse ? 1 : 0];
 
 /** Types that are not places one can put a pin on for a reader's name. */
 const NOT_A_LOCATION = new Set(['people', 'ethnic-group', 'unknown', 'false', 'label']);
 
-type Row = [number, string, number, number, 0 | 1, string, number | null, number | null, number, [string, number | null, number | null, string][], number[], [number, string][]?];
+// ── The tiled index ───────────────────────────────────────────────────────
 
-export class Gazetteer {
-  readonly byKey = new Map<string, GazPlace[]>();
-  readonly byId = new Map<string, GazPlace>();
-  readonly all: GazPlace[] = [];
-  constructor(readonly info: GazetteerInfo, rows: Row[], titles: Record<string, string>) {
-    for (const r of rows) {
-      const p: GazPlace = {
-        key: `${info.id}:${r[0]}`, gazetteer: info.id, id: r[0], title: r[1], lon: r[2], lat: r[3], precise: r[4] === 1,
-        types: r[5] ? r[5].split(',') : [], from: r[6] ?? undefined, to: r[7] ?? undefined, uncertain: r[8],
-        names: r[9].map(([name, from, to, lang]) => ({ name, from: from ?? undefined, to: to ?? undefined, lang: lang || undefined })),
-        partOf: [], related: [], url: `https://pleiades.stoa.org/places/${r[0]}`,
-      };
-      this.all.push(p);
-      this.byId.set(p.key, p);
-      for (const n of new Set([p.title, ...p.names.map((x) => x.name)].map(normName))) {
-        if (n.length < 2) continue;
-        const list = this.byKey.get(n) ?? [];
-        list.push(p);
-        this.byKey.set(n, list);
-      }
-    }
-    // "Part of" titles, looked up after every place is known.
-    const title = (id: number) => this.byId.get(`${info.id}:${id}`)?.title ?? titles[String(id)];
-    rows.forEach((r, i) => {
-      const p = this.all[i];
-      p.partOf = r[10].map(title).filter((x): x is string => !!x);
-      for (const [id, type] of r[11] ?? []) {
-        const t = title(id);
-        if (!t) continue;
-        const key = `${info.id}:${id}`;
-        p.related.push({ title: t, key: this.byId.has(key) ? key : undefined, type });
-        this.byId.get(key)?.related.push({ title: p.title, key: p.key, type, reverse: true });
-      }
-    });
-  }
+type Row = [GazetteerId, number | string, string, number, number, 0 | 1, string, number | null, number | null, number,
+  [string, number | null, number | null, string][], string[], [number | string, string, string, 0 | 1][], { roles?: [string, number | null, number | null][]; period?: [number, number]; z?: number } | null];
+type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
-  /** Every place whose recorded names include this name exactly. */
-  match(name: string): GazPlace[] {
-    return (this.byKey.get(normName(name)) ?? []).filter((p) => !p.types.every((t) => NOT_A_LOCATION.has(t)));
-  }
+const CELL = 2;
+const base = () => `${import.meta.env.BASE_URL}world/places/`;
+export const cellOf = (lon: number, lat: number) => `${Math.floor((lon + 180) / CELL)}_${Math.floor((lat + 90) / CELL)}`;
 
-  /** Places by name prefix (for search). Title matches first. */
-  search(q: string, limit = 20): GazPlace[] {
-    const k = normName(q);
-    if (k.length < 2) return [];
-    const exact = this.byKey.get(k) ?? [];
-    const out = new Set(exact);
-    for (const [n, ps] of this.byKey) {
-      if (out.size >= limit * 3) break;
-      if (n !== k && n.startsWith(k)) for (const p of ps) out.add(p);
-    }
-    return [...out].sort((a, b) => Number(normName(b.title) === k) - Number(normName(a.title) === k) || Number(b.precise) - Number(a.precise)).slice(0, limit);
-  }
+/** A small bounded cache, so exploring the whole map never keeps everything in memory. */
+class Lru<V> {
+  private m = new Map<string, V>();
+  constructor(private max: number) {}
+  get(k: string) { const v = this.m.get(k); if (v !== undefined) { this.m.delete(k); this.m.set(k, v); } return v; }
+  set(k: string, v: V) { this.m.set(k, v); if (this.m.size > this.max) this.m.delete(this.m.keys().next().value!); }
+}
+const cells = new Lru<Promise<GazPlace[]>>(120);
+const shards = new Lru<Promise<NameEntry[]>>(40);
+const idShards = new Lru<Promise<Record<string, string>>>(16);
 
-  /** Places within `radiusKm`, nearest first; with a year, only those recorded around then (or undated). */
-  nearby(at: Pos, radiusKm: number, opts: { year?: HistYear; slack?: number; exclude?: string; filter?: (p: GazPlace) => boolean } = {}): { place: GazPlace; km: number }[] {
-    const dLat = radiusKm / 110.57;
-    const dLon = radiusKm / (111.32 * Math.max(0.1, Math.cos((at[1] * Math.PI) / 180)));
-    const out: { place: GazPlace; km: number }[] = [];
-    for (const p of this.all) {
-      if (Math.abs(p.lat - at[1]) > dLat || Math.abs(p.lon - at[0]) > dLon || p.key === opts.exclude) continue;
-      if (opts.year !== undefined && !existedAround(p, opts.year, opts.slack)) continue;
-      if (opts.filter && !opts.filter(p)) continue;
-      const d = km(at, [p.lon, p.lat]);
-      if (d <= radiusKm) out.push({ place: p, km: d });
-    }
-    return out.sort((a, b) => a.km - b.km);
+function toPlace(r: Row): GazPlace {
+  const [src, id, title, lon, lat, precise, types, from, to, unc, names, partOf, related, extra] = r;
+  const info = gazetteerInfo(src);
+  return {
+    key: `${src}:${id}`, gazetteer: src, id, title, lon, lat, precise: precise === 1,
+    types: types ? types.split(',') : [],
+    from: from ?? extra?.period?.[0] ?? undefined, to: to ?? extra?.period?.[1] ?? undefined, datasetPeriod: from === null && to === null && !!extra?.period,
+    uncertain: unc, names: names.map(([name, a, b, lang]) => ({ name, from: a ?? undefined, to: b ?? undefined, lang: lang || undefined })),
+    partOf, related: related.map(([rid, type, t, rev]) => ({ title: t, key: `${src}:${rid}`, type, reverse: rev === 1 })),
+    roles: extra?.roles, url: info.record(id),
+  };
+}
+
+export function placesInCell(cell: string): Promise<GazPlace[]> {
+  let p = cells.get(cell);
+  if (!p) {
+    p = getJSON<Row[]>(`${base()}c/${cell}.json`).then((rows) => rows.map(toPlace)).catch(() => []);
+    cells.set(cell, p);
   }
+  return p;
+}
+function nameEntries(norm: string): Promise<NameEntry[]> {
+  const s = nameShard(norm);
+  let p = shards.get(s);
+  if (!p) {
+    p = getJSON<NameEntry[]>(`${base()}n/${s}.json`).catch(() => []);
+    shards.set(s, p);
+  }
+  return p;
+}
+
+// CRC-32, to find which id shard holds a place (matches zlib.crc32 in world.py).
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+export function crc32(s: string): number {
+  let c = 0xffffffff;
+  for (const b of new TextEncoder().encode(s)) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+/** One place by key ("pleiades:423025"). */
+export async function getPlace(key: string): Promise<GazPlace | undefined> {
+  const i = key.indexOf(':');
+  const src = key.slice(0, i);
+  const id = key.slice(i + 1);
+  if (!GAZETTEERS.some((g) => g.id === src)) return undefined;
+  const shard = `${src}-${crc32(id) % 16}`;
+  let p = idShards.get(shard);
+  if (!p) { p = getJSON<Record<string, string>>(`${base()}i/${shard}.json`).catch(() => ({})); idShards.set(shard, p); }
+  const cell = (await p)[id];
+  if (!cell) return undefined;
+  return (await placesInCell(cell)).find((x) => x.key === key);
+}
+
+/** Every place (in any gazetteer) with this exact name; isTitle = it's the record's main name. */
+export async function placesByName(name: string): Promise<{ place: GazPlace; isTitle: boolean }[]> {
+  const k = normName(name);
+  if (k.length < 2) return [];
+  const hits = (await nameEntries(k)).filter((e) => e[0] === k);
+  const byCell = new Map<string, NameEntry[]>();
+  for (const e of hits) byCell.set(e[3], [...(byCell.get(e[3]) ?? []), e]);
+  const out: { place: GazPlace; isTitle: boolean }[] = [];
+  await Promise.all([...byCell].map(async ([cell, es]) => {
+    const ps = await placesInCell(cell);
+    for (const e of es) { const p = ps.find((x) => x.gazetteer === e[1] && x.id === e[2]); if (p) out.push({ place: p, isTitle: e[4] === 1 }); }
+  }));
+  return out.filter((h) => !h.place.types.every((t) => NOT_A_LOCATION.has(t)));
+}
+
+/** Places whose names start with the text (search). Title matches first. */
+export async function searchPlaces(q: string, limit = 20): Promise<{ place: GazPlace; matched: string }[]> {
+  const k = normName(q);
+  if (k.length < 2) return [];
+  const es = (await nameEntries(k)).filter((e) => e[0].startsWith(k)).sort((a, b) => Number(b[0] === k) - Number(a[0] === k) || b[4] - a[4]).slice(0, limit * 2);
+  const out: { place: GazPlace; matched: string }[] = [];
+  const seen = new Set<string>();
+  for (const e of es) {
+    const key = `${e[1]}:${e[2]}`;
+    if (seen.has(key)) continue;
+    const p = (await placesInCell(e[3])).find((x) => x.key === key);
+    if (!p) continue;
+    seen.add(key);
+    out.push({ place: p, matched: e[0] });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/** Places within `radiusKm`, nearest first; with a year, only those recorded around then (or undated). Loads only the cells it needs. */
+export async function nearbyPlaces(at: Pos, radiusKm: number, opts: { year?: HistYear; slack?: number; exclude?: string; filter?: (p: GazPlace) => boolean } = {}): Promise<{ place: GazPlace; km: number }[]> {
+  const dLat = radiusKm / 110.57;
+  const dLon = radiusKm / (111.32 * Math.max(0.1, Math.cos((at[1] * Math.PI) / 180)));
+  const x0 = Math.floor((at[0] - dLon + 180) / CELL);
+  const x1 = Math.floor((at[0] + dLon + 180) / CELL);
+  const y0 = Math.floor((at[1] - dLat + 90) / CELL);
+  const y1 = Math.floor((at[1] + dLat + 90) / CELL);
+  const keys: string[] = [];
+  for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) keys.push(`${x}_${y}`);
+  const all = (await Promise.all(keys.slice(0, 36).map(placesInCell))).flat();
+  const out: { place: GazPlace; km: number }[] = [];
+  for (const p of all) {
+    if (p.key === opts.exclude || Math.abs(p.lat - at[1]) > dLat || Math.abs(p.lon - at[0]) > dLon) continue;
+    if (opts.year !== undefined && !existedAround(p, opts.year, opts.slack ?? (p.datasetPeriod ? 150 : 0))) continue;
+    if (opts.filter && !opts.filter(p)) continue;
+    const d = km(at, [p.lon, p.lat]);
+    if (d <= radiusKm) out.push({ place: p, km: d });
+  }
+  return out.sort((a, b) => a.km - b.km);
 }
 
 /** Was the place recorded around this year? Undated places count as "maybe". */
@@ -141,17 +222,6 @@ export function namesAround(p: GazPlace, year?: HistYear): GazName[] {
   return p.names.filter((n) => existedAround(n, year, 50));
 }
 
-const loaded = new Map<GazetteerId, Promise<Gazetteer>>();
-export function loadGazetteer(id: GazetteerId = 'pleiades'): Promise<Gazetteer> {
-  if (!loaded.has(id)) {
-    const info = GAZETTEERS.find((g) => g.id === id)!;
-    const p = pack<{ rows: Row[]; titles: Record<string, string> }>('pleiades-gazetteer.json').then((d) => new Gazetteer(info, d.rows, d.titles ?? {}));
-    p.catch(() => loaded.delete(id));
-    loaded.set(id, p);
-  }
-  return loaded.get(id)!;
-}
-
 // ── Matching a name from the book ─────────────────────────────────────────
 
 export type MatchStatus = 'unique' | 'ambiguous' | 'none';
@@ -159,31 +229,54 @@ export interface NameMatch {
   status: MatchStatus;
   place?: GazPlace;
   candidates: GazPlace[];
+  /** Records of the same place in other datasets (same name, within a few km). */
+  corroborating: GazPlace[];
   /** Which recorded name matched ("Carthage" → recorded name of Carthago). */
   matchedName?: GazName & { isTitle: boolean };
   reason: string;
 }
 
+const SAME_PLACE_KM = 8;
+const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).join(' and ');
+
 /**
- * Match a name as written in the book. A place is chosen only when exactly one
- * place in the dataset carries that name (after keeping only places recorded
- * around the year, when the year is known). Otherwise it is ambiguous and the
- * reader decides.
+ * Match a name as written in the book. A place is chosen only when every
+ * record carrying that name (in the gazetteers covering the year, recorded
+ * around the year when it's known) is one place — records from different
+ * datasets count as one place only when they lie within a few kilometres.
+ * Otherwise it's ambiguous and the reader decides.
  */
-export function matchName(g: Gazetteer, written: string, year?: HistYear): NameMatch {
-  const all = g.match(written);
-  if (!all.length) return { status: 'none', candidates: [], reason: `No place called “${written}” in ${g.info.name}.` };
-  const inTime = year === undefined ? all : all.filter((p) => existedAround(p, year, 150));
-  const pool = inTime.length ? inTime : all;
-  // Places whose main title is the name outrank places that only list it among other names.
+export async function matchName(written: string, year?: HistYear): Promise<NameMatch> {
+  const sources = gazetteersFor(year).map((g) => g.id);
+  const hits = (await placesByName(written)).filter((h) => sources.includes(h.place.gazetteer));
+  if (!hits.length) return { status: 'none', candidates: [], corroborating: [], reason: `No place called “${written}” in ${srcList(sources) || 'the gazetteers for this period'}.` };
+  const inTime = year === undefined ? hits : hits.filter((h) => existedAround(h.place, year, h.place.datasetPeriod ? 150 : 150));
+  const pool = inTime.length ? inTime : hits;
+  // Group records that are the same place: same dataset id, or different datasets within a few km.
+  const groups: { place: GazPlace; isTitle: boolean }[][] = [];
+  for (const h of pool) {
+    const g = groups.find((gr) => gr.some((x) => x.place.gazetteer !== h.place.gazetteer && km([x.place.lon, x.place.lat], [h.place.lon, h.place.lat]) <= SAME_PLACE_KM));
+    if (g) g.push(h); else groups.push([h]);
+  }
+  // Pick the record to show from a group: the dataset whose period fits best (listed first in GAZETTEERS for the year), titled first.
+  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => Number(b.isTitle) - Number(a.isTitle) || sources.indexOf(a.place.gazetteer) - sources.indexOf(b.place.gazetteer))[0];
   const k = normName(written);
-  const titled = pool.filter((p) => normName(p.title) === k);
-  const chosen = pool.length === 1 ? pool[0] : titled.length === 1 && pool.length - titled.length <= 1 && titled[0].precise ? titled[0] : undefined;
-  if (!chosen) return { status: 'ambiguous', candidates: pool.slice(0, 12), reason: `${pool.length} places in ${g.info.name} are recorded with the name “${written}”${year !== undefined && inTime.length ? ' around this date' : ''}.` };
-  const isTitle = normName(chosen.title) === k;
-  const nm = isTitle ? { name: chosen.title, isTitle } : { ...chosen.names.find((n) => normName(n.name) === k)!, isTitle };
+  let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
+  if (groups.length === 1) chosen = groups[0];
+  else {
+    // A single group where the name is the main title, against at most one other place listing it as an alternative.
+    const titled = groups.filter((gr) => gr.some((x) => x.isTitle));
+    if (titled.length === 1 && groups.length - 1 <= 1 && lead(titled[0]).place.precise) chosen = titled[0];
+  }
+  const where = srcList(pool.map((h) => h.place.gazetteer));
+  if (!chosen) return { status: 'ambiguous', candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: [], reason: `${groups.length} different places in ${where} are recorded with the name “${written}”${year !== undefined && inTime.length ? ' around this date' : ''}.` };
+  const main = lead(chosen);
+  const nm = main.isTitle ? { name: main.place.title, isTitle: true } : { ...(main.place.names.find((n) => normName(n.name) === k) ?? { name: written }), isTitle: false };
+  const others = chosen.filter((x) => x !== main).map((x) => x.place);
   return {
-    status: 'unique', place: chosen, candidates: pool.slice(0, 12), matchedName: nm,
-    reason: pool.length === 1 ? `The only place in ${g.info.name} recorded with the name “${written}”${year !== undefined && inTime.length < all.length ? ' around this date' : ''}.` : `The only place in ${g.info.name} whose main name is “${written}”.`,
+    status: 'unique', place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm,
+    reason: groups.length === 1
+      ? `The only place in ${where} recorded with the name “${written}”${year !== undefined && inTime.length < hits.length ? ' around this date' : ''}.${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}`
+      : `The only place in ${where} whose main name is “${written}”.`,
   };
 }

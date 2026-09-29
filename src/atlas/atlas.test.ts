@@ -1,6 +1,6 @@
 // The atlas: year maths, layer catalog, and spot checks on the built data packs.
 import { featureFilter, validateStyleMin } from '@maplibre/maplibre-gl-style-spec';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, type LayerCtx, LAYERS, SOURCE_SPECS } from './catalog';
@@ -84,12 +84,20 @@ describe('atlas data packs', () => {
       expect(d.attribution, id).toBeTruthy();
     }
   });
-  it('has Carthage as an ancient port with Pleiades dates', () => {
-    const places = pack<FC>('pleiades-places.json');
-    const carthage = places.features.find((f) => f.properties.n === 'Carthago')!;
-    expect(carthage).toBeDefined();
-    expect(String(carthage.properties.l)).toContain('port');
-    expect(matches(existedIn(-218, { undated: { until: 640 } }), carthage.properties)).toBe(true);
+  it('has Carthage in the World place index, as an ancient port with Pleiades dates', () => {
+    // Name shard → cell → row, exactly as the app looks it up.
+    const entry = pack<[string, string, number, string, number][]>('../world/places/n/ca.json').find((e) => e[0] === 'carthago' && e[1] === 'pleiades')!;
+    expect(entry).toBeDefined();
+    const row = pack<unknown[][]>(`../world/places/c/${entry[3]}.json`).find((r) => r[1] === entry[2])!;
+    expect(row[2]).toBe('Carthago');
+    expect(String(row[6])).toContain('port');
+    expect(matches(existedIn(-218, { undated: { until: 640 } }), { f: row[7], t: row[8] })).toBe(true);
+  });
+  it('ships vector tiles for the heavy layers and no whole-world files', () => {
+    const tiles = readdirSync(join(PACK, '../world/tiles'));
+    for (const t of ['pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles']) expect(tiles).toContain(t);
+    expect(readdirSync(PACK)).not.toContain('pleiades-places.json');
+    expect(readdirSync(PACK)).not.toContain('pleiades-gazetteer.json');
   });
   it('dates the battles of the Second Punic War as Wikidata does', () => {
     const ev = pack<FC>('wikidata-events.json');

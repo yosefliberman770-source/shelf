@@ -11,8 +11,10 @@ import { norm } from '../lib/history/assess';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, gazetteersFor, GAZETTEERS, loadGazetteer, matchName, normName, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, gazetteerInfo, getPlace, matchName, normName, type Relation } from './gazetteer';
 import type { HistYear } from './time';
+import { type HistDate, mergeDates, period, yearRange } from '../world/histdate';
+import type { EvidenceKind } from '../world/evidence';
 
 /** How the name was found in the book (shown in "Why is this place here?"). */
 export type Detection = 'cue' | 'known' | 'ai' | 'selection' | 'search' | 'map';
@@ -34,7 +36,9 @@ export const CERTAINTY_LABEL: Record<Certainty, string> = {
   disputed: 'Disputed location',
 };
 
-export interface Source { name: string; url?: string; license?: string; record?: string; note?: string }
+export interface Source { name: string; url?: string; license?: string; record?: string; note?: string; id?: string; tier?: string; accessed?: string }
+/** Two or more sources saying different things about the same place — kept side by side, never averaged. */
+export interface Disagreement { field: 'location' | 'date' | 'name' | 'affiliation'; claims: { source: string; value: string }[]; note?: string }
 
 export interface ReaderPlace {
   key: string;
@@ -46,6 +50,12 @@ export interface ReaderPlace {
   certainty: Certainty;
   from?: HistYear;
   to?: HistYear;
+  /** The record's dates with their kind and uncertainty (and other sources' dates as conflicts). */
+  when?: HistDate;
+  /** Dated roles (Viabundus: town, toll, fair…). */
+  roles?: [string, number | null, number | null][];
+  evidence?: EvidenceKind;
+  disagreements?: Disagreement[];
   names: GazName[];
   partOf: string[];
   related: Relation[];
@@ -68,13 +78,31 @@ export interface Resolution {
 
 const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
 
-export function fromGaz(p: GazPlace, written: string, why: ReaderPlace['why'], status: Confidence = 'HIGH'): ReaderPlace {
-  const info = GAZETTEERS.find((g) => g.id === p.gazetteer)!;
+/** A gazetteer record's dates, keeping what kind of date they are. */
+export function gazDate(p: GazPlace): HistDate {
+  const name = gazetteerInfo(p.gazetteer).name;
+  if (p.datasetPeriod) return period(p.from, p.to, 'Period of the whole dataset, not of this place', name);
+  if (p.gazetteer === 'pleiades') return period(p.from, p.to, 'Pleiades periods', name);
+  return yearRange(p.from, p.to, { source: name, qualifier: p.to === undefined && p.from !== undefined ? 'after' : 'between' });
+}
+
+export function fromGaz(p: GazPlace, written: string, why: ReaderPlace['why'], status: Confidence = 'HIGH', corroborating: GazPlace[] = []): ReaderPlace {
+  const src = (g: GazPlace): Source => { const info = gazetteerInfo(g.gazetteer); return { name: info.name, url: info.url, license: info.license, record: g.url, id: String(g.id) }; };
+  const all = [p, ...corroborating];
+  // Other datasets placing the same name at the same spot: note any gap in distance or dates rather than hiding it.
+  const disagreements: Disagreement[] = [];
+  for (const c of corroborating) {
+    const d = km([p.lon, p.lat], [c.lon, c.lat]);
+    if (d >= 2) disagreements.push({ field: 'location', claims: [{ source: gazetteerInfo(p.gazetteer).name, value: `${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}` }, { source: gazetteerInfo(c.gazetteer).name, value: `${c.lat.toFixed(3)}, ${c.lon.toFixed(3)}` }], note: `The two records are ${d.toFixed(1)} km apart — datasets often mark different points of the same town.` });
+  }
   return {
     key: p.key, title: p.title, written, lat: p.lat, lon: p.lon,
     certainty: p.uncertain >= 1 ? 'uncertain' : p.precise ? 'known' : 'approximate',
-    from: p.from, to: p.to, names: p.names, partOf: p.partOf, related: p.related, types: p.types,
-    sources: [{ name: info.name, url: info.url, license: info.license, record: p.url }],
+    from: p.from, to: p.to, when: mergeDates(all.map(gazDate)), names: p.names, partOf: p.partOf, related: p.related, types: [...new Set(all.flatMap((x) => x.types))],
+    roles: p.roles ?? corroborating.find((c) => c.roles)?.roles,
+    sources: all.map(src),
+    evidence: p.uncertain >= 1 ? 'historical-uncertainty' : corroborating.length ? 'confirmed' : 'single-source',
+    disagreements,
     status, why, gaz: p,
   };
 }
@@ -114,24 +142,21 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     const c = await db.placeChoices.get(choiceKey(opts.bookId, written)).catch(() => undefined);
     const h = c?.place as HistoricalPlace | undefined;
     if (h) {
-      const g = h.id.startsWith('pleiades:') ? (await loadGazetteer().catch(() => undefined))?.byId.get(h.id) : undefined;
+      const g = await getPlace(h.id).catch(() => undefined);
       const p = g ? fromGaz(g, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true })) : fromOnline(h, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true }), 'HIGH');
       if (p) return { place: p, status: 'HIGH', candidates: [], reason: p.why.reason };
     }
   }
   // 2. Period gazetteers, offline.
   let local: Resolution | undefined;
-  for (const info of gazetteersFor(opts.year)) {
-    const g = await loadGazetteer(info.id).catch(() => undefined);
-    if (!g) continue;
-    const m = matchName(g, written, opts.year);
-    if (m.status === 'unique' && m.place) {
-      const status: Confidence = m.candidates.length === 1 ? 'HIGH' : 'MEDIUM';
-      const place = fromGaz(m.place, written, why(m.reason, `${info.name} name match`, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status);
-      return { place, status, candidates: m.candidates.filter((c) => c.key !== m.place!.key).map((c) => fromGaz(c, written, place.why, 'LOW')), reason: m.reason };
-    }
-    if (m.status === 'ambiguous') local = { status: 'AMBIGUOUS', candidates: m.candidates.map((c) => fromGaz(c, written, why(m.reason, `${info.name} name match`), 'AMBIGUOUS')), reason: m.reason };
+  const m = await matchName(written, opts.year).catch(() => undefined);
+  if (m?.status === 'unique' && m.place) {
+    const status: Confidence = m.candidates.length === 1 ? 'HIGH' : 'MEDIUM';
+    const method = `${[m.place, ...m.corroborating].map((p) => gazetteerInfo(p.gazetteer).name).join(' + ')} name match`;
+    const place = fromGaz(m.place, written, why(m.reason, method, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status, m.corroborating);
+    return { place, status, candidates: m.candidates.filter((c) => c.key !== m.place!.key).map((c) => fromGaz(c, written, place.why, 'LOW')), reason: m.reason };
   }
+  if (m?.status === 'ambiguous') local = { status: 'AMBIGUOUS', candidates: m.candidates.map((c) => fromGaz(c, written, why(m.reason, `${gazetteerInfo(c.gazetteer).name} name match`), 'AMBIGUOUS')), reason: m.reason };
   if (opts.online === false) return local ?? { status: 'UNRESOLVED', candidates: [], reason: `“${written}” isn’t in the offline gazetteer for this period.` };
   // 3. The online place service (WHG via Shelf's server, else Wikidata).
   const q: PlaceQuery = { name: written, date: opts.year, surroundingText: opts.passage?.slice(0, 1200), nearbyPlaceNames: opts.nearby?.slice(0, 10), chapterTitle: opts.chapter, bookTitle: opts.bookTitle, bookId: opts.bookId, language: 'en' };
@@ -152,15 +177,11 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
 /** Quick offline check used while reading: is this name one unique place in the period's gazetteer? */
 export async function offlineUnique(names: string[], year: HistYear): Promise<Map<string, GazPlace>> {
   const out = new Map<string, GazPlace>();
-  for (const info of gazetteersFor(year)) {
-    const g = await loadGazetteer(info.id).catch(() => undefined);
-    if (!g) continue;
-    for (const n of names) {
-      if (out.has(normName(n))) continue;
-      const m = matchName(g, n, year);
-      // Underline only clear cases: one place, located on the map with confidence.
-      if (m.status === 'unique' && m.place && m.candidates.length === 1 && m.place.uncertain === 0) out.set(normName(n), m.place);
-    }
+  for (const n of [...new Set(names)]) {
+    if (out.has(normName(n))) continue;
+    const m = await matchName(n, year).catch(() => undefined);
+    // Underline only clear cases: one place, located on the map with confidence.
+    if (m?.status === 'unique' && m.place && m.candidates.length === 1 && m.place.uncertain === 0) out.set(normName(n), m.place);
   }
   return out;
 }

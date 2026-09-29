@@ -3,7 +3,7 @@
 // with a way to see why the name was matched. "View on map" opens the atlas.
 import { useEffect, useState } from 'react';
 import { politiesAt, type Polity } from '../../atlas/context';
-import { type GazPlace, GAZETTEERS, loadGazetteer, matchName, namesAround, normName } from '../../atlas/gazetteer';
+import { type GazPlace, GAZETTEERS, matchName, namesAround, normName } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, type Detection, DETECTION_LABEL } from '../../atlas/resolve';
 import { yearLabel } from '../../atlas/time';
 import { DATE_SOURCE_LABEL, type DateContext } from '../../lib/history/placeDetect';
@@ -26,7 +26,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
     let dead = false;
     setPol(null);
     if (year !== undefined) politiesAt([place.lon, place.lat], year).then((p) => !dead && setPol(p)).catch(() => !dead && setPol([]));
-    loadGazetteer().then((g) => !dead && setReason(matchName(g, written, year).reason)).catch(() => {});
+    matchName(written, year).then((m) => !dead && setReason(m.reason)).catch(() => {});
     return () => { dead = true; };
   }, [place.key, year, written]);
   const names = (year !== undefined ? namesAround(place, year) : place.names).filter((n) => normName(n.name) !== normName(written)).slice(0, 5);

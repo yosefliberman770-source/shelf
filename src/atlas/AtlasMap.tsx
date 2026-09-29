@@ -22,6 +22,7 @@ export interface AtlasOverlay {
 export interface AtlasPick { key: string; name: string; lat: number; lon: number }
 
 const LAYERS_KEY = 'shelf.atlas.layers';
+let pmtilesReady = false;
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
@@ -130,7 +131,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const war = onWarChange ? warProp : warOwn;
   const setWar = onWarChange ?? setWarOwn;
   const [info, setInfo] = useState<Info | null>(null);
-  const ctx: LayerCtx = useMemo(() => ({ year, base, eventWindow, war }), [year, base, eventWindow, war]);
+  const ctx: LayerCtx = useMemo(() => ({ year, base, world: `${import.meta.env.BASE_URL}world/`, eventWindow, war }), [year, base, eventWindow, war]);
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
   const enabledRef = useRef(enabled);
@@ -146,6 +147,12 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     (async () => {
       try {
         const ml = await import('maplibre-gl');
+        // Vector tiles are read from PMTiles archives by range request: only what's on screen is fetched.
+        if (!pmtilesReady) {
+          const { Protocol } = await import('pmtiles');
+          ml.addProtocol('pmtiles', new Protocol().tile);
+          pmtilesReady = true;
+        }
         await import('maplibre-gl/dist/maplibre-gl.css');
         if (dead || !host.current) return;
         map = new ml.Map({
@@ -418,6 +425,8 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
   const src = f.source;
   const num = (k: string) => (typeof p[k] === 'number' ? (p[k] as number) : undefined);
   const str = (k: string) => (typeof p[k] === 'string' ? (p[k] as string) : undefined);
+  const pt = f.geometry.type === 'Point' ? (f.geometry.coordinates as [number, number]) : undefined;
+  const pickOf = (g: string): AtlasPick | undefined => (pt && p.i !== undefined ? { key: `${g}:${p.i}`, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined);
   switch (src) {
     case 'pleiades-places':
     case 'pleiades-lines':
@@ -425,7 +434,6 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '', `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
       if (str('a')) lines.push(`Also: ${str('a')!.split('|').join(' · ')}`);
       if (src === 'pleiades-places') lines.push(num('p') === 1 ? `Precise location${num('r') ? ` (± ${num('r')} m)` : ''}` : 'Rough location');
-      const pt = f.geometry.type === 'Point' ? (f.geometry.coordinates as [number, number]) : undefined;
       return {
         title: str('n') ?? 'Place', lines: lines.filter(Boolean),
         pick: src === 'pleiades-places' && pt ? { key: `pleiades:${num('i')}`, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
@@ -463,6 +471,37 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return { title: str('n') ?? (str('k') ?? 'Water').replace(/^./, (x) => x.toUpperCase()), lines: [str('k') ?? ''], source: credit('awmc'), caution: 'Outline based on modern mapping.' };
     case 'ne-rivers':
       return { title: str('n') ?? 'River', lines: ['Modern course'], source: credit('naturalearth'), caution: 'Rivers have shifted since antiquity.' };
+    case 'itinere': {
+      const f0 = num('f');
+      const t0 = num('t');
+      const fe = num('fe');
+      const te = num('te');
+      const dates = f0 === undefined && t0 === undefined ? 'Dates not recorded' : `${f0 !== undefined ? yearLabel(f0) : '?'}${fe ? ` (± ${fe} yrs)` : ''} – ${t0 !== undefined ? yearLabel(t0) : '?'}${te ? ` (± ${te} yrs)` : ''}`;
+      return {
+        title: str('n') || 'Roman road', lines: [`${str('k') ?? 'Road'} · ${str('c') ?? 'certainty not given'}`, `In use: ${dates}`, ...(str('cp') ? [`Built: ${str('cp')}`] : []), ...(str('b') ? [`Bibliography: ${str('b')}`] : []), ...(str('au') ? [`Compiled by: ${str('au')}`] : [])],
+        link: num('i') !== undefined ? { href: `https://itiner-e.org/route-segment/${num('i')}`, label: 'Itiner-e segment ↗' } : undefined, source: credit('itinere'),
+        caution: str('c') === 'Certain' ? undefined : `Itiner-e marks this segment as ${str('c')?.toLowerCase() ?? 'uncertain'}.`,
+      };
+    }
+    case 'viabundus-edges': {
+      const c = num('c');
+      return {
+        title: `${str('k') === 'land' ? 'Road' : (str('k') ?? 'Route').replace(/^./, (x) => x.toUpperCase())} (Viabundus)`,
+        lines: [c === 1 ? 'Very certain — drawn on the pre-modern road' : c === 2 ? 'Mediocre — more or less on the pre-modern road' : 'Uncertain — known from sources, not reconstructable in detail', num('f') || num('t') ? `In use: ${range(num('f'), num('t'))}` : 'Assumed in use throughout 1350–1650 (no dates in the source)'],
+        source: credit('viabundus'), caution: c === 3 ? 'Viabundus marks this route as uncertain (or not yet checked against historical maps).' : undefined,
+      };
+    }
+    case 'viabundus-nodes': {
+      const roles = (str('l') ?? '').split(',').filter(Boolean);
+      return {
+        title: str('n') ?? 'Place', lines: [roles.join(', '), `Recorded: ${range(num('f'), num('t'))}`, ...(num('tf') !== undefined ? [`Town from ${yearLabel(num('tf')!)}`] : [])],
+        pick: pickOf('viabundus'), source: credit('viabundus'), caution: 'Each role (town, toll, fair…) has its own dates in Viabundus — open the place history for them.',
+      };
+    }
+    case 'thurayya-places':
+      return { title: str('n') ?? 'Place', lines: [`${str('k') ?? ''}${str('rg') ? ` · ${str('rg')}` : ''}`, 'Period: 9th–10th c. (the atlas it comes from)'], pick: pickOf('althurayya'), source: credit('althurayya'), caution: 'Georeferenced from G. Cornu’s atlas; the date is the atlas’s period, not this place’s.' };
+    case 'thurayya-routes':
+      return { title: 'Route section', lines: [num('m') ? `${Math.round(num('m')! / 1000)} km` : '', 'Period: 9th–10th c. (Cornu’s atlas)'].filter(Boolean), source: credit('althurayya') };
     case 'ohm': {
       const s = str('start_date');
       const e = str('end_date');

@@ -7,7 +7,7 @@ import type { Map as MLMap } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AtlasMap, type AtlasOverlay, type AtlasPin, type AtlasView } from '../../atlas/AtlasMap';
 import { allEvents, allWars, type AtlasEvent, warsNear, type War } from '../../atlas/context';
-import { loadGazetteer } from '../../atlas/gazetteer';
+import { gazetteerInfo, getPlace } from '../../atlas/gazetteer';
 import { useBookPlaceNames } from '../../atlas/readerNames';
 import { choosePlace, type Detection, fromGaz, type ReaderPlace, type Resolution, resolvePlace } from '../../atlas/resolve';
 import { recordVisit, saveBookmark } from '../../atlas/store';
@@ -78,10 +78,10 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
     setRes(null);
     (async () => {
       // Already identified (from the text popup, the map, a list): use that record.
-      if (target.key?.startsWith('pleiades:')) {
-        const g = await loadGazetteer().catch(() => undefined);
-        const p = g?.byId.get(target.key);
-        if (p) return { place: fromGaz(p, target.written || p.title, { detection: target.detection, reason: 'Chosen directly from the Pleiades record.', method: 'Pleiades record' }), status: 'HIGH', candidates: [], reason: '' } as Resolution;
+      if (target.key) {
+        const p = await getPlace(target.key).catch(() => undefined);
+        const name = p ? gazetteerInfo(p.gazetteer).name : '';
+        if (p) return { place: fromGaz(p, target.written || p.title, { detection: target.detection, reason: `Chosen directly from the ${name} record.`, method: `${name} record` }), status: 'HIGH', candidates: [], reason: '' } as Resolution;
       }
       return resolvePlace(target.written, { year: known, bookId: book.bookId, detection: target.detection, passage: target.passage, nearby: pagePlaces.map((p) => p.name), chapter: book.chapter, bookTitle: book.title, signal: c.signal });
     })()

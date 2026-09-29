@@ -4,7 +4,7 @@
 // and roads, rivers and places around it (Pleiades, AWMC). Nothing is
 // inferred beyond what those records say.
 import { contains, distanceToLine, type FC, type Feature, km, type Pos, pack } from './data';
-import { existedAround, type GazPlace, loadGazetteer } from './gazetteer';
+import { existedAround, type GazPlace, nearbyPlaces } from './gazetteer';
 import { type HistYear, shiftYear } from './time';
 
 /** Dataset rows keep dates as f/t. */
@@ -85,11 +85,12 @@ export async function linesNear(p: Pos, radiusKm: number, year?: HistYear): Prom
 
 /** Categories for "What's around here?", from Pleiades place types. */
 export const AROUND_KINDS: { id: string; label: string; types: string[] }[] = [
-  { id: 'settlement', label: 'Cities, towns & settlements', types: ['settlement', 'urban', 'polis', 'vicus', 'fortified-settlement', 'townhouse-settlement', 'village'] },
-  { id: 'port', label: 'Ports & harbours', types: ['port', 'harbor', 'anchorage', 'lighthouse'] },
+  { id: 'settlement', label: 'Cities, towns & settlements', types: ['settlement', 'urban', 'polis', 'vicus', 'fortified-settlement', 'townhouse-settlement', 'village', 'town', 'towns', 'capitals', 'villages'] },
+  { id: 'port', label: 'Ports & harbours', types: ['port', 'harbor', 'anchorage', 'lighthouse', 'harbour'] },
   { id: 'fort', label: 'Forts & camps', types: ['fort', 'fort-2', 'fortlet', 'castellum', 'castle', 'hillfort', 'military-installation-or-camp-temporary', 'military-base', 'citadel'] },
   { id: 'religious', label: 'Religious sites', types: ['temple', 'temple-2', 'sanctuary', 'shrine', 'church', 'church-2', 'mosque', 'synagogue', 'monastery', 'altar'] },
-  { id: 'water', label: 'Rivers, lakes & springs', types: ['river', 'lake', 'spring', 'lagoon', 'water-inland', 'bay'] },
+  { id: 'trade', label: 'Tolls, fairs, staples, ferries & bridges', types: ['toll', 'fair', 'staple', 'ferry', 'bridge', 'lock', 'waystations', 'xroads'] },
+  { id: 'water', label: 'Rivers, lakes & springs', types: ['river', 'lake', 'spring', 'lagoon', 'water-inland', 'bay', 'waters'] },
   { id: 'relief', label: 'Mountains & passes', types: ['mountain', 'hill', 'pass', 'volcano', 'plain', 'valley'] },
   { id: 'other', label: 'Other sites', types: [] },
 ];
@@ -110,13 +111,13 @@ export interface LookingAt {
  * no city sizes, so they are not called "major".
  */
 export async function lookingAt(p: Pos, year: HistYear, opts: { exclude?: string; partOf?: string[] } = {}): Promise<LookingAt> {
-  const [polities, g, wars] = await Promise.all([
+  const settle = AROUND_KINDS[0].types;
+  const [polities, near, wars] = await Promise.all([
     politiesAt(p, year).catch(() => []),
-    loadGazetteer().catch(() => undefined),
+    nearbyPlaces(p, 60, { year, slack: 0, exclude: opts.exclude, filter: (x) => x.precise && x.from !== undefined && !x.datasetPeriod && x.title !== 'Untitled' && x.types.some((t) => settle.includes(t)) }).catch(() => []),
     warsNear(p, year).catch(() => []),
   ]);
-  const settle = AROUND_KINDS[0].types;
-  const nearest = g ? g.nearby(p, 60, { year, slack: 0, exclude: opts.exclude, filter: (x) => x.precise && x.from !== undefined && x.title !== 'Untitled' && x.types.some((t) => settle.includes(t)) }).slice(0, 4) : [];
+  const nearest = near.slice(0, 4);
   // Regions only from Pleiades' own "part of" links — its province outlines are too coarse to test a point against.
   return { polities, regions: [...new Set(opts.partOf ?? [])], nearest, wars: wars.slice(0, 3) };
 }

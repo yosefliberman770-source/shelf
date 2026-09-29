@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
-import { existedAround, type GazPlace, loadGazetteer, namesAround, relationLabel } from '../../atlas/gazetteer';
+import { existedAround, type GazPlace, nearbyPlaces, namesAround, relationLabel } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
@@ -327,8 +327,7 @@ export function NearbyPanel({ at, year, radiusMi, setRadiusMi, onResults, onOpen
     if (!at) return;
     let dead = false;
     (async () => {
-      const g = await loadGazetteer().catch(() => undefined);
-      const found = g ? g.nearby([at.lon, at.lat], radiusKm, { year: inTime ? year : undefined, slack: 50, exclude: at.key }) : [];
+      const found = await nearbyPlaces([at.lon, at.lat], radiusKm, { year: inTime ? year : undefined, slack: 50, exclude: at.key }).catch(() => []);
       const [ls, ev] = await Promise.all([linesNear([at.lon, at.lat], radiusKm, inTime ? year : undefined).catch(() => []), eventsNear([at.lon, at.lat], radiusKm, inTime ? year : undefined, 50).catch(() => [])]);
       if (dead) return;
       setPlaces(found);

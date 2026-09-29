@@ -572,6 +572,22 @@ export interface PlaceVisitRow {
   lastAt: number;
 }
 
+/** A cached answer from a live historical source (not part of backups). */
+export interface WorldCacheRow { id: string; data: unknown; at: number }
+
+/** The book's own historical geography, built in the background once and reused. */
+export interface BookWorldRow {
+  /** bookId */
+  id: string;
+  version: number;
+  /** One entry per book section (spine item), in reading order. */
+  chapters: { index: number; href: string; label?: string; dates: number[]; mentions: { name: string; count: number; cfi?: string; detection: 'cue' | 'known' | 'ai' }[] }[];
+  /** Name as written → resolved place key (null = not identified with confidence). */
+  resolved: Record<string, string | null>;
+  done: boolean;
+  updatedAt: number;
+}
+
 /** AI usage per day, provider and model (counts only — never content or keys). */
 export interface AIUsageRow {
   id: string;

@@ -15,7 +15,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'economic', label: 'Economic & cultural' },
 ];
 
-export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain';
+export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -26,12 +26,17 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   naturalearth: { name: 'Natural Earth', url: 'https://www.naturalearthdata.com/', license: 'public domain' },
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
   terrain: { name: 'Terrain Tiles (Mapzen/AWS, SRTM & others)', url: 'https://github.com/tilezen/joerd/blob/master/docs/attribution.md', license: 'see sources' },
+  itinere: { name: 'Itiner-e (Brughmans et al. 2024)', url: 'https://itiner-e.org/', license: 'CC BY 4.0' },
+  viabundus: { name: 'Viabundus 2', url: 'https://www.viabundus.eu/', license: 'CC BY 4.0' },
+  althurayya: { name: 'al-Ṯurayyā Gazetteer (after G. Cornu)', url: 'https://althurayya.github.io/', license: 'Apache-2.0' },
 };
 
 export interface LayerCtx {
   year: HistYear;
   /** Where the data packs are served, e.g. "/shelf/atlas/". */
   base: string;
+  /** Where the World packs (tiles, place index) are served, e.g. "/shelf/world/". Defaults next to base. */
+  world?: string;
   /** Show events within ± this many years. */
   eventWindow: number;
   /** A war picked in the Military panel (Wikidata id). */
@@ -82,9 +87,23 @@ const certaintyOpacity = (strong = 0.95): ExpressionSpecification => ['case',
   ['==', ['get', 'db'], 'names'], strong * 0.7,
   strong];
 
+/** Vector tiles in a PMTiles archive, fetched by range request: only the tiles on screen are downloaded. */
+const worldBase = (c: LayerCtx) => c.world ?? c.base.replace(/atlas\/$/, 'world/');
+const pmtiles = (c: LayerCtx, file: string, id: DatasetId, maxzoom: number): SourceSpecification => {
+  const path = `${worldBase(c)}tiles/${file}`;
+  const abs = typeof location === 'undefined' ? `http://localhost${path}` : new URL(path, location.href).href;
+  return { type: 'vector', url: `pmtiles://${abs}`, attribution: credit(id), maxzoom } as SourceSpecification;
+};
+/** Level of detail comes from the tiles themselves: each feature only appears from the zoom its dataset's own attributes warrant. */
+
 // ── Shared sources ────────────────────────────────────────────────────────
 export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification> = {
-  'pleiades-places': (c) => ({ type: 'geojson', data: c.base + 'pleiades-places.json', attribution: credit('pleiades') }),
+  'pleiades-places': (c) => pmtiles(c, 'pleiades.pmtiles', 'pleiades', 10),
+  itinere: (c) => pmtiles(c, 'itinere.pmtiles', 'itinere', 10),
+  'viabundus-edges': (c) => pmtiles(c, 'viabundus-edges.pmtiles', 'viabundus', 11),
+  'viabundus-nodes': (c) => pmtiles(c, 'viabundus-nodes.pmtiles', 'viabundus', 11),
+  'thurayya-places': (c) => pmtiles(c, 'thurayya-places.pmtiles', 'althurayya', 10),
+  'thurayya-routes': (c) => pmtiles(c, 'thurayya-routes.pmtiles', 'althurayya', 10),
   'pleiades-lines': (c) => ({ type: 'geojson', data: c.base + 'pleiades-lines.json', attribution: credit('pleiades') }),
   'pleiades-provinces': (c) => ({ type: 'geojson', data: c.base + 'pleiades-provinces.json', attribution: credit('pleiades') }),
   'awmc-roads': (c) => ({ type: 'geojson', data: c.base + 'awmc-roads.json', attribution: credit('awmc') }),
@@ -112,7 +131,7 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
   const r = opts.radius ?? 3.5;
   return [
     {
-      id: `${id}-pt`, type: 'circle', source: 'pleiades-places', filter, minzoom: opts.minzoom ?? 3,
+      id: `${id}-pt`, type: 'circle', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.minzoom ?? 3,
       paint: {
         // Small when zoomed out: thousands of sites would otherwise hide the map.
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, r * 0.3, 5, r * 0.55, 8, r * 1.3, 12, r * 2],
@@ -125,7 +144,7 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
       },
     },
     {
-      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', filter, minzoom: opts.labelZoom ?? 7,
+      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.labelZoom ?? 7,
       layout: {
         // Pleiades titles unnamed sites "Untitled": keep the dot, skip the label.
         'text-field': ['case', ['==', ['get', 'n'], 'Untitled'], '', ['>=', u(), 1], ['concat', ['get', 'n'], ' ?'], ['get', 'n']],
@@ -162,6 +181,27 @@ function events(id: string, kind: string, color: string, ctx: LayerCtx): LayerSp
   ];
 }
 
+/** Viabundus covers 1350–1650 (a little either side is kept so the edges of the period still show). */
+const VIABUNDUS: [HistYear, HistYear] = [1250, 1700];
+/** al-Ṯurayyā follows Cornu's atlas of the 9th–10th centuries. */
+const THURAYYA: [HistYear, HistYear] = [700, 1100];
+const inWindow = (y: HistYear, w: [HistYear, HistYear]): FilterSpecification => (y >= w[0] && y <= w[1] ? ['boolean', true] : ['boolean', false]) as FilterSpecification;
+
+/** Itiner-e segments: shown when the year falls within the segment's dates widened by the dataset's own error margins. */
+function itinereFilter(y: HistYear): ExpressionSpecification {
+  const lo: ExpressionSpecification = ['-', ['coalesce', ['get', 'f'], -99999], ['coalesce', ['get', 'fe'], 0]];
+  const hi: ExpressionSpecification = ['+', ['coalesce', ['get', 't'], 99999], ['coalesce', ['get', 'te'], 0]];
+  const dated: ExpressionSpecification = ['any', ['has', 'f'], ['has', 't']];
+  return ['any', ['all', dated, ['<=', lo, y], ['>=', hi, y]], ['all', ['!', dated], ['boolean', y >= -800 && y <= 700]]];
+}
+/** Fainter when only the error margin (not the core dates) reaches the year, or when undated. */
+function itinereOpacity(y: HistYear): ExpressionSpecification {
+  return ['case',
+    ['!', ['any', ['has', 'f'], ['has', 't']]], 0.35,
+    ['all', ['<=', ['coalesce', ['get', 'f'], -99999], y], ['>=', ['coalesce', ['get', 't'], 99999], y]], ['match', ['get', 'c'], 'Certain', 0.95, 'Conjectured', 0.75, 0.45],
+    0.4];
+}
+
 // ── The catalogue ─────────────────────────────────────────────────────────
 export const LAYERS: AtlasLayerDef[] = [
   // PLACES
@@ -194,6 +234,31 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'archaeological', group: 'places', label: 'Archaeological sites', datasets: ['pleiades'], defaultOn: false, coverage: [-3000, 1500],
     hint: 'Archaeological sites, tells, ruins, tumuli and nuraghi recorded in Pleiades.', sources: ['pleiades-places'], specs: (c) => pleiadesPoints('archaeological', 'archaeological', C.arch, c, { labelZoom: 9, radius: 2.6 }),
+  },
+
+  {
+    id: 'medieval-places', group: 'places', label: 'Medieval towns & places (N. Europe)', datasets: ['viabundus'], defaultOn: true, coverage: VIABUNDUS,
+    hint: 'Towns, settlements and other places of northern Europe, 1350–1650 (Viabundus). Towns larger; a town is shown as one from the year its town status is recorded. Undated records are shown for the whole period, as Viabundus intends.', sources: ['viabundus-nodes'],
+    specs: (c) => {
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' })] as FilterSpecification;
+      const town: ExpressionSpecification = ['all', ['in', 'town', ['get', 'l']], ['any', ['!', ['has', 'tf']], ['<=', ['get', 'tf'], c.year]]];
+      return [
+        { id: 'medieval-places-pt', type: 'circle', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, ['case', town, 2.2, 0.8], 9, ['case', town, 5, 2.4], 11, ['case', town, 6, 3.2]], 'circle-color': ['case', town, C.city, C.village], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
+        { id: 'medieval-places-label', type: 'symbol', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['case', town, 12, 10.5], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': ['case', town, C.city, C.village], 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ];
+    },
+  },
+  {
+    id: 'islamic-places', group: 'places', label: 'Early Islamic world places', datasets: ['althurayya'], defaultOn: true, coverage: THURAYYA,
+    hint: 'Towns, capitals, way-stations and regions of the 9th–10th-century Islamic world, georeferenced from Georgette Cornu’s atlas (al-Ṯurayyā). The dates are the atlas’s period, not individual founding dates.', sources: ['thurayya-places'],
+    specs: (c) => {
+      const filter = inWindow(c.year, THURAYYA);
+      const big: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['capitals', 'towns']]];
+      return [
+        { id: 'islamic-places-pt', type: 'circle', source: 'thurayya-places', 'source-layer': 'places', filter, paint: { 'circle-radius': ['case', ['==', ['get', 'k'], 'capitals'], 5, big, 3.2, 2], 'circle-color': ['match', ['get', 'k'], 'capitals', '#1b5e20', 'towns', '#2e7d32', 'waystations', '#8d6e63', '#6d8b74'], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
+        { id: 'islamic-places-label', type: 'symbol', source: 'thurayya-places', 'source-layer': 'places', filter, minzoom: 5, layout: { 'text-field': ['get', 'n'], 'text-font': FONT, 'text-size': ['case', big, 12, 10], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#1b5e20', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ];
+    },
   },
 
   // PHYSICAL GEOGRAPHY
@@ -241,7 +306,32 @@ export const LAYERS: AtlasLayerDef[] = [
 
   // INFRASTRUCTURE
   {
-    id: 'roads-ancient', group: 'infrastructure', label: 'Ancient road network', datasets: ['awmc'], defaultOn: true, coverage: BARRINGTON,
+    id: 'roads-roman', group: 'infrastructure', label: 'Roman roads (Itiner-e)', datasets: ['itinere'], defaultOn: true, coverage: [-800, 700],
+    hint: 'The most detailed open dataset of Roman roads (Itiner-e). Each segment has its own dates with error margins: it appears when the year falls within them — faded if only the error margin reaches the year. Solid = certain, lighter = conjectured, dashed = hypothetical; blue = river and sea lanes. Tap a road for its sources.', sources: ['itinere'],
+    specs: (c) => {
+      const filter = itinereFilter(c.year) as FilterSpecification;
+      const water: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['River', 'Sea Lane']]];
+      return [
+        { id: 'roads-roman-land', type: 'line', source: 'itinere', 'source-layer': 'roads', filter: ['all', filter, ['!', water], ['!=', ['get', 'c'], 'Hypothetical']] as FilterSpecification, paint: { 'line-color': C.road, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, ['case', ['==', ['get', 'k'], 'Main Road'], 0.8, 0.4], 9, ['case', ['==', ['get', 'k'], 'Main Road'], 2.6, 1.4]], 'line-opacity': itinereOpacity(c.year) } },
+        { id: 'roads-roman-hypothetical', type: 'line', source: 'itinere', 'source-layer': 'roads', filter: ['all', filter, ['!', water], ['==', ['get', 'c'], 'Hypothetical']] as FilterSpecification, paint: { 'line-color': C.road, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.4, 9, 1.4], 'line-opacity': 0.45, 'line-dasharray': [2, 2] } },
+        { id: 'roads-roman-water', type: 'line', source: 'itinere', 'source-layer': 'roads', filter: ['all', filter, water] as FilterSpecification, paint: { 'line-color': '#2b6f95', 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.4, 9, 1.4], 'line-opacity': 0.5, 'line-dasharray': [1, 2] } },
+      ];
+    },
+  },
+  {
+    id: 'roads-medieval', group: 'infrastructure', alsoIn: ['economic'], label: 'Medieval roads & waterways (N. Europe)', datasets: ['viabundus'], defaultOn: true, coverage: VIABUNDUS,
+    hint: 'Land roads, rivers, canals, coastal routes, ferries and winter roads of northern Europe 1350–1650 (Viabundus) — the Hanseatic trade roads. Viabundus rates each stretch: solid dark = very certain (mostly inside towns), solid = “more or less” on the old road (most), dashed grey = uncertain or not yet checked against old maps.', sources: ['viabundus-edges'],
+    specs: (c) => {
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' })] as FilterSpecification;
+      const water: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['river', 'canal', 'coast', 'ferry']]];
+      return [
+        { id: 'roads-medieval-sure', type: 'line', source: 'viabundus-edges', 'source-layer': 'edges', filter: ['all', filter, ['<', ['get', 'c'], 3]] as FilterSpecification, paint: { 'line-color': ['case', water, '#2b6f95', ['==', ['get', 'c'], 1], '#5b2c0f', '#8d5524'], 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.6, 10, 2.2], 'line-opacity': 0.8 } },
+        { id: 'roads-medieval-unsure', type: 'line', source: 'viabundus-edges', 'source-layer': 'edges', filter: ['all', filter, ['>=', ['get', 'c'], 3]] as FilterSpecification, paint: { 'line-color': ['case', water, '#7fa7bf', '#9e9e9e'], 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.5, 10, 1.6], 'line-opacity': 0.8, 'line-dasharray': [2, 2] } },
+      ];
+    },
+  },
+  {
+    id: 'roads-ancient', group: 'infrastructure', label: 'Roads (Barrington Atlas / AWMC)', datasets: ['awmc'], defaultOn: false, coverage: BARRINGTON,
     hint: 'Roads of the Greek and Roman world from the Barrington Atlas (AWMC). Dashed where the source gives no period (shown up to 640 CE); faded where the period is marked uncertain.', sources: ['awmc-roads'],
     specs: (c) => [
       { id: 'roads-ancient-dated', type: 'line', source: 'awmc-roads', filter: existedIn(c.year) as FilterSpecification, paint: { 'line-color': C.road, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.6, 9, 2.2], 'line-opacity': ['case', ['>=', u(), 1], 0.45, 0.85] } },
@@ -338,9 +428,17 @@ export const LAYERS: AtlasLayerDef[] = [
 
   // ECONOMIC & CULTURAL
   {
-    id: 'trade-routes', group: 'economic', label: 'Trade routes', datasets: [], defaultOn: false,
-    unavailable: 'No open scholarly trade-route dataset with dated routes is available yet, so none are drawn rather than guessed. Ports, markets and the ancient road network show the infrastructure trade used.',
-    hint: '', sources: [], specs: () => [],
+    id: 'trade-routes', group: 'economic', alsoIn: ['infrastructure'], label: 'Early Islamic routes', datasets: ['althurayya'], defaultOn: true, coverage: THURAYYA,
+    hint: 'Route sections between towns and way-stations of the 9th–10th-century Islamic world, from Cornu’s atlas (al-Ṯurayyā). For northern Europe 1350–1650 see “Medieval roads & waterways”. No open dataset covers trade routes elsewhere, so none are drawn there.', sources: ['thurayya-routes'],
+    specs: (c) => [{ id: 'trade-routes-line', type: 'line', source: 'thurayya-routes', 'source-layer': 'routes', filter: inWindow(c.year, THURAYYA), paint: { 'line-color': '#2e7d32', 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.8], 'line-opacity': 0.7, 'line-dasharray': [3, 1.5] } }],
+  },
+  {
+    id: 'tolls-fairs', group: 'economic', label: 'Tolls, fairs & staple markets (N. Europe)', datasets: ['viabundus'], defaultOn: false, coverage: VIABUNDUS,
+    hint: 'Places where Viabundus records a toll, an annual fair or staple rights (1350–1650). Each role has its own dates in the source — tap a place for them.', sources: ['viabundus-nodes'],
+    specs: (c) => {
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' }), ['any', ['in', 'toll', ['get', 'l']], ['in', 'fair', ['get', 'l']], ['in', 'staple', ['get', 'l']]]] as FilterSpecification;
+      return [{ id: 'tolls-fairs-pt', type: 'circle', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 2, 10, 5], 'circle-color': ['case', ['in', 'staple', ['get', 'l']], '#6a1b9a', ['in', 'fair', ['get', 'l']], C.market, '#37474f'], 'circle-stroke-color': C.halo, 'circle-stroke-width': 1 } }];
+    },
   },
   {
     id: 'markets', group: 'economic', label: 'Markets & fora', datasets: ['pleiades'], defaultOn: false, coverage: [-3000, 1500],
@@ -360,7 +458,7 @@ export const layerById = (id: string) => LAYERS.find((l) => l.id === id);
 export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable).map((l) => l.id);
 
 /** Order in which layers are drawn, bottom to top (areas under lines under points). */
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'coast-modern', 'coast-ancient', 'rivers', 'roads', 'roads-ancient',
-  'archaeological', 'religious', 'cultural', 'markets', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'ports', 'settlements', 'cities', 'campaigns', 'sieges', 'battles', 'wars'];
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'coast-modern', 'coast-ancient', 'rivers', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'trade-routes',
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

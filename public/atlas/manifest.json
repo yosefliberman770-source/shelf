@@ -11,10 +11,10 @@
    "shareAlike": false,
    "attribution": "Pleiades: A Gazetteer of Past Places, pleiades.stoa.org (CC BY 3.0)",
    "files": [
-    "pleiades-places.json",
     "pleiades-lines.json",
     "pleiades-provinces.json",
-    "pleiades-gazetteer.json"
+    "../world/places/",
+    "../world/tiles/pleiades.pmtiles"
    ],
    "notes": "Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.",
    "retrieved": "2026-09-29",

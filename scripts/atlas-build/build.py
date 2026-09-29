@@ -126,9 +126,10 @@ def simplify(geom_json, tol, digits=4):
     return rnd(g, digits)
 
 
-def write(name: str, fc: dict) -> int:
-    os.makedirs(OUT, exist_ok=True)
-    path = os.path.join(OUT, name)
+def write(name: str, fc: dict, folder: str | None = None) -> int:
+    folder = folder or OUT
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, name)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(fc, f, ensure_ascii=False, separators=(',', ':'))
     size = os.path.getsize(path)
@@ -253,7 +254,8 @@ def pleiades():
         if radius.get(pid):
             props['r'] = radius[pid]
         feats.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(float(p['representative_longitude']), 4), round(float(p['representative_latitude']), 4)]}, 'properties': props})
-    write('pleiades-places.json', fc(feats))
+    # Source for the vector tiles (public/world/tiles/pleiades.pmtiles); not served whole.
+    write('pleiades-places.json', fc(feats), CACHE)
 
     # Lines: roads, rivers, aqueducts, canals.
     line_feats = []
@@ -680,7 +682,8 @@ def gazetteer():
             rel,
         ])
     doc = {'v': 1, 'fields': ['id', 'title', 'lon', 'lat', 'precise', 'types', 'from', 'to', 'uncertain', 'names', 'partOf', 'related'], 'titles': titles, 'rows': out}
-    path = os.path.join(OUT, 'pleiades-gazetteer.json')
+    # Kept in the build cache: the app reads it through the tiled World index (public/world/places), never whole.
+    path = os.path.join(CACHE, 'pleiades-gazetteer.json')
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
     log(f'  wrote pleiades-gazetteer.json: {len(out)} places, {os.path.getsize(path)/1e6:.2f} MB')
@@ -727,7 +730,7 @@ def manifest(stats):
             {'id': 'pleiades', 'name': 'Pleiades', 'url': 'https://pleiades.stoa.org/', 'license': 'CC BY 3.0',
              'licenseUrl': 'https://creativecommons.org/licenses/by/3.0/', 'commercial': True, 'shareAlike': False,
              'attribution': 'Pleiades: A Gazetteer of Past Places, pleiades.stoa.org (CC BY 3.0)',
-             'files': ['pleiades-places.json', 'pleiades-lines.json', 'pleiades-provinces.json', 'pleiades-gazetteer.json'],
+             'files': ['pleiades-lines.json', 'pleiades-provinces.json', '../world/places/', '../world/tiles/pleiades.pmtiles'],
              'notes': 'Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.',
              'retrieved': today, 'counts': stats.get('pleiades')},
             {'id': 'awmc', 'name': 'Ancient World Mapping Center', 'url': 'https://awmc.unc.edu/', 'license': 'ODbL 1.0',
@@ -769,6 +772,9 @@ def main():
              ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
+    if not only or 'world' in only:
+        import world
+        world.build_world()
     # The manifest keeps counts per dataset; extra steps fold into their dataset.
     stats['pleiades'] = {**(stats.get('pleiades') or {}), 'gazetteer': stats.pop('gazetteer', None)}
     stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None)}
