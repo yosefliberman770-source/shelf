@@ -1,0 +1,835 @@
+Site_name,Site_ID,Easting,Northing,County,Parish,Reference_1,Date_from,Date_to,Number of individuals,Excavation_Date
+Windmill Field Hitcham,BckBHM-BI1,492177,181201,Buckinghamshire,Burnham,Rec. of Bucks 1989 31: 75-7,500,550,1,1889
+Eton Rowing Course,BckDNY-BI1,493515,177535,Buckinghamshire,Dorney,Booth et al 2007: 189,600,650,1,pre 2007
+Taplow mound,BckTPW-BI1,490610,182155,Buckinghamshire,Taplow,Geake 1997: 146,575,625,1,1882
+Egham's Farm Bourne End,BckWBN-IC1,489645,187395,Buckinghamshire,Wooburn,Rec. of Bucks 1987 29: 170-4,575,700,00,1905
+86 Gainsborough Green,BrkABD-BI2,449108,196200,Berkshire,Abingdon,Oxford SMR SU 49 NE?,450,700,1,1977
+Spring Gardens Cemetery,BrkABD-IC5,448748,197455,Berkshire,Abingdon,Oxon 1956-7 21-22: 104,450,700,2,1956
+Horse and Jockey Bath St,BrkABD-IC6,449613,197285,Berkshire,Abingdon,JMHS report 04.166,400,700,2,2004
+Barton Court Farm,BrkABD-IC7,450942,197748,Berkshire,Abingdon,Dickinson site 4,500,600,4,1972
+Saxton Road,BrkABD-MC1,449115,196327,Berkshire,Abingdon,Dickinson site 1,400,625,228,1860; 1934-5
+Hayley Wood,BrkADN-IC1,428150,182950,Berkshire,Ashdown,Dickinson site 8,450,700,00,pre 1850
+Appleford,BrkAFD-IC1,452845,193842,Berkshire,Appleford,Dickinson site 7,525,600,9,1890
+Blue Circle Site Aldermaston Court,BrkAMT-BI1,459600,164900,Berkshire,Aldermaston,Berks SMR MWB16162,450,700,1,1983
+Unlocated - Aston Tirrold,BrkATD-IC1,456000,186000,Berkshire,Aston Tirrold,Dickinson site 12,450,700,00,1887; pre1931
+Lowbury Hill Barrow,BrkAUT-BI1,454073,182257,Berkshire,Aston Upthorpe,Dickinson site 100,640,700,1,1914; 1992
+Lowbury Hill Temple enclosure,BrkAUT-BI2,454073,182257,Berkshire,Aston Upthorpe,Arch. Jnl. 1994 151: 158-211,590,670,1,1992
+Field on west facing slope,BrkBBY-BI1,454002,185438,Berkshire,Blewbury,Net. Arch. Rep. 333: 206-7,680,880,1,2006
+White House,BrkBBY-IC1,451560,186342,Berkshire,Blewbury,Oxford SMR 2784,400,800,4,1974
+Blewburton Hill,BrkBBY-MC1,454555,186115,Berkshire,Blewbury,Dickinson site 22,475,525,22,1948-1967
+Field Farm,BrkBGH-IC1,467550,170232,Berkshire,Burghfield,Butterworth and Lobb 1992,600,700,50,1985
+Field Barn Farm,BrkBHM-BI1,461000,169000,Berkshire,Beenham,SMR MWB6362,400,500,1,1991
+Cherbury Camp,BrkCBT-IC1,437450,196550,Berkshire,Charney Bassett,Dickinson site 36,500,600,00,pre 1939
+Coleshill House,BrkCHL-BI1,423755,194345,Berkshire,Coleshill,Dickinson site 45,525,600,1,1841
+Cock Marsh,BrkCKM-BI1,488633,186985,Berkshire,Cookham,Meaney 1964: 45,500,650,1,1874
+Noahs Ark Field,BrkCKM-IC1,488945,185840,Berkshire,Cookham,Meaney 1964: 45,450,650,6,1854
+Unlocated - Sandfield,BrkCMR-BI1,446550,204450,Berkshire,Cumnor,Dickinson site 48,450,650,1,1773
+Roden Downs,BrkCPN-IC1,453130,181780,Berkshire,Compton,TNDFC 1948 9: 10-62,325,425,10,1944-7
+East Garston to Eastbury railway,BrkEGN-BI1,435500,177000,Berkshire,East Garston,Dickinson site 57,500,575,1,1890
+Scutchamore Knob,BrkEHD-BI1,445658,185163,Berkshire,East Hendred,TNDFC 1934 7: 93-102,600,750,1,1844
+Cross Barrows,BrkEIY-IC1,450690,180939,Berkshire,East Ilsley,Dickinson site 58,650,700,8,1843
+Unlocated - Faringdon,BrkFDN-BI1,428505,195500,Berkshire,Faringdon,Meaney 1964: 46,450,600,1,1920
+Crossroads Frilford,BrkFFD-BI1,444653,198760,Berkshire,Frilford,Dickinson site 70,450,600,1,pre 1887
+Noahs Ark Frilford III,BrkFFD-IC2,443950,196250,Berkshire,Frilford,Dickinson site 71,400,700,00,1937-8
+Frilford Heath Field,BrkFFD-MC1,443730,196440,Berkshire,Frilford,Dickinson site 69,350,575,189,1840-1938
+South of Greenaway Cottages,BrkFLY-BI1,439920,180450,Berkshire,Fawley,Berks SMR MWB3241,600,900,2,unknown
+East Shefford,BrkGSD-IC1,438940,174900,Berkshire,Great Shefford,Dickinson site 60,450,600,78,1889-1912
+West of Horseclose Copse,BrkHFD-BI1,434060,172300,Berkshire,Hungerford,SMR MWB9878,450,700,1,1930s
+Horspath,BrkHPH-BI1,457497,204503,Berkshire,Horspath,SMR OX16034,-500,900,1,1847
+Downscroft Harwell,BrkHWL-IC1,449065,188548,Berkshire,Harwell,Dickinson site 76,400,700,7,1956; 1967
+Kintbury,BrkKBY-IC1,438410,167060,Berkshire,Kintbury,"TNDFC 1956 10,3: 42-50",600,800,00,1763; 1870; 1954
+Row Down west mound,BrkLBN-BI1,429960,179580,Berkshire,Lambourn,SMR MWB3360,200,700,1,1958
+Upper Lambourn Downs,BrkLBN-BI2,431000,181000,Berkshire,Lambourn,Meaney 1964: 48,650,750,1,1879
+Longcot,BrkLCT-BI1,427500,190505,Berkshire,Longcot,Dickinson site 96,600,700,1,1848
+Helena's Park,BrkLKG-BI1,442910,187095,Berkshire,Lockinge,Dickinson site 95,475,525,1,1892
+Arn Hill,BrkLKG-IC1,442277,187193,Berkshire,Lockinge,Dickinson site 94,450,650,80,1863
+Segsbury Camp,BrkLRS-BI1,438545,184325,Berkshire,Letcombe Regis,Dickinson site 125,450,650,1,1871
+Castle Hill,BrkLTM-BC1,457050,192550,Berkshire,Little Wittenham,Dickinson site 93,450,600,1,1937
+Long Wittenham II,BrkLWM-IC1,454600,193618,Berkshire,Long Wittenham,Dickinson site 99,600,700,11,1861-2
+Long Wittenham,BrkLWM-MC1,454250,193508,Berkshire,Long Wittenham,Dickinson site 98,400,625,247,1848; 1858-60
+"""Ballast Pit Milton IIlton I""",BrkMTN-IC1,448840,192560,Berkshire,Milton,Dickinson site 106,350,600,11,various
+North Field Milton II,BrkMTN-IC2,448870,192548,Berkshire,Milton,Dickinson site 107,600,700,12,1832-1859
+Ten Mile House/Shooter's Hill,BrkPBN-MC1,463055,175850,Berkshire,Pangbourne,Dickinson site 118,450,700,00,various
+Tilehurst Station,BrkPLY-BI1,465450,176480,Berkshire,Purley,Dickinson site 119,450,600,1,1891
+77 Southcote Lane,BrkRDG-BC1,469520,172105,Berkshire,Reading,Dickinson site 122,450,600,1,1923
+Oxford Road,BrkRDG-BI1,469760,173655,Berkshire,Reading,Dickinson site 123,450,650,1,1893
+The Plummery Wall Reading Abbey,BrkRDG-IC2,471772,173683,Berkshire,Reading,Berks SMR MRD1388,630,780,2,unknown
+Dreadnought/Broken Bow Cemetery,BrkRDG-MC1,473653,173847,Berkshire,Reading,Dickinson site 121,400,600,15,1891
+Barrow Hills,BrkRLY-MC1,451553,198347,Berkshire,Radley,Chambers and McAdam 2007,200,420,00,1983-5
+Aston Rise,BrkRMM-IC1,478250,184120,Berkshire,Remenham,Dickinson site 11,400,600,00,1882-7; 1921
+Hut X Room 1,BrkSCY-BI1,448945,194050,Berkshire,Sutton Courtenay,Dickinson site 143,550,600,1,1922
+Sutton Field,BrkSCY-BI2,450390,193558,Berkshire,Sutton Courtenay,Dickinson site 141,475,525,1,unknown
+Sutton Courtenay Lane,BrkSCY-BI3,449992,192668,Berkshire,Sutton Courtenay,Dickinson site 142,450,700,1,1920
+Amey's Pit,BrkSCY-IC1,451050,194560,Berkshire,Sutton Courtenay,Dickinson site 140,500,600,3,1944
+Didcot Power Station,BrkSCY-IC2,450375,191970,Oxfordshire,Didcot,Boyle et al 1995,600,725,17,1991
+Sparsholt,BrkSHT-BI1,434845,188345,Berkshire,Sparsholt,Dickinson site 130,450,650,1,1847
+Shiplake,BrkSLK-MC1,477240,179513,Berkshire,Shiplake,Dickinson site 102,500,600,00,1949
+New Bowling Green,BrkSLY-BI1,459360,181140,Berkshire,Streatley,Dickinson site 139,500,600,1,1932
+Little Field Streatley,BrkSLY-IC1,459260,181700,Berkshire,Streatley,Meaney 1964: 52,450,700,00,pre 1819
+Tubney Wood Quarry,BrkTBY-IC1,444575,200455,Berkshire,Tubney,Oxoniensia 2011 76:105-172,425,650,0,2001-9
+Stockholm Farm burial 1,BrkUFN-BI1,430050,188558,Berkshire,Uffington,Dickinson site 149,450,600,1,1932
+White Horse Hill,BrkUFN-IC1,430103,186525,Berkshire,Uffington,Dickinson site 148,500,700,10,pre 1865
+Upton,BrkUPN-IC1,451347,186660,Berkshire,Upton,Dickinson site 154,400,600,3,1958
+Wraysbury Combined School,BrkWBY-IC1,500105,174228,Berkshire,Wraysbury,SMR MRW64,400,1100,3,1984
+St Johns Road,BrkWFD-MC1,460432,189090,Berkshire,Wallingford,Dickinson site 155,400,600,30,1910; 1924; 1936-8
+Goldbury Hill,BrkWHD-MC1,444750,187982,Berkshire,West Hendred,ASSAH 1993 6: 113-23,400,550,4,1990
+Stockholm Farm,BrkWSE-IC1,429050,187748,Berkshire,Woolstone,Dickinson site 164,600,700,5,1884
+Watchfield,BrkWTD-MC1,424912,190718,Berkshire,Watchfield,Arch. Jnl.1992 149: 124-281,475,575,54,1983/1989
+Water Works Crossing,BrkWTN-BI1,447910,200470,Berkshire,Wootton,Dickinson site 165,575,700,1,1961
+University Field Station,BrkWYM-IC1,447395,209337,Berkshire,Wytham,Dickinson site 166,450,600,3,1869-78
+Abbotsbury 20a,DstABY-IC1,359270,83420,Dorset,Abbotsbury,Dorset SMR SY 58 SE 9,600,725,00,1877
+South of Eggardon,DstAWL-IC1,352800,91575,Dorset,Askerswell,DNHAS 1982 104: 181,400,700,3,1981
+Lords Down,DstBLN-IC1,378290,96540,Dorset,Burleston,Pastscape 454535,-1000,700,00,1882
+Iford Bridge,DstBMT-BC1,413880,93300,Dorset,Bournemouth,Meaney 1964: 94,400,600,1,1938
+Frome View,DstBPV-IC1,366110,92780,Dorset,Bradford Peverell,Dorset SMR SY 69 SE 21,650,700,18,Unpublished records
+Bargates,DstCHH-MC1,415750,93050,Dorset,Christchurch,Jarvis 1983:102-33,575,700,34,1969-80
+18 Coldharbour,DstCKL-IC1,365200,81300,Dorset,Chickerell,DNHAS 1996 118: 145-6,400,700,2,1995
+Chettle House,DstCTT-IC1,395060,112800,Dorset,Chettle,Pastscape 210068,450,700,00,unexcavated
+Trumpet Major Wareham House,DstDCR-IC1,370257,90058,Dorset,Dorchester,DNHAS 1984 106: 149-52,575,700,9,1892
+Poundbury,DstDCR-IC2,368400,91000,Dorset,Dorchester,Farwell and Molleson 1993,500,700,3,1966-87
+Langham,DstGLH-BI1,377800,126300,Dorset,Gillingham,RCHM 1972 4: 35-6,600,700,1,unknown
+Stepleton Spur Hambeldon Hill,DstHNF-IC1,385500,111500,Dorset,Hanford,Mercer 1980: 52-4,400,700,14,1978
+Launceston Down cemetery,DstLCL-IC1,396040,111590,Dorset,Long Crichel,DNHAS 1982 104: 39-58,600,700,5,1960
+Army Camp,DstPDH-IC1,372540,96780,Dorset,Piddlehinton,DNHAS 1965 87: 110,400,700,12,1961
+Pimperne East Group,DstPMP-IC1,391520,110340,Dorset,Pimperne,Pastscape 210175,400,800,5,unexcavated
+Manor Farm,DstPSM-IC1,360250,85955,Dorset,Portesham,DNHAS 2003 125: 23-69,580,770,8,2003
+Bokerley Dyke SW,DstPTR-BI1,405370,118110,Dorset,Pentridge,DNHAS 1975 97: 48-9,600,700,2,1975
+Bokerley Dyke Woodyates Inn,DstPTR-BI2,403940,119510,Dorset,Pentridge,Bowen 1991: 5,600,700,1,pre 1810
+Spetisbury Rings,DstSBY-IC1,391525,102025,Dorset,Spetisbury,Dorset SMR ST 90 SW 30AB,500,700,00,1857
+Tinney's Lane,DstSHB-BI1,364440,116907,Dorset,Sherborne,DNHAS 2000 121: 53-68,430,660,1,1997
+Newland Road,DstSHB-IC1,364100,116800,Dorset,Sherborne,Meaney 1964: 81,400,800,15,1955
+Cheap Street,DstSHB-IC2,363830,116693,Dorset,Sherborne,DNHAS 1950 72: 79,400,1000,00,1950
+Shapwick,DstSPW-BI1,395000,102500,Dorset,Shapwick,Pastscape 912121,600,700,1,pre 1839
+Shepherds Well Ulwell,DstSWG-IC1,402260,80920,Dorset,Swanage,DNHAS 1988 110: 37 - 48,600,700,54,1982
+Pimperne Long Barrow NNW,DstTHT-IC1,391690,110610,Dorset,Tarrant Hinton,Pastscape 210180,500,700,5,unexcavated
+Barrow burial 1,DstTLT-BI1,395900,109935,Dorset,Tarrant Launceston,Dorset SMR ST 91 SE 43B,300,700,1,pre 1962
+Launceston Down burial 2,DstTLT-BI2,395900,110600,Dorset,Tarrant Launceston,"Archaeologia 1944 90: 49, 69",500,800,3,1938
+Tolpuddle Ball,DstTPL-IC1,380880,94745,Dorset,Tolpuddle,Wessex Arch. Report 15,400,700,50,1998
+Hardown Hill,DstWCC-IC1,340500,94400,Dorset,Whitchurch Canonicorum,DNHAS 1968 90: 232-49,500,650,00,1916
+Mount Pleasant Henge,DstWSF-IC1,370990,89920,Dorset,West Stafford,Schwieso1979: 181-3,650,700,2,1970-1
+Oakley Down,DstWSG-BI1,402020,117560,Dorset,Wimborne St Giles,Dorset SMR SU 01 NW 120AB,500,550,1,pre 1896
+Rew Group Barrows,DstWSM-BI1,363600,90300,Dorset,Winterborne St Martin,Pastscape 453825,500,700,1,1839-40
+Third Milestone Group,DstWSM-BI2,364300,90300,Dorset,Winterborne St Mtn,Pastscape 1267590,500,700,1,1839
+Maiden Castle Long Mound,DstWSM-BI3,366920,88500,Dorset,Winterborne St Martin,Wheeler 1943: 78-9,600,650,1,1934-7
+Culliford Tree Barrow,DstWTC-BI1,369900,85470,Dorset,Whitcombe,DNHAS 1966 88: 142,500,600,4,1837-1860
+NE of Chavenage Green,GlsAVG-IC1,387770,196080,Gloucestershire,Avening,JBAA 1849 4: 50-4,450,650,9,1847
+Barton Roman Villa,GlsCCR-BI1,401630,202320,Gloucestershire,Cirencester,Dickinson site 40,475,525,2,1909
+Stratton,GlsCCR-BI2,401515,203520,Gloucestershire,Cirencester,TBGAS 1894-5 19: 394-7,450,650,1,1894
+Gravel Pit,GlsCCR-BI3,401630,202540,Gloucestershire,Cirencester,Glocs SMR 28574,450,650,1,1929
+Barton Gravel Pit,GlsCCR-IC1,401558,202553,Gloucestershire,Cirencester,TBGAS 1895 19: 394,500,700,00,1866-96
+Barrow cemetery,GlsCWH-IC1,404080,212850,Gloucestershire,Chedworth,TBGAS 1960 79: 106,500,700,00,pre1960
+Frocester Court,GlsFCR-IC1,378800,202900,Gloucestershire,Frocester,TBGAS 2002 120: 246,700,800,4,2001
+Tanners Field,GlsFFD-MC1,414550,201450,Gloucestershire,Fairford,Meaney 1964: 91,450,600,183,1844-55
+Burn Ground,GlsHNT-MC1,410450,216050,Gloucestershire,Hampnett,Meaney 1964: 90,475,600,15,1939-45
+ENE of Kemble,GlsKBE-IC1,398900,197800,Gloucestershire,Kemble,Archaeologia 1857 37: 113-5,475,600,26,1856
+Road to Kemblehead,GlsKBE-IC2,397100,196600,Gloucestershire,Kemble,Dickinson site 83,475,600,00,1837
+Clayfurlong Road,GlsKBE-IC3,398870,197590,Gloucestershire,Kemble,TBGAS 1987 105: 247,600,700,2,1986
+West Hay Yard,GlsKBE-IC4,398600,197300,Gloucestershire,Kemble,TBGAS 1996 114: 15-54,575,700,8,1992-3
+USAAF Fairford,GlsKFD-BI1,415500,197400,Gloucestershire,Kempsford,TBGAS 1962 81: 196-7,500,700,1,pre 1955
+Field OS74,GlsLLE-IC1,421500,200700,Gloucestershire,Lechlade,Antiq. Jnl 1939 19: 193,450,700,00,1939
+Butlers Field,GlsLLE-MC1,421150,200250,Gloucestershire,Lechlade,Boyle and Palmer 1998,450,725,254,1985
+Ready Token,GlsPTN-IC1,410570,204530,Gloucestershire,Poulton,Dickinson site 124,500,600,00,pre 1931
+Royal Oak High Street,GlsSCY-IC1,404631,196841,Gloucestershire,South Cerney,TBGAS 1999 117: 183,600,800,6,1997; 1999
+Foxcote Manor,GlsWTN-IC1,401380,218020,Gloucestershire,Withington,Dickinson site 68,450,650,3,1935-6
+Portway West,HtsADV-IC1,433600,146300,Hampshire,Andover,"HFCAS 2006, 61: 63-80 Stoodley",625,750,19,1981
+Portway,HtsADV-MC1,434400,146100,Hampshire,Andover,Cook and Dacre 1985,490,600,161,1974
+Mount Pleasant,HtsALT-MC1,471850,138830,Hampshire,Alton CP,Evison 1988,425,650,106,1960/1986
+Broughton Hill,HtsBGT-BI1,430850,131750,Hampshire,Broughton CP,Meaney 1964:95,550,600,1,1875
+Shallows Farm,HtsBMR-IC1,416083,117320,Hampshire,Breamore CP,Unpublished notes,500,600,11,2001
+West Ham,HtsBSK-BI1,462470,151880,Hampshire,Basingstoke Town,Meaney 1964: 98,575,650,1,1899
+Popley,HtsBSK-IC1,464300,154000,Hampshire,Basingstoke Town,Hants SMR SU 65 SW 56,450,700,4,1966
+East of Milbarrow Barn,HtsBWT-IC1,457400,124150,Hampshire,Beauworth,MWC5621,410,1065,00,1995
+Shavards Farm,HtsCAM-IC1,461830,120780,Hampshire,Corhampton and Meonstoke CP,HFCAS 2001 56: 129-169,475,700,21,1998-9
+Pound House,HtsCAM-IC2,461437,120161,Hampshire,Corhampton and Meonstoke CP,"SMR 54,735",600,750,2,1985
+Testcombe Gravel Pit,HtsCBT-BI1,438430,139000,Hampshire,Chilbolton CP,Meaney 1964: 97,475,550,1,1931
+Barton Stacey,HtsCBT-IC1,442100,140100,Hampshire,Chilbolton CP,Pers. Comm. Stoodley,475,550,00,pre 2007
+NE of Moth Farm,HtsCDV-BI1,458690,139790,Hampshire,Candovers CP,Meaney 1964: 95,575,650,1,1959
+Chalton Peak,HtsCLF-IC1,473442,116030,Hampshire,Clanfield CP,Hants SMR 55360,550,650,2,2003
+Unlocated - East Down,HtsCRT-BI1,459700,129700,Hampshire,Cheriton,Winchester CM AY12,500,650,1,1983
+Wind Farm,HtsEXT-BI1,458000,124100,Hampshire,Exton CP,Meaney 1964: 99,590,610,1,1870
+Old Turnpike,HtsFHM-CC1,457593,107593,Hampshire,Fareham,HFCAS 1968 25: 51-9 Hawkes,450,650,2,pre 1963
+Spurlings Yard East Fareham,HtsFHM-IC1,459000,107450,Hampshire,Fareham,"Hants SMR SU 50 NE 84,85",500,700,11,pre 1926
+Unlocated - Headbourne Worthy,HtsHBW-IC1,448926,132763,Hampshire,Headbourne Worthy CP,MWC7209,450,700,00,unexcavated
+Snells Corner,HtsHND-IC1,470750,115310,Hampshire,Horndean CP,HFCAS 1957 XIX: 117-70,600,700,33,1947
+Mount Down,HtsHSY-BI1,440340,128680,Hampshire,Hursley CP,Meaney 1964: 97-8,550,600,1,1914
+Towncil Field,HtsHVT-BC1,472600,103100,Hampshire,Havant,Hants SMR SU 70 SW 37,450,650,1,1965
+Beviss Grave long barrow,HtsHVT-IC1,469230,106420,Hampshire,Havant,Meaney 1964:94,595,700,4,1974-6
+Huckles Bridge,HtsHYD-BC1,415290,110650,Hampshire,Hyde CP,Hants SMR 21080,450,650,1,1926-7
+Unlocated Itchen Valley,HtsICH-IC1,452300,131700,Hampshire,Itchen Valley CP,HFCAS 1951 17: 110-111,450,700,00,1984
+Itchen Abbas Primary School,HtsICH-MC1,453600,133000,Hampshire,Itchen Valley CP,Wessex Arch. 74950,450,500,84,1984 - 2010
+North of Rookley Farm,HtsKSB-IC1,439800,132900,Hampshire,Kings Somborne CP,SU 33 SE 44,450,700,00,unexcavated
+Worthy Park,HtsKWY-MC1,449952,132891,Hampshire,Kings Worthy CP,Hawkes and Grainger 2003,475,650,156,1961-2
+Old Dairy Cottage Halls Farm Close,HtsLAH-IC1,447200,131400,Hampshire,Littleton and Harestock,Geake 1997: 154,600,900,17,1989
+Meon Hill,HtsLGK-IC1,434370,135270,Hampshire,Longstock CP,Hants SMR 25539,600,900,10,1933
+Weston Colley,HtsMDV-IC1,450460,139540,Hampshire,Micheldever CP,Meaney 1964: 98,450,600,3,1845; 2003
+Tichborne Down House,HtsNAF-BI1,458784,131505,Hampshire,New Alresford CP,Meaney 1964:94,450,650,2,1948
+Brewery House Farm,HtsNWP-BI1,428920,137720,Hampshire,Nether Wallop CP,Hants SMR 21916,600,650,1,1957
+Unlocated - Nether Wallop,HtsNWP-BI2,430400,136400,Hampshire,Nether Wallop CP,Meaney 1964:101,600,650,1,1870; 1931
+Oliver Cromwells Battery,HtsOVB-BI1,445920,127900,Hampshire,Oliver's Battery CP,Meaney 1964: 98,630,670,1,1913
+Preston Grange,HtsPCD-IC1,460460,140320,Hampshire,Preston Candover CP,Meaney 1964: 99,575,700,00,pre 1893; pre 1939
+Portsdown II Barrow,HtsPTM-IC1,466650,106410,Hampshire,Portsmouth,Meaney 1964: 99,600,700,3,1817
+George Inn Portsdown,HtsPTM-IC2,466740,106380,Hampshire,Portsmouth,HFCAS 1968 25: 27-41,550,650,2,1967
+Portsdown,HtsPTM-IC3,464870,106560,Hampshire,Portsmouth,Meaney 1964:  99,675,700,25,1948; 1956
+Oak Lodge Southwick,HtsSAW-BI1,462200,108600,Hampshire,Southwick and Widley CP,Hants SMR 24585,450,700,1,pre 1955
+Althorne Cottage,HtsSBG-IC1,423200,144600,Hampshire,Shipton Bellinger CP,Meaney 1964: 100,400,900,4,1909
+Droxford,HtsSBT-IC1,461220,118490,Hampshire,Soberton CP,HFCAS 1979 35: 93-182,490,600,42,1900
+Silchester North Gate,HtsSCR-BI1,463854,162795,Hampshire,Silchester CP,Hants SMR 50293,400,500,1,1991
+Derrydown Copse,HtsSMB-BI1,442260,149730,Hampshire,St. Mary Bourne CP,Hants SMR SU 44 NW 25,450,700,1,1875
+Cook Street,HtsSTN-IC1,442472,111608,Hampshire,Southampton,HFCAS 2001 56: 170-191,700,750,24,pre 2001
+Bitterne Manor,HtsSTN-IC2,443436,113301,Hampshire,Southampton,Cotton and Gathercole 1958:30,750,900,100,1804-5; 1935-6; 1939; 1954
+Craven Street Winton Street,HtsSTN-IC3,442473,112069,Hampshire,Southampton,Southampton SMR 1134,700,800,00,1993
+Clifford Street,HtsSTN-IC4,442543,112100,Hampshire,Southampton,Morton 1992: 171-184,700,750,16,1968
+St Marys Stadium later cemetery,HtsSTN-IC5,622790,167000,Hampshire,Southampton,Birbeck 2005: 107,700,800,8,1998-2000
+Golden Grove,HtsSTN-IC6,442675,111952,Hampshire,Southampton,Morton 1992: 193-194,700,750,6,pre 1992
+St Marys Stadium,HtsSTN-MC1,442947,112063,Hampshire,Southampton,Birbeck 2005,650,720,55,1998-2000
+Twyford School,HtsTFD-IC1,448380,125016,Hampshire,Twyford,HFCAS 2011 66: 75-106,575,700,17,2009
+SW of Twinley Manor,HtsWCH-BI1,447700,151790,Hampshire,Whitchurch CP,Meaney 1964: 101,500,650,1,1918
+Station area,HtsWCH-IC1,445880,147800,Hampshire,Whitchurch CP,Hants SMR SU 44 NE 10,450,700,9,pre 1895
+Uplands House,HtsWCR-BI1,447340,129390,Hampshire,Winchester,Meaney 1964: 101,450,700,1,1852; 1949
+Winnall I,HtsWCR-IC1,449098,130051,Hampshire,Winchester,Meaney and Hawkes 1970,500,650,2,1884
+Winnall II,HtsWCR-IC2,449400,130140,Hampshire,Winchester,Meaney and Hawkes 1970,650,750,47,1957/8
+St Giles Hill,HtsWCR-IC3,449070,129250,Hampshire,Winchester,Meaney 1964: 101,500,650,3,1845; 1884; 1894; 1905; 1944
+23 Lower Brook Street,HtsWCR-IC4,448452,129580,Hampshire,Winchester,Antiq. Jnl. 1975 55: 295-321,650,750,5,1974
+South Gate,HtsWCR-IC6,447900,129100,Hampshire,Winchester,Geake 1997: 156,650,750,2,1971
+Lankhills Roman cemetery,HtsWCR-RIC1,447877,130295,Hampshire,Winchester,Pastscape 231838,300,500,00,1967-72; 2000-5
+Chalk Dell Sutton Scotney,HtsWNS-BI1,446210,139190,Hampshire,Wonston CP,Meaney 1964: 101 ,600,650,1,1921
+Arreton Down Michael Moreys Hump,IoWART-MC1,453540,87420,Isle of Wight,Arreton,Pr.Preh.Soc.1990 126: 263-296,475,600,9,1815
+Bembridge Down,IoWBDG-BI1,462580,85990,Isle of Wight,Brading,Arnold 1982: 84-5,475,600,2,1892
+Rancombe Down,IoWBGS-CC1,444000,83000,Isle of Wight,Brighstone,Arnold 1982: 73-4,475,600,3,1920
+Mottistone Down burial 1,IoWCLB-BI1,440370,84860,Isle of Wight,Calbourne,"Pr.IoWNHAS 1940 3: 182, 202",475,600,1,pre 1940
+Newbarn Down,IoWCLB-IC1,443730,86060,Isle of Wight ,Calbourne,Arnold 1982: 86,475,600,00,1838
+Fr???,??????????,448200,87400,?????????????,???????????,??????????????,475,550,,
+Carisbrooke Castle,IoWCSB-IC1,448660,87780,Isle of Wight,Carisbrooke,Young 2000,450,600,3,1921-96
+Bowcombe Down,IoWCSB-MC1,446150,87280,Isle of Wight,Carisbrooke,Arnold 1982: 89-96,475,600,35,1854-8
+Totland,IoWFWT-BI1,433000,87100,Isle of Wight,Freshwater,IoW SMR 66,475,600,1,1965
+Lowthervill Ventnor,IoWGDH-BI1,455610,77810,Isle of Wight,Godshill,Pr.IoWNHAS 1940 3: 212,475,600,1,1904
+Mottistone Down,IoWMST-IC1,440640,84795,Isle of Wight,Mottistone,Arnold 1982: 88,450,700,00,1856
+Little Chessell Farm,IoWSHF-BI1,440190,86630,Isle of Wight,Shalfleet,IoW SMR 402,475,600,1,1933
+Chessell Down,IoWSHF-MC1,439890,85380,Isle of Wight,Shalfleet,Arnold 1982: 13 - 72,475,575,113,1818; 1855
+Shalcombe Down burial 1,IoWSTN-BI1,439020,85440,Isle of Wight,St Nicholas,"Pr.IoWNHAS 1940 3: 201, 219",475,600,1,1816
+Shalcombe Down barrow,IoWSTN-BI2,439430,85480,Isle of Wight,St Nicholas,Basford 1980: 115,475,600,1,pre 1816
+Chessell,IoWSTN-BI3,439800,85800,Isle of Wight,St Nicholas,IoW SMR 405,475,600,1,c.1818
+Shalcombe Down,IoWSTN-IC1,439290,85310,Isle of Wight,St Nicholas,Arnold 1982: 80-3,475,600,3,1816
+Unlocated - Rowborough Down,IoWSWL-BC1,445000,85000,Isle of Wight,Shorwell,IoW SMR 520,475,600,1,unknown
+Sheards Barrow,IoWSWL-BC2,447240,82720,Isle of Wight,Shorwell,Pastscape 460298,475,600,1,1931
+Unlocated - Acol Hill,KntACL-BI1,630755,167658,Kent,Acol,Richardson site 1,500,800,1,1942
+Acol Hill,KntACL-IC1,630700,167800,Kent,Acol,TTA site 250,500,800,00,pre 1992
+Crispe Road,KntACL-IC2,630400,167800,Kent,Acol,TR 36 NW 158,600,700,00,NA
+Court-le-Street,KntADN-IC1,608250,135180,Kent,Aldington,TR 03 NE 16,700,900,00,1850
+Ashford,KntAFD-BI1,601000,142000,Kent,Ashford,TR 04 SW 13,600,700,1,pre-1856
+Chilton Farm,KntAKM-BI1,627800,143100,Kent,Alkham,Richardson site 291,540,625,1,c.1974
+Richborough,KntASH-BI1,632470,160460,Kent,Ash,TR 36 SW 16,350,450,1,1800
+Richborough Castle,KntASH-BI2,632400,160300,Kent,Ash,Meaney 1964: 133,600,750,1,1928
+Millfield,KntASH-BI3,629340,158150,Kent,Ash,TR 25 NE 49,500,600,1,1992
+Guilton Mill,KntASH-BI4,628168,158188,Kent,Ash,Arch. Cant. 2006 126: 391-2,450,700,1,2006
+Cop St,KntASH-IC1,629000,159750,Kent,Ash,TR 25 NE 2,500,600,20,1850
+Gilton,KntASH-IC2,628110,158260,Kent,Ash,TR 25 NE 6,480,650,107,1759-1957
+Eccles,KntAYF-IC1,572200,160500,Kent,Aylesford,TQ 76 SW 37,650,800,203,1962-
+Preston Hall,KntAYF-IC2,572390,158320,Kent,Aylesford,TQ 75 NW 30,590,650,4,"1922, 1926"
+Lees,KntBBN-BI2,608000,140000,Kent,Brabourne,TR 04 SE 12,500,600,1,pre 1866
+Pilgrims Way Brabourne,KntBBN-IC1,610750,142000,Kent,Brabourne,Richardson site 39,525,600,00,1986-96
+Iden Corner,KntBBN-IC2,610720,142000,Kent,Brabourne,TR 14 SW 20,500,600,4,1955
+Bourne Park,KntBDG-IC1,618608,153743,Kent,Bridge,Richardson site Bridge I,650,750,24,2005
+Chalkwell,KntBDN-IC1,589460,163770,Kent,Borden,TQ 86 SE 20,590,675,2,1882
+Boughton Aluph,KntBGA-IC1,603720,148780,Kent,Boughton Aluph,TR 04 NW 4,550,700,3,"1720, 1903"
+Minnis Bay,KntBGN-BI1,629270,169520,Kent,Birchington,TR 26 NE 21,500,700,3,1937
+Brooksend,KntBGN-IC1,629270,168670,Kent,Birchington,TR 26 NE 38,500,700,00,1958
+Breach Downs burial 1,KntBHM-BI1,620300,149000,Kent,Barham,TR 24 NW 32,600,700,1,pre 1600
+Breach Downs,KntBHM-IC1,620670,148900,Kent,Barham,Meaney 1964: 111,600,730,92,"1841-44, 1930-40"
+Upper Digges,KntBHM-IC2,621300,150800,Kent,Barham,TR 25 SW 45,600,700,4,1966
+Wick Wood,KntBHM-IC3,622350,149150,Kent,Barham,TR 24 NW 75,600,700,3,1972
+Broom Park,KntBHM-IC4,622260,148840,Kent,Barham,TR 24 NW 21,600,900,5,1969
+Barham aka Kingston Down,KntBHM-IC5,620600,151500,Kent,Barham,TR 24 NW 32,600,700,00,1759-1968
+Adisham Down,KntBKB-IC1,620760,154790,Kent,Bekesbourne,TR 25 SW 1,630,700,48,1773
+Aerodrome,KntBKB-IC2,619990,155490,Kent,Bekesbourne,TR 15 NE 1,475,700,40,"1914-19, 1936, 1955-58"
+High Meadow,KntBLD-BI1,631010,141970,Kent,Buckland,TR 34 SW 76,650,700,1,1956
+Dover Buckland,KntBLD-IC1,631000,143000,Kent,Buckland,Evison 1987,475,750,434,1953
+Castle View,KntBLD-IC2,630800,142900,Kent,Buckland,TR 34 SW 461,475,750,00,c.1853
+Little Knock Wood Lidsing,KntBOX-BI1,578000,164000,Kent,Boxley,TQ 76 SE 16,500,700,1,1881
+Broadstairs 1910,KntBRS-BI1,639330,168540,Kent,Broadstairs,TR 36 NE 6,500,700,2,1911
+Bradstow School burial 2,KntBRS-BI2,639450,167090,Kent,Broadstairs,Arch. Cant. 2007 127: 424,450,650,1,2006
+Broadstairs St  Peters Tip,KntBRS-IC1,637530,169260,Kent,Broadstairs,TR 36 NE 60,525,700,426,1969-71
+Bleak House,KntBRS-IC2,639950,167580,Kent,Broadstairs,TR 36 NE 186,500,700,00,1960s
+Bradstow School,KntBRS-IC3,639450,167090,Kent,Broadstairs,TR 36 NE 12,500,700,97,1970-4
+Valetta House,KntBRS-IC4,639450,167090,Kent,Broadstairs,TR 36 NE 12,575,725,19,1910-11
+Bishopsbourne Kingston burial 1,KntBSB-BI1,619890,152090,Kent,Bishopsbourne,TR 15 SE 21,-1000,900,1,1940
+Bishopsbourne burial 2,KntBSB-BI2,619240,153200,Kent,Bishopsbourne,TR 15 SE 3,600,700,1,unexcavated
+Bishopsbourne,KntBSB-IC1,619100,153000,Kent,Bishopsbourne,TR 15 SE 6,600,750,15,1844 on
+Bourne Place,KntBSB-IC2,618680,153680,Kent,Bishopsbourne,TR 15 SE 2,600,700,11,c.1844
+Bishopsbourne cemetery 3,KntBSB-IC3,619700,152500,Kent,Bishopsbourne,TR 15 SE 32,600,800,23,1973
+Burstead Wood,KntBSB-IC4,616000,150500,Kent,Bishopsbourne,TR 15 SE 16,500,700,3,1749
+Parsonage Farm,KntBUB-BI1,604700,158600,Kent,Boughton-under-Blean,Meaney 1964: 111,500,650,1,1716
+Buckland Farm,KntCAH-IC1,573500,174700,Kent,Cliffe-at-Hoo,TQ 77 SW 6,500,570,00,1880
+St Martins churchyard,KntCAT-BI1,615850,157770,Kent,Canterbury,TR 15 NE 80,575,650,1,1844
+Stour Street,KntCAT-BI2,614900,157600,Kent,Canterbury,Richardson site 47,400,450,1,1980
+St Pancras,KntCAT-BI3,615570,157750,Kent,Canterbury,Richardson site 52,720,750,1,1975
+St Augustines Abbey,KntCAT-IC1,615400,157730,Kent,Canterbury,TR 15 NW 302,600,900,19,1955
+Canterbury Martyrs Field,KntCAT-IC5,614700,157000,Kent,Canterbury,TR 15 NW 48,500,600,00,"1900, 1958"
+Old Westgate Farm,KntCAT-MC1,613990,158290,Kent,Canterbury,TR 15 NW 201,650,800,5,1982
+New River,KntCFD-IC1,552050,175150,Kent,Crayford,Richardson site 63,480,550,00,1889
+Swan Lane,KntCFD-IC2,551749,173610,Kent,Crayford,Richardson site 64,450,700,00,1889
+Chartham Downs,KntCHM-IC1,610970,154260,Kent,Chartham,Meaney 1964: 114,575,800,63,"1729-30, 1764-773"
+Horton pipe line,KntCHM-IC2,611745,155240,Kent,Chartham,Arch. Cant. 2004 124:369-70,500,625,6,2001
+Charing I Bishops Palace,KntCHR-IC1,595500,145900,Kent,Charing,Richardson site 54,500,700,00,1864
+Crundale,KntCRD-IC1,606320,149330,Kent,Crundale,TR 04 NE 3,650,700,17,"1703, 1713, 1757-59, 1858"
+Crundale Downs,KntCRD-IC2,608500,148500,Kent,Crundale,TR 04 NE 3,500,700,2,1861-1895
+Chatham Lines,KntCTM-IC1,576130,168355,Kent,Chatham,Meaney 1964: 114-5,450,700,20,1756-82
+Coombe Woodnesborough,KntCWN-BI1,629800,157500,Kent,Woodnesborough,TR 25 NE 13,575,600,1,1885
+Woodnesborough II,KntCWN-IC1,630810,156830,Kent,Woodnesborough,TR 35 NW 38,550,650,00,1845
+Ringlemere Farm,KntCWN-MC1,629380,156975,Kent,Woodnesborough,Arch. Cant. 2007 127: 51-3,400,600,58,2007
+Strood Cuxton railway,KntCXN-BI1,573228,168538,Kent,Cuxton,Richardson site 68,575,650,1,1859
+Cuxton,KntCXN-IC1,572000,167350,Kent,Cuxton,Glass 1999,550,650,37,1999
+Redsull Ave,KntDEA-BI1,636290,151140,Kent,Deal,TR 35 SE 20,400,900,1,1939
+Sand Hills,KntDEA-BI2,637600,154300,Kent,Deal,Richardson site 86,575,650,1,pre-1973
+Darenth Park Hospital,KntDRH-IC1,556500,172900,Kent,Darenth,Meaney 1964: 116,450,600,15,"1881, 1954; 1998"
+Tunnel Approach Road,KntDTD-BI1,555451,174522,Kent,Dartford,Richardson site 73,400,900,1,1937
+Barrow burial 2,KntDTD-BI2,551038,172339,Kent,Dartford,Richardson site 74,450,700,1,1889
+Unlocated - Dartford,KntDTD-BI3,553506,173500,Kent,Dartford,Richardson site 75,450,650,1,1884
+Littlebrook Stone,KntDTD-IC1,555600,175000,Kent,Dartford,Meaney 1964: 126,450,700,8,1883
+Temple Hill,KntDTD-IC2,554943,175025,Kent,Dartford,Richardson site 78,450,600,59,2002
+Holy Trinity School,KntDTD-IC3,553751,174099,Kent,Dartford,Arch SE 718,600,725,25,1997
+Powder Mills Bignores,KntDTD-IC4,555065,173118,Kent,Dartford,Richardson site 70,450,700,00,1818
+Denton Court,KntDTN-IC1,566100,173500,Kent,Denton,Arch. Cant. 1992 110: 71-81,450,900,00,1937
+Brown Rd,KntDTN-IC2,566500,173100,Kent,Denton,Arch. Cant. 1992 110: 71-81,400,900,3,1937
+Albany Place,KntDVR-IC1,631847,141347,Kent,Dover,Richardson site 90,400,900,4,1980
+Priory Hill,KntDVR-IC2,631450,141750,Kent,Dover,TR 34 SW 6,550,725,5,"1883, 1889, 1956"
+Eynsford,KntEFD-BI1,553051,166230,Kent,Eynsford,Richardson site 103,400,900,1,1950s
+Toll Bar Cottage,KntEFD-BI2,553728,165666,Kent,Eynsford,Richardson site 106,400,900,1,1940
+Darenth Cottage Eynsford,KntEFD-IC1,554238,165778,Kent,Eynsford,Richardson site 105,750,900,31,1940; 1971
+Mill Down,KntEHM-IC1,618300,143100,Kent,Elham,TR 14 SE 74,500,700,00,1760
+Eastry,KntESY-BI1,630970,154480,Kent,Eastry,Richardson site 98,475,600,1,1987
+Eastry I Buttsole,KntESY-IC1,631100,154500,Kent,Eastry,TR 35 SW 1,450,600,00,"1792, 1804, 1860"
+Eastry House,KntESY-IC2,630900,154900,Kent,Eastry,Hawkes 1979,540,625,2,1970; 2003
+Eastry 3 Updown,KntESY-IC3,631100,153700,Kent,Eastry,Hawkes 1979,600,700,77,1976
+Eastry IV Eastry Mill,KntESY-IC4,630300,154400,Kent,Eastry,Hawkes 1979,600,700,4,1968
+Highborough Hill,KntESY-IC5,631345,155945,Kent,Eastry,Richardson site 101 V,450,625,00,1987-2002
+Unlocated - Eythorne,KntETN-BI1,628000,148800,Kent,Eythorne,TR 24 NE 17,600,700,1,1828
+Lousyberry Wood Temple Ewell,KntEWL-IC1,629140,144350,Kent,Ewell,TR 24 SE 14,600,700,5,pre-1799; 2004
+Watersend Temple Ewell,KntEWL-IC2,628200,144700,Kent,Ewell,Richardson site 256,500,700,20,1843
+Churchyard burial 1,KntFAV-BI1,601810,161530,Kent,Faversham,TR 06 SW 18,500,700,1,1853
+Kings Field,KntFAV-IC1,601220,160920,Kent,Faversham,TR 06 SW 16,550,600,3,"1858-68, 1874, 1894, 1957"
+Clevelands,KntFHM-BI1,554759,166339,Kent,Farningham,Richardson site 107,400,900,1,1901
+Charton Manor,KntFHM-IC1,555500,166500,Kent,Farningham,Meaney 1964: 118,575,650,5,1939
+Cherry Garden Hill,KntFLK-BI2,620830,138010,Kent,Folkestone,Meaney 1964: 120,625,700,1,c.1848
+Folkestone,KntFLK-BI3,624000,137000,Kent,Folkestone,TR 23 NW 96,500,575,1,Pre 1849
+Folkestone III Dover Hill,KntFLK-IC1,623800,137590,Kent,Folkestone,Richardson site114,500,650,40,"1849, 1889, 1907-10"
+Folkestone Folly Rd,KntFLK-IC2,623560,136710,Kent,Folkestone,TR 23 NW 6,600,800,5,1869-75
+The Bayle,KntFLK-MC1,623100,135900,Kent,Folkestone,TR 23 NW 19,500,700,6,1853
+Otterham Creek burial 1,KntGGH-BI1,582840,167150,Kent,Gillingham,TQ 86 NW 21,500,700,1,1930
+Woodlands-Grange Rd,KntGGH-BI2,579000,168700,Kent,Gillingham,TQ 76 NE 30,500,700,1,1933
+Unlocated - Gillingham,KntGGH-BI3,578500,167500,Kent,Gillingham,Richardson site 119,450,650,1,1800s
+Mill Hill Deal I,KntGMM-IC1,636310,150740,Kent,Great Mongeham,Parfitt and Brugmann 1997,490,590,81,1986-89
+Catholic church Waterworks Hill,KntGMM-IC2,636040,151120,Kent,Great Mongeham,TR 35 SE 19,500,700,3,"1898, 1933, 1970"
+Great Mongeham,KntGMM-IC4,635070,151020,Kent,Great Mongeham,TR 35 SE 48,450,800,00,"1911-3, 1918"
+Beacon Hill cemetery,KntGMM-IC5,634130,151050,Kent,Great Mongeham,TR 35 SW 31,600,700,00,NA
+Godmersham,KntGOD-BI1,606000,142000,Kent,Godmersham,TR 05 SE 7,500,700,1,pre 1720
+Godmersham churchyard,KntGOD-BI2,606150,150420,Kent,Godmersham,Richardson site 120,400,900,1,1974-5
+Guston,KntGUS-BI1,632000,144000,Kent,Guston,TR 34 SW 59,520,620,1,1864
+Greenwich Barrow Cemetery,KntGWH-IC1,538800,177100,Kent,Greenwich,Richardson site 124,625,750,50,1784
+Old Tiltyard Romney Road,KntGWH-IC2,538690,177850,Kent,Greenwich,Richardson site 125,590,700,3,1862
+Court Farm Lodge,KntHAR-BI2,586520,154030,Kent,Harrietsham,TQ 85 SE 4,650,700,1,1933
+Pilgrims Way (Deodora House),KntHAR-BI3,587300,153600,Kent,Harrietsham,TQ 85 SE 3,500,700,1,1925
+Churchyard Harrietsham,KntHAR-IC1,587240,153570,Kent,Harrietsham,TQ 85 SE 2,500,700,00,1892
+Unlocated - Broad Street,KntHBN-IC2,582995,157000,Kent,Hollingbourne,Richardson site 137:II,450,550,00,1997-2004
+Whiteheath,KntHBN-MC1,582000,154770,Kent,Hollingbourne,TQ 85 SW 5,450,650,00,1819-43
+Hoo Junction,KntHGM-IC1,570310,173660,Kent,Higham,TQ 77 SW 2,450,550,00,1905
+Shelford Farm,KntHKN-BI1,616490,160280,Kent,Hackington,TR 16 SE 2,570,625,1,ante 1928
+Unlocated - Chapel Farm,KntHKY-BI1,556500,168500,Kent,Horton Kirby,Pastscape 1236083,450,620,1,unknown
+Boys Home South Darenth,KntHKY-IC1,556751,169339,Kent,Horton Kirby,Meaney 1964: 124,450,540,3,1866-8
+Riseley II,KntHKY-MC2,556254,167554,Kent,Horton Kirby,Meaney 1964: 133-4,475,650,120,1937-49
+Millbank,KntHTH-BI1,620480,165320,Kent,Hoath,TR 26 NW 11,500,650,1,1772
+Sandtun,KntHYT-IC1,612150,133880,Kent,Hythe,Richardson site 143,650,750,3,1939-48
+Near church,KntKSG-IC1,554836,158842,Kent,Kemsing,Richardson site 148,450,700,2,1880
+Kingston Down burial 1,KntKSN-BI1,620000,151000,Kent,Kingston,TR 25 SW 27,500,700,1,1944
+Kingston Down I,KntKSN-IC1,620200,151900,Kent,Kingston,TR 25 SW 14,575,725,321,"1749-73, 1850, 1959"
+Kingston Down II,KntKSN-IC2,620300,151800,Kent,Kingston,TR 25 SW 42,600,700,4,NA
+Kingston Down III,KntKSN-IC3,620600,151510,Kent,Kingston,TR 25 SW 43,550,650,18,NA
+Kingston Down IV,KntKSN-IC4,620000,152300,Kent,Kingston,TR 25 SW 41,550,650,9,1966
+Kingston Down V,KntKSN-IC5,620200,151910,Kent,Kingston,Geake 1997: 164,650,725,3,1965
+Keston Church,KntKTN-IC1,541850,163000,Kent,Keston,Pastscape 407820,450,900,5,1950
+Surrenden Park,KntLCT-IC1,593910,145725,Kent,Little Chart,TQ 96 NW 13,500,700,3,1936
+Leeds,KntLDS-IC1,582710,153880,Kent,Leeds,TQ 85 SW 7,500,625,2,1910
+Pilgrims Way Lenham,KntLEN-BI1,590240,152800,Kent,Lenham,TQ 95 SW 2,500,700,1,1946
+The Square,KntLEN-IC1,589820,152150,Kent,Lenham,TQ 85 SE 8,500,600,3,1946
+7 Deptford Broadway,KntLHM-IC1,537212,177006,Kent,Lewisham,Kent AR 2006 163: 53-7,600,650,2,1989; 1992
+Lower Halstow,KntLHS-BI1,585710,166420,Kent,Lower Halstow,TQ 86 NE 17,500,700,1,1893
+Lullingstone,KntLSN-IC1,553300,164600,Kent,Lullingstone,Meaney 1964: 126,650,700,00,1860
+Littlebourne II,KntLTB-BI1,621000,157000,Kent,Littlebourne,TR 25 NW 26,625,675,1,pre-1848
+Howletts Littlebourne,KntLTB-IC1,620070,156870,Kent,Littlebourne,TR 25 NW 2/28,475,700,35,1913-18
+Lyminge railway,KntLYM-IC1,616470,140700,Kent,Lyminge,TR 14 SE 11,475,600,00,1885
+Lyminge,KntLYM-MC1,616380,141690,Kent,Lyminge,TR 14 SE 12,450,570,116,1953-55; 2002
+Unlocated - Lydden,KntLYN-BI1,626000,145000,Kent,Lydden,TR 24 NE 12,500,700,2,1760
+Bellevue,KntLYP-IC1,610960,134990,Kent,Lympne,TR 13 SW 2,500,700,00,1828
+Wheeler St,KntMAS-IC1,576250,156170,Kent,Maidstone,TQ 75 NE 30,500,625,00,"1823, 1836"
+Northdown,KntMGT-BI1,638000,170000,Kent,Margate,TR 37 SE 20,500,700,1,1841/1898
+Half Mile Ride,KntMGT-IC1,634980,169130,Kent,Margate,Arch Cant 1987 104: 219-236,600,750,34,1848-63
+Gas Alley,KntMGT-IC2,635730,170890,Kent,Margate,TR 37 SE 35/36,500,700,2,1840
+Salmestone Grange,KntMGT-IC3,635392,169385,Kent,Margate,Richardson site 173 VII,540,570,3,2000
+Unlocated - Millmead Estate,KntMGT-IC4,637400,169600,Kent,Margate,Richardson site 171,450,700,00,1950/60
+Minster-in-Thanet,KntMIT-BI1,634120,165220,Kent,Minster in Thanet,TR 36 NW 189,500,700,1,1984
+Minster-in-Thanet Churchyard,KntMIT-BI2,631070,164280,Kent,Minster in Thanet,TR 36 SW 1,500,600,1,c.1876
+Prospect Road,KntMIT-BI3,630553,164905,Kent,Minster in Thanet,Richardson site 190,450,700,1,1968
+Laundry Telegraph Hill,KntMIT-IC1,631670,165570,Kent,Minster in Thanet,TR 36 NW 214/216,650,700,11,"NA,1982-3"
+Minster Mount Pleasant II,KntMIT-IC2,630700,165800,Kent,Minster in Thanet,TR 36 NW 240,625,750,18,1996
+Minster Thorne Farm,KntMIT-IC3,633370,165430,Kent,Minster in Thanet,Richardson site 186,575,700,3,1983
+Minster Mount Pleasant IV,KntMIT-IC4,630110,165650,Kent,Minster in Thanet,TR 36 NW 195,620,725,8,1971
+Monkton Court Farm,KntMKN-BI1,627700,165200,Kent,Monkton,Richardson site 193,450,700,1,1977
+Primrose Hill,KntMKN-IC1,629100,165550,Kent,Monkton,Richardson site 192,500,700,35,"1971, 1984"
+Cooks Lane,KntMRE-IC1,590490,164770,Kent,Milton,TQ 96 SW 56,600,710,00,1916-1962
+Rondeau Estate,KntMRE-IC2,590070,163860,Kent,Milton,TQ 96 SW 14,550,700,42,1879-80
+Brickfields,KntMRE-IC3,591200,165050,Kent,Milton,TQ 96 NW 11,450,600,00,1889
+Milton Regis (Sittingbourne),KntMRE-IC4,592150,166290,Kent,Milton,TQ 96 NW 13,450,700,00,pre 1900
+The Meads,KntMRE-MC1,589500,165000,Kent,Milton Regis,CAT unpublished 2008,400,700,229,2008
+Bower Farm Mersham,KntMRS-IC1,605000,139000,Kent,Mersham,TR 03 NE 9,500,600,3,1828/1853
+Meres Court Murston,KntMUN-BI1,592400,164600,Kent,Murston,TQ 96 SW 10,500,700,1,1929
+Finglesham Northbourne,KntNBN-IC1,632550,153420,Kent,Northbourne,Hawkes and Grainger 2006,520,750,257,1928-67
+Church Field Northfleet,KntNFT-MC1,562342,174060,Kent,Northfleet,Richardson site198,450,600,24,1847; 1899; 1900; 1901; 1948
+Newington,KntNNH-IC1,616900,138900,Kent,Newington,TR 13 NE 15,500,700,00,1760
+Dollands Moor,KntNNH-IC2,618100,137200,Kent,Newington Hythe,Richardson site 195,350,700,3,1989
+Nonington Court,KntNON-IC1,626255,152695,Kent,Nonington,Richardson site 196,600,750,19,1875; 2001
+Unlocated - Chapman's Pit,KntNTN-IC1,597180,159170,Kent,Norton,TQ 95 NE 2,500,700,00,1893
+Orpington,KntOPN-MC1,546696,167517,Kent,Orpington,Richardson site 200,450,625,84,1965-78
+19 The Charre Otford,KntOTF-BC1,552222,158967,Kent,Otford,Richardson site 201,500,600,1,1954; 2002
+Polhill,KntOTF-IC1,550400,159000,Kent,Otford,Philp and Hawkes 1973,600,750,125,"1880, 1956"
+Unlocated - Postling,KntPOS-BI1,614000,138000,Kent,Postling,Meaney 1964: 132,540,570,1,1773
+Patrixbourne Church,KntPXB-BI1,618800,155200,Kent,Patrixbourne,Meaney 1964: 131,500,700,1,1866
+Bifrons Patrixbourne,KntPXB-IC1,619020,154570,Kent,Patrixbourne,Hawkes 2000,450,625,102,1866-76
+Chalk Hill,KntRAM-BI1,635680,164780,Kent,Ramsgate,Richardson site 213,400,700,2,1992-4
+Unlocated - Ramsgate,KntRAM-BI2,637700,165500,Kent,Ramsgate,TR 36 NE 124,450,700,4,pre-1931
+St Lawrence,KntRAM-BI3,637500,164400,Kent,Ramsgate,Richardson site 212,400,650,1,"1846, 1939-40"
+Nethercourt Estate 1988,KntRAM-BI5,635760,165210,Kent,Ramsgate,Kent SMR TR 36 NE 2001,450,650,1,1988
+Station Approach,KntRAM-BI6,637900,165470,Kent,Ramsgate,TR 36 NE 32,600,700,1,1932
+Ozengell,KntRAM-IC1,635500,165300,Kent,Ramsgate,TR 36 NE 51/58/26,475,725,232,"1845-50, 1977-82"
+Nethercourt Farm,KntRAM-IC2,636790,165230,Kent,Ramsgate,TR 36 NE 29,500,700,4,"1931, 1949"
+St Augustines College,KntRAM-IC3,637500,164500,Kent,Ramsgate,TR 36 SE 6,600,700,00,c.1877
+Nethercourt Farm Estate West,KntRAM-IC4,636100,165100,Kent,Ramsgate,Meaney 1964: 130,450,700,00,1898-1953
+Cliffs End Farm,KntRAM-IC5,634820,164290,Kent,Ramsgate,McKinley et al 2014,500,700,13,2004-5
+Short Bros Works,KntRCR-BI1,573600,167590,Kent,Rochester,TQ 76 NW 38,500,700,1,1939
+Watts Avenue,KntRCR-IC1,574050,168050,Kent,Rochester,TQ 76 NW 37,450,700,3,1892-99
+Cathedral Cemetery,KntRCR-IC2,574220,168540,Kent,Rochester,TQ 76 NW 9,650,900,00,"1800s, 1960"
+Star Hill,KntRCR-IC3,574660,168070,Kent,Rochester,TQ 76 NW 15,500,600,20,1852
+Freedown,KntRGW-BI1,636500,147100,Kent,Ringwould,TR 34 NE 18/7,500,600,1,1945
+Kingsdown,KntRGW-BI2,637700,148600,Kent,Ringwould,Richardson site 219,575,650,1,1960s
+Ringwould,KntRGW-IC1,635910,148320,Kent,Ringwould,TR 34 NE 8,500,600,2,1852
+Ripple Mill Service Station,KntRPL-BI1,634700,149350,Kent,Ripple,TR 34 NE 28,450,700,1,pre-1980
+Foreshore,KntRVR-IC1,622000,169000,Kent,Reculver,TR 26 NW 66,550,750,00,"1828, 1850, 1894, 1953"
+Sarre,KntSAR-IC1,626100,165060,Kent,Sarre,Meaney 1964: 135-6,480,700,319,"1843, 1863-4"
+Stodmarsh,KntSDM-BI1,621400,160200,Kent,Stodmarsh,TR 26 SW 7,525,625,2,"1847, 1854"
+Joyce Hall Betsham,KntSFT-BI1,560730,171485,Kent,Southfleet,Richardson site 244,500,650,1,1928
+Southfleet,KntSFT-MC1,561700,172600,Kent,Southfleet,Meaney 1964: 137,450,750,15,1848
+Upper Deal,KntSHD-BI1,635910,152120,Kent,Sholden,TR 35 SE 27,500,700,1,1939
+Claylane Wood Shorne II (Cobham),KntSHN-IC1,566400,170400,Kent,Shorne,TQ 67 SE 7,450,650,00,1825
+Sibertswold Barfriston,KntSIB-IC1,626650,149000,Kent,Sibertswold,TR 24 NE 2,600,725,184,1772-3
+Barfreston (Sibertswold),KntSIB-IC2,626500,148850,Kent,Sibertswold,Meaney 1964: 136,575,725,51,"1772-3, 1772"
+Huggins Fields,KntSIT-IC1,590600,164000,Kent,Sittingbourne,TQ 96 SW 27/60,575,700,9,"1824-28, 1916"
+Lads Farm,KntSLD-BI1,568720,163220,Kent,Snodland,TQ 66 SE 24,450,700,1,pre-1956
+Holborough,KntSLD-IC1,569670,162620,Kent,Snodland,TQ 66 SE 14,575,700,40,1943-3
+Parringtons Lane,KntSLD-IC2,570130,162700,Kent,Snodland,Meaney 1964: 137,450,650,00,pre 1893
+The Droveway Bay Hill,KntSMC-IC1,636685,144792,Kent,St Margaret at Cliffe,Richardson 227,550,750,31,"1775, 1782, 1943, 2012, 2018"
+Townsend Farm Road,KntSMC-IC4,635755,144842,Kent,St Margaret at Cliffe,Richardson site 226-9 II,570,650,12,2004
+Church Path Horns Cross,KntSND-BI1,557500,174520,Kent,Stone (Dartford),Richardson site 245,450,550,1,pre 1992; 1963
+Coach and Horses Strood Hill,KntSTD-BI1,573050,169455,Kent,Strood,TQ 76 NW 20,500,700,1,1918
+Woodstock Road Strood,KntSTD-BI2,572997,169193,Kent,Strood,Richardson site 251,450,700,1,1918
+Unlocated - Strood,KntSTD-BI3,573000,168000,Kent,Strood,TQ 76 NW 60,500,700,1,1918
+Temple Farm,KntSTD-IC1,573300,168900,Kent,Strood,TQ 76 NW 30/268,540,590,3,"1846, 88-891960"
+Saltwood Stone Farm Bridleway,KntSWD-IC1,615970,136960,Kent,Saltwood,Pers. Comm. Cant AT,400,750,220,1999-2000
+Stowting,KntSWT-IC1,612340,142370,Kent,Stowting,TR 14 SW 3,500,600,42,"1844, 1866-81"
+Stowting Common,KntSWT-IC2,612000,143000,Kent,Stowting,TR 14 SW 44,500,700,00,pre-1867
+Unlocated - Swanley,KntSWY-BI1,552497,169000,Kent,Swanley,Richardson site 254,450,600,1,1887
+Teynham Street,KntTEY-BI1,595450,163580,Kent,Teynham,TQ 96 SE 6,590,625,1,1888/9
+Brickfield Teynham,KntTEY-IC1,596900,163900,Kent,Teynham,Meaney 1964: 139,500,650,00,1894
+Pilgrims Way Thurnham,KntTHU-BI1,581347,157555,Kent,Thurnham,TQ 85 NW 24,600,700,1,1967
+Thurnham Friars,KntTHU-IC1,580660,157810,Kent,Thurnham,TQ 85 NW 5,575,650,00,1913
+Belmont Park,KntTLY-BI1,598500,156400,Kent,Throwley,Meaney 1964: 109,540,570,1,1852
+Otterham Creek,KntUPC-IC1,583060,167250,Kent,Upchurch,TQ 86 NW 20,590,650,00,1847-1930
+Unlocated - Willesborough,KntWBH-BI1,602000,141000,Kent,Willesborough,TR 04 SW 19,500,600,1,1844
+Westbere,KntWBR-MC1,619930,161550,Kent,Westbere,TR 16 SE 12,450,650,00,1931
+Grove Ferry,KntWBX-BI1,623500,163500,Kent,Wickhambreux,Meaney 1964: 122,600,700,1,"1894, 1896"
+Supperton Farm,KntWBX-IC1,622700,160440,Kent,Wickhambreux,TR 26 SW 9,575,650,00,"1886, 1910"
+Whitfield II,KntWHF-BI1,630050,145520,Kent,Whitfield,Richardson site 270,43,700,1,1976
+Old Park (Dover Long Hill),KntWHF-IC1,629430,143750,Kent,Whitfield,TR 34 SW 49/182: CAT 2018/122,600,700,5,various; 2017
+Unlocated - Wingham,KntWHM-BI1,624600,157400,Kent,Wingham,TR 25 NW 57,500,700,3,Pre1885
+Witherden Farm,KntWHM-IC1,624950,156900,Kent,Wingham,TR 25 NW 19,575,650,7,"1843, 1854"
+Sutton Downs,KntWLD-BI1,633400,148500,Kent,West Langdon,Richardson site 252,500,700,1,c.1876
+White Fields,KntWRM-IC1,561900,159000,Kent,Wrotham,Meaney 1964: 141,500,650,00,"1907, 1920"
+Bradford Platt,KntWRM-IC2,561500,159800,Kent,Wrotham,Meaney 1964: 141-2,590,750,00,"1920, 1927, 1958"
+Pilgrims Way Wrotham,KNTWRM-IC3,559470,159580,Kent,Wrotham,Wessex Arch 2015,575,650,0,2008-9
+North of Rothfield Station,KntWWL-BI1,598000,147000,Kent,Westwell,TQ 94 NE 7,590,700,1,1858
+Chelsbourne Farm,KntWYE-BI1,607395,145470,Kent,Wye,Richardson site 289,450,700,1,1841
+Wye,KntWYE-IC1,607100,146800,Kent,Wye,TR 04 NE 10,600,650,9,1858
+Olantigh Mount,KntWYE-IC2,605990,148230,Kent,Wye,Richardson site 288,500,700,2,pre-1800
+St Brides Church Fleet Street,MsxCOL-IC1,531550,181130,Middlesex,City of London,Grimes 1968: 182-197,350,700,00,1952
+"""Valor Site (former ) Valor Corney Reach""",MsxCWK-BI1,521500,177300,Middlesex,Chiswick,Greater London SMR,450,900,1,1995
+Lundenwic,MsxWMR-IC1,530102,180575,Middlesex,Westminster,Geake 1997: 169,600,750,8,various
+London Transport Museum extension,MsxWMR-IC2,530452,180905,Middlesex,Westminster,AOC report 2009,410,640,0,2005
+Beam Cottage,OxfBTN-IC1,432110,203450,Oxfordshire,Bampton,Pastscape 812166,600,799,00,1985
+Chimney Farm,OxfBTN-IC2,435750,200850,Oxfordshire,Bampton,Dickinson site 37,450,650,00,1898; 1952
+Cote,OxfBTN-IC3,435085,203090,Oxfordshire,Bampton,Dickinson site 46,450,700,00,1858
+Long Hadden Clifton Hampden,OxfCHN-IC1,454450,196060,Oxfordshire,Clifton Hampden,Dickinson site 43,450,650,00,1865
+Tuckwells pit,OxfCSN-IC1,445640,210782,Oxfordshire,Cassington,Dickinson site 34,450,700,10,1928
+Smiths Pit II,OxfCSN-IC3,445267,210235,Oxfordshire,Cassington,Dickinson site 33,400,600,9,1940
+Purwell Farm,OxfCSN-IC5,444450,211752,Oxfordshire,Cassington,Dickinson site 32,500,600,13,1942; 1963
+Minchin Recreation Ground,OxfDOT-BI1,457772,194805,Oxfordshire,Dorchester on Thames,Dickinson site 51,375,425,1,pre 1886
+Ameys Pit Burcot,OxfDOT-IC1,456757,195845,Oxfordshire,Dorchester on Thames,Dickinson site 42,475,525,11,1947
+Bishops Court,OxfDOT-IC2,457252,194347,Oxfordshire,Dorchester on Thames,Dickinson site 53,600,750,15,1957
+Dyke Hills,OxfDOT-IC3,457755,193432,Oxfordshire,Dorchester on Thames,Dickinson site 50,350,425,6,1871; 1874; etc
+Wally Corner,OxfDOT-MC1,458048,195660,Berkshire,Berinsfield,Boyle et al 1995,450,625,118,1974
+New Wintles Farm,OxfEHM-IC2,443257,210842,Oxfordshire,Eynsham,Dickinson site 64,500,700,4,pre1973
+Wytham View,OxfEHM-MC1,443417,209892,Oxfordshire,Eynsham,Dickinson site 63,475,525,6,1952
+Painters Pit Ewelme,OxfEWM-IC1,464563,192752,Oxfordshire,Ewelme,Dickinson site 62,450,700,15,1903
+Oseney Abbey,OxfOFD-BC1,450947,209108,Oxfordshire,Oxford,Dickinson site 112,400,500,1,pre 1912
+Fox Inn Barton Village,OxfOFD-BI1,455048,207845,Oxfordshire,Oxford,Dickinson site 77,450,900,1,1931
+Rose Hill Iffley,OxfOFD-BI2,453045,203628,Oxfordshire,Oxford,Dickinson site 81,500,600,1,pre 1874
+Banbury Road Summertown,OxfOFD-BI3,450847,209153,Oxfordshire,Oxford,Dickinson site 116,475,525,1,1850
+Radcliffe Infirmary,OxfOFD-IC1,450945,207050,Oxfordshire,Oxford,Dickinson site 114,500,600,3,1770
+Summerfields School Summertown,OxfOFD-IC2,451250,209250,Oxfordshire,Oxford,Dickinson site 117,475,600,00,1882
+Park Town Crescent,OxfOFD-IC3,451250,207850,Oxfordshire,Oxford,Dickinson site 115,475,600,2,1865; 1903
+Stanton Harcourt Barrow,OxfSHT-IC1,441005,205115,Oxfordshire,Stanton Harcourt,Dickinson site 135,600,700,24,1940
+Blackditch,OxfSHT-IC2,440752,205442,Oxfordshire,Stanton Harcourt,Dickinson site 136,400,900,15,1951
+Standlake Down,OxfSLK-IC2,438750,204450,Oxfordshire,Standlake,Dickinson site 132,600,700,114,1825-1971
+Standlake Down II,OxfSLK-IC3,439270,204570,Oxfordshire,Standlake,Dickinson site 133,450,700,00,1863
+Brighthampton,OxfSLK-MC1,438302,203267,Oxfordshire,Standlake,Dickinson site 25,450,600,81,1857
+Coombe,OxfWCH-IC1,462250,178250,Oxfordshire,Whitchurch,Dickinson site 160,350,700,2,1895
+Yarnton,OxfYTN-IC1,447450,211450,Oxfordshire,Yarnton,Dickinson site 167,575,625,00,1862-1877
+Barrow Hill Buckland Denham,SmtBDM-IC1,374837,150275,Somerset,Buckland Dinham,Antiq. Jnl. 1926 6: 77-78,600,700,6,1925
+Stoneage Barton Cothelstone,SmtBLD-IC1,317387,131210,Somerset,Bishop's Lydeard,Arch. Jnl. 2004 161: 54-81,600,700,5,2000
+Sand Cliff Brean Down,SmtBRN-IC1,329558,158757,Somerset,Brean,Bell 1990,415,660,8,1983-9
+Banwell Castle,SmtBWL-IC1,340130,158710,Somerset,Banwell,Somerset SMR 225,400,800,00,1800;1813
+Winthill Farm,SmtBWL-IC2,339752,158457,Somerset,Banwell,Pastscape 192386,400,600,00,1954-6; 1963-4
+Burnett Hill,SmtCDD-BI1,366555,166553,Somerset,Compton Dando,Pastscape 200893,375,425,1,1922
+Elm Farm Burnett,SmtCDD-BI2,366663,165255,Somerset,Compton Dando,TBGAS 1937 59: 244,500,700,1,1920s
+Camerton,SmtCMN-IC1,368603,156593,Somerset,Camerton,SANHS 1928 74: 61-70,600,700,116,1926-32
+Hicknell Slait,SmtCPT-IC1,363975,125033,Somerset,Compton Pauncefoot,Tabor 2002,650,750,6,pre 1967
+Cannington Park Quarry,SmtCTN-IC1,325150,140347,Somerset,Cannington,Rahtz et al 2000,255,1020,63,1962-3
+Strode Farm,SmtCVN-IC1,340277,171188,Somerset,Clevedon,Somerset SMR 475,300,600,5,1978
+Leighton Lane,SmtECH-BI1,364462,138840,Somerset,Evercreech,Meaney 1964; 219,600,700,1,1934
+Beckery Chapel,SmtGBY-IC1,348442,138342,Somerset,Glastonbury,Rahtz and Hirst 1974,650,810,59,1967-8
+Kingsweston Hill,SmtHBY-IC1,354940,177832,Somerset,Henbury,BNE Somerset SMR 768,400,700,10,1966
+South of church,SmtLBV-IC1,311198,122902,Somerset,Langford Budville,SANHS 1989 133: 172,450,900,10,1989
+Lamyatt Beacon,SmtLYT-IC1,366942,136155,Somerset,Lamyat,Britannia 1986 17: 259-328,470,870,16,1973
+St Marys Primary School,SmtPBY-IC1,349880,175342,Somerset,Portbury,"Pastscape 	198312",400,900,15,1972
+Station Road Portishead,SmtPHD-IC1,346855,176755,Somerset,Portishead,Pastscape 195253,350,450,43,pre 1969
+Eckweek Lane,SmtPSJ-IC1,371240,157252,Somerset,Peasedown St John,BNE Somerset SMR 11079,400,900,00,unknown
+Queen Camel Hill,SmtQCL-IC1,359275,125523,Somerset,Queen Camel,SNHAS 1946 92: 47-48,600,700,11,1931
+Avon Farm,SmtSFD-IC1,368653,168655,Somerset,Saltford,Meaney 1964: 219,600,700,6,1936
+Charmy Down Airfield,SmtSTC-IC1,376340,170342,Somerset,St Catherine,BNE Somerset SMR 2042,350,700,00,pre 1940
+Wembdon Hill,SmtWBD-IC1,327942,137845,Somerset,Wembdon,SANHS 1990 134: 222,400,600,00,1984-8
+The Lynch,SmtWCB-IC1,341683,157290,Somerset,Winscombe,Somerset SMR,300,600,5,1993
+Daws Castle,SmtWCT-IC1,306255,143340,Somerset,Watchet,Somerset SMR 34164,500,600,22,1982
+Ashcombe Reservoir,SmtWSM-IC1,333715,161900,Somerset,Weston-super-Mare,Somerset SMR 3499,600,800,7,1837
+Addington Park,SryADN-IC1,536842,164334,Surrey,Addington,Meaney 1964: 237,450,700,00,1728
+Ashstead Park,SryASD-BI1,519917,157264,Surrey,Ashstead,Meaney 1964: 237,450,700,1,1910
+Goblin Works Ashstead burial 2,SryASD-BI2,518193,156728,Surrey,Ashstead,Surrey SMR 2280,450,700,1,1927
+Goblin Works Ashstead,SryASD-IC1,518225,156709,Surrey,Ashstead,SryAC 1989 79: 67-98,600,725,18,1927; 1974; 1985
+Tilburstow Hill Common gravel pit,SryBLY-BC1,534704,150395,Surrey,Bletchingley,SryAC 1959 56: 147,450,600,1,1239
+Stratton House Godstone,SryBLY-CC1,534704,150395,Surrey,Bletchingley,SryAC 1959 56: 141,450,650,00,1231
+Oakwood The Drive,SryBSD-BI1,524722,161206,Surrey,Banstead,SryAC 1959 56: 133,450,700,1,1918
+Gally Hills bowl barrow 3,SryBSD-IC1,524959,160796,Surrey,Banstead,SryAS Res. 1976 3: 59-76,650,1100,7,1972
+Headley Drive Tadworth,SryBSD-IC2,522791,157656,Surrey,Banstead,SryAC 2003 90: 117-146,600,700,48,1986
+Fir Tree Road,SryBSD-IC3,524105,160244,Surrey,Banstead,Meaney 1964: 237,550,600,2,1925
+Beddington Lane,SryBTN-MC1,529906,165401,Surrey,Beddington,Meaney 1964: 237-8,450,600,23,1871-5
+Farthing Down central barrows,SryCDN-IC1,530019,157890,Surrey,Coulsdon,Meaney 1964: 240-1,625,675,30,1760-1871
+Lion Green Cane Hill,SryCDN-IC4,529100,158700,Surrey,Coulsdon,Meaney 1964: 238,600,750,11,1873-1912
+Latter Day Saints Ewell,SryCGN-BI1,523121,161791,Surrey,Cuddington,SryAC Ann. Rep.1962: 8,450,650,1,1962
+Carshalton Road,SryCTN-IC1,527046,164244,Surrey,Carshalton,Meaney 1964: 238,450,650,00,1906
+Queen Marys Avenue,SryCTN-IC2,527927,162352,Surrey,Carshalton,Greater London SMR,450,700,00,1937
+Paynes Factory,SryCYN-BI1,530728,164804,Surrey,Croydon,Pers Comm Archaeology SE,450,525,1,2007
+George Street,SryCYN-IC1,532344,165483,Surrey,Croydon,Morris 1959 56: 137-9,450,650,00,1596 onwards
+82-90 Park Lane,SryCYN-MC1,532567,165086,Surrey,Croydon,SryAC 2003 90: 1-116,475,700,64,1999-2000
+West Dorking sandpit Vincent Lane,SryDKG-BI1,516121,149153,Surrey,Dorking,SryAC 1932 40: 133,450,650,1,87
+Ten Acre Field Yew Tree Road,SryDKG-IC1,516347,150339,Surrey,Dorking,Sry SMR 5894,600,750,10,pre 2005
+Standard Hill,SryEFM-IC1,511438,152844,Surrey,Effingham,SryAC 1934 42: 51,600,700,00,1758
+Market Garden,SryEHY-BI1,509438,152312,Surrey,East Horsley,SryAC 1955 54: 136,450,650,1,1953
+Cerne Cottage,SryEHY-IC1,509315,152441,Surrey,East Horsley,Meaney 1964: 243,600,750,2,1953
+Curvan Close,SryESM-BI1,521973,162251,Surrey,Epsom,Surrey SMR 13575,300,700,1,2002
+Allotments,SryESM-IC1,521642,160770,Surrey,Epsom,SryAC 1950 51: 151,500,1100,6,1950
+Copse Edge Avenue,SryESM-IC2,521780,160623,Surrey,Epsom,Meaney 1964: 239,300,750,00,1934
+The Warren Sandown Park,SryESR-IC1,513930,165035,Surrey,Esher,Antiq. Jnl. 1947 27: 24-46,450,650,3,1940-45
+Unlocated - Quelland,SryEWL-BI1,521500,162500,Surrey,Ewell,Surrey Mus Acc Reg,600,700,1,1962
+Unlocated - Ewell Downs,SryEWL-IC1,522494,162000,Surrey,Ewell,Meaney 1964: 240,450,650,00,1807
+Ewell House The Grove,SryEWL-MC1,521909,162360,Surrey,Ewell,Wheeler 1935: 131 - 5,450,600,13,1718-1934; 1993
+Cesspool,SryFCM-IC1,515871,155799,Surrey,Fetcham,Sry SMR 119,450,700,3,1926
+Hawkshill,SryFCM-IC3,515621,155486,Surrey,Fetcham,SryAC 1907 20: 119-28,450,650,62,123
+Fetcham Down,SryFCM-IC6,515503,154509,Surrey,Fetcham,SryAC 1926 37: 93,450,650,2,1926
+Guildown,SryGDN-MC1,498837,148827,Surrey,Guildown,SryAC 1931 39: 1-50,450,600,49,1929
+Mount Street,SryGFD-IC1,499255,149252,Surrey,Guildford,Meaney 1964: 241,450,650,10,1930
+West Heath sandpit,SryLFD-BC1,540150,152067,Surrey,Limpsfield,SryAC 1959 56: 143,450,600,1,pre 1891
+Mound,SryLHD-BI1,518280,156470,Surrey,Leatherhead,Sry SMR 140,450,700,1,unexcavated
+Hawks Hill House,SryLHD-BI2,515751,155551,Surrey,Leatherhead,Sry SMR 5891,450,700,1,pre 1920
+Morden Gardens,SryMHM-IC1,527065,168145,Surrey,Mitcham,SryAC 1959 56: 51-131,450,600,238,1848-1922
+Juniper Hill,SryMKM-IC1,517254,152709,Surrey,Mickleham,SryAC 1959 56: 143-4,450,700,2,1780
+Saxons Levylsdene,SryMRW-BI1,502660,150058,Surrey,Merrow,SryAC 1980 72: 69-76,475,550,1,1957
+Bartons,SryMRW-BI2,493130,148317,Surrey,Merrow,SryAC 1980 72: 69-76,450,700,1,1973
+Merrow Down,SryMRW-CC1,499330,148183,Surrey,Merrow,SryAC 1934 42: 49,450,700,00,1836
+Etherley Farm,SryOLY-IC1,513445,141518,Surrey,Ockley Det3,Sry SMR 4,400,900,00,pre 1900
+Hogs Back Barrow,SryPHM-BI1,492625,148245,Surrey,Puttenham,SryAC 1895 12: 153-4,450,650,1,1895
+Beggars Bush,SryPHM-BI2,493125,148317,Surrey,Puttenham,Sry SMR 2286,450,700,1,pre 1900
+3 Overhill Road,SryPLY-BI1,531200,162400,Surrey,Purley,SryAC 1959 56: 144,450,700,1,1924/9
+Russell Hill burial 2,SryPLY-BI2,531006,162009,Surrey,Purley,Greater London SMR,450,700,1,1974
+Beggars Bush Edgehill Road,SryPLY-IC1,531398,162398,Surrey,Purley,Greater London SMR,450,700,60,1865
+Riddlesdown Road,SryPLY-IC2,532280,160740,Surrey,Purley,Meaney 1964: 244-5,600,700,8,1927
+Russell Hill Road,SryPLY-IC3,531222,162097,Surrey,Purley,SryAC 2002 89: 270,450,700,107,2001
+Tibbets Corner Putney Heath,SryPNY-IC1,523009,173006,Surrey,Putney,Greater London SMR,450,700,00,1786
+Old Vicarage,SryRGT-BI1,525701,150304,Surrey,Reigate,SryAC 1986 77: 17-94,500,650,1,1986
+Everest Normanton Reigate Heath,SryRGT-IC1,523844,150057,Surrey,Reigate,SryAC 1987 78: 136,450,700,00,1987
+Ham,SryRMD-BI1,516895,173212,Surrey,Richmond,Greater London SMR,500,650,1,1912
+Barrow-site of,SrySBY-BI1,508438,170336,Surrey,Sunbury,SryAC 1987 78: 32,450,700,1,1987
+Briton Hill,SrySSD-IC1,533130,162470,Surrey,Sanderstead,Meaney 1964: 245,450,650,12,1884
+Saxon County School,SrySTN-IC1,507043,167677,Surrey,Shepperton,Sry SMR 2285,700,1000,20,c.1979
+War Close Field,SrySTN-IC2,507959,166759,Surrey,Shepperton,Meaney 1964:168,450,650,00,pre 1700
+Saxon County School IV,SrySTN-IC4,507059,167709,Surrey,Shepperton,LAMAS 1979 30: 97-124,700,1000,20,1967; 1973
+Upper West Field,SrySTN-MC1,506347,166842,Surrey,Shepperton,LAMAS 1982 33: 177-185,450,550,12,1868
+London Road,SrySTS-IC1,504148,171818,Surrey,Staines,SryAC 2000 87: 183-218,700,900,30,2000
+Old Kent Road,SrySWK-BC1,532594,179065,Surrey,Southwark,Greater London SMR,450,600,1,1861
+Alcester Road,SryWLN-IC1,528941,164746,Surrey,Wallington,Meaney 1964: 245,450,700,7,1869; 1896
+Windmill Hill,SryWOT-IC1,509158,166051,Surrey,Walton on Thames,SryAC 1959 56: 145,450,650,00,1793
+New Barn Down Angmering,SsxAGM-BI1,508955,109005,Sussex,Angmering ,TQ 00 NE 20,450,700,1,unexcavated
+East of Firle Beacon,SsxALC-IC1,548800,105700,Sussex,Alciston,MGW 17,600,700,3,1849
+Tilton Hill,SsxALC-IC2,549455,105390,Sussex,Alciston,Pastscape 405774,450,700,00,unexcavated
+Bo Peep,SsxALC-IC3,549100,105200,Sussex,Alciston,Pastscape 405777,450,700,00,unexcavated
+Bostal Hill,SsxALC-IC4,549700,104700,Sussex,Alciston,Pastscape 406119,450,700,00,unexcavated
+Barrows cemetery 5,SsxALC-IC5,549950,103680,Sussex,Alciston,TQ 40 SE 36,450,700,00,unexcavated
+The Sanctuary,SsxALF-IC2,551690,103750,Sussex,Alfriston,MGW 12,450,625,135,1896; 1912; 1914
+Front Hill Alfriston,SsxALF-IC3,551300,103000,Sussex,Alfriston,MGW 14,450,750,00,1763
+Winton Hill,SsxALF-IC4,550847,103840,Sussex,Alfriston,MGW 13,600,750,3,1975
+Kings Ride,SsxALF-IC5,551340,103055,Sussex,Alfriston,MGW 11,650,750,8,1896
+Highdown House,SsxAMB-IC1,503450,112650,Sussex,Amberley,MGW 107,14,900,00,unknown
+Great Drayton Field,SsxBDD-IC1,545500,107300,Sussex,Beddingham,MGW 22,500,600,6,1800; 1804-5
+Beddingham Hill,SsxBDD-IC2,545765,105897,Sussex,Beddingham,MGW 21,450,550,00,1799-1819
+Balcombe Pit,SsxBDD-IC3,546660,108550,Sussex,Beddingham,MGW 24,450,600,2,ante 1868; 1870; ante 196
+Glatting Down,SsxBGN-IC1,497030,114105,Sussex,Bignor,SAC 1870 22: 189-90,600,700,7,pre 1869
+Unlocated - Peppering,SsxBHM-BI3,504000,109990,Sussex,Burpham,Unpubl. Notes Brighton Museum,450,650,1,1911
+Peppering Farm,SsxBPH-BI1,503630,109250,Sussex,Burpham,MGW 104,450,650,1,pre 1835
+Fridays Church,SsxBPH-BI2,506695,109765,Sussex,Burpham,MGW 102,-500,700,1,pre 1834
+Perry Hill,SsxBPH-IC1,505555,109412,Sussex,Burpham,MGW 103,600,700,4,1893
+Pepperns,SsxBPH-IC2,505400,110920,Sussex,Burpham,MGW 105,450,700,13,1893
+Rookery Hill,SsxBPS-MC1,546690,100600,Sussex,Bishopstone,Unpublished notes Thomson arch,450,600,116,1967-75
+Brighton racecourse,SsxBTN-BC1,534500,105405,Sussex,Brighton,Arch. Jnl. 1852 19: 336-7,-2000,700,1,1822
+Moulsecombe,SsxBTN-BC2,532900,106960,Sussex,Brighton,MGW 57,500,700,1,1923
+Whitehawk Hill,SsxBTN-BC4,532845,107255,Sussex,Brighton,MGW 58,450,700,1,1952
+Bates Nursery Estate,SsxBTN-BC5,529510,106510,Sussex,Brighton,MGW 60,500,700,1,1952
+Kemp Town,SsxBTN-BI1,533320,103410,Sussex,Brighton,MGW 56,490,600,1,1837
+Near Brighton,SsxBTN-BI3,532360,108950,Sussex,Brighton,Pastscape 402013,43,700,1,pre 1849
+TQ 30 NW 44,SsxBTN-BI4,536020,103650,Sussex,Brighton,MGW 47,500,650,1,1935
+30 Exeter Street,SsxBTN-BI6,530395,105693,Sussex,Brighton,East Sussex SMR 6912,450,650,1,2000
+Longhill Road,SsxBTN-BI7,531525,106520,Sussex,Brighton,MGW 63,500,625,1,1842
+Woodingdean,SsxBTN-IC1,536490,105410,Sussex,Brighton,MGW 46,500,625,6,1933
+40 Stafford Road,SsxBTN-IC2,530370,105690,Sussex,Brighton,SAC 1988 126: 31-51,450,650,5,1883-4; 1985
+Coldean Lane Car park,SsxBTN-IC3,532850,109430,Sussex,Brighton,Sussex County Mag. 1951 25: 3,-2000,1000,3,1950
+The Bostle Woodingdean,SsxBTN-IC4,537200,105400,Sussex,Brighton,SAC 2004 142: 25-44,650,750,10,1931; 1939; 1997
+Ashdown Avenue Saltdean,SsxBTN-IC5,537755,102477,Sussex,Brighton,MGW 44,500,600,2,1959
+Balsdean Pumping Station,SsxBTN-IC6,537540,104690,Sussex,Brighton,East Sussex SMR 7259,450,700,00,Unexcavated
+Upper Lewes Road,SsxBTN-IC7,531760,105570,Sussex,Brighton,TQ 30 NW 28,-2000,700,5,1922
+Halnaker Hill,SsxBXG-IC1,492080,109240,Sussex,Boxgrove,Chichester SMR 1568-70,450,700,00,1981-2
+69-70 East Street,SsxCHC-IC1,486215,104768,Sussex,Chichester,Chichester SMR 3919,680,810,6,2001
+Shippams factory East Street,SsxCHC-IC2,486355,104850,Sussex,Chichester,Chichester SMR 4069,450,700,3,1977
+Coombes,SsxCMB-BI1,518210,108470,Sussex,Coombes,MGW 90,450,700,1,pre 1849
+Barrow Blackpatch,SsxCPH-BI1,509700,109200,Sussex,Clapham,TQ 00 NE 71,450,700,1,pre 1932
+Blackpatch,SsxCPH-IC1,509700,109230,Sussex,Clapham,MGW 94,450,700,6,1922-9
+West Marden,SsxCPT-BC1,477400,113600,Sussex,Compton,Pastscape 242761,450,650,1,pre 1958
+Apple Down 2,SsxCPT-IC1,479470,114855,Sussex,Compton,Down and Welch 1990,670,720,13,1987
+Apple Down 1,SsxCPT-MC1,479250,115265,Sussex,Compton,Down and Welch 1990,475,700,189,1982-7
+Clayton Windmill,SsxCYT-BI1,530390,113360,Sussex,Clayton,MGW 66,450,700,1,1938
+Stonepound Sandpit Hassocks,SsxCYT-MC1,529670,115540,Sussex,Clayton,MGW 67,450,700,33,1902-25
+West of Ditchling Beacon,SsxDTG-BI1,532300,113100,Sussex,Ditchling,SNQ 1963 716: 26-7,575,650,1,1962
+Holly Grange Hampden Park,SsxEAS-BC1,559770,101625,Sussex,Eastbourne,MGW 2,450,700,1,pre 1925
+Ocklynge Hill,SsxEAS-IC1,559500,100720,Sussex,Eastbourne,MGW 3,650,700,35,various
+Hydneye,SsxEAS-IC3,561010,102780,Sussex,Eastbourne,TQ 60 SW 42,450,700,00,1941
+Holbrook Close,SsxEAS-IC4,560472,97701,Sussex,Eastbourne,East Sussex SMR 7342,400,900,00,1956
+Eastbourne College of A and T,SsxEAS-MC1,560300,99830,Sussex,Eastbourne,Doherty and Greatorex 2016,450,700,254,1997
+East Chiltington burial 1,SsxECH-BI1,537020,112580,Sussex,East Chiltington,TQ 31 SE 146,450,700,1,unexcavated
+East Chiltington burial 2,SsxECH-BI2,537010,112530,Sussex,East Chiltington,TQ 31 SE 146,450,700,1,unexcavated
+East Chiltington burial 3,SsxECH-BI3,537010,112580,Sussex,East Chiltington,TQ 31 SE 146,450,700,1,unexcavated
+East Chiltington burial 4,SsxECH-BI4,537070,112540,Sussex,East Chiltington,TQ 31 SE 155,450,700,1,unexcavated
+East Chiltington,SsxECH-IC1,537530,112545,Sussex,East Chiltington,TQ 31 SE 9,450,700,00,unexcavated
+East Dean and Friston,SsxEDF-BC1,554400,98615,Sussex,East Dean and Friston,TV 59 NW 26,450,800,1,unknown
+Friston Hill,SsxEDF-BI1,554465,99450,Sussex,East Dean and Friston,MGW 9,-1000,900,1,1952
+Harting Beacon,SsxESD-BI1,480710,118040,Sussex,Elsted,MGW 128,450,700,1,1976
+Stanmer Park burial 1,SsxFAL-BI1,533000,109000,Sussex,Falmer,MGW 52,450,800,1,1956
+University Sports Pavilion,SsxFAL-BI2,535155,109342,Sussex,Falmer,MGW 53,450,800,1,1966
+Patchway Field Rocky Clump,SsxFAL-IC1,532810,110120,Sussex,Falmer,MGW 54,200,750,7,1951-61
+Four Lords Burgh,SsxFAL-IC2,536500,111660,Sussex,Falmer,TQ 31 SE 21,450,700,00,unexcavated
+Falmer Hill,SsxFAL-IC3,535500,107600,Sussex,Falmer,TQ 30 NE 9,450,700,00,unexcavated
+Bow Hill cemetery,SsxFAL-IC4,534310,111460,Sussex,Falmer,MGW 49,450,700,00,1870
+Stanmer Park,SsxFAL-IC5,534385,111490,Sussex,Falmer,MGW 51,450,700,00,Falmer
+Highdown Hill,SsxFRG-MC1,509220,104360,Sussex,Ferring,MGW 95,450,600,198,1867; 1892-4; 1988
+Near Firle Beacon,SsxFRL-IC1,548000,105000,Sussex,Firle,MGW 18,600,700,12,1843; 1849
+Overhill Lodge,SsxFRL-IC2,547100,105900,Sussex,Firle,TQ 40 NE 6,450,700,00,1843; 1849
+Bow Hill West Coppice,SsxFTG-CC1,481765,109430,Sussex,Funtington,MGW 123,450,650,2,1859
+Saxon Down,SsxGLY-IC1,544600,110500,Sussex,Glynde,MGW 25,600,700,8,1818
+Coombe Plantation Offham Hill,SsxHSY-IC1,539200,111900,Sussex,Hamsey,MGW 35,-2000,700,5,c. 1800
+West Hove Golf Course,SsxHVE-BI1,526190,107350,Sussex,Hove,MGW 77,520,600,1,1931
+Church Road Portslade,SsxHVE-IC1,525880,105180,Sussex,Hove,MGW 78,490,600,9,1898; 1925-6; 1949
+Unlocated - Hove,SsxHVE-IC2,526000,107000,Sussex,Hove,SAC 1857 9: 124,43,700,7,1857
+Pickers Hill,SsxIFD-IC1,538900,105300,Sussex,Iford,MGW 39,450,700,00,1886
+Front Hill,SsxIFD-IC2,540100,106000,Sussex,Iford,MGW 38,450,700,00,unexcavated
+Juggs Road,SsxKNL-IC1,537420,107470,Sussex,Kingston near Lewes,Sussex SMR TQ 30 NE 64,450,700,00,unexcavated
+Saxonbury,SsxKNL-IC2,540740,109500,Sussex,Kingston near Lewes,MGW 34,490,630,33,1891
+Clayton Hill Coombe Bottom,SsxKYM-IC1,531535,113630,Sussex,Keymer,MGW 65B,480,550,5,1981
+Hoe Court Farm,SsxLCG-IC1,519040,106080,Sussex,Lancing,MGW 87,450,600,7,1928; 1936
+Abinger House,SsxLWS-BI1,541422,110325,Sussex,Lewes,East Sussex ES7174 - MES7174,450,700,1,pre 1900
+St John Sub Castro Churchyard,SsxLWS-BI2,541475,110420,Sussex,Lewes,East Sussex ES7175 - MES7175,450,700,1,1779; 1839
+Elephant and Castle Whitehill,SsxLWS-BI3,541390,110315,Sussex,Lewes,SAC 1997 135: 131-142,450,700,1,pre 1838
+Brack Mount,SsxLWS-BI4,541447,110225,Sussex,Lewes,SAC 1997 135: 131-142,450,700,1,1838
+Near Lewes,SsxLWS-BI5,543000,111000,Sussex,Lewes,MGW 33,500,600,1,1846
+Unlocated - Lewes,SsxLWS-IC2,541000,110000,Sussex,Lewes,East Sussex SMR TQ 41 SW 144,450,700,00,pre 1824
+St Annes Crescent,SsxLWS-MC1,540713,110045,Sussex,Lewes,SAC 1997 135: 131-142,450,700,00,1834
+East Marden,SsxMDN-IC1,481290,114708,Sussex,Marden,West Sussex SMR 978,450,600,2,1930
+Nalgo Lodge,SsxMOS-BI1,497425,100342,Sussex,Middleton-on-sea,West Sussex SMR 7345,640,990,1,2000
+Baldwins Farm,SsxMSF-IC1,571940,120840,Sussex,Maresfield,Pastscape 968329,450,700,00,unexcavated
+Summer Down,SsxNWT-MC1,526935,111090,Sussex,Newtimber,MGW 75,500,700,4,1901-45
+Churchyard cremation,SsxPGH-BC1,488370,97480,Sussex,Pagham,MGW 109A,450,650,1,1954
+TQ 00 NE 40,SsxPTC-BI1,508400,109360,Sussex,Patching,Pastscape 392604,450,700,1,unexcavated
+South of Harrow Hill,SsxPTC-BI2,508500,109000,Sussex,Patching,MGW 101,450,700,1,1893
+Patching burial 3,SsxPTC-BI3,508000,109000,Sussex,Patching,TQ 00 NE 60,450,700,1,1893
+Blackpatch barrow 2,SsxPTC-BI4,509508,109015,Sussex,Patching,West Sussex SMR 2041,575,650,1,c.1920
+Blackpatch barrow 12,SsxPTC-BI5,509510,109008,Sussex,Patching,MGW 94,450,700,3,1922-9
+New Barn Down Patching,SsxPTC-IC1,508410,109090,Sussex,Patching,MGW 96,450,700,8,1933
+Patching cemetery 2,SsxPTC-IC2,508300,108800,Sussex,Patching,Pastscape 392599,450,700,6,unexcavated
+Patching cemetery 3,SsxPTC-IC3,508430,109260,Sussex,Patching,Pastscape 392620,450,700,5,unexcavated
+Wolstonbury Hill,SsxPYC-IC1,528400,113800,Sussex,Pyecombe,MGW 72,450,700,3,1765
+Dyke Camp,SsxPYN-BI1,526048,111093,Sussex,Poynings,MGW 76,450,700,1,1931
+Unlocated - Piddinghoe,SsxRDM-BI1,543000,102995,Sussex,Rodmell,MGW 41,450,700,1,1850
+Mill Hill Rodmell,SsxRDM-IC1,541300,105320,Sussex,Rodmell,MGW 40,450,700,00,1931
+Week Lane,SsxRGM-MC1,544900,111000,Sussex,Ringmer,MGW 26,500,600,15,1879
+Beacon Hill burial 1,SsxRGN-BI1,536585,102480,Sussex,Rottingdean,East Sussex SMR 7278,450,650,1,1802
+Houndean Ashcombe Field,SsxSAW-IC1,538900,109900,Sussex,St Ann Without,MGW 37,43,700,12,1972
+Ashcombe,SsxSAW-IC2,538950,109850,Sussex,St Ann Without,TQ 30 NE 2,450,700,00,unexcavated
+Slonk Hill,SsxSBS-BI1,522490,106630,Sussex,Shoreham By Sea,MGW 82,600,700,1,1978
+Thunders Barrow,SsxSBS-CC1,522970,108310,Sussex,Shoreham By Sea,MGW 81,450,650,3,1873
+Mill Hill Shoreham,SsxSBS-IC1,521390,106590,Sussex,Shoreham By Sea,MGW 83,200,700,8,1915; 1918
+Near the Trundle,SsxSGT-BI1,488100,111130,Sussex,Singleton,MGW 120,600,800,1,1975
+Long DownManor Farm,SsxSHN-BI1,545350,103350,Sussex,South Heighton,MGW 20,450,650,1,1923
+Malling Hill Church Lane,SsxSML-IC1,541800,111070,Sussex,South Malling,MGW 28,475,550,4,1953; 1955; 1977
+Cliffe Hill South Malling Without,SsxSML-IC2,543240,110860,Sussex,South Malling,MGW 27,450,650,00,1853
+Earwig Corner Malling Hill,SsxSML-IC3,542315,111330,Sussex,South Malling,MGW 28,450,700,25,1830; 2001
+Church Farm,SsxSMN-IC1,551060,107170,Sussex,Selmeston,MGW 16A,450,625,31,1897; 1950; 1963; 1979
+Halewick Farm,SsxSMP-BC1,517300,105600,Sussex,Sompting,MGW  89,500,550,1,pre 1963
+Walderton Down,SsxSTG-IC1,478748,109472,Sussex,Stoughton,West Sussex SMR 7810,450,700,2,2004
+Bow Hill mixed cemetery,SsxSTG-MC1,482670,111390,Sussex,Stoughton,Pastscape 246620,450,700,3,unexcavated
+Southwick Down,SsxSTW-BI1,523900,107395,Sussex,Southwick,MGW 79,450,700,1,1871
+Round Hill chalk pit,SsxSTY-BI1,516780,110280,Sussex,Steyning,MGW 92,450,700,1,1950-52
+Round Hill,SsxSTY-IC1,516470,110210,Sussex,Steyning,SAC 1983 121: 259-60,450,650,10,1950s
+Sullington burial 1,SsxSUL-BI1,508990,111800,Sussex,Sullington,Pastscape 393120,450,700,1,1940
+Sullington,SsxSUL-IC1,509080,111880,Sussex,Sullington,Pastscape 393133,450,700,00,1868
+Sullington Hill ,SsxSUL-MC1,509540,111670,Sussex,Sullington,MGW 97,450,700,17,1868-1933
+A27 Chichester Westhampnett Bypass,SsxTGM-IC1,489520,106600,Sussex,Tangmere,Wessex Arch. Report 12,450,725,9,1992
+Hickstead Place,SsxTWH-BC1,526800,119990,Sussex,Twineham,MGW 71,450,650,1,pre 1867
+Unlocated burial,SsxUNL-BI1,530000,110000,Sussex,Unlocated,MGW 126,450,700,1,Unlocated
+Unlocated cemetery,SsxUNL-IC1,531525,109535,Sussex,Unlocated,MGW 125,600,700,7,unknown
+Unlocated - Burpham,SsxUNL-IC2,505505,109510,Sussex,Burpham,MGW 106,450,700,7,1893
+Beeding Hill,SsxUPB-IC1,520930,109690,Sussex,Upper Beeding,MGW 86,450,700,2,1874
+Crane Down,SsxWAJ-IC1,556660,103130,Sussex,Willingdon and Jevington,MGW 8,600,700,8,1965-67
+Pound Common,SsxWLB-BI1,487173,125218,Sussex,Woolbeding,West Sussex SMR 7600,450,700,1,unexcavated
+Western Brow Round Barrow cemetery,SsxWMN-IC1,533940,112810,Sussex,Westmeston,Pastscape 403097,450,700,12,unexcvated
+Near Great Barn Farm,SsxWST-IC1,514380,112415,Sussex,Wiston,Pastscape 1122771,450,700,00,unexcavated
+Witherington Lynchets,WltABY-BI1,418412,125180,Wiltshire,Alderbury ,Meaney 1964: 279,475,525,1,1874
+Crowcastle site,WltADB-IC1,426357,175337,Wiltshire,Aldbourne,WAM 2012 105: 58-95,650,700,12,2007
+18 London Road,WltAMB-BI1,415613,141710,Wiltshire,Amesbury ,WAM 2005 98: 349-356,450,900,1,2003
+Stonehenge,WltAMB-BI2,412248,142180,Wiltshire,Amesbury ,WAM 2002 95: 131-46,660,890,1,1919-1926
+Boscombe Airfield,WltAMB-BI3,417792,140103,Wiltshire,Amesbury ,WAM 1930-32 45: 432-445,450,600,1,1930
+London Road junction with Countess Rd,WltAMB-IC1,415515,141653,Wiltshire,Amesbury ,WAM 1982 77: 150,450,700,3,1834
+Old Dairy,WltAMB-IC2,416200,142000,Wiltshire,Amesbury,WAM 2017 110: 56-114,640,700,6,post 2013
+Middle Down - Swallowcliffe,WltASY-BI1,396720,125395,Wiltshire,Ansty ,Speake 1989,650,700,1,1966
+Honey Street,WltATN-IC1,410068,161750,Wiltshire,Alton; Stanton St Bernard ,Wilts SMR SU 16 SW 402,450,700,00,unexcavated
+By the Longstones Longstones Field,WltAVB-BI1,408900,169305,Wiltshire,Avebury ,Wilts SMR SU 06 NE 406,600,700,1,2000
+Picket Barrow or adjacent barrow,WltAVB-IC1,408658,171345,Wiltshire,Avebury ,Wilts SMR SU 07 SE 405,450,700,7,pre 1949
+Middle Down barrow Ic,WltAVD-BI1,396675,125230,Wiltshire,Alvediston ,WAM 1927 43: 432-9,600,700,1,1925
+Roundway Down II,WltBCG-BI1,401950,164330,Wiltshire,Bishop's Cannings,WAM 1866 9: 25,650,700,1,1840
+Roundway Down I,WltBCG-IC1,401970,164385,Wiltshire,Bishops Cannings,Meaney 1964: 273-4,600,700,2,1819
+Unlocated - Near Woodyates ,WltBCK-BI1,403520,121510,Wiltshire,Bower Chalke ,Meaney 1964:  266,450,700,1,1842
+Sling Plantation Group    ,WltBFD-BI1,419045,144437,Wiltshire,Bulford ,Meaney 1964: 267,400,700,1,1896
+North of White Horse    ,WltBHN-BI1,413090,175357,Wiltshire,Broad Hinton ,Wilts SMR SU 17 NW 402,600,700,1,pre 1957
+Hinton Downs,WltBPS-BI1,425312,180045,Wiltshire,Bishopstone ,Dickinson site 78,600,700,1,1890
+Broad Chalke SE of Church    ,WltBRK-IC1,404252,125060,Wiltshire,Broad Chalke ,WAM1925-7 43: 94-101,500,650,25,1924
+Abbeymeads (Groundwell West)    ,WltBSA-IC1,414257,189945,Wiltshire,Blunsdon St Andrew ,WAM 102 2009: 160-174,650,700,2,"2000, 2007"
+Winkelbury Hill II,WltBSJ-IC1,395113,121248,Wiltshire,Berwick St John ,Meaney 1964: 277-8,575,650,30,1880-8
+Winkelbury Hill I,WltBSJ-IC2,395173,121412,Wiltshire,Berwick St John ,Meaney 1964: 277,575,700,2,1880-88
+Broad Town    ,WltBTW-BI1,409558,177663,Wiltshire,Broad Town ,WAM 2004 97: 89-94,540,680,1,2000
+Collingbourne Ducis,WltCBD-IC1,424590,154163,Wiltshire,Collingbourne Ducis ,WAM 1978 70/1: 61-98,485,650,120,1974; 2007
+North of Forty Acre Barn,WltCEN-BI1,416080,196063,Wiltshire,Castle Eaton ,WAM 1977/8 72/3: 207,400,500,1,1976
+Ashton Valley I,WltCFD-BI1,398053,142792,Wiltshire,Codford St Peter,Meaney 1964: 264,500,650,1,1812
+Ashton Valley II,WltCFD-BI2,398058,142845,Wiltshire,Codford St Peter,Meaney 1964: 264-5,500,650,1,1812
+Yatesbury I,WltCHL-BI1,406503,171500,Wiltshire,Cherhill ,Meaney 1964: 279,500,650,1,18th century
+Yatesbury II Barrow Field,WltCHL-BI2,407088,170955,Wiltshire,Cherhill ,Meaney 1964: 279,600,725,2,1833
+Northeast of Church,WltCLN-IC1,399942,170942,Wiltshire,Calne,WAM 1991 84: 143,400,900,00,unknown
+Petersfinger,WltCLP-IC1,416307,129375,Wiltshire,Clarendon Park ,Leeds and Shortt 1953,475,625,71,1948-51
+Salisbury Race Course,WltCOT-BI1,410402,128190,Wiltshire,Coombe Bissett ,Meaney 1964: 274-5,600,650,1,1803
+Thornhill Lane Broad Town    ,WltCPD-IC1,409015,177252,Wiltshire,Clyffe Pypard ,WAM 1860 6: 256,475,625,00,1836
+Pond Barrow,WltDGN-BI1,411655,144160,Wiltshire,Durrington ,Meaney 1964: 267,450,700,1,1865
+Fargo,WltDGN-IC1,411503,144508,Wiltshire,Durrington ,Meaney 1964: 267-8,400,900,30,1864
+West of Matrimony Farm Charlton Plantation,WltDWN-MC1,416668,124857,Wiltshire,Downton ,WAM 1984 79: 109-115,475,700,45,1981
+Barrow Hill burial 1,WltEBW-BI1,399340,123397,Wiltshire,Ebbesbourne Wake ,WAM 1925-7 43: 101,575,650,1,pre 1927
+West Chisenbury    ,WltEFD-BI1,413610,153178,Wiltshire,Enford ,WAM 1933 45: 84,450,700,1,1928
+Unlocated - Kennet,WltEKT-BI1,412500,168503,Wiltshire,East Kennett ,Meaney 1964: 269,500,650,1,1643
+South of Easton Clump    ,WltETN-BI1,421155,159158,Wiltshire,Easton ,WAM 1934 46: 168,500,70,1,pre 1934
+South of Down Farm,WltEVL-BI1,418482,156043,Wiltshire,Everleigh,Meaney 1964: 267,500,700,1,1853
+Officers Mess Netheravon Airfield,WltFGD-IC1,415425,148847,Wiltshire,Figheldean ,Meaney 1964: 270-1,500,620,2,1913
+Barrow Clump - Cicencutt Barrow    ,WltFGD-IC2,416565,146900,Wiltshire,Figheldean ,Wilts SMR SU 14 NE 402,500,600,00,1935; 2004
+Crofton,WltGBW-IC1,426155,162345,Wiltshire,Great Bedwyn ,Meaney 1964: 265,400,900,00,1892-1920
+Above Knowtham Pond ,WltGCV-BI1,398055,154440,Wiltshire,Great Cheverell ,Meaney 1964: 267,500,650,1,1934
+Great Botley Copse ,WltGFT-IC1,429357,160018,Wiltshire,Grafton ,Meaney 1964: 268,500,650,3,1910
+Kings Play Down,WltHDN-BI1,400942,165945,Wiltshire,Heddington,Meaney 1964: 269,500,700,1,1907
+From Bowls Barrow,WltHYY-BI1,394238,146775,Wiltshire,Heytesbury ,WAM 1914 38:392,450,700,1,1864
+Newtown Plantation    ,WltHYY-IC1,392020,142830,Wiltshire,Heytesbury ,Meaney 1964: 269,600,800,3,1852
+Winterslow Hut,WltIDN-BI1,422837,135377,Wiltshire,Idmiston ,Meaney 1964: 278,500,650,1,1814
+North east of Monkton Deverill burial 1,WltKDV-BI1,385835,137760,Wiltshire,Kingston Deverill ,WAM 1995 88: 26-36,600,700,1,1990
+North east of Monkton Deverill    ,WltKDV-IC1,385840,137762,Wiltshire,Kingston Deverill ,WAM 1995 88: 26-37,625,700,15,1990
+Knook Barrow    ,WltKNK-IC1,395625,144623,Wiltshire,Knook ,Meaney 1964: 269-70,600,800,4,1801
+Bassett Down,WltLTG-IC1,411553,179955,Wiltshire,Lydiard Tregoze ,WAM 1896 28: 104-8,500,600,00,1822-30
+Barrow 1 Broken Cross Ford,WltLVK-BI1,417233,133238,Wiltshire,Laverstock ,Antiq. Jnl. 1969 49: 98-117,500,650,1,1964
+Barrow 2 Broken Cross Ford,WltLVK-BI2,417223,133218,Wiltshire,Laverstock ,Antiq. Jnl. 1969 49: 98-117,675,700,1,1964
+End Burgh    ,WltLVK-IC1,415875,134058,Wiltshire,Laverstock ,WAM 1935-7 47: 406-11,500,600,00,unexcavated
+Old Sarum II,WltLVK-IC2,413467,132940,Wiltshire,Laverstock ,WAM 107 2014: 77-90,450,550,2,1970;
+Near Savernake Hospital    ,WltMBH-BI1,420757,168660,Wiltshire,Marlborough ,Meaney 1964: 270,475,600,1,1927
+Rodmead Hill    ,WltMBY-BI1,381970,135987,Wiltshire,Maiden Bradley with Yarnfield ,Wilts SMR ST 83 NW 400,625,700,1,1807
+Near Mildenhall ,WltMDL-BI1,420515,169510,Wiltshire,Mildenhall ,WAM 1911-12 37: 611-2,500,550,1,1827
+Poulton Downs    ,WltMDL-BI2,420377,171600,Wiltshire,Mildenhall ,WAM 1950 53: 220-2,450,600,1,1949
+Unlocated - Manningford,WltMGF-IC1,414515,158510,Wiltshire,Manningford,WAM 1935-7 47: 316,450,700,3,1935
+Grove Farm,WltMLV-IC1,401402,154060,Wiltshire,Market Lavington ,Williams and Newman 1996,500,700,42,1986-90
+9 Barnes Close,WltMRE-BI1,381315,132250,Wiltshire,Mere ,WAM 1997 90: 156,600,700,1,1996
+Silk Hill ,WltMSN-BI1,419058,146947,Wiltshire,Milston ,Wilts SMR SU 14 NE U06,450,650,1,pre 1812
+South-east of Woodbridge Inn    ,WltNNN-IC1,413265,157075,Wiltshire,North Newnton ,WAM 1935-7 47: 265-7,500,650,2,pre 1935
+South of All Saints Church Harnham,WltNSM-BI1,414025,128877,Wiltshire,New Sarum (Salisbury) ,Wilts SMR SA030,450,550,1,1931
+Kelsey Road    ,WltNSM-BI2,415060,130260,Wiltshire,New Sarum (Salisbury) ,Wilts SMR SA032,500,650,1,1878
+South of Netherhampton Road,WltNSM-BI4,413130,129165,Wiltshire,New Sarum,WAM 1947-8 52: 346,500,700,1,1939
+Old Sarum I,WltNSM-IC1,413470,132940,Wiltshire,New Sarum (Salisbury) ,Meaney 1964: 275,450,550,2,1889
+Low Field  Harnham Hill,WltNSM-IC2,413710,128752,Wiltshire,New Sarum (Salisbury) ,Archaeologia 1855 35: 259-277,450,625,75,1853-4
+St Edmunds Church    ,WltNSM-IC3,414777,130355,Wiltshire,New Sarum (Salisbury) ,WAM 1927-9 44: 187,500,650,30,1771-4
+Eastern Outskirts Old Sarum,WltNSM-IC4,414275,132485,Wiltshire,New Sarum (Salisbury) ,Wilts SMR SU 13 SW 404,600,800,14,1890
+Opposite Old Parsonage Farm,WltNSM-IC5,413495,129073,Wiltshire,New Sarum,WAM 1947-8 52: 345-6,400,900,2,1937
+Unlocated - S of Elston Hill ,WltOCN-IC1,406420,145115,Wiltshire,Orcheston ,WAM 1913-14 38: 303,450,800,00,1856
+Barbury Castle    ,WltOSA-IC1,415050,176347,Wiltshire,Ogbourne St Andrew ,Meaney 1964: 271,575,700,00,1885
+The Fox    ,WltPTN-IC1,410345,187128,Wiltshire,Purton ,WAM 1911-12 37: 606- 8,600,700,11,1912
+Blacknall Field (Black Patch)    ,WltPWY-MC1,415555,158070,Wiltshire,Pewsey ,Unpublished notes,450,625,109,1970
+East of Stanton Fitzwarren    ,WltSFW-BI1,418797,190523,Wiltshire,Stanton Fitzwarren ,WAM 1914 38: 322,450,700,1,1906
+East of Sherrington,WltSGN-IC1,396870,139188,Wiltshire,Sherrington ,WAM 1914 38: 399,400,700,00,1804
+Unlocated - Stourton,WltSTN-BI1,377520,134515,Wiltshire,Stourton,Swanton 1974: 84,500,620,1,Unknown
+NW of Allotment Gardens Maddington,WltSTN-IC1,406550,144425,Wiltshire,Shrewton ,Med. Arch. 1968 13: 241,600,625,3,1968
+Barrow 4a,WltSVY-BI1,391390,141560,Wiltshire,Sutton Veny ,WAM 1999 92: 120-32,400,700,1,1964
+Evelyn Street    ,WltSWN-BI1,415815,183233,Wiltshire,Swindon ,Dickinson site 145,450,700,1,1978
+Wood Street to Devizes Road,WltSWN-IC1,415548,183550,Wiltshire,Swindon ,Meaney 1964: 276,600,900,00,1868
+Tilshead Lodge Barrow,WltTSH-BI1,402118,147518,Wiltshire,Tilshead ,WAM 1914 38: 403,500,650,1,c.1860
+Perham Down Barracks    ,WltTWH-BI1,425250,149250,Wiltshire,Tidworth ,WAM 1942 49: 114,450,700,1,1939
+Unlocated - Perham Down ,WltTWH-BI3,425515,149515,Wiltshire,Tidworth ,Wilts SMR SU 24 NW U04,450,700,1,1939
+Warren Hill,WltTWH-BI4,424252,147555,Wiltshire,Tidworth ,HFCAS 2002 57: 38-52,525,575,4,1992
+Salt Lane  Winterbourne Gunner    ,WltWBG-IC1,418250,135235,Wiltshire,Winterbourne ,WAM 1964 59: 86-109,450,600,10,1960
+Callas Hill burial 1,WltWBH-BI1,421593,183040,Wiltshire,Wanborough ,WAM 1927-29 44: 244,575,700,1,1927
+Callas Hill burial 2,WltWBH-BI2,421615,183395,Wiltshire,Wanborough ,WAM 1975/6 70/1: 136,450,700,1,1975
+North of Foxhill Stud,WltWBH-IC1,422445,182053,Wiltshire,Wanborough ,WAM 1942 49: 542-3; 503,500,600,8,1941
+Winterbourne Stoke West Group I,WltWBS-BI1,407670,142085,Wiltshire,Winterbourne Stoke ,Meaney 1964: 278,450,700,1,1809
+Winterbourne Stoke II,WltWBS-BI2,410442,142213,Wiltshire,Winterbourne Stoke ,Meaney 1964: 278,450,650,1,1809
+Winterbourne Stoke III,WltWBS-IC1,410125,141688,Wiltshire,Winterbourne Stoke ,Meaney 1964: 278,450,700,5,ante 1812
+Lake Field,WltWCL-BI1,412053,139558,Wiltshire,Wilsford cum Lake ,WAM 2003 96: 7-18,500,620,1,1996
+SE of Lake House    ,WltWCL-BI2,413640,138870,Wiltshire,Wilsford Cum Lake ,WAM 2003 96: 7-18,475,525,1,1996
+Brimble Hill    ,WltWGN-IC1,415590,180277,Wiltshire,Wroughton ,WAM 2002 95: 291,500,650,2,2002
+West Knoyle I,WltWKN-BI1,386300,133718,Wiltshire,West Knoyle ,Wilts SMR ST 83 SE 402,625,700,1,1807
+West Knoyle II or East Knoyle,WltWKN-BI2,386655,133755,Wiltshire,West Knoyle ,Meaney 1964: 270,450,700,1,1802
+Beyond Hut,WltWLW-BI1,423445,134850,Wiltshire,Winterslow ,Meaney 1964: 278,500,650,1,1870
+Roche Court Down II,WltWLW-IC1,425135,135787,Wiltshire,Winterslow ,Meaney 1964: 273,450,700,2,1931
+Roche Court Down I,WltWLW-IC2,425185,135827,Wiltshire,Winterslow ,Meaney 1964: 272,600,900,17,1931
+Roche Court Down III,WltWLW-IC3,425203,135775,Wiltshire,Winterslow ,Meaney 1964: 273,450,700,17,1931
+In King Barrow    ,WltWMR-IC1,389745,144460,Wiltshire,Warminster ,WAM 1979/80 74/5:194,575,650,3,pre 1810
+Overton Hill I,WltWOV-IC1,411887,168275,Wiltshire,West Overton ,Wilts SMR SU 16 NW 417,400,900,00,1957
+Overton Hill II,WltWOV-IC2,411917,168332,Wiltshire,West Overton ,WAM 1986 80: 103-120,500,600,9,1962
+Ell Barrow    ,WltWSF-BI1,407305,151377,Wiltshire,Wilsford ,Wilts SMR SU 05 SE 400,400,700,1,pre 1957

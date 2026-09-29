@@ -1,0 +1,462 @@
+[
+ {
+  "id": "tribal-hidage",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
+    "path": "original/Individuals_Data.csv"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Objects_Data.csv",
+    "path": "original/Objects_Data.csv"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Sites_data.csv",
+    "path": "original/Sites_data.csv"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/TribalHidage_website_image.jpg",
+    "path": "original/TribalHidage_website_image.jpg"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/TribalHidgae_GeneralGuide.pdf",
+    "path": "original/TribalHidgae_GeneralGuide.pdf"
+   }
+  ]
+ },
+ {
+  "id": "domesday",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",
+    "path": "original/DBhundreds.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBinter.zip",
+    "path": "original/DBinter.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBshires.zip",
+    "path": "original/DBshires.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
+    "path": "original/LoG_GeneralGuide.pdf"
+   }
+  ]
+ },
+ {
+  "id": "medieval-bridges",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/General_Guide_bridges.pdf",
+    "path": "original/General_Guide_bridges.pdf"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.csv",
+    "path": "original/gis/Bridges1250.csv"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.zip",
+    "path": "original/gis/Bridges1250.zip"
+   }
+  ]
+ },
+ {
+  "id": "inland-navigation",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
+    "path": "original/gis/direct_evidence.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip",
+    "path": "original/gis/heads_of_navigation.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/indirect_evidence.zip",
+    "path": "original/gis/indirect_evidence.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
+    "path": "original/gis/pn_river_traffic.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf",
+    "path": "original/pdf/general_guide.pdf"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/png/inland_navigation.png",
+    "path": "original/png/inland_navigation.png"
+   }
+  ]
+ },
+ {
+  "id": "gough-map",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_general_guide.pdf",
+    "path": "original/Gough_Map_general_guide.pdf"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_image.pdf",
+    "path": "original/Gough_Map_image.pdf"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_image.png",
+    "path": "original/Gough_Map_website_image.png"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
+    "path": "original/Gough_Map_website_intro.pdf"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip",
+    "path": "original/gough_red_lines.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_routes.zip",
+    "path": "original/gough_routes.zip"
+   },
+   {
+    "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip",
+    "path": "original/gough_way_stations.zip"
+   }
+  ]
+ },
+ {
+  "id": "viabundus",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/alternativenames.csv/content",
+    "path": "original/alternativenames.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/water-1500.csv/content",
+    "path": "original/water-1500.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/nodes.csv/content",
+    "path": "original/nodes.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-town-outlines.geojson/content",
+    "path": "original/Viabundus-2-town-outlines.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus_Documentation_v2.pdf/content",
+    "path": "original/Viabundus_Documentation_v2.pdf"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/descriptions.csv/content",
+    "path": "original/descriptions.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/edgesdescriptionlang.csv/content",
+    "path": "original/edgesdescriptionlang.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-town-outlines.gml/content",
+    "path": "original/Viabundus-2-town-outlines.gml"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.gml/content",
+    "path": "original/Viabundus-2-edges.gml"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/literature.csv/content",
+    "path": "original/literature.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/fairsdescription.csv/content",
+    "path": "original/fairsdescription.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/edges.csv/content",
+    "path": "original/edges.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/literaturelink.csv/content",
+    "path": "original/literaturelink.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-water-1500.geojson/content",
+    "path": "original/Viabundus-2-water-1500.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/population.csv/content",
+    "path": "original/population.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.geojson/content",
+    "path": "original/Viabundus-2-edges.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-water-1500.gml/content",
+    "path": "original/Viabundus-2-water-1500.gml"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/database%20structure%202.pdf/content",
+    "path": "original/database structure 2.pdf"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/towns.csv/content",
+    "path": "original/towns.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/edgesdescription.csv/content",
+    "path": "original/edgesdescription.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/16611998/files/fairs.csv/content",
+    "path": "original/fairs.csv"
+   }
+  ]
+ },
+ {
+  "id": "itinere",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.geojson/content",
+    "path": "original/itinere_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.sbn/content",
+    "path": "original/itinere_roads.sbn"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.dbf/content",
+    "path": "original/itinere_roads.dbf"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.sbx/content",
+    "path": "original/itinere_roads.sbx"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/Itiner-e%20bibliography.bib/content",
+    "path": "original/Itiner-e bibliography.bib"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/Data%20field%20description.docx/content",
+    "path": "original/Data field description.docx"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.shp/content",
+    "path": "original/itinere_roads.shp"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.gpkg/content",
+    "path": "original/itinere_roads.gpkg"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.shx/content",
+    "path": "original/itinere_roads.shx"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.prj/content",
+    "path": "original/itinere_roads.prj"
+   },
+   {
+    "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.cpg/content",
+    "path": "original/itinere_roads.cpg"
+   },
+   {
+    "url": "https://itiner-e.org/route-segments/download",
+    "path": "nightly-export/route-segments.ndjson"
+   }
+  ]
+ },
+ {
+  "id": "pleiades",
+  "files": [
+   {
+    "url": "https://atlantides.org/downloads/pleiades/gis/pleiades_gis_data.zip",
+    "path": "original/gis/pleiades_gis_data.zip"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/json/pleiades-places-20260929.json.gz",
+    "path": "original/json/pleiades-places-20260929.json.gz"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/json/pleiades-errata-20260929.json.gz",
+    "path": "original/json/pleiades-errata-20260929.json.gz"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
+    "path": "original/dumps/README.txt"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-places-20260929.csv.gz",
+    "path": "original/dumps/pleiades-places-20260929.csv.gz"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-names-20260929.csv.gz",
+    "path": "original/dumps/pleiades-names-20260929.csv.gz"
+   },
+   {
+    "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-locations-20260929.csv.gz",
+    "path": "original/dumps/pleiades-locations-20260929.csv.gz"
+   }
+  ]
+ },
+ {
+  "id": "cshapes",
+  "files": [
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.zip",
+    "path": "original/CShapes-2.0.zip"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson",
+    "path": "original/CShapes-2.0.geojson"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-Europe.geojson",
+    "path": "original/CShapes-Europe.geojson"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
+    "path": "original/CShapes-2.0.csv"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0_Codebook.pdf",
+    "path": "original/CShapes-2.0_Codebook.pdf"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.txt",
+    "path": "original/CShapes-2.0.txt"
+   },
+   {
+    "url": "https://icr.ethz.ch/data/cshapes/ChangeLog.txt",
+    "path": "original/ChangeLog.txt"
+   }
+  ]
+ },
+ {
+  "id": "al-thurayya",
+  "files": [
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/README.md",
+    "path": "original/README.md"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/LICENSE",
+    "path": "original/LICENSE"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/DATA-LICENSE.md",
+    "path": "original/DATA-LICENSE.md"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places.geojson",
+    "path": "original/master/places.geojson"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places_full.geojson",
+    "path": "original/master/places_full.geojson"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places_new_structure.geojson",
+    "path": "original/master/places_new_structure.geojson"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places.json",
+    "path": "original/master/places.json"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/routes.json",
+    "path": "original/master/routes.json"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/routes_full.json",
+    "path": "original/master/routes_full.json"
+   },
+   {
+    "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/regions.json",
+    "path": "original/master/regions.json"
+   }
+  ]
+ },
+ {
+  "id": "living-with-machines",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/README.md/content",
+    "path": "original/annotations-2024_zenodo-11241371/README.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_all.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_all.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_railspace_all.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_railspace_all.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_building.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_building.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_all_georeferenced.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_all_georeferenced.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_railspace_all_georeferenced.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_railspace_all_georeferenced.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/11241371/files/annots_building_georeferenced.csv/content",
+    "path": "original/annotations-2024_zenodo-11241371/annots_building_georeferenced.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/14522926/files/railspace_predictions_patch_df.csv/content",
+    "path": "original/railspace-v2_zenodo-14522926/railspace_predictions_patch_df.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/14522926/files/post_processed_railspace_predictions_patch_df.csv/content",
+    "path": "original/railspace-v2_zenodo-14522926/post_processed_railspace_predictions_patch_df.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7147906/files/README/content",
+    "path": "original/sigspatial-2022_zenodo-7147906/README"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7147906/files/MapReader_Data_SIGSPATIAL_2022.zip/content",
+    "path": "original/sigspatial-2022_zenodo-7147906/MapReader_Data_SIGSPATIAL_2022.zip"
+   }
+  ]
+ },
+ {
+  "id": "historic-england",
+  "files": [
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=0",
+    "path": "original/Listed_Building_points.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=3",
+    "path": "original/Listed_Building_polygons.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=6",
+    "path": "original/Scheduled_Monuments.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=7",
+    "path": "original/Parks_and_Gardens.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
+    "path": "original/Battlefields.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=9",
+    "path": "original/Protected_Wreck_Sites.gpkg"
+   },
+   {
+    "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=10",
+    "path": "original/World_Heritage_Sites.gpkg"
+   }
+  ]
+ }
+]
