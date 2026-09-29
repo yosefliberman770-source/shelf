@@ -88,6 +88,7 @@ export default function TodayPage() {
     );
 
   const current = reading[0];
+  const unreadEbook = current ? undefined : [...ebookIds].map((id) => idx.items.get(id)).find((i) => i && i.status !== 'read');
   const others = reading.slice(1);
   const pages = pagesByDay(idx).get(idx.today) ?? 0;
   const minutes = minutesByDay(idx).get(idx.today) ?? 0;
@@ -122,7 +123,16 @@ export default function TodayPage() {
         <Link className="chip" to="/reading/journal">Journal</Link>
       </div>
 
-      {current ? <ContinueHero item={current} f={forecasts.get(current.id)!} idx={idx} hasFile={ebookIds.has(current.id)} /> : (
+      {current ? <ContinueHero item={current} f={forecasts.get(current.id)!} idx={idx} hasFile={ebookIds.has(current.id)} /> : unreadEbook ? (
+        <Link to={`/read/${unreadEbook.id}`} className="hero row gap-16" style={{ display: 'flex' }}>
+          <Cover item={unreadEbook} width={72} />
+          <div style={{ minWidth: 0 }}>
+            <div className="eyebrow">Start reading</div>
+            <div className="hero-title">{unreadEbook.title}</div>
+            <div className="small muted">{idx.authorLine(unreadEbook)} · tracked automatically</div>
+          </div>
+        </Link>
+      ) : (
         <div className="card">
           <Empty illustration="reading" title="Nothing in progress" action={<div className="row wrap" style={{ justifyContent: 'center' }}><Link className="btn primary" to="/reading/queue">Choose what to read</Link><button className="btn" onClick={() => open({ kind: 'add' })}>Add a book</button></div>}>
             Pick a book from your Want to Read list, or add a new one.
@@ -143,7 +153,7 @@ export default function TodayPage() {
 
       <Universe idx={idx} hasEbooks={ebookIds.size > 0} />
 
-      <div className="section-title">Today</div>
+      <div className="section-row"><h2 className="section-title">Today</h2><Link to="/insights">All stats</Link></div>
       <div className="card">
         <div className="row gap-16">
           {daily ? (
@@ -185,7 +195,7 @@ export default function TodayPage() {
 
       <UpNext idx={idx} />
 
-      <div className="grid c2 mt-24">
+      <div className="mt-24">
         <div className="card">
           <div className="card-head"><h3 className="row"><Icon name="quote" /> Quote of the day</h3>{quotes.length > 0 && <Link className="small muted" to="/knowledge/notes">All quotes</Link>}</div>
           {qotd ? (
@@ -194,15 +204,6 @@ export default function TodayPage() {
               {qotd.itemId && <div className="small muted mt-8">— {idx.items.get(qotd.itemId)?.title}{qotd.page ? `, p. ${qotd.page}` : ''}</div>}
             </>
           ) : <div className="small muted">Save quotes while you read (in the ebook reader, press and hold on text) and one will greet you here each day.</div>}
-        </div>
-        <div className="ai-card">
-          <h2 className="row" style={{ gap: 8 }}><Icon name="sparkle" /> Ask about your reading</h2>
-          <p style={{ opacity: 0.9, margin: '6px 0 12px' }}>Your assistant knows your books, progress and notes.</p>
-          <div className="row wrap gap-8">
-            {['What should I read next?', 'Summarise my reading this week', 'Which book should I focus on?'].map((q) => (
-              <button key={q} className="chip" onClick={() => open({ kind: 'ai', question: q })}>{q}</button>
-            ))}
-          </div>
         </div>
       </div>
     </div>
@@ -385,30 +386,55 @@ function UpNext({ idx }: { idx: LibraryIndex }) {
   );
 }
 
-/** Your ebooks, one tap from reading. */
-function EbookShelf({ idx, ebookIds, skip }: { idx: LibraryIndex; ebookIds: Set<string>; skip?: string }) {
+type LibFilter = 'all' | 'reading' | 'unread' | 'finished' | 'paper';
+type LibSort = 'recent' | 'title' | 'author' | 'progress';
+const LIB_PREF = 'shelf.kindleLib';
+
+/** The Kindle-style library: every ebook, one tap from reading. */
+function EbookShelf({ idx, ebookIds }: { idx: LibraryIndex; ebookIds: Set<string>; skip?: string }) {
   const { open } = useUI();
-  const books = [...ebookIds].map((id) => idx.items.get(id)).filter((i): i is Item => !!i && i.id !== skip && i.status !== 'read').sort((a, b) => (b.lastReadAt ?? 0) - (a.lastReadAt ?? 0)).slice(0, 12);
+  const [pref, setPref] = useState<{ f: LibFilter; s: LibSort }>(() => { try { return { f: 'all', s: 'recent', ...JSON.parse(localStorage.getItem(LIB_PREF) ?? '{}') }; } catch { return { f: 'all', s: 'recent' }; } });
+  const set = (p: Partial<typeof pref>) => { const n = { ...pref, ...p }; setPref(n); try { localStorage.setItem(LIB_PREF, JSON.stringify(n)); } catch { /* ignore */ } };
+  const pctOf = (i: Item) => (i.total ? Math.min(1, idx.position(i) / i.total) : 0);
+  const ebooks = [...ebookIds].map((id) => idx.items.get(id)).filter((i): i is Item => !!i);
+  const paper = idx.itemList().filter((i) => !ebookIds.has(i.id) && (i.status === 'reading' || i.status === 'paused'));
+  let books = pref.f === 'paper' ? paper : ebooks.filter((i) => pref.f === 'all' || (pref.f === 'reading' ? i.status === 'reading' : pref.f === 'finished' ? i.status === 'read' : i.status === 'want' && pctOf(i) === 0));
+  books = [...books].sort((a, b) => pref.s === 'title' ? a.title.localeCompare(b.title) : pref.s === 'author' ? idx.authorLine(a).localeCompare(idx.authorLine(b)) : pref.s === 'progress' ? pctOf(b) - pctOf(a) : (b.lastReadAt ?? b.createdAt ?? 0) - (a.lastReadAt ?? a.createdAt ?? 0));
   return (
     <>
-      <div className="section-row"><h2 className="section-title">Your ebooks</h2><Link to="/reading/ebooks">See all</Link></div>
-      <div className="shelf-row">
+      <div className="section-row">
+        <h2 className="section-title">Your library</h2>
+        <select className="select sm" style={{ width: 'auto' }} value={pref.s} onChange={(e) => set({ s: e.target.value as LibSort })} aria-label="Sort books">
+          <option value="recent">Recent</option><option value="title">Title</option><option value="author">Author</option><option value="progress">Progress</option>
+        </select>
+      </div>
+      <div className="chips-scroll mb-16">
+        {([['all', `All · ${ebooks.length}`], ['reading', 'Reading'], ['unread', 'Not started'], ['finished', 'Finished'], ['paper', `📖 Paper books${paper.length ? ` · ${paper.length}` : ''}`]] as [LibFilter, string][]).map(([f, l]) => <button key={f} className={`chip ${pref.f === f ? 'on' : ''}`} onClick={() => set({ f })}>{l}</button>)}
+      </div>
+      <div className="cover-grid compact">
         {books.map((i) => {
-          const pct = i.total ? Math.round((idx.position(i) / i.total) * 100) : 0;
+          const pct = Math.round(pctOf(i) * 100);
+          const to = ebookIds.has(i.id) ? `/read/${i.id}` : `/item/${i.id}`;
           return (
             <div key={i.id} className="cover-tile">
-              <div className="shelf-slot"><Link to={`/read/${i.id}`} aria-label={`Read ${i.title}`}><Cover item={i} width={96} author={idx.authorLine(i)} /></Link></div>
-              <div className="meta"><div className="small ellipsis" style={{ fontWeight: 700 }}>{i.title}</div><div className="tiny faint">{pct > 0 ? `${pct}% read` : 'Not started'}</div></div>
+              <Link to={to} aria-label={`${ebookIds.has(i.id) ? 'Read' : 'Open'} ${i.title}`}><Cover item={i} width={92} author={idx.authorLine(i)} /></Link>
+              <div className="meta" style={{ textAlign: 'left' }}>
+                <div className="small clamp-2" style={{ fontWeight: 700 }}>{i.title}</div>
+                {i.status === 'read' ? <div className="tiny faint">Finished ✓</div> : pct > 0 ? <><ProgressBar value={pct / 100} thin /><div className="tiny faint">{pct}%</div></> : <div className="tiny faint">New</div>}
+              </div>
             </div>
           );
         })}
-        <div className="cover-tile">
-          <button className="shelf-slot add-slot" onClick={() => open({ kind: 'add', preset: { step: 'epub' } })} aria-label="Open an ePub file">
-            <span style={{ width: 96, height: 144, borderRadius: 8, border: '2px dashed var(--border-strong)', display: 'grid', placeItems: 'center', color: 'var(--text-3)' }}><Icon name="plus" size={28} /></span>
-          </button>
-          <div className="meta"><div className="small" style={{ fontWeight: 700 }}>Open an ePub</div><div className="tiny faint">Read it here</div></div>
-        </div>
+        {pref.f !== 'paper' && (
+          <div className="cover-tile">
+            <button className="add-slot" onClick={() => open({ kind: 'add', preset: { step: 'epub' } })} aria-label="Add an ePub">
+              <span style={{ width: 92, height: 138, borderRadius: 8, border: '2px dashed var(--border-strong)', display: 'grid', placeItems: 'center', color: 'var(--text-3)' }}><Icon name="plus" size={28} /></span>
+            </button>
+            <div className="meta" style={{ textAlign: 'left' }}><div className="small" style={{ fontWeight: 700 }}>Add an ePub</div></div>
+          </div>
+        )}
       </div>
+      {!books.length && pref.f !== 'all' && <div className="small muted">Nothing here yet.</div>}
     </>
   );
 }

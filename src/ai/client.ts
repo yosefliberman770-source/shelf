@@ -111,11 +111,71 @@ export function parseJSON<T>(text: string): T {
         /* fall through */
       }
     }
+    const fixed = repairJSON(cleaned);
+    if (fixed !== undefined) return fixed as T;
     throw new AIError('parse', 'The AI reply could not be read as structured data. Try again.');
   }
 }
 
-export async function completeJSON<T>(req: AIRequest, signal?: AbortSignal): Promise<{ data: T; response: AIResponse }> {
+export async function completeJSON<T>(req: AIRequest, signal?: AbortSignal, fallback?: (text: string) => T): Promise<{ data: T; response: AIResponse }> {
   const response = await complete({ ...req, json: true }, signal);
-  return { data: parseJSON<T>(response.text), response };
+  try {
+    return { data: parseJSON<T>(response.text), response };
+  } catch (e) {
+    // A reply we can't structure is still worth showing when the caller can use plain text.
+    if (fallback) return { data: fallback(response.text), response };
+    throw e;
+  }
+}
+
+/** Read one string field out of JSON-ish text (e.g. a cut-off reply). */
+export function jsonField(text: string, field: string): string | undefined {
+  const m = new RegExp(`"${field}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)`).exec(text);
+  if (!m) return undefined;
+  try { return JSON.parse(`"${m[1]}"`); } catch { return m[1].replace(/\\n/g, '\n'); }
+}
+
+/** Close a JSON reply that was cut off mid-way (unfinished strings, arrays, objects). */
+export function repairJSON(text: string): unknown {
+  const start = text.search(/[[{]/);
+  if (start < 0) return undefined;
+  const src = text.slice(start);
+  const stack: string[] = [];
+  let inStr = false;
+  let esc = false;
+  let lastSafe = 0;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '{' || ch === '[') stack.push(ch === '{' ? '}' : ']');
+    else if (ch === '}' || ch === ']') stack.pop();
+    if (!inStr && (ch === ',' || ch === '{' || ch === '[' || ch === '}' || ch === ']' || ch === '"')) lastSafe = i;
+  }
+  const attempts = [
+    src + (inStr ? '"' : '') + [...stack].reverse().join(''),
+  ];
+  // Otherwise cut back to the last complete value and close from there.
+  let cut = src.slice(0, lastSafe + 1).replace(/[,:]\s*$/, '');
+  for (let k = 0; k < 6; k++) {
+    const st: string[] = [];
+    let s2 = false, e2 = false;
+    for (const ch of cut) {
+      if (s2) { if (e2) e2 = false; else if (ch === '\\') e2 = true; else if (ch === '"') s2 = false; continue; }
+      if (ch === '"') s2 = true; else if (ch === '{' || ch === '[') st.push(ch === '{' ? '}' : ']'); else if (ch === '}' || ch === ']') st.pop();
+    }
+    attempts.push(cut.replace(/,\s*$/, '') + [...st].reverse().join(''));
+    const j = Math.max(cut.lastIndexOf(','), 0);
+    if (!j) break;
+    cut = cut.slice(0, j);
+  }
+  for (const a of attempts) {
+    try { return JSON.parse(a); } catch { /* try the next */ }
+  }
+  return undefined;
 }

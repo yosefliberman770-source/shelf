@@ -80,6 +80,19 @@ export interface GeminiResult {
   text: string;
   model: string;
   refused?: boolean;
+  truncated?: boolean;
+}
+
+/**
+ * Keep "thinking" short so it doesn't eat the answer. Flash models can skip it
+ * entirely; Pro models need a small budget; Gemini 3 uses a thinking level.
+ */
+function thinkingFor(model: string): Record<string, unknown> | undefined {
+  const m = model.toLowerCase();
+  if (/gemini-3/.test(m)) return { thinkingLevel: 'low' };
+  if (/gemini-2\.5-.*flash/.test(m) || /gemini-2\.5-flash/.test(m)) return { thinkingBudget: 0 };
+  if (/gemini-2\.5-pro/.test(m)) return { thinkingBudget: 128 };
+  return undefined;
 }
 
 export async function geminiComplete(
@@ -98,10 +111,21 @@ export async function geminiComplete(
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: req.system + (req.json ? '\n\nRespond with a single valid JSON value only — no prose, no code fences.' : '') }] },
         contents: req.messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
-        generationConfig: { maxOutputTokens: Math.max(req.maxTokens ?? 2000, 1024) * 2, ...(req.json ? { responseMimeType: 'application/json' } : {}) },
+        generationConfig: {
+          // Generous room: "thinking" models spend part of this before answering.
+          maxOutputTokens: Math.max(8192, (req.maxTokens ?? 2000) * 3),
+          ...(req.json ? { responseMimeType: 'application/json' } : {}),
+          ...(useThinking ? { thinkingConfig: thinkingFor(m) } : {}),
+        },
       }),
     });
+  let useThinking = !!thinkingFor(model);
   let res = await call(model);
+  if (res.status === 400 && useThinking) {
+    // Older models reject thinking settings: ask again without them.
+    useThinking = false;
+    res = await call(model);
+  }
   if (res.status === 404 && !preferredModel) {
     // The cached model was retired: pick a fresh one once.
     try {
@@ -124,5 +148,6 @@ export async function geminiComplete(
   const c = data.candidates?.[0];
   if (data.promptFeedback?.blockReason || !c || c.finishReason === 'SAFETY' || c.finishReason === 'PROHIBITED_CONTENT') return { text: '', model, refused: true };
   const text = (c.content?.parts ?? []).filter((p) => !p.thought).map((p) => p.text ?? '').join('').trim();
-  return { text, model };
+  if (!text) throw new Error(c.finishReason === 'MAX_TOKENS' ? 'The answer was too long and got cut off. Try a shorter question.' : 'Gemini sent back an empty answer. Try again.');
+  return { text, model, truncated: c.finishReason === 'MAX_TOKENS' };
 }

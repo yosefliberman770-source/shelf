@@ -196,6 +196,15 @@ function pageAnchor(r: Rendition, cfi: string): string {
   return cfi;
 }
 
+/** The paragraph around a word, so the AI can tell which "Edward" is meant. */
+function passageAround(r: Range): string {
+  const el = (r.startContainer.nodeType === Node.TEXT_NODE ? r.startContainer.parentElement : r.startContainer as Element)?.closest('p, li, blockquote, div');
+  const text = (el?.textContent ?? r.startContainer.textContent ?? '').replace(/\s+/g, ' ').trim();
+  if (text.length <= 1200) return text;
+  const at = text.indexOf(r.toString());
+  return text.slice(Math.max(0, at - 600), at + 600);
+}
+
 const spineStep = (cfi: string) => Number(/epubcfi\(\/6\/(\d+)/.exec(cfi)?.[1] ?? -1);
 
 function flatToc(items: NavItem[]): NavItem[] {
@@ -411,7 +420,30 @@ export default function ReaderPage() {
     setPanel(null);
     setHint(false);
   };
-  openEntityRef.current = (h: Hit) => openTool({ tab: 'entity', focus: { name: h.term.name, kind: h.term.kind, conceptId: h.term.conceptId } });
+  openEntityRef.current = (h: Hit) => openTool({ tab: 'entity', focus: { name: h.term.name, kind: h.term.kind, conceptId: h.term.conceptId, passage: passageAround(h.range) } });
+
+  /** Every place a name appears in the chapter, for X-Ray's "Mentions". */
+  const findMentions = (name: string) => {
+    const r = rendRef.current;
+    const c = (r?.getContents() as unknown as Contents[] | undefined)?.[0];
+    const doc = c?.document;
+    if (!c || !doc?.body || name.length < 2) return [];
+    const re = new RegExp(`(?<![\\p{L}])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}])`, 'gu');
+    const out: { cfi: string; snippet: string }[] = [];
+    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n && out.length < 40; n = walker.nextNode()) {
+      const text = n.textContent ?? '';
+      for (const m of text.matchAll(re)) {
+        try {
+          const range = doc.createRange();
+          range.setStart(n, m.index!);
+          range.setEnd(n, m.index! + m[0].length);
+          out.push({ cfi: c.cfiFromRange(range), snippet: text.slice(Math.max(0, m.index! - 50), m.index! + m[0].length + 50).replace(/\s+/g, ' ').trim() });
+        } catch { /* skip */ }
+      }
+    }
+    return out;
+  };
   // With the side panel open on a big screen, the tools follow your page.
   refreshToolRef.current = () => {
     const cur = toolRef.current;
@@ -482,7 +514,8 @@ export default function ReaderPage() {
         const saveLength = () => {
           const it2 = idxRef.current.items.get(id!);
           const chars = book.locations.length() * LOC_CHARS;
-          if (it2 && chars && it2.ebookChars !== chars) updateItem(it2.id, { ebookChars: chars });
+          // An estimated page count lets ebook reading show up in page stats and charts.
+          if (it2 && chars && (it2.ebookChars !== chars || !it2.pageCount)) updateItem(it2.id, { ebookChars: chars, pageCount: it2.pageCount || Math.max(1, Math.round(chars / CHARS_PER_PAGE)) });
         };
         if (!file.locations) {
           setPreparing(true);
@@ -521,6 +554,8 @@ export default function ReaderPage() {
             return null;
           });
         });
+        // Following a link inside the book (e.g. a footnote): remember where you were.
+        rendition.on('linkClicked', () => { if (session.current.cfi) setJumpBack(session.current.cfi); jumping.current = true; });
         rendition.on('keyup', (e: KeyboardEvent) => {
           if (e.key === 'ArrowRight') { userNav.current = true; rendition.next(); }
           if (e.key === 'ArrowLeft') { userNav.current = true; rendition.prev(); }
@@ -736,11 +771,50 @@ export default function ReaderPage() {
 
   useEffect(() => { if (panel === 'aa') for (const f of FONTS) loadAppFont(fontUrl(f)); }, [panel]);
 
+  // Phone back button: first close what's open (a menu, X-Ray, the text
+  // selection), then return from a jump (contents, search, footnote), and
+  // only after that leave the book.
+  const backLayer = tool ? 'tool' : panel ? 'panel' : selection ? 'selection' : jumpBack ? 'jump' : null;
+  const backPushed = useRef(false);
+  const ignorePop = useRef(false);
+  const leaving = useRef(false);
+  const [, bump] = useState(0);
+  const onBackRef = useRef<() => void>(() => {});
+  onBackRef.current = () => {
+    if (tool) { if (tool.tab === 'entity' && tool.focus?.entry) setTool({ ...tool, tab: 'xray', focus: undefined }); else setTool(null); }
+    else if (panel) setPanel(null);
+    else if (selection) clearSelection();
+    else if (jumpBack) { const b = jumpBack; setJumpBack(null); jumping.current = true; userNav.current = true; rendRef.current?.display(b); }
+    bump((n) => n + 1);
+  };
+  useEffect(() => {
+    const onPop = () => {
+      if (ignorePop.current) { ignorePop.current = false; bump((n) => n + 1); return; }
+      if (backPushed.current) { backPushed.current = false; onBackRef.current(); }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+  useEffect(() => {
+    if (leaving.current || ignorePop.current) return;
+    if (backLayer && !backPushed.current) {
+      window.history.pushState({ ...(window.history.state ?? {}), shelfReader: true }, '');
+      backPushed.current = true;
+    } else if (!backLayer && backPushed.current) {
+      backPushed.current = false;
+      ignorePop.current = true;
+      window.history.back();
+    }
+  });
+
   const close = async () => {
     await flush(true);
     if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
-    if ((window.history.state as { idx?: number } | null)?.idx) nav(-1);
-    else nav('/ebooks');
+    leaving.current = true;
+    const extra = backPushed.current ? 1 : 0;
+    backPushed.current = false;
+    if ((window.history.state as { idx?: number } | null)?.idx) window.history.go(-(1 + extra));
+    else nav('/', { replace: true });
   };
 
   /** Jump somewhere, remembering where you were (like Kindle's "Back to page"). */
@@ -958,7 +1032,7 @@ export default function ReaderPage() {
       {tool && (
         <div className={`reader-tool-sheet ${wide ? 'side' : 'bottom'}`} role="dialog" aria-label="Reading tools">
           {!wide && <div className="sheet-handle" style={{ margin: '0 auto 10px' }} />}
-          <ReaderTools state={tool} setState={setTool} onClose={() => setTool(null)} found={found} chapterText={chapterText} chapterHref={toolHref} />
+          <ReaderTools state={tool} setState={setTool} onClose={() => setTool(null)} found={found} chapterText={chapterText} chapterHref={toolHref} findMentions={findMentions} onJump={(cfi) => { setTool(null); jumpTo(cfi); setChrome(false); }} />
         </div>
       )}
 
@@ -991,7 +1065,7 @@ export default function ReaderPage() {
             <div className="row wrap" style={{ gap: 4 }}>
               <button className="btn sm primary" onClick={() => saveHighlight()}>❝ Save quote</button>
               <button className="btn sm ai-solid" onClick={() => { const text = selection.text; clearSelection(); openTool({ tab: 'ai', selection: text }); }}>✨ Ask AI</button>
-              {selection.text.split(/\s+/).length <= 6 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); clearSelection(); openTool({ tab: 'entity', focus: { name: text } }); }}>🧭 Explore</button>}
+              {selection.text.split(/\s+/).length <= 6 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openTool({ tab: 'entity', focus: { name: text, passage } }); }}>🧭 Explore</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setNoteDraft('')}>✎ Note</button>
               {selection.text.split(/\s+/).length <= 3 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={lookUpSelection}>📖 Define</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { navigator.clipboard?.writeText(selection.text).then(() => toast('Copied')).catch(() => {}); clearSelection(); }}>Copy</button>
@@ -1068,7 +1142,7 @@ export default function ReaderPage() {
         </Sheet>
       )}
       {/* Always offer a way out if the book never finishes opening. */}
-      {status === 'loading' && <button className="btn sm" style={{ position: 'absolute', top: 'calc(8px + env(safe-area-inset-top))', left: 8, zIndex: 8 }} onClick={() => { if ((window.history.state as { idx?: number } | null)?.idx) nav(-1); else nav('/ebooks'); }}>← Back</button>}
+      {status === 'loading' && <button className="btn sm" style={{ position: 'absolute', top: 'calc(8px + env(safe-area-inset-top))', left: 8, zIndex: 8 }} onClick={() => { if ((window.history.state as { idx?: number } | null)?.idx) nav(-1); else nav('/'); }}>← Back</button>}
     </div>
   );
 }

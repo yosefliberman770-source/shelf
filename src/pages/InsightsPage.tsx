@@ -4,7 +4,7 @@ import { brainSummary } from '../ai/summaries';
 import { BASE_SYSTEM } from '../ai/context';
 import { AIPanel, AskChip, useConcierge } from '../ai/ui';
 import { BarChart, CalendarHeatmap, ChartCard, Donut, LineChart, MatrixHeatmap, Scatter, StackedBars } from '../components/charts';
-import { Cover, DateRangePicker, Empty, type RangeId, Segmented, Tabs } from '../components/common';
+import { Cover, DateRangePicker, Empty, ProgressBar, type RangeId, Segmented, Tabs } from '../components/common';
 import { download } from '../db/portability';
 import { addDays, formatKey, formatMonth, resolveRange, startOfMonth, WEEKDAYS } from '../engine/dates';
 import { readingBrain } from '../engine/brain';
@@ -19,7 +19,11 @@ import {
   ratingBreakdown, sessionsIn, speedByItem, speedByMonth, timeProfile, topN, typeBreakdown, yearsWithData,
 } from '../engine/stats';
 import { fmtDuration, fmtNum, fmtUnits, pagesOf } from '../engine/units';
-import { useLibrary } from '../state/library';
+import { useEbookIds, useLibrary } from '../state/library';
+import { useUI } from '../state/ui';
+import { itemForecast } from '../engine/forecast';
+import { readingFormat } from '../lib/ebooks';
+import { readingSpeed } from '../lib/readingSpeed';
 
 type Tab = 'overview' | 'books' | 'habits' | 'progress' | 'brain' | 'forecast' | 'dna' | 'records' | 'balance';
 const TABS: { id: Tab; label: string }[] = [
@@ -43,13 +47,14 @@ export default function InsightsPage() {
   return (
     <div className="page">
       <div className="page-head">
-        <div><h1>Insights</h1><div className="sub">What’s happening in your reading — calculated only from what you’ve logged.</div></div>
+        <div><h1>Tracking</h1><div className="sub">Your reading in numbers. Ebooks are tracked automatically as you read.</div></div>
         {['overview', 'books', 'habits', 'balance'].includes(tab) && enough && <DateRangePicker value={range} today={idx.today} onChange={(v, c) => { setRange(v); setCustom(c); }} />}
       </div>
+      {tab === 'overview' && <TrackingDashboard idx={idx} />}
       {enough && tab === 'overview' && <MonthSummary idx={idx} />}
       <Tabs<Tab> value={tab} onChange={(t) => nav(`/insights/${t}`)} tabs={TABS} />
       {!enough && tab !== 'dna' && tab !== 'books' ? (
-        <div className="card"><Empty illustration="chart" title="Your statistics will grow here" action={<Link className="btn primary" to="/reading">Go to Reading</Link>}>Insights grow with your data — charts first, then patterns, forecasts and your Reading DNA.</Empty></div>
+        <div className="card"><Empty illustration="chart" title="Your statistics will grow here" action={<Link className="btn primary" to="/">Start reading</Link>}>Open an ebook and your reading is tracked automatically. Insights grow with your data — charts first, then patterns, forecasts and your Reading DNA.</Empty></div>
       ) : (
         <>
           {tab === 'overview' && <Overview idx={idx} r={r} />}
@@ -63,6 +68,70 @@ export default function InsightsPage() {
           {tab === 'balance' && <Balance idx={idx} r={r} />}
         </>
       )}
+    </div>
+  );
+}
+
+/** Today, this week, pace and every book in progress — at a glance. */
+function TrackingDashboard({ idx }: { idx: LibraryIndex }) {
+  const { open } = useUI();
+  const ebookIds = useEbookIds();
+  const pd = pagesByDay(idx);
+  const md = minutesByDay(idx);
+  const days = Array.from({ length: 14 }, (_, i) => addDays(idx.today, i - 13));
+  const sum = (m: Map<string, number>, ks: string[]) => ks.reduce((a, k) => a + (m.get(k) ?? 0), 0);
+  const week = days.slice(-7);
+  const lastWeek = days.slice(0, 7);
+  const monthFrom = startOfMonth(idx.today);
+  const month = overview(idx, { from: monthFrom, to: idx.today });
+  const year = overview(idx, { from: `${idx.today.slice(0, 4)}-01-01`, to: idx.today });
+  const ov = overview(idx, {});
+  const speed = readingSpeed();
+  const pph = idx.pagesPerMinute();
+  const reading = idx.itemList().filter((i) => i.status === 'reading');
+  const wkPages = sum(pd, week);
+  const prevPages = sum(pd, lastWeek);
+  const change = prevPages ? Math.round(((wkPages - prevPages) / prevPages) * 100) : undefined;
+  return (
+    <div className="col gap-16 mb-16">
+      <div className="card">
+        <div className="stats-row">
+          <div className="stat"><span className="label">Today</span><span className="value">{fmtNum(pd.get(idx.today) ?? 0)}</span><span className="hint">pages · {fmtDuration((md.get(idx.today) ?? 0) * 60) || '0m'}</span></div>
+          <div className="stat"><span className="label">Last 7 days</span><span className="value">{fmtNum(wkPages)}</span><span className="hint">pages{change !== undefined ? ` · ${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}% vs week before` : ''}</span></div>
+          <div className="stat"><span className="label">Streak</span><span className="value">{ov.currentStreak}</span><span className="hint">days · best {ov.longestStreak}</span></div>
+          <div className="stat"><span className="label">Reading speed</span><span className="value">{speed.wpm}</span><span className="hint">words/min{pph ? ` · ${fmtNum(pph * 60)} pages/hr` : ''}</span></div>
+          <div className="stat"><span className="label">This month</span><span className="value">{fmtDuration(month.minutes * 60) || '0m'}</span><span className="hint">{fmtNum(month.pages)} pages · {month.activeDays} days</span></div>
+          <div className="stat"><span className="label">This year</span><span className="value">{year.booksFinished}</span><span className="hint">books finished · {fmtNum(year.pages)} pages</span></div>
+        </div>
+      </div>
+      <ChartCard title="Last 14 days" subtitle="pages" data={days.map((d) => ({ label: d, value: pd.get(d) ?? 0, title: formatKey(d) }))} xFormat={(k) => WEEKDAYS[new Date(`${k}T12:00:00`).getDay()].slice(0, 2)} format={(v) => fmtNum(v)} />
+      {reading.length > 0 && (
+        <div className="card">
+          <div className="card-head"><h3>In progress</h3><button className="btn xs" onClick={() => open({ kind: 'log' })}>📖 Log a paper book</button></div>
+          <div className="col" style={{ gap: 12 }}>
+            {reading.map((i) => {
+              const f = itemForecast(idx, i);
+              const auto = readingFormat(i, ebookIds.has(i.id)) !== 'print';
+              return (
+                <Link key={i.id} to={`/item/${i.id}`} className="row gap-12">
+                  <Cover item={i} width={34} />
+                  <div className="grow" style={{ minWidth: 0 }}>
+                    <div className="row between small"><b className="ellipsis">{i.title}</b><span className="num">{Math.round((f.percent ?? 0) * 100)}%</span></div>
+                    <div className="mt-8"><ProgressBar value={f.percent} thin /></div>
+                    <div className="tiny faint mt-8">{auto ? '📱 auto-tracked' : '📖 paper'}{f.pace ? ` · ${fmtNum(f.pace, 1)}/day` : ''}{f.estimatedFinish ? ` · finish ~${formatKey(f.estimatedFinish)}` : ''}</div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      <div className="chips-scroll">
+        <Link className="chip" to="/reading/journal">📅 Reading journal</Link>
+        <Link className="chip" to="/plan/goals">🎯 Goals</Link>
+        <Link className="chip" to="/plan">🗓 Plans & projects</Link>
+        <Link className="chip" to="/insights/records">🏆 Records</Link>
+      </div>
     </div>
   );
 }
