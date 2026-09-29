@@ -58,7 +58,7 @@ export interface ProviderDef {
 
 export const PROVIDER_DEFS: ProviderDef[] = [
   {
-    id: 'gemini', keyPrefix: 'AIza', name: 'Google Gemini', transport: 'device', api: 'gemini',
+    id: 'gemini', name: 'Google Gemini', transport: 'device', api: 'gemini',
     keyUrl: 'https://aistudio.google.com/app/apikey', docsUrl: 'https://ai.google.dev/gemini-api/docs/rate-limits',
     freeNote: 'Free tier with daily limits, as long as billing is not enabled on the Google project behind your key.',
     tier: 'free', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', env: ['GEMINI_API_KEY'],
@@ -196,9 +196,10 @@ export function keyOwner(key: string): ProviderDef | undefined {
 export function keyMismatch(id: ProviderId, key: string, onlyCertain = false): string | undefined {
   const def = providerDef(id);
   const k = key.trim();
-  if (!def?.keyPrefix || !k || k.startsWith(def.keyPrefix)) return undefined;
-  if (id === 'gemini' && k.startsWith('AQ.')) return onlyCertain ? undefined : 'Keys starting with “AQ.” are usually Google sign-in tokens, not Gemini API keys, and Google rejects them here. In Google AI Studio tap “Create API key” — the key starts with “AIza”.';
+  if (!def || !k) return undefined;
+  // A key that clearly belongs to another provider.
   const other = keyOwner(k);
-  if (other) return `This looks like a ${other.name} key. Paste it under ${other.name} instead. ${def.name} keys start with “${def.keyPrefix}”.`;
+  if (other && other.id !== id) return `This looks like a ${other.name} key. Paste it under ${other.name} instead.${def.keyPrefix ? ` ${def.name} keys start with “${def.keyPrefix}”.` : ''}`;
+  if (!def.keyPrefix || k.startsWith(def.keyPrefix)) return undefined;
   return onlyCertain ? undefined : `${def.name} keys usually start with “${def.keyPrefix}”. Check you copied the right key.`;
 }
