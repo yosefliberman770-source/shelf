@@ -6,9 +6,8 @@ import { useEffect, useState } from 'react';
 import { AUTO } from '../ai/client';
 import {
   type AIConfig, type AIMode, clearAICache, clearCooldown, cooldownInfo, effectiveTier, getKey, type Health, isConfigured, lastTest, loadConfig,
-  modelsFor, onAIEvent, providerHealth, refreshServerProviders, saveConfig, setKey, testProvider,
+  modelsFor, onAIEvent, providerHealth, refreshModels, refreshServerProviders, saveConfig, setKey, testProvider,
 } from '../ai/manager';
-import { listModels } from '../ai/providers/adapters';
 import { type AITask, PROVIDER_DEFS, type ProviderDef, type ProviderId, providerDef, TASKS, type Tier } from '../ai/providers/catalog';
 import { updateSettings } from '../db/actions';
 import { db } from '../db/db';
@@ -184,6 +183,8 @@ function ProviderCard({ def, cfg, update }: { def: ProviderDef } & SectionProps)
     setKeyText('');
     setP({ enabled: true });
     toast(`${def.name} key saved on this device`);
+    // Learn which models this key can use, so a retired default doesn't break it.
+    await refreshModels(def.id).catch(() => {});
     await runTest();
   };
   const runTest = async () => {
@@ -195,9 +196,9 @@ function ProviderCard({ def, cfg, update }: { def: ProviderDef } & SectionProps)
     setBusy('models');
     setErr('');
     try {
-      const list = await listModels(def.id, { apiKey: saved || undefined, accountId: p.accountId, baseUrl: p.baseUrl });
+      const list = await refreshModels(def.id);
       if (!list.length) setErr('No models were returned.');
-      else { setP({ models: list, model: p.model && list.some((m) => m.id === p.model) ? p.model : list[0].id }); toast(`Found ${list.length} models`); }
+      else toast(`Found ${list.length} models`);
     } catch (e) {
       setErr(def.id === 'ollama' ? 'Ollama wasn’t found at that address. Start Ollama on this computer and allow this site with OLLAMA_ORIGINS.' : (e as Error).message);
     } finally { setBusy(''); }

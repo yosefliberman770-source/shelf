@@ -9,7 +9,7 @@
 // on Shelf's server for providers that can't be called from a browser) and are
 // never logged.
 import { db } from '../db/db';
-import { type ChatRequest, type ChatResult, chat, type Credentials, type FailureKind, ProviderFailure } from './providers/adapters';
+import { type ChatRequest, type ChatResult, chat, type Credentials, type FailureKind, listModels, ProviderFailure } from './providers/adapters';
 import { type AITask, type ModelInfo, PROVIDER_DEFS, type ProviderId, providerDef, TASKS, type Tier } from './providers/catalog';
 
 export type AIMode = 'free' | 'quality' | 'fastest' | 'manual';
@@ -318,6 +318,32 @@ function credsFor(id: ProviderId, cfg: AIConfig): Credentials {
   return { apiKey: getKey(id) || undefined, accountId: p?.accountId, baseUrl: p?.baseUrl };
 }
 
+/** Best model to use from a provider's live list: a known good one, else a stable "flash"-style one, else the first. */
+export function pickAvailable(id: ProviderId, list: ModelInfo[]): string | undefined {
+  const known = providerDef(id)?.models.map((m) => m.id) ?? [];
+  for (const k of known) if (list.some((m) => m.id === k)) return k;
+  const stable = list.filter((m) => !/preview|exp|lite|tts|image|embed|vision|audio|guard/i.test(m.id));
+  return (stable.find((m) => /flash|instant|small|mini/i.test(m.id)) ?? stable[0] ?? list[0])?.id;
+}
+
+/**
+ * Ask the provider which models this key can use and remember them. If the
+ * chosen model is gone (providers retire models), switch to one that exists.
+ */
+export async function refreshModels(id: ProviderId): Promise<ModelInfo[]> {
+  const cfg = loadConfig();
+  const list = await listModels(id, credsFor(id, cfg));
+  if (!list.length) return list;
+  const c = loadConfig();
+  const p = { enabled: true, ...c.providers[id] };
+  p.models = list;
+  if (!p.model || !list.some((m) => m.id === p.model)) p.model = pickAvailable(id, list);
+  c.providers[id] = p;
+  saveConfig(c);
+  clearCooldown(id);
+  return list;
+}
+
 /** Test one provider with the smallest sensible request. */
 export async function testProvider(id: ProviderId, model?: string): Promise<{ ok: boolean; ms?: number; model?: string; message?: string }> {
   const cfg = loadConfig();
@@ -334,8 +360,23 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
       out = { ok: true, ms: Math.round(performance.now() - t0), model: res.model };
       clearCooldown(id);
     } catch (e) {
-      const f = e instanceof ProviderFailure ? e : new ProviderFailure('network', (e as Error).message);
+      let f = e instanceof ProviderFailure ? e : new ProviderFailure('network', (e as Error).message);
       out = { ok: false, message: failureMessage(def.name, f) };
+      // The model was retired or isn't offered to this key: find one that is, and try again.
+      if (f.kind === 'model' && !model && def.transport !== 'server') {
+        try {
+          await refreshModels(id);
+          const next = loadConfig().providers[id]?.model;
+          if (next && next !== m) {
+            const res = await chat(id, next, { system: 'Reply with the single word: ok', messages: [{ role: 'user', content: 'ping' }], maxTokens: 300 }, credsFor(id, loadConfig()));
+            out = { ok: true, ms: Math.round(performance.now() - t0), model: res.model };
+            clearCooldown(id);
+          }
+        } catch (e2) {
+          f = e2 instanceof ProviderFailure ? e2 : new ProviderFailure('network', (e2 as Error).message);
+          out = { ok: false, message: failureMessage(def.name, f) };
+        }
+      }
     }
   }
   const r = runtime();
@@ -409,7 +450,11 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
       void recordUsage(c.provider, c.model, { ok: false, rateLimited: f.kind === 'rate_limit' || f.kind === 'quota' });
       void log({ provider: c.provider, model: c.model, task, ms: Math.round(performance.now() - t0), ok: false, error: f.kind });
       // Rest the provider (or just this model) so it isn't hammered.
-      if (f.kind === 'model') coolDown(`${c.provider}:${c.model}`, f.kind, f.retryAfter);
+      if (f.kind === 'model') {
+        coolDown(`${c.provider}:${c.model}`, f.kind, f.retryAfter);
+        // Next time, use a model this key actually has.
+        if (def.transport !== 'server') void refreshModels(c.provider).catch(() => {});
+      }
       else if (f.kind !== 'bad_request' && f.kind !== 'refused') coolDown(c.provider, f.kind, f.retryAfter);
       if (f.kind === 'refused') throw f;
       firstFailure ??= { name: def.name, reason: f.kind };
