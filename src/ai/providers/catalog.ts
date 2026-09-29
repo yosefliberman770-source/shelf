@@ -42,6 +42,8 @@ export interface ProviderDef {
   /** Default tier of this provider's models (individual models can differ). */
   tier: Tier;
   keyOptional?: boolean;
+  /** What this provider's keys start with, to catch a key pasted into the wrong place. */
+  keyPrefix?: string;
   /** Cloudflare needs an account id as well as a token. */
   needsAccountId?: boolean;
   /** API base (OpenAI-compatible providers). */
@@ -56,7 +58,7 @@ export interface ProviderDef {
 
 export const PROVIDER_DEFS: ProviderDef[] = [
   {
-    id: 'gemini', name: 'Google Gemini', transport: 'device', api: 'gemini',
+    id: 'gemini', keyPrefix: 'AIza', name: 'Google Gemini', transport: 'device', api: 'gemini',
     keyUrl: 'https://aistudio.google.com/app/apikey', docsUrl: 'https://ai.google.dev/gemini-api/docs/rate-limits',
     freeNote: 'Free tier with daily limits, as long as billing is not enabled on the Google project behind your key.',
     tier: 'free', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', env: ['GEMINI_API_KEY'],
@@ -67,7 +69,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    id: 'groq', name: 'Groq', transport: 'device', api: 'openai',
+    id: 'groq', keyPrefix: 'gsk_', name: 'Groq', transport: 'device', api: 'openai',
     keyUrl: 'https://console.groq.com/keys', docsUrl: 'https://console.groq.com/docs/rate-limits',
     freeNote: 'Free plan with per-model limits (requests and tokens per minute/day).',
     tier: 'free', baseUrl: 'https://api.groq.com/openai/v1', env: ['GROQ_API_KEY'],
@@ -89,7 +91,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    id: 'openrouter', name: 'OpenRouter', transport: 'device', api: 'openai',
+    id: 'openrouter', keyPrefix: 'sk-or-', name: 'OpenRouter', transport: 'device', api: 'openai',
     keyUrl: 'https://openrouter.ai/settings/keys', docsUrl: 'https://openrouter.ai/docs/api-reference/limits',
     freeNote: 'Models ending in “:free” cost nothing (with a daily request cap). Every other model is paid.',
     tier: 'unknown', baseUrl: 'https://openrouter.ai/api/v1', env: ['OPENROUTER_API_KEY'],
@@ -98,7 +100,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    id: 'cerebras', name: 'Cerebras', transport: 'device', api: 'openai',
+    id: 'cerebras', keyPrefix: 'csk-', name: 'Cerebras', transport: 'device', api: 'openai',
     keyUrl: 'https://cloud.cerebras.ai/', docsUrl: 'https://inference-docs.cerebras.ai/support/rate-limits',
     freeNote: 'Free trial credits ($5, 30 days) after adding a payment method; no charge unless you buy more credits.',
     tier: 'free', baseUrl: 'https://api.cerebras.ai/v1', env: ['CEREBRAS_API_KEY'],
@@ -117,7 +119,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    id: 'nvidia', name: 'NVIDIA NIM', transport: 'server', api: 'openai',
+    id: 'nvidia', keyPrefix: 'nvapi-', name: 'NVIDIA NIM', transport: 'server', api: 'openai',
     keyUrl: 'https://build.nvidia.com/settings/api-keys', docsUrl: 'https://docs.api.nvidia.com/nim/reference/llm-apis',
     freeNote: 'Free hosted endpoints for development and prototyping on build.nvidia.com.',
     tier: 'free', baseUrl: 'https://integrate.api.nvidia.com/v1', env: ['NVIDIA_API_KEY'],
@@ -126,7 +128,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    id: 'huggingface', name: 'Hugging Face', transport: 'device', api: 'openai',
+    id: 'huggingface', keyPrefix: 'hf_', name: 'Hugging Face', transport: 'device', api: 'openai',
     keyUrl: 'https://huggingface.co/settings/tokens', docsUrl: 'https://huggingface.co/docs/inference-providers/pricing',
     freeNote: 'Small monthly free credits ($0.10 for free accounts). Going beyond requires buying credits.',
     tier: 'free', baseUrl: 'https://router.huggingface.co/v1', env: ['HUGGINGFACE_API_KEY'],
@@ -183,3 +185,20 @@ export const TASKS: { id: AITask; label: string; weight: 'light' | 'standard' | 
   { id: 'synthesis', label: 'Book analysis: character X-Rays', weight: 'heavy' },
   { id: 'recommendation', label: 'Reading recommendations', weight: 'standard' },
 ];
+
+/** Which provider a key most likely belongs to, from its prefix. */
+export function keyOwner(key: string): ProviderDef | undefined {
+  const k = key.trim();
+  return PROVIDER_DEFS.find((d) => d.keyPrefix && k.startsWith(d.keyPrefix));
+}
+
+/** A plain warning if a key clearly isn't for this provider, else undefined. */
+export function keyMismatch(id: ProviderId, key: string, onlyCertain = false): string | undefined {
+  const def = providerDef(id);
+  const k = key.trim();
+  if (!def?.keyPrefix || !k || k.startsWith(def.keyPrefix)) return undefined;
+  if (id === 'gemini' && k.startsWith('AQ.')) return 'This looks like a Google Cloud (Vertex AI) key. Shelf needs a Gemini API key from Google AI Studio — it starts with “AIza”. Tap “Get API key”, then “Create API key”.';
+  const other = keyOwner(k);
+  if (other) return `This looks like a ${other.name} key. Paste it under ${other.name} instead. ${def.name} keys start with “${def.keyPrefix}”.`;
+  return onlyCertain ? undefined : `${def.name} keys usually start with “${def.keyPrefix}”. Check you copied the right key.`;
+}

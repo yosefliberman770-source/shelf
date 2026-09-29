@@ -10,7 +10,7 @@
 // never logged.
 import { db } from '../db/db';
 import { type ChatRequest, type ChatResult, chat, type Credentials, type FailureKind, listModels, ProviderFailure } from './providers/adapters';
-import { type AITask, type ModelInfo, PROVIDER_DEFS, type ProviderId, providerDef, TASKS, type Tier } from './providers/catalog';
+import { type AITask, keyMismatch, type ModelInfo, PROVIDER_DEFS, type ProviderId, providerDef, TASKS, type Tier } from './providers/catalog';
 
 export type AIMode = 'free' | 'quality' | 'fastest' | 'manual';
 
@@ -351,7 +351,9 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
   const m = model ?? cfg.providers[id]?.model ?? modelsFor(id, cfg)[0]?.id;
   const t0 = performance.now();
   let out: { ok: boolean; ms?: number; model?: string; message?: string };
-  if (!m) out = { ok: false, message: 'Choose a model first.' };
+  const wrongKey = def.transport === 'device' ? keyMismatch(id, getKey(id), true) : undefined;
+  if (wrongKey) out = { ok: false, message: wrongKey };
+  else if (!m) out = { ok: false, message: 'Choose a model first.' };
   else {
     try {
       // Small, but with room for models that think before answering.
@@ -388,10 +390,10 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
 
 export function failureMessage(name: string, f: ProviderFailure): string {
   switch (f.kind) {
-    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key.`;
+    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.`;
     case 'rate_limit': return `${name} is rate-limiting requests right now.`;
     case 'quota': return `${name}’s free allowance is used up for now.`;
-    case 'model': return `That model isn’t available on ${name}. Pick another one.`;
+    case 'model': return `That model isn’t available on ${name}. Tap “Find models” and pick another one.${f.message ? ` (${name} said: ${f.message.replace(/^Model unavailable \((.*)\)\.$/, '$1').slice(0, 160)})` : ''}`;
     case 'network': return name.startsWith('Ollama') ? 'Ollama wasn’t found. Is it running, and does OLLAMA_ORIGINS allow this site?' : `Couldn’t reach ${name}.`;
     case 'not_configured': return f.message;
     default: return `${name}: ${f.message}`;

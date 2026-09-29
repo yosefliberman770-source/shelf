@@ -8,7 +8,7 @@ import {
   type AIConfig, type AIMode, clearAICache, clearCooldown, cooldownInfo, effectiveTier, getKey, type Health, isConfigured, lastTest, loadConfig,
   modelsFor, onAIEvent, providerHealth, refreshModels, refreshServerProviders, saveConfig, setKey, testProvider,
 } from '../ai/manager';
-import { type AITask, PROVIDER_DEFS, type ProviderDef, type ProviderId, providerDef, TASKS, type Tier } from '../ai/providers/catalog';
+import { type AITask, keyMismatch, PROVIDER_DEFS, type ProviderDef, type ProviderId, providerDef, TASKS, type Tier } from '../ai/providers/catalog';
 import { updateSettings } from '../db/actions';
 import { db } from '../db/db';
 import type { AIUsageRow } from '../db/types';
@@ -233,6 +233,7 @@ function ProviderCard({ def, cfg, update }: { def: ProviderDef } & SectionProps)
               <button className="btn sm ghost" onClick={() => setShow(!show)}>{show ? 'Hide' : 'Show'}</button>
             </div>
           </label>
+          {keyMismatch(def.id, key) && <div className="notice warn small">{keyMismatch(def.id, key)}</div>}
           <div className="row wrap gap-8">
             <a className="btn sm" href={def.keyUrl} target="_blank" rel="noreferrer">Get API key ↗</a>
             <button className="btn sm primary" disabled={key.trim().length < 8} onClick={saveKey}>Save key</button>

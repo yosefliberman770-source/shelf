@@ -225,3 +225,20 @@ describe('retired default model', () => {
     expect(calls.some((c) => c.url.includes('gemini-3-flash:generateContent'))).toBe(true);
   });
 });
+
+describe('keys pasted in the wrong place', () => {
+  it('explains a Google Cloud key in Gemini or a Groq key in Gemini, without calling the provider', async () => {
+    const { keyMismatch } = await import('./providers/catalog');
+    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc')).toMatch(/Vertex AI/);
+    expect(keyMismatch('gemini', 'gsk_abc')).toMatch(/Groq key/);
+    expect(keyMismatch('gemini', 'AIzaSyabc')).toBeUndefined();
+    expect(keyMismatch('groq', 'weird-key', true)).toBeUndefined();
+    setKey('gemini', 'AQ.Ab8RN6abc');
+    setup({ gemini: { enabled: true } });
+    mockFetch(() => geminiOk('ok'));
+    const r = await testProvider('gemini');
+    expect(r.ok).toBe(false);
+    expect(r.message).toMatch(/AI Studio/);
+    expect(calls).toHaveLength(0);
+  });
+});
