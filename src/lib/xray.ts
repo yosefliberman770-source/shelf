@@ -37,21 +37,81 @@ export interface BookCtx { title: string; author: string; chapter?: string }
 
 const KINDS: ConceptKind[] = ['person', 'place', 'event', 'polity', 'organization', 'period', 'object', 'source', 'concept'];
 
-/** Scan a chapter with AI: the people (and key places/things) in it. */
-export async function scanChapter(book: BookCtx, chapterText: string, signal?: AbortSignal): Promise<XRayEntry[]> {
-  const { data } = await completeJSON<{ entries: XRayEntry[] }>({
-    system: `${BASE_SYSTEM}
-You build an X-Ray for a chapter, like Kindle X-Ray. Return JSON {"entries":[{"name":"name as written in the text","full":"the specific real-world person/place with disambiguation, e.g. 'Edward I of England', or null if fictional","kind":"person|place|event|polity|organization|period|object|concept","real":true,"role":"one or two sentences: who this is and their part in the story so far"}]}.
-List characters/people first (most important first), then important places and terms. Max 25. Work out WHICH real person is meant from the book and context (e.g. which King Edward). Never reveal anything that happens after this chapter.`,
-    messages: [{ role: 'user', content: `Book: "${book.title}" by ${book.author}${book.chapter ? `\nChapter: ${book.chapter}` : ''}\n\nChapter text:\n"""${chapterText.slice(0, 14000)}"""` }],
-    maxTokens: 2500,
-  }, signal, () => ({ entries: [] }));
-  const counts = (n: string) => (chapterText.match(new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g')) ?? []).length;
-  return (data.entries ?? [])
-    .filter((e) => e?.name)
-    .map((e) => ({ ...e, kind: KINDS.includes(e.kind) ? e.kind : 'concept', real: e.real !== false && !!(e.full ?? e.name), full: e.full || undefined, mentions: counts(e.name) }))
-    .slice(0, 25);
+/** Split long chapters into overlapping windows so names near the end are not missed. */
+function chapterWindows(text: string, size = 9_000, overlap = 600): string[] {
+  const windows: string[] = [];
+  let start = 0;
+  while (start < text.length) {
+    let end = Math.min(start + size, text.length);
+    if (end < text.length) {
+      const newline = text.lastIndexOf('\n', end);
+      const space = text.lastIndexOf(' ', end);
+      const boundary = newline > start + size * 0.65 ? newline : space;
+      if (boundary > start + size * 0.65) end = boundary;
+    }
+    windows.push(text.slice(start, end));
+    if (end >= text.length) break;
+    start = Math.max(start + 1, end - overlap);
+  }
+  return windows;
 }
+
+/** Count exact whole-name mentions, including Unicode names. */
+function mentionCount(text: string, name: string): number {
+  const normalized = text.normalize('NFKC').toLowerCase();
+  const target = name.normalize('NFKC').toLowerCase();
+  if (!target) return 0;
+  const isNameCharacter = (character: string | undefined) => !!character && /[\p{L}\p{N}_]/u.test(character);
+  let count = 0;
+  let cursor = 0;
+  let found = -1;
+  while ((found = normalized.indexOf(target, cursor)) !== -1) {
+    const before = Array.from(normalized.slice(0, found)).at(-1);
+    const after = Array.from(normalized.slice(found + target.length))[0];
+    if (!isNameCharacter(before) && !isNameCharacter(after)) count++;
+    cursor = found + target.length;
+  }
+  return count;
+}
+
+
+export async function scanChapter(book: BookCtx, chapterText: string, signal?: AbortSignal): Promise<XRayEntry[]> {
+  const merged = new Map<string, XRayEntry>();
+  for (const [index, window] of chapterWindows(chapterText).entries()) {
+    if (signal?.aborted) break;
+    const { data } = await completeJSON<{ entries: XRayEntry[] }>({
+      system: BASE_SYSTEM + '\n' +
+        'Build a careful X-Ray for this book chapter. Identify every named character/person and every meaningful named place, event, organization, polity, period, object, or concept actually mentioned in the supplied text. Prioritize people, then places, then other terms. Return JSON with entries containing name (exact name as written), full (specific real-world identity with disambiguation, or null for fictional/uncertain entities), kind (person|place|event|polity|organization|period|object|concept), real (boolean), and role (brief description supported only by supplied text). Do not invent names or list a name unless it appears in the text. Include all meaningful names in this piece; do not impose an overall chapter limit. No spoilers beyond the active chapter.',
+      messages: [{ role: 'user', content: 'Book: "' + book.title + '" by ' + book.author + (book.chapter ? '\nChapter: ' + book.chapter : '') + '\nText piece ' + (index + 1) + ':\n"""' + window + '"""' }],
+      maxTokens: 4_000,
+    }, signal, () => ({ entries: [] }));
+
+    for (const candidate of data.entries ?? []) {
+      const name = typeof candidate?.name === 'string' ? candidate.name.trim() : '';
+      if (!name || !mentionCount(window, name)) continue;
+      const kind = KINDS.includes(candidate.kind) ? candidate.kind : 'concept';
+      const entry: XRayEntry = {
+        ...candidate,
+        name,
+        kind,
+        real: candidate.real !== false && !!(candidate.full ?? name),
+        full: candidate.full || undefined,
+        mentions: mentionCount(chapterText, name),
+      };
+      const key = name.normalize('NFKC').toLowerCase();
+      const previous = merged.get(key);
+      if (!previous) merged.set(key, entry);
+      else merged.set(key, {
+        ...previous,
+        full: previous.full ?? entry.full,
+        role: previous.role ?? entry.role,
+        mentions: Math.max(previous.mentions ?? 0, entry.mentions ?? 0),
+      });
+    }
+  }
+  return [...merged.values()];
+}
+
 
 /** Ask the AI which person/place a name means in this passage. */
 export async function identifyWithAI(name: string, passage: string, book: BookCtx, signal?: AbortSignal): Promise<XRayEntry> {
