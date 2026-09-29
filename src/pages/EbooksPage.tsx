@@ -12,7 +12,7 @@ import { useUI } from '../state/ui';
 type Filter = 'all' | 'reading' | 'new' | 'done';
 type Sort = 'recent' | 'title' | 'progress';
 
-export default function EbooksPage() {
+export function EbooksShelf() {
   const idx = useLibrary();
   const { open } = useUI();
   const nav = useNavigate();
@@ -39,25 +39,19 @@ export default function EbooksPage() {
   );
 
   return (
-    <div className="page">
-      <div className="page-head">
-        <div>
-          <h1>My ebooks</h1>
-          <div className="sub">Books you can read right here in the app.</div>
-        </div>
-        {books.length > 0 && <div className="row wrap gap-8">{addButtons}</div>}
-      </div>
+    <div>
+      {books.length > 0 && <div className="row wrap gap-8 mb-16">{addButtons}</div>}
 
       {!books.length ? (
         <div className="card">
-          <Empty icon="📱" title="No ebooks yet" action={<div className="row wrap gap-8" style={{ justifyContent: 'center' }}>{addButtons}</div>}>
+          <Empty illustration="reading" title="No ebooks yet" action={<div className="row wrap gap-8" style={{ justifyContent: 'center' }}>{addButtons}</div>}>
             Open an ePub file from your phone (for example from your Downloads), or pick a free classic. It will appear here, ready to read.
           </Empty>
         </div>
       ) : (
         <>
           {hero && (
-            <div className="card mb-16" style={{ cursor: 'pointer' }} onClick={() => nav(`/read/${hero.id}`)}>
+            <div className="hero mb-16" style={{ cursor: 'pointer' }} onClick={() => nav(`/read/${hero.id}`)}>
               <div className="row gap-16" style={{ alignItems: 'center' }}>
                 <Cover item={hero} width={84} author={idx.authorLine(hero)} />
                 <div className="grow" style={{ minWidth: 0 }}>
@@ -66,7 +60,7 @@ export default function EbooksPage() {
                   <div className="small muted ellipsis">{idx.authorLine(hero)}</div>
                   <div className="mt-8"><ProgressBar value={frac(hero)} /></div>
                   <div className="small muted mt-8">{pctText(hero)}{leftText(hero) ? ` · about ${leftText(hero)}` : ''}</div>
-                  <button className="btn accent mt-8" onClick={(e) => { e.stopPropagation(); nav(`/read/${hero.id}`); }}>📖 Continue reading</button>
+                  <button className="btn accent mt-8" onClick={(e) => { e.stopPropagation(); nav(`/read/${hero.id}`); }}>Continue reading</button>
                 </div>
               </div>
             </div>
@@ -78,17 +72,18 @@ export default function EbooksPage() {
           </div>
 
           {shown.length ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))', gap: '18px 14px' }}>
+            <div className="cover-grid">
               {shown.map((i) => (
-                <div key={i.id} style={{ minWidth: 0 }}>
-                  <button onClick={() => nav(`/read/${i.id}`)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer', display: 'block', width: '100%' }} aria-label={`Read ${i.title}`}>
-                    <Cover item={i} width={104} author={idx.authorLine(i)} />
-                  </button>
-                  {started(i) && !done(i) && <div style={{ marginTop: 6 }}><ProgressBar value={frac(i)} thin /></div>}
-                  <div className="small ellipsis" style={{ marginTop: 6, fontWeight: 600 }}>{i.title}</div>
-                  <div className="row between tiny faint">
-                    <span>{pctText(i)}</span>
-                    <Link to={`/item/${i.id}`} aria-label={`Details for ${i.title}`}>Details</Link>
+                <div key={i.id} className="cover-tile">
+                  <div className="shelf-slot">
+                    <button onClick={() => nav(`/read/${i.id}`)} style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }} aria-label={`Read ${i.title}`}>
+                      <Cover item={i} width={128} author={idx.authorLine(i)} />
+                    </button>
+                  </div>
+                  {started(i) && !done(i) && <ProgressBar value={frac(i)} thin />}
+                  <div className="meta">
+                    <div className="small ellipsis" style={{ fontWeight: 700 }}>{i.title}</div>
+                    <div className="tiny faint">{pctText(i)} · <Link to={`/item/${i.id}`} style={{ textDecoration: 'underline' }} aria-label={`Details for ${i.title}`}>details</Link></div>
                   </div>
                 </div>
               ))}

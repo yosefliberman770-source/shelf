@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { itemContext } from '../ai/context';
 import { useConcierge } from '../ai/ui';
-import { Cover, DeadlineChip, Empty, ProgressBar, Segmented, Tabs } from '../components/common';
+import { Cover, DeadlineChip, Empty, Modal, ProgressBar, Segmented, Tabs } from '../components/common';
+import { Icon } from '../components/icons';
+import { EbooksShelf } from './EbooksPage';
+import { timeLeft } from './TodayPage';
 import { moveInQueue, startTimer } from '../db/actions';
 import type { DateKey, Item, QueueLane } from '../db/types';
 import { addDays, endOfMonth, formatKey, formatMonth, fromKey, monthKey, startOfMonth, startOfWeek, WEEKDAYS, WEEKDAYS_LONG, weekday } from '../engine/dates';
@@ -10,25 +13,27 @@ import { itemForecast } from '../engine/forecast';
 import type { LibraryIndex } from '../engine/model';
 import { progressOf } from '../engine/query';
 import { sessionPages } from '../engine/stats';
-import { fmtDuration, fmtNum, fmtUnits, toDisplay } from '../engine/units';
-import { useLibrary } from '../state/library';
+import { fmtDuration, fmtNum, fmtUnits, toDisplay, unitLabel } from '../engine/units';
+import { useEbookIds, useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 
-type Tab = 'now' | 'queue' | 'journal';
+type Tab = 'now' | 'queue' | 'ebooks' | 'journal';
 
 export default function ReadingPage() {
   const idx = useLibrary();
   const loc = useLocation();
   const nav = useNavigate();
-  const tab: Tab = loc.pathname.includes('queue') ? 'queue' : loc.pathname.includes('journal') ? 'journal' : 'now';
-  const reading = idx.itemList().filter((i) => i.status === 'reading');
-  useConcierge('Reading', ['Which of my current books should I focus on?', 'Am I reading too many books at once?'], () => reading.map((i) => itemContext(idx, i, idx.settings.ai.share)).join('\n\n'), [idx]);
+  const tab: Tab = loc.pathname.includes('queue') ? 'queue' : loc.pathname.includes('journal') ? 'journal' : loc.pathname.includes('ebooks') ? 'ebooks' : 'now';
+  const reading = idx.itemList().filter((i) => i.status === 'reading').sort((a, b) => (b.lastReadAt ?? 0) - (a.lastReadAt ?? 0));
+  const ebookIds = useEbookIds();
+  useConcierge('Reading', ['Which of my current books should I focus on?', 'Am I reading too many books at once?', 'What should I read after these?'], () => reading.map((i) => itemContext(idx, i, idx.settings.ai.share)).join('\n\n'), [idx]);
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Reading</h1><div className="sub">What you’re doing now, what’s next, and everything you’ve read, day by day.</div></div></div>
-      <Tabs<Tab> value={tab} onChange={(t) => nav(t === 'now' ? '/reading' : `/reading/${t}`)} tabs={[{ id: 'now', label: `Now (${reading.length})` }, { id: 'queue', label: 'Queue' }, { id: 'journal', label: 'Journal' }]} />
+      <div className="page-head"><div><h1>Reading</h1><div className="sub">What you’re reading now, what’s next, your ebooks, and every day you’ve read.</div></div></div>
+      <Tabs<Tab> value={tab} onChange={(t) => nav(t === 'now' ? '/reading' : `/reading/${t}`)} tabs={[{ id: 'now', label: `Now${reading.length ? ` · ${reading.length}` : ''}` }, { id: 'queue', label: 'Up next' }, { id: 'ebooks', label: `Ebooks${ebookIds.size ? ` · ${ebookIds.size}` : ''}` }, { id: 'journal', label: 'Journal' }]} />
       {tab === 'now' && <NowTab idx={idx} reading={reading} />}
       {tab === 'queue' && <QueueBoard idx={idx} />}
+      {tab === 'ebooks' && <EbooksShelf />}
       {tab === 'journal' && <Journal idx={idx} />}
     </div>
   );
@@ -36,37 +41,50 @@ export default function ReadingPage() {
 
 function NowTab({ idx, reading }: { idx: LibraryIndex; reading: Item[] }) {
   const { open, toast } = useUI();
+  const nav = useNavigate();
+  const ebookIds = useEbookIds();
   const todaySessions = idx.sessions.filter((s) => s.date === idx.today);
-  const todayMin = todaySessions.reduce((a, s) => a + (s.durationSec ?? 0), 0);
-  if (!reading.length) return <div className="card"><Empty icon="📖" title="Nothing in progress" action={<Link className="btn" to="/reading/queue">Open the queue</Link>}>Drag a book into “Now” or open one and log a session.</Empty></div>;
+  const todaySec = todaySessions.reduce((a, s) => a + (s.durationSec ?? 0), 0);
+  const todayPages = todaySessions.reduce((a, s) => a + (sessionPages(idx, s) ?? 0), 0);
+  if (!reading.length) return <div className="card"><Empty illustration="reading" title="Nothing in progress" action={<div className="row wrap" style={{ justifyContent: 'center' }}><Link className="btn primary" to="/reading/queue">Choose from Up next</Link><Link className="btn" to="/reading/ebooks">Open an ebook</Link></div>}>Start a book from your Want to Read list, or open one of your ebooks.</Empty></div>;
   return (
     <div className="col gap-16">
-      <div className="card row wrap gap-24">
-        <div className="stat"><span className="label">Today</span><span className="value">{todaySessions.length} session{todaySessions.length === 1 ? '' : 's'}</span></div>
-        <div className="stat"><span className="label">Time today</span><span className="value">{fmtDuration(todayMin)}</span></div>
-        <div className="stat"><span className="label">Pages today</span><span className="value">{fmtNum(todaySessions.reduce((a, s) => a + (sessionPages(idx, s) ?? 0), 0))}</span></div>
-        <div className="stat"><span className="label">Active books</span><span className="value">{reading.length}</span></div>
+      <div className="row wrap gap-8">
+        <span className="pill"><Icon name="calendar" />Today</span>
+        <span className="pill">{fmtNum(todayPages)} pages</span>
+        <span className="pill">{todaySec ? fmtDuration(todaySec) : '0m'}</span>
+        <span className="pill">{todaySessions.length} session{todaySessions.length === 1 ? '' : 's'}</span>
       </div>
-      <div className="card flat table-wrap" style={{ padding: 0 }}>
-        <table className="table">
-          <thead><tr><th>Item</th><th>Progress</th><th className="r">Today / target</th><th className="r">Pace</th><th>Est. finish</th><th>Deadline</th><th /></tr></thead>
-          <tbody>
-            {reading.map((i) => {
-              const f = itemForecast(idx, i);
-              return (
-                <tr key={i.id}>
-                  <td><Link to={`/item/${i.id}`} className="row"><Cover item={i} width={30} /><span className="ellipsis" style={{ maxWidth: 240, fontWeight: 500 }}>{i.title}</span></Link></td>
-                  <td style={{ minWidth: 120 }}>{f.percent !== undefined ? <><ProgressBar value={f.percent} thin /><span className="tiny faint">{Math.round(f.percent * 100)}% · {fmtUnits(i, f.remaining)} left</span></> : <span className="faint small">length unknown</span>}</td>
-                  <td className="r num small">{fmtNum(toDisplay(i, f.todayAmount), 1)} / {f.todayTarget !== undefined ? fmtUnits(i, f.todayTarget) : '—'}</td>
-                  <td className="r num small">{f.pace ? `${fmtNum(toDisplay(i, f.pace), 1)}/day` : '—'}</td>
-                  <td className="small">{formatKey(f.estimatedFinish)}</td>
-                  <td>{i.deadline ? <DeadlineChip status={f.status} delta={f.delta} deadline={i.deadline} /> : <span className="small faint">No deadline yet</span>}</td>
-                  <td className="nowrap"><button className="btn xs primary" onClick={() => open({ kind: 'log', itemId: i.id })}>Log</button> <button className="btn xs" onClick={async () => { await startTimer(i.id); toast('Timer started'); }}>Timer</button></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="grid auto">
+        {reading.map((i) => {
+          const f = itemForecast(idx, i);
+          const hasFile = ebookIds.has(i.id);
+          const left = timeLeft(i, f, hasFile);
+          return (
+            <div key={i.id} className="card">
+              <div className="row top gap-16">
+                <Link to={`/item/${i.id}`}><Cover item={i} width={76} author={idx.authorLine(i)} showType /></Link>
+                <div className="grow col" style={{ gap: 5, minWidth: 0 }}>
+                  <Link to={`/item/${i.id}`} className="book-title clamp-2">{i.title}</Link>
+                  <div className="small muted ellipsis">{idx.authorLine(i)}</div>
+                  {f.percent !== undefined ? (
+                    <>
+                      <ProgressBar value={f.percent} />
+                      <div className="small muted"><b style={{ color: 'var(--text)' }}>{Math.round(f.percent * 100)}%</b> · {fmtUnits(i, f.remaining)} left{left ? ` · ~${left}` : ''}</div>
+                    </>
+                  ) : <div className="small muted">At {fmtUnits(i, f.completed)} · length unknown</div>}
+                  <div className="tiny faint">{f.pace ? `${fmtNum(toDisplay(i, f.pace), 1)} ${unitLabel(i)}/day · ` : ''}{f.estimatedFinish ? `finish ~${formatKey(f.estimatedFinish)}` : ''}</div>
+                  {i.deadline && <div><DeadlineChip status={f.status} delta={f.delta} deadline={i.deadline} /></div>}
+                </div>
+              </div>
+              <div className="row mt-16">
+                {hasFile && <button className="btn accent grow" onClick={() => nav(`/read/${i.id}`)}><Icon name="book" />Read</button>}
+                <button className={`btn grow ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: i.id })}><Icon name="logPlus" />Log</button>
+                <button className="btn icon" aria-label={`Start a timer for ${i.title}`} onClick={async () => { await startTimer(i.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -84,6 +102,7 @@ function QueueBoard({ idx }: { idx: LibraryIndex }) {
   const { toast } = useUI();
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<{ lane: QueueLane; before?: string } | null>(null);
+  const [moving, setMoving] = useState<string | null>(null);
   const lanes = useMemo(() => {
     const m = new Map<QueueLane, Item[]>(LANES.map((l) => [l.id, []]));
     for (const i of idx.itemList()) m.get(i.queue)?.push(i);
@@ -101,7 +120,8 @@ function QueueBoard({ idx }: { idx: LibraryIndex }) {
   };
   return (
     <>
-      <p className="small muted mb-16">Drag cards between lanes and reorder within a lane. Moving to Now starts reading; to Finished marks it read.</p>
+      <p className="small muted mb-16">Drag cards between lanes, or tap <b>⋯</b> on a card to move it. Moving a book to Now starts reading; to Finished marks it read.</p>
+      {moving && <MoveSheet idx={idx} id={moving} lanes={lanes} onClose={() => setMoving(null)} />}
       <div className="queue-board">
         {LANES.map((l) => {
           const items = lanes.get(l.id) ?? [];
@@ -123,10 +143,11 @@ function QueueBoard({ idx }: { idx: LibraryIndex }) {
                   >
                     <Cover item={i} width={30} />
                     <div className="grow" style={{ minWidth: 0 }}>
-                      <Link to={`/item/${i.id}`} className="ellipsis" style={{ display: 'block', fontWeight: 500, fontSize: 13 }}>{i.title}</Link>
+                      <Link to={`/item/${i.id}`} className="ellipsis" style={{ display: 'block', fontWeight: 700, fontSize: 13.5 }}>{i.title}</Link>
                       <div className="tiny faint ellipsis">{idx.authorLine(i)}</div>
                       {i.status === 'reading' && p !== undefined && <ProgressBar value={p} thin />}
                     </div>
+                    <button className="btn xs ghost icon" aria-label={`Move ${i.title}`} onClick={() => setMoving(i.id)}><Icon name="dots" /></button>
                   </div>
                 );
               })}
@@ -135,6 +156,36 @@ function QueueBoard({ idx }: { idx: LibraryIndex }) {
         })}
       </div>
     </>
+  );
+}
+
+function MoveSheet({ idx, id, lanes, onClose }: { idx: LibraryIndex; id: string; lanes: Map<QueueLane, Item[]>; onClose: () => void }) {
+  const { toast } = useUI();
+  const it = idx.items.get(id);
+  if (!it) return null;
+  const lane = lanes.get(it.queue) ?? [];
+  const pos = lane.findIndex((x) => x.id === id);
+  const move = async (to: QueueLane, before?: string) => {
+    await moveInQueue(id, to, before);
+    if (to !== it.queue) toast(`Moved “${it.title}” to ${LANES.find((l) => l.id === to)?.label}`);
+    onClose();
+  };
+  return (
+    <Modal title={`Move “${it.title}”`} onClose={onClose}>
+      <div className="col gap-8">
+        {LANES.filter((l) => l.id !== it.queue).map((l) => (
+          <button key={l.id} className="rabbit-node" onClick={() => move(l.id)}>
+            <span><b>{l.label}</b> <span className="small muted">— {l.hint}</span></span><Icon name="chevronRight" className="faint" />
+          </button>
+        ))}
+        {lane.length > 1 && (
+          <div className="row mt-8">
+            <button className="btn grow" disabled={pos <= 0} onClick={() => move(it.queue, lane[pos - 1]?.id)}>↑ Move up</button>
+            <button className="btn grow" disabled={pos < 0 || pos >= lane.length - 1} onClick={() => move(it.queue, lane[pos + 2]?.id)}>↓ Move down</button>
+          </div>
+        )}
+      </div>
+    </Modal>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { addItem, addNote, finishTimer, discardTimer, logProgress, type LogResult, pauseTimer, resumeTimer, timerElapsedMs, updateInstance, updateNote } from '../db/actions';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { addItem, addNote, createFolder, createShelf, finishTimer, discardTimer, logProgress, type LogResult, pauseTimer, resumeTimer, saveProject, startTimer, timerElapsedMs, updateInstance, updateItem, updateItemTags, updateNote } from '../db/actions';
 import type { ContentType, Status, UnitKind } from '../db/types';
 import { formatKey, isValidKey, todayKey } from '../engine/dates';
 import { itemForecast } from '../engine/forecast';
@@ -10,13 +10,19 @@ import { fetchDescription, type MetaResult, searchBooks } from '../lib/openlibra
 import { downloadFreeBook, type FreeBook, importEpub, isEpub, searchGutenberg, searchStandardEbooks } from '../lib/ebooks';
 import { useLibrary, useTimer } from '../state/library';
 import { useUI } from '../state/ui';
-import { Cover, FolderPicker, Modal, Segmented, Stars, TagInput, useDebounced } from './common';
+import { Cover, Empty, FolderPicker, Modal, Segmented, Stars, TagInput, useDebounced } from './common';
+import { Icon, type IconName, TONES, type Tone } from './icons';
+import { Illustration } from './illustrations';
+import { confetti } from '../lib/confetti';
 
 export function Sheets() {
   const { sheet } = useUI();
   if (!sheet) return null;
   switch (sheet.kind) {
     case 'log': return <LogSheet itemId={sheet.itemId} />;
+    case 'quick': return <QuickSheet />;
+    case 'pick': return <PickSheet purpose={sheet.purpose} />;
+    case 'organize': return <OrganizeSheet itemId={sheet.itemId} />;
     case 'note': return <NoteSheet itemId={sheet.itemId} kind={sheet.noteKind} noteId={sheet.noteId} />;
     case 'add': return <AddSheet preset={sheet.preset} />;
     case 'complete': return <CompletionSheet itemId={sheet.itemId} />;
@@ -33,51 +39,158 @@ export function useAfterLog() {
   return (res: LogResult | undefined, label?: string) => {
     if (!res) return;
     const item = idx.items.get(res.session.itemId);
-    toast(label ?? `Logged ${item ? fmtUnits(item, res.session.amount) : res.session.amount}${res.session.durationSec ? ` · ${fmtDuration(res.session.durationSec)}` : ''}`, { undo: res.undo });
+    let text = label ?? `+${item ? fmtUnits(item, res.session.amount) : res.session.amount}${res.session.durationSec ? ` · ${fmtDuration(res.session.durationSec)}` : ''}`;
+    if (!label && item?.total && res.session.to !== undefined && !res.completed) {
+      text += ` · you’re ${Math.min(99, Math.round((res.session.to / item.total) * 100))}% through “${item.title.length > 28 ? `${item.title.slice(0, 27)}…` : item.title}”`;
+    }
+    toast(res.completed ? `Finished “${item?.title ?? ''}” 🎉` : text, { undo: res.undo });
     if (res.completed && idx.settings.notifications.completion) open({ kind: 'complete', itemId: res.session.itemId });
   };
 }
 
+/** The item a screen is about (book page or reader), for context-aware actions. */
+function useContextItemId(): string | undefined {
+  const loc = useLocation();
+  return /^\/(item|read)\/([^/?#]+)/.exec(loc.pathname)?.[2];
+}
+
+// ── Quick actions (＋) ─────────────────────────────────────────────────
+
+function QuickSheet() {
+  const idx = useLibrary();
+  const { open, close, toast } = useUI();
+  const nav = useNavigate();
+  const ctxId = useContextItemId();
+  const ctx = ctxId ? idx.items.get(ctxId) : undefined;
+  const reading = idx.itemList().filter((i) => i.status === 'reading');
+  const go = (to: string) => { close(); nav(to); };
+  const actions: { icon: IconName; tone: Tone; label: string; run: () => void }[] = [
+    { icon: 'logPlus', tone: 'terracotta', label: 'Log reading', run: () => open({ kind: 'log', itemId: ctx?.id ?? (reading.length === 1 ? reading[0].id : undefined) }) },
+    { icon: 'clock', tone: 'green', label: 'Start timer', run: async () => { const id = ctx?.id ?? (reading.length === 1 ? reading[0].id : undefined); if (!id) return open({ kind: 'pick', purpose: 'timer' }); await startTimer(id); close(); toast('Timer started — tap Stop when you’re done'); } },
+    { icon: 'plus', tone: 'gold', label: 'Add a book', run: () => open({ kind: 'add' }) },
+    { icon: 'file', tone: 'blue', label: 'Open an ePub', run: () => open({ kind: 'add', preset: { step: 'epub' } }) },
+    { icon: 'gift', tone: 'teal', label: 'Free ebooks', run: () => open({ kind: 'add', preset: { step: 'free' } }) },
+    { icon: 'quote', tone: 'rose', label: 'Save a quote', run: () => open({ kind: 'note', itemId: ctx?.id, noteKind: 'quote' }) },
+    { icon: 'pencil', tone: 'brown', label: 'Write a note', run: () => open({ kind: 'note', itemId: ctx?.id, noteKind: 'note' }) },
+    { icon: 'sparkle', tone: 'ai', label: 'Ask AI', run: () => open({ kind: 'ai' }) },
+    { icon: 'target', tone: 'green', label: 'New goal', run: () => go('/plan/goals?new=1') },
+    { icon: 'layers', tone: 'plum', label: 'New project', run: () => go('/plan/projects?new=1') },
+    { icon: 'download', tone: 'brown', label: 'Import Goodreads', run: () => go('/library/import') },
+    { icon: 'search', tone: 'terracotta', label: 'Search', run: () => open({ kind: 'search' }) },
+  ];
+  return (
+    <Modal title="What would you like to do?" onClose={close}>
+      {ctx && (
+        <button className="book-row mb-16" style={{ width: '100%', border: '1px solid var(--border)', background: 'var(--accent-soft)', cursor: 'pointer', textAlign: 'left' }} onClick={() => open({ kind: 'log', itemId: ctx.id })}>
+          <Cover item={ctx} width={36} />
+          <div className="grow"><div className="small muted">This book</div><div className="book-title ellipsis" style={{ fontSize: 16 }}>Log reading for {ctx.title}</div></div>
+          <Icon name="chevronRight" />
+        </button>
+      )}
+      <div className="quick-grid">
+        {actions.map((a) => (
+          <button key={a.label} className="quick" onClick={a.run}>
+            <span className="q-ico" style={{ background: TONES[a.tone] }}><Icon name={a.icon} /></span>
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
+/** Pick a book: what you're reading first, then everything else. */
+function BookPicker({ onPick, hint }: { onPick: (id: string) => void; hint?: string }) {
+  const idx = useLibrary();
+  const [q, setQ] = useState('');
+  const reading = idx.itemList().filter((i) => i.status === 'reading');
+  const others = idx.itemList().filter((i) => i.status !== 'reading' && (!q || `${i.title} ${idx.authorLine(i)}`.toLowerCase().includes(q.toLowerCase())));
+  const Row = ({ id }: { id: string }) => {
+    const i = idx.items.get(id)!;
+    const f = itemForecast(idx, i);
+    return (
+      <button className="book-row" style={{ width: '100%', border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left' }} onClick={() => onPick(i.id)}>
+        <Cover item={i} width={36} />
+        <div className="grow"><div className="ellipsis" style={{ fontWeight: 800 }}>{i.title}</div><div className="small muted ellipsis">{idx.authorLine(i)}{f.percent !== undefined && i.status === 'reading' ? ` · ${Math.round(f.percent * 100)}%` : ''}</div></div>
+        <Icon name="chevronRight" className="faint" />
+      </button>
+    );
+  };
+  if (!idx.itemList().length) return <Empty illustration="shelf" title="No books yet">Add a book first, then you can log your reading.</Empty>;
+  return (
+    <div className="col gap-8">
+      {hint && <p className="muted">{hint}</p>}
+      {reading.length > 0 && <><div className="eyebrow">Reading now</div>{reading.map((i) => <Row key={i.id} id={i.id} />)}</>}
+      <div className="eyebrow mt-8">{reading.length ? 'Other books' : 'Your books'}</div>
+      <input className="input" placeholder="Find a book…" value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="col" style={{ gap: 0, maxHeight: 320, overflowY: 'auto' }}>{others.slice(0, 80).map((i) => <Row key={i.id} id={i.id} />)}</div>
+    </div>
+  );
+}
+
+function PickSheet({ purpose }: { purpose: 'timer' | 'note' | 'quote' }) {
+  const { open, close, toast } = useUI();
+  return (
+    <Modal title={purpose === 'timer' ? 'Time which book?' : purpose === 'quote' ? 'Quote from which book?' : 'Note about which book?'} onClose={close}>
+      <BookPicker onPick={async (id) => {
+        if (purpose === 'timer') { await startTimer(id); close(); toast('Timer started — tap Stop when you’re done'); }
+        else open({ kind: 'note', itemId: id, noteKind: purpose });
+      }} />
+    </Modal>
+  );
+}
+
 // ── Log reading ────────────────────────────────────────────────────────
 
-function LogSheet({ itemId }: { itemId: string }) {
+const LOG_PREFS = 'shelf.logPrefs';
+
+function LogSheet({ itemId: initial }: { itemId?: string }) {
   const idx = useLibrary();
   const { close, toast } = useUI();
   const after = useAfterLog();
-  const item = idx.items.get(itemId);
-  const [mode, setMode] = useState<'amount' | 'to' | 'range'>('amount');
+  const reading = idx.itemList().filter((i) => i.status === 'reading');
+  const [itemId, setItemId] = useState<string | undefined>(initial ?? (reading.length === 1 ? reading[0].id : undefined));
+  const item = itemId ? idx.items.get(itemId) : undefined;
+  const [mode, setMode] = useState<'amount' | 'to' | 'range'>(() => {
+    try { return (JSON.parse(localStorage.getItem(LOG_PREFS) ?? '{}').mode as 'amount' | 'to' | 'range') ?? 'amount'; } catch { return 'amount'; }
+  });
   const [amount, setAmount] = useState('');
   const [to, setTo] = useState('');
   const [from, setFrom] = useState('');
   const [minutes, setMinutes] = useState('');
   const [date, setDate] = useState(todayKey());
   const [note, setNote] = useState('');
-  if (!item) return null;
+  if (!item) return <Modal title="What did you read?" onClose={close}><BookPicker onPick={setItemId} /></Modal>;
   const pos = idx.position(item);
   const f = itemForecast(idx, item);
   const dPos = round(toDisplay(item, pos), 2);
   const u = unitLabel(item);
+  const last = [...(idx.sessionsByItem.get(item.id) ?? [])].reverse().find((x) => x.amount > 0);
+  const lastAmt = last ? round(toDisplay(item, last.amount), 1) : undefined;
+  const quick = [...new Set([...(lastAmt && !idx.settings.quickAmounts.includes(lastAmt) ? [lastAmt] : []), ...idx.settings.quickAmounts])].slice(0, 4);
+  const remember = () => { try { localStorage.setItem(LOG_PREFS, JSON.stringify({ mode })); } catch { /* ignore */ } };
 
-  const submit = async (quick?: number) => {
+  const submit = async (quickAmt?: number) => {
     try {
       if (!isValidKey(date) || date > todayKey()) throw new Error('Choose a valid date that is not in the future.');
       const durationSec = minutes ? Math.round(Number(minutes) * 60) : undefined;
       if (durationSec !== undefined && (!Number.isFinite(durationSec) || durationSec < 0)) throw new Error('Minutes must be a positive number.');
       let res: LogResult | undefined;
-      if (quick !== undefined) res = await logProgress({ itemId, amount: toBase(item, quick), date, durationSec, note });
+      if (quickAmt !== undefined) res = await logProgress({ itemId: item.id, amount: toBase(item, quickAmt), date, durationSec, note });
       else if (mode === 'amount') {
         const v = Number(amount);
         if (!(v > 0)) throw new Error(`Enter how many ${u} you read.`);
-        res = await logProgress({ itemId, amount: toBase(item, v), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, amount: toBase(item, v), date, durationSec, note });
       } else if (mode === 'to') {
         const v = Number(to);
         if (!(v > dPos)) throw new Error(`Enter a position after ${fmtNum(dPos, 2)}.`);
-        res = await logProgress({ itemId, to: toBase(item, v), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, to: toBase(item, v), date, durationSec, note });
       } else {
         const a = Number(from), b = Number(to);
         if (!(a > 0 && b >= a)) throw new Error('Enter a valid range, e.g. 120 – 145.');
-        res = await logProgress({ itemId, from: toBase(item, a), to: toBase(item, b), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, from: toBase(item, a), to: toBase(item, b), date, durationSec, note });
       }
+      remember();
       close();
       after(res);
     } catch (e) {
@@ -86,52 +199,117 @@ function LogSheet({ itemId }: { itemId: string }) {
   };
 
   return (
-    <Modal
-      title="Log reading"
-      onClose={close}
-      footer={<><button className="btn" onClick={close}>Cancel</button><button className="btn primary" onClick={() => submit()}>Save</button></>}
-    >
+    <Modal title="Log reading" onClose={close}>
       <div className="row gap-12 mb-16">
-        <Cover item={item} width={44} />
-        <div className="grow">
-          <div className="book-title">{item.title}</div>
+        <Cover item={item} width={48} />
+        <div className="grow" style={{ minWidth: 0 }}>
+          <div className="book-title ellipsis">{item.title}</div>
           <div className="small muted">
-            {item.total ? `${fmtNum(dPos, 2)} / ${fmtUnits(item, item.total)} · ${Math.round((f.percent ?? 0) * 100)}%` : `At ${fmtNum(dPos, 2)} ${u} · length unknown`}
+            {item.total ? `${fmtNum(dPos, 2)} of ${fmtUnits(item, item.total)} · ${Math.round((f.percent ?? 0) * 100)}%` : `At ${fmtNum(dPos, 2)} ${u} · length unknown`}
           </div>
+          {progressBarFor(f.percent)}
         </div>
+        {(reading.length > 1 || !initial) && <button className="btn xs ghost" onClick={() => setItemId(undefined)}>Change</button>}
       </div>
-      <div className="small muted mb-8">Quick add</div>
-      <div className="row wrap mb-16">
-        {idx.settings.quickAmounts.map((q) => (
-          <button key={q} className="btn" onClick={() => submit(q)}>+{q}</button>
+      <div className="eyebrow mb-8">How much did you read?</div>
+      <div className="amount-grid mb-16">
+        {quick.map((q) => (
+          <button key={q} onClick={() => submit(q)} aria-label={`Log ${q} ${u}`}>+{q}<small>{q === lastAmt ? 'like last time' : u}</small></button>
         ))}
       </div>
+      <div className="eyebrow mb-8">Or enter it exactly</div>
       <Segmented
         value={mode}
         onChange={setMode}
         options={[
           { value: 'amount', label: `${u[0].toUpperCase()}${u.slice(1)} read` },
           { value: 'to', label: 'I’m now at…' },
-          { value: 'range', label: 'Range' },
+          { value: 'range', label: 'From – to' },
         ]}
       />
-      <div className="fields mt-16">
-        {mode === 'amount' && (
-          <label className="field">Amount ({u})<input autoFocus className="input" type="number" min={0} step="any" value={amount} onChange={(e) => setAmount(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} /></label>
-        )}
-        {mode === 'to' && (
-          <label className="field">Current position<input autoFocus className="input" type="number" min={0} step="any" value={to} placeholder={String(dPos)} onChange={(e) => setTo(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} /></label>
-        )}
+      <form className="row mt-16" style={{ alignItems: 'flex-end' }} onSubmit={(e) => { e.preventDefault(); submit(); }}>
+        {mode === 'amount' && <label className="field grow">How many {u}<input autoFocus className="input" type="number" inputMode="decimal" min={0} step="any" value={amount} onChange={(e) => setAmount(e.target.value)} /></label>}
+        {mode === 'to' && <label className="field grow">I’m now at<input autoFocus className="input" type="number" inputMode="decimal" min={0} step="any" value={to} placeholder={String(dPos)} onChange={(e) => setTo(e.target.value)} /></label>}
         {mode === 'range' && (
-          <div className="row">
-            <label className="field grow">From<input autoFocus className="input" type="number" value={from} placeholder={String(Math.floor(dPos) + 1)} onChange={(e) => setFrom(e.target.value)} /></label>
-            <label className="field grow">To<input className="input" type="number" value={to} onChange={(e) => setTo(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submit()} /></label>
-          </div>
+          <>
+            <label className="field grow">From<input autoFocus className="input" type="number" inputMode="numeric" value={from} placeholder={String(Math.floor(dPos) + 1)} onChange={(e) => setFrom(e.target.value)} /></label>
+            <label className="field grow">To<input className="input" type="number" inputMode="numeric" value={to} onChange={(e) => setTo(e.target.value)} /></label>
+          </>
         )}
-        <label className="field">Minutes (optional)<input className="input" type="number" min={0} value={minutes} onChange={(e) => setMinutes(e.target.value)} /></label>
-        <label className="field">Date<input className="input" type="date" max={todayKey()} value={date} onChange={(e) => setDate(e.target.value)} /></label>
-        <label className="field" style={{ gridColumn: '1 / -1' }}>Session note (optional)<input className="input" value={note} onChange={(e) => setNote(e.target.value)} /></label>
-      </div>
+        <button className="btn primary" type="submit">Save</button>
+      </form>
+      <details className="mt-16">
+        <summary className="small muted" style={{ cursor: 'pointer', fontWeight: 700 }}>More options — time, date, note</summary>
+        <div className="fields mt-8">
+          <label className="field">Minutes (optional)<input className="input" type="number" inputMode="numeric" min={0} value={minutes} onChange={(e) => setMinutes(e.target.value)} /></label>
+          <label className="field">Date<input className="input" type="date" max={todayKey()} value={date} onChange={(e) => setDate(e.target.value)} /></label>
+          <label className="field" style={{ gridColumn: '1 / -1' }}>Session note (optional)<input className="input" value={note} onChange={(e) => setNote(e.target.value)} /></label>
+        </div>
+      </details>
+    </Modal>
+  );
+}
+
+function progressBarFor(v?: number) {
+  return v === undefined ? null : <div className="bar thin mt-8"><i style={{ width: `${Math.max(0, Math.min(1, v)) * 100}%` }} /></div>;
+}
+
+// ── Organize a book (folders, shelves, tags, projects) ─────────────────
+
+function OrganizeSheet({ itemId }: { itemId: string }) {
+  const idx = useLibrary();
+  const { close, toast } = useUI();
+  const item = idx.items.get(itemId);
+  const [folderIds, setFolderIds] = useState<string[]>(item?.folderIds ?? []);
+  const [shelfIds, setShelfIds] = useState<string[]>(item?.shelfIds ?? []);
+  const [tags, setTags] = useState<string[]>(item ? item.tagIds.map((t) => idx.tags.get(t)?.name ?? '').filter(Boolean) : []);
+  const [projectIds, setProjectIds] = useState<string[]>(() => idx.snap.projects.filter((p) => p.itemIds.includes(itemId)).map((p) => p.id));
+  const [newFolder, setNewFolder] = useState('');
+  const [newShelf, setNewShelf] = useState('');
+  const [newProject, setNewProject] = useState('');
+  if (!item) return null;
+  const save = async () => {
+    await updateItem(item.id, { folderIds, shelfIds });
+    await updateItemTags(item.id, tags);
+    for (const p of idx.snap.projects) {
+      const has = p.itemIds.includes(item.id);
+      const want = projectIds.includes(p.id);
+      if (has !== want) await saveProject({ ...p, itemIds: want ? [...p.itemIds, item.id] : p.itemIds.filter((x) => x !== item.id) });
+    }
+    toast('Saved');
+    close();
+  };
+  const Section = ({ icon, title, hint, children }: { icon: IconName; title: string; hint: string; children: React.ReactNode }) => (
+    <div className="col gap-8" style={{ padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
+      <div className="row gap-12"><span className="brand-mark" style={{ width: 32, height: 32, fontSize: 14, background: 'var(--surface-2)', color: 'var(--text-2)', boxShadow: 'none' }}><Icon name={icon} /></span><div><div style={{ fontWeight: 800 }}>{title}</div><div className="small muted">{hint}</div></div></div>
+      {children}
+    </div>
+  );
+  return (
+    <Modal title="Organize this book" onClose={close} footer={<><button className="btn" onClick={close}>Cancel</button><button className="btn primary" onClick={save}>Save</button></>}>
+      <div className="row gap-12 mb-8"><Cover item={item} width={36} /><div className="book-title ellipsis">{item.title}</div></div>
+      <p className="small muted">It’s always one book — put it in as many places as you like.</p>
+      <Section icon="folder" title="Folders" hint="Subjects and topics, like History → Rome. Folders can sit inside folders.">
+        <FolderPicker idx={idx} value={folderIds} onChange={setFolderIds} />
+        <div className="row"><input className="input sm" placeholder="New folder name" value={newFolder} onChange={(e) => setNewFolder(e.target.value)} /><button className="btn sm" disabled={!newFolder.trim()} onClick={async () => { const id = await createFolder({ name: newFolder.trim() }); setFolderIds([...folderIds, id]); setNewFolder(''); }}>Add</button></div>
+      </Section>
+      <Section icon="shelf" title="Shelves" hint="Your own lists, like “Favorites” or “Summer reading”.">
+        <div className="row wrap gap-4">
+          {idx.snap.shelves.map((sh) => <button key={sh.id} className={`chip ${shelfIds.includes(sh.id) ? 'on' : ''}`} onClick={() => setShelfIds(shelfIds.includes(sh.id) ? shelfIds.filter((x) => x !== sh.id) : [...shelfIds, sh.id])}>{sh.icon ?? '🏷'} {sh.name}</button>)}
+          {!idx.snap.shelves.length && <span className="small faint">No shelves yet.</span>}
+        </div>
+        <div className="row"><input className="input sm" placeholder="New shelf name" value={newShelf} onChange={(e) => setNewShelf(e.target.value)} /><button className="btn sm" disabled={!newShelf.trim()} onClick={async () => { const id = await createShelf(newShelf.trim()); setShelfIds([...shelfIds, id]); setNewShelf(''); }}>Add</button></div>
+      </Section>
+      <Section icon="tag" title="Tags" hint="Quick labels you can filter by, like “gift idea” or “reread”.">
+        <TagInput value={tags} onChange={setTags} suggestions={idx.snap.tags.map((t) => t.name)} placeholder="Type a tag and press Enter" />
+      </Section>
+      <Section icon="layers" title="Projects" hint="Goals with a list of books, like “Learn about the Roman Republic by June”.">
+        <div className="col" style={{ gap: 4 }}>
+          {idx.snap.projects.map((p) => <label key={p.id} className="check"><input type="checkbox" checked={projectIds.includes(p.id)} onChange={(e) => setProjectIds(e.target.checked ? [...projectIds, p.id] : projectIds.filter((x) => x !== p.id))} />{p.name}</label>)}
+          {!idx.snap.projects.length && <span className="small faint">No projects yet.</span>}
+        </div>
+        <div className="row"><input className="input sm" placeholder="New project name" value={newProject} onChange={(e) => setNewProject(e.target.value)} /><button className="btn sm" disabled={!newProject.trim()} onClick={async () => { const id = await saveProject({ name: newProject.trim(), itemIds: [] }); setProjectIds([...projectIds, id]); setNewProject(''); }}>Add</button></div>
+      </Section>
     </Modal>
   );
 }
@@ -498,6 +676,7 @@ function CompletionSheet({ itemId }: { itemId: string }) {
   const inst = item ? idx.currentInstance(item) : undefined;
   const [rating, setRating] = useState<number | undefined>(inst?.rating);
   const [review, setReview] = useState(inst?.review ?? '');
+  useEffect(() => { confetti(); }, []);
   if (!item || !inst) return null;
   const ss = idx.sessionsByInstance.get(inst.id) ?? [];
   const sec = ss.reduce((a, s) => a + (s.durationSec ?? 0), 0);
@@ -511,9 +690,13 @@ function CompletionSheet({ itemId }: { itemId: string }) {
     close();
   };
   return (
-    <Modal title="Finished" onClose={close} footer={<><button className="btn" onClick={close}>Skip</button><button className="btn primary" onClick={save}>Save</button></>}>
+    <Modal title="Finished!" onClose={close} footer={<><button className="btn" onClick={close}>Skip</button><button className="btn primary" onClick={save}>Save</button></>}>
       <div className="completion">
-        <Cover item={item} width={110} author={idx.authorLine(item)} />
+        <div className="badge">You finished it! ★</div>
+        <div style={{ position: 'relative' }}>
+          <Cover item={item} width={120} author={idx.authorLine(item)} />
+          <span style={{ position: 'absolute', right: -34, bottom: -18, width: 76 }} aria-hidden><Illustration name="finished" /></span>
+        </div>
         <div>
           <div className="book-title" style={{ fontSize: 22 }}>{item.title}</div>
           <div className="muted">{idx.authorLine(item)}{inst.number > 1 ? ` · Reading #${inst.number}` : ''}</div>

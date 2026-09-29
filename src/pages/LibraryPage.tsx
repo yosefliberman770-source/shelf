@@ -3,6 +3,7 @@ import { Link, Route, Routes, useLocation, useNavigate, useParams, useSearchPara
 import { folderDigest, libraryDigest } from '../ai/context';
 import { useConcierge } from '../ai/ui';
 import { Empty, FolderPicker, Modal, Segmented, TagInput } from '../components/common';
+import { Icon } from '../components/icons';
 import { activeFilterCount, FilterPanel, FolderTree, ForecastSummary, ItemViews, LibraryMap, type ViewMode } from '../components/library';
 import { addItemsToFolder, createFolder, createShelf, deleteCollection, deleteFolder, deleteShelf, renameShelf, saveCollection, saveProject, setStatus, updateFolder, updateItem } from '../db/actions';
 import { commitImport, type ImportRow, previewGoodreads } from '../db/portability';
@@ -10,7 +11,7 @@ import type { Folder, Rule, RuleField, RuleOp, SmartCollection, Status } from '.
 import { folderForecast } from '../engine/forecast';
 import type { LibraryIndex } from '../engine/model';
 import { evalCollection, type LibraryQuery, PRESET_COLLECTIONS, runQuery, type SortKey, sortItems } from '../engine/query';
-import { useLibrary } from '../state/library';
+import { useEbookIds, useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 import { STATUS_LABEL } from '../components/common';
 
@@ -20,11 +21,12 @@ export default function LibraryPage() {
   return (
     <div className="page" style={{ maxWidth: 1400 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 250px) minmax(0, 1fr)', gap: 24 }} className="lib-layout">
-        <style>{`@media (max-width: 860px) { .lib-layout { grid-template-columns: 1fr !important; } .lib-side { display: none; } }`}</style>
+        <style>{`@media (max-width: 860px) { .lib-layout { grid-template-columns: 1fr !important; } .lib-side { display: none; } } @media (min-width: 861px) { .lib-browse { display: none !important; } }`}</style>
         <LibrarySidebar idx={idx} />
         <div style={{ minWidth: 0 }}>
           <Routes>
-            <Route index element={<ItemsView title="All items" />} />
+            <Route index element={<ItemsView title="Library" />} />
+            <Route path="ebooks" element={<EbookItemsView />} />
             <Route path="status/:status" element={<StatusView />} />
             <Route path="shelf/:id" element={<ShelfView />} />
             <Route path="folder/:id" element={<FolderView />} />
@@ -103,54 +105,136 @@ function ItemsView({ title, base, header, emptyText }: { title: string; base?: R
   const [mode, setMode] = useState<ViewMode>(() => (localStorageGet('shelf.view') as ViewMode) ?? 'grid');
   const [text, setText] = useState('');
   const [q, setQ] = useState<LibraryQuery>(() => (params.get('tag') ? { tagIds: [params.get('tag')!] } : {}));
-  const [showFilters, setShowFilters] = useState(!!params.get('tag'));
+  const [showFilters, setShowFilters] = useState(false);
+  const [browse, setBrowse] = useState(false);
   const [sort, setSort] = useState<SortKey>('added');
   const [dir, setDir] = useState<'asc' | 'desc'>('desc');
+  const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const items = useMemo(() => sortItems(idx, runQuery(idx, { ...q, text: text || undefined }, base ?? idx.itemList()), sort, dir), [idx, q, text, base, sort, dir]);
   const toggle = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const setView = (m: ViewMode) => { setMode(m); localStorageSet('shelf.view', m); };
   const fc = activeFilterCount(q);
+  const stopSelecting = () => { setSelecting(false); setSelected(new Set()); };
   return (
     <>
       <div className="page-head">
-        <div><h1>{title}</h1><div className="sub">{items.length} item{items.length === 1 ? '' : 's'}{fc ? ` · ${fc} filter${fc === 1 ? '' : 's'}` : ''}</div></div>
+        <div><h1>{title}</h1><div className="sub">{items.length} book{items.length === 1 ? '' : 's'}{fc ? ` · ${fc} filter${fc === 1 ? '' : 's'} on` : ''}</div></div>
         <div className="row wrap">
-          <Segmented value={mode} onChange={setView} options={[{ value: 'grid', label: '▦ Covers' }, { value: 'compact', label: '▤ Compact' }, { value: 'list', label: '☰ List' }]} />
+          <button className="btn lib-browse" onClick={() => setBrowse(true)}><Icon name="folder" />Folders & shelves</button>
+          <button className="btn primary" onClick={() => open({ kind: 'add' })}><Icon name="plus" />Add</button>
         </div>
       </div>
+      <LibraryChips />
       {header}
       <div className="row wrap mb-16 mt-16">
-        <input className="input" style={{ flex: '1 1 240px' }} placeholder="Search title, author, ISBN, notes, quotes, tags…" value={text} onChange={(e) => setText(e.target.value)} />
-        <button className={`btn ${showFilters || fc ? 'accent' : ''}`} onClick={() => setShowFilters(!showFilters)}>Filters{fc ? ` (${fc})` : ''}</button>
-        {fc > 0 && <button className="btn ghost" onClick={() => setQ({})}>Clear</button>}
-        <select className="select" style={{ width: 170 }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Sort by">
-          {([['title', 'Title'], ['author', 'Author'], ['added', 'Date added'], ['started', 'Date started'], ['finished', 'Date finished'], ['progress', 'Progress'], ['pages', 'Page count'], ['rating', 'Rating'], ['deadline', 'Deadline'], ['estimate', 'Estimated finish'], ['recent', 'Recently read']] as [SortKey, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+        <div className="row" style={{ flex: '1 1 260px', position: 'relative' }}>
+          <span style={{ position: 'absolute', left: 14, color: 'var(--text-3)', display: 'grid' }}><Icon name="search" /></span>
+          <input className="input" style={{ paddingLeft: 42 }} placeholder="Search title, author, notes, tags…" value={text} onChange={(e) => setText(e.target.value)} aria-label="Search this list" />
+        </div>
+        <button className={`btn ${fc ? 'accent' : ''}`} onClick={() => setShowFilters(true)}><Icon name="filter" />Filter{fc ? ` · ${fc}` : ''}</button>
+        <select className="select" style={{ width: 'auto', minWidth: 150 }} value={`${sort}:${dir}`} onChange={(e) => { const [k, d] = e.target.value.split(':'); setSort(k as SortKey); setDir(d as 'asc' | 'desc'); }} aria-label="Sort by">
+          {([['added:desc', 'Newest first'], ['recent:desc', 'Recently read'], ['title:asc', 'Title A–Z'], ['author:asc', 'Author A–Z'], ['progress:desc', 'Most progress'], ['rating:desc', 'Highest rated'], ['pages:asc', 'Shortest'], ['pages:desc', 'Longest'], ['finished:desc', 'Recently finished'], ['deadline:asc', 'Deadline soonest'], ['estimate:asc', 'Finishing soonest']] as [string, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
         </select>
-        <button className="btn icon" onClick={() => setDir(dir === 'asc' ? 'desc' : 'asc')} title="Sort direction">{dir === 'asc' ? '↑' : '↓'}</button>
+        <Segmented value={mode} onChange={setView} options={[{ value: 'grid', label: <Icon name="grid" title="Covers" /> }, { value: 'compact', label: <Icon name="library" title="Compact" /> }, { value: 'list', label: <Icon name="list" title="List" /> }]} />
+        <button className={`btn ${selecting ? 'primary' : 'ghost'}`} onClick={() => (selecting ? stopSelecting() : setSelecting(true))}>{selecting ? 'Done' : 'Select'}</button>
       </div>
-      {showFilters && <div className="mb-16"><FilterPanel idx={idx} q={q} onChange={setQ} /></div>}
-      {selected.size > 0 && <BulkBar idx={idx} ids={[...selected]} onDone={() => setSelected(new Set())} />}
+      {fc > 0 && <div className="row wrap mb-16"><span className="small muted">Filtered</span><button className="chip" onClick={() => setQ({})}>Clear filters ✕</button></div>}
+      {selecting && <BulkBar idx={idx} ids={[...selected]} onDone={stopSelecting} onAll={() => setSelected(new Set(items.map((i) => i.id)))} />}
       {items.length === 0 ? (
-        <div className="card"><Empty icon="🔍" title={idx.itemList().length ? 'Nothing matches' : 'No items yet'} action={!idx.itemList().length && <button className="btn primary" onClick={() => open({ kind: 'add' })}>Add an item</button>}>{emptyText ?? (idx.itemList().length ? 'Try removing a filter.' : 'Add books, audiobooks, courses, articles and more.')}</Empty></div>
+        <div className="card"><Empty illustration={idx.itemList().length ? 'search' : 'shelf'} title={idx.itemList().length ? 'Nothing matches' : 'Your shelves are empty'} action={idx.itemList().length ? (fc || text ? <button className="btn" onClick={() => { setQ({}); setText(''); }}>Clear search & filters</button> : undefined) : <button className="btn primary" onClick={() => open({ kind: 'add' })}>Add your first book</button>}>{emptyText ?? (idx.itemList().length ? 'Try a different search or remove a filter.' : 'Add books, ebooks, audiobooks, courses, articles — anything you read.')}</Empty></div>
       ) : (
-        <ItemViews idx={idx} items={items} mode={mode} selected={selected} onToggle={toggle} />
+        <ItemViews idx={idx} items={items} mode={mode} selected={selected} onToggle={selecting ? toggle : undefined} />
       )}
-      {items.length > 0 && <div className="small faint mt-16">Tip: drag covers onto a folder or shelf in the sidebar to file them. A book can live in many folders at once — it’s always the same book.</div>}
+      {items.length > 0 && !selecting && <div className="small faint mt-24">A book can be in many folders and shelves at once — it’s always the same book. Open a book and tap <b>Organize</b>.</div>}
+      {showFilters && (
+        <Modal title="Filter your library" size="wide" onClose={() => setShowFilters(false)} footer={<><button className="btn ghost" onClick={() => setQ({})}>Clear all</button><span className="grow" /><button className="btn primary" onClick={() => setShowFilters(false)}>Show {items.length} book{items.length === 1 ? '' : 's'}</button></>}>
+          <FilterPanel idx={idx} q={q} onChange={setQ} />
+        </Modal>
+      )}
+      {browse && <BrowseSheet idx={idx} onClose={() => setBrowse(false)} />}
     </>
+  );
+}
+
+/** Quick shelves as chips — the fastest way around the library on a phone. */
+function LibraryChips() {
+  const idx = useLibrary();
+  const loc = useLocation();
+  const ebookIds = useEbookIds();
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {};
+    for (const i of idx.itemList()) c[i.status] = (c[i.status] ?? 0) + 1;
+    return c;
+  }, [idx]);
+  const chips: { to: string; label: string; n?: number }[] = [
+    { to: '/library', label: 'All', n: idx.itemList().length },
+    { to: '/library/status/reading', label: 'Reading', n: counts.reading },
+    { to: '/library/status/want', label: 'Want to read', n: counts.want },
+    { to: '/library/status/read', label: 'Read', n: counts.read },
+    ...(ebookIds.size ? [{ to: '/library/ebooks', label: 'Ebooks', n: ebookIds.size }] : []),
+    ...(counts.paused ? [{ to: '/library/status/paused', label: 'Set aside', n: counts.paused }] : []),
+    ...(counts.dnf ? [{ to: '/library/status/dnf', label: 'Didn’t finish', n: counts.dnf }] : []),
+  ];
+  return (
+    <div className="chips-scroll" role="navigation" aria-label="Shelves">
+      {chips.map((c) => <Link key={c.to} to={c.to} className={`chip ${loc.pathname === c.to ? 'on' : ''}`} style={{ minHeight: 36, padding: '0 14px' }}>{c.label}{c.n !== undefined ? <span style={{ opacity: 0.7 }}>{c.n}</span> : null}</Link>)}
+    </div>
+  );
+}
+
+function EbookItemsView() {
+  const idx = useLibrary();
+  const ids = useEbookIds();
+  const base = useMemo(() => idx.itemList().filter((i) => ids.has(i.id)), [idx, ids]);
+  return <ItemsView title="Ebooks" base={base} emptyText="Open an ePub file or pick a free classic and it will appear here." />;
+}
+
+/** Folders, shelves and smart collections — the sidebar, as a sheet on phones. */
+function BrowseSheet({ idx, onClose }: { idx: LibraryIndex; onClose: () => void }) {
+  const nav = useNavigate();
+  const go = (to: string) => { onClose(); nav(to); };
+  const [newFolder, setNewFolder] = useState(false);
+  return (
+    <Modal title="Folders & shelves" onClose={onClose}>
+      <div className="col gap-16">
+        <div>
+          <div className="row between mb-8"><div className="eyebrow">Folders · by subject</div><button className="btn xs" onClick={() => setNewFolder(true)}>＋ New</button></div>
+          {idx.snap.folders.length === 0 ? <div className="small muted">Folders group books by subject, like History → Rome. A book can be in many.</div> : <FolderTree idx={idx} onSelect={(f) => go(`/library/folder/${f.id}`)} />}
+        </div>
+        <div>
+          <div className="eyebrow mb-8">Your shelves</div>
+          {idx.snap.shelves.length === 0 ? <div className="small muted">Shelves are your own lists, like “Favorites”. Create one from a book’s Organize button.</div> : idx.snap.shelves.map((sh) => (
+            <button key={sh.id} className="tree-row" style={{ width: '100%', border: 0, background: 'transparent' }} onClick={() => go(`/library/shelf/${sh.id}`)}><span>{sh.icon ?? '🏷'}</span><span className="ellipsis">{sh.name}</span><span className="count">{idx.itemList().filter((i) => i.shelfIds.includes(sh.id)).length}</span></button>
+          ))}
+        </div>
+        <div>
+          <div className="eyebrow mb-8">Smart collections · fill themselves</div>
+          {idx.snap.collections.length === 0 ? <div className="small muted">Lists that update automatically from rules, like “unread books under 300 pages”. Create them on a computer or tablet from the library sidebar.</div> : idx.snap.collections.map((c) => (
+            <button key={c.id} className="tree-row" style={{ width: '100%', border: 0, background: 'transparent' }} onClick={() => go(`/library/collection/${c.id}`)}><span>{c.icon ?? '✦'}</span><span className="ellipsis">{c.name}</span><span className="count">{evalCollection(idx, c).length}</span></button>
+          ))}
+        </div>
+        <div className="row wrap">
+          <button className="btn" onClick={() => go('/library/map')}><Icon name="map" />Library map</button>
+          <button className="btn" onClick={() => go('/library/import')}><Icon name="download" />Import</button>
+        </div>
+      </div>
+      {newFolder && <FolderEditor idx={idx} onClose={() => { setNewFolder(false); onClose(); }} />}
+    </Modal>
   );
 }
 
 function localStorageGet(k: string): string | null { try { return localStorage.getItem(k); } catch { return null; } }
 function localStorageSet(k: string, v: string) { try { localStorage.setItem(k, v); } catch { /* ignore */ } }
 
-function BulkBar({ idx, ids, onDone }: { idx: LibraryIndex; ids: string[]; onDone: () => void }) {
+function BulkBar({ idx, ids, onDone, onAll }: { idx: LibraryIndex; ids: string[]; onDone: () => void; onAll: () => void }) {
   const { toast } = useUI();
   const [folderPick, setFolderPick] = useState(false);
   const [folders, setFolders] = useState<string[]>([]);
   return (
-    <div className="notice row wrap mb-16" style={{ position: 'sticky', top: 64, zIndex: 5 }}>
-      <b>{ids.length} selected</b>
+    <div className="notice row wrap mb-16" style={{ position: 'sticky', top: 70, zIndex: 5, boxShadow: 'var(--shadow)' }}>
+      <b>{ids.length ? `${ids.length} selected` : 'Tap books to select them'}</b>
+      <button className="btn xs ghost" onClick={onAll}>Select all</button>
       <select className="select sm" style={{ width: 160 }} value="" onChange={async (e) => { const s = e.target.value as Status; if (!s) return; for (const id of ids) await setStatus(id, s); toast(`Moved to ${STATUS_LABEL[s]}`); onDone(); }}>
         <option value="">Set status…</option>{(Object.keys(STATUS_LABEL) as Status[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
       </select>
@@ -163,7 +247,7 @@ function BulkBar({ idx, ids, onDone }: { idx: LibraryIndex; ids: string[]; onDon
       </select>
       <button className="btn sm" onClick={async () => { for (const id of ids) await updateItem(id, { favorite: true }); toast('Marked as favorites'); onDone(); }}>♥ Favorite</button>
       <span className="grow" />
-      <button className="btn sm ghost" onClick={onDone}>Clear</button>
+      <button className="btn sm ghost" onClick={onDone}>Cancel</button>
       {folderPick && (
         <Modal title="Add to folders" onClose={() => setFolderPick(false)} footer={<button className="btn primary" onClick={async () => { for (const f of folders) await addItemsToFolder(ids, f); toast('Added to folders'); setFolderPick(false); onDone(); }}>Add</button>}>
           <FolderPicker idx={idx} value={folders} onChange={setFolders} />

@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { completeJSON } from '../ai/client';
 import { BASE_SYSTEM, itemContext, noteLine, SPOILER_LEVELS, type SpoilerLevel } from '../ai/context';
-import { AIErrorNotice, AIOff, AIPanel, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
+import { AIErrorNotice, AIOff, AIPanel, AskChip, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { BarChart, LineChart } from '../components/charts';
 import { AIBadge, Cover, DeadlineChip, Empty, FolderPicker, Markdown, Modal, ProgressBar, Segmented, Stars, STATUS_LABEL, StatusChip, TagInput, Tabs } from '../components/common';
+import { Icon } from '../components/icons';
 import { NoteCard } from '../components/notes';
+import { timeLeft } from './TodayPage';
 import { deleteItem, deleteSession, link, saveAIRecord, saveConcept, setPosition, setStatus, startReread, startTimer, unlink, updateInstance, updateItem, updateItemAuthors, updateItemTags } from '../db/actions';
 import type { ContentType, Item, Status, UnitKind } from '../db/types';
 import { formatKey, formatYear, isValidKey } from '../engine/dates';
@@ -16,108 +18,168 @@ import { useEbookIds, useLibrary } from '../state/library';
 import { attachEpub, isEpub, removeEbookFile } from '../lib/ebooks';
 import { useUI } from '../state/ui';
 
-type Tab = 'overview' | 'notes' | 'sessions' | 'readings' | 'ai' | 'edit';
+type Tab = 'overview' | 'notes' | 'history' | 'ai' | 'edit';
 
 export default function ItemPage() {
   const { id } = useParams();
   const idx = useLibrary();
   const [params] = useSearchParams();
-  const [tab, setTab] = useState<Tab>((params.get('tab') as Tab) ?? 'overview');
+  const initialTab = params.get('tab');
+  const [tab, setTab] = useState<Tab>(initialTab === 'sessions' || initialTab === 'readings' ? 'history' : ((initialTab as Tab) ?? 'overview'));
   const item = idx.items.get(id!);
-  useConcierge(`Book: ${item?.title ?? ''}`, ['What should I know before starting?', 'What is the historical context?', 'What should I read before this?', 'What should I pay attention to?'], () => (item ? itemContext(idx, item, idx.settings.ai.share, 'read') : ''), [idx, id]);
-  if (!item) return <div className="page"><Empty title="Item not found" icon="❓" action={<Link className="btn" to="/library">Back to library</Link>}>It may have been deleted.</Empty></div>;
+  useConcierge(`Book: ${item?.title ?? ''}`, ['What should I know before starting?', 'What is the historical context?', 'What should I pay attention to?', 'Compare this with my other books'], () => (item ? `${itemContext(idx, item, idx.settings.ai.share, 'read')}\n\nOTHER BOOKS IN THE LIBRARY:\n${idx.itemList().filter((i) => i.id !== item.id).slice(0, 60).map((i) => `- ${i.title} (${idx.authorLine(i)}; ${i.status})`).join('\n')}` : ''), [idx, id]);
+  if (!item) return <div className="page"><Empty illustration="search" title="Book not found" action={<Link className="btn" to="/library">Back to library</Link>}>It may have been deleted.</Empty></div>;
   const notes = idx.notesByItem.get(item.id) ?? [];
-  const instances = idx.instancesByItem.get(item.id) ?? [];
   return (
-    <div className="page">
-      <Header idx={idx} item={item} />
+    <div className="page" style={{ maxWidth: 1000 }}>
+      <Header idx={idx} item={item} onEdit={() => setTab('edit')} />
       <Tabs<Tab>
         value={tab}
         onChange={setTab}
         tabs={[
           { id: 'overview', label: 'Overview' },
-          { id: 'notes', label: `Notes & quotes${notes.length ? ` (${notes.length})` : ''}` },
-          { id: 'sessions', label: 'Sessions' },
-          { id: 'readings', label: `Readings${instances.length > 1 ? ` (${instances.length})` : ''}` },
+          { id: 'notes', label: `Notes${notes.length ? ` · ${notes.length}` : ''}` },
+          { id: 'history', label: 'History' },
           { id: 'ai', label: '✦ Ask AI' },
-          { id: 'edit', label: 'Edit' },
+          { id: 'edit', label: 'Details' },
         ]}
       />
       {tab === 'overview' && <Overview idx={idx} item={item} />}
       {tab === 'notes' && <NotesTab idx={idx} item={item} />}
-      {tab === 'sessions' && <SessionsTab idx={idx} item={item} />}
-      {tab === 'readings' && <ReadingsTab idx={idx} item={item} />}
+      {tab === 'history' && <div className="col gap-24"><ReadingsTab idx={idx} item={item} /><SessionsTab idx={idx} item={item} /></div>}
       {tab === 'ai' && <BookAI idx={idx} item={item} />}
       {tab === 'edit' && <EditTab idx={idx} item={item} />}
     </div>
   );
 }
 
-function Header({ idx, item }: { idx: LibraryIndex; item: Item }) {
+function Header({ idx, item, onEdit }: { idx: LibraryIndex; item: Item; onEdit: () => void }) {
   const { open, toast } = useUI();
   const nav = useNavigate();
   const hasFile = useEbookIds().has(item.id);
   const f = itemForecast(idx, item);
   const inst = idx.currentInstance(item);
+  const [more, setMore] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const left = timeLeft(item, f, hasFile);
+  const changeStatus = async (st: Status) => {
+    const prev = item.status;
+    setStatusOpen(false);
+    await setStatus(item.id, st);
+    if (st === 'read') open({ kind: 'complete', itemId: item.id });
+    else toast(`Moved to ${STATUS_LABEL[st]}`, { undo: () => setStatus(item.id, prev) });
+  };
   return (
-    <div className="row top gap-24 mb-16 wrap">
-      <Cover item={item} width={150} author={idx.authorLine(item)} />
-      <div className="grow col" style={{ minWidth: 260 }}>
-        <div className="small muted">{contentLabel(item)}{item.publishedYear !== undefined ? ` · ${formatYear(item.publishedYear)}` : ''}{item.series ? ` · ${item.series}` : ''}</div>
-        <h1 style={{ fontSize: 32 }}>{item.title}</h1>
-        {item.subtitle && <div className="serif muted" style={{ fontSize: 18 }}>{item.subtitle}</div>}
-        <div className="row wrap">
-          {item.authorIds.map((a) => <Link key={a} to={`/author/${a}`} style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>{idx.authors.get(a)?.name}</Link>)}
-          {!item.authorIds.length && <span className="muted">Unknown author</span>}
-        </div>
-        <div className="row wrap mt-8">
-          <StatusChip status={item.status} />
-          {inst && inst.number > 1 && <span className="chip">Reading #{inst.number}</span>}
-          <Stars value={inst?.rating} onChange={inst ? (v) => updateInstance(inst.id, { rating: v }) : undefined} />
-          <button className={`chip ${item.favorite ? 'on' : ''}`} onClick={() => updateItem(item.id, { favorite: !item.favorite })}>♥ {item.favorite ? 'Favorite' : 'Favorite?'}</button>
-          {item.folderIds.map((fid) => <Link key={fid} to={`/library/folder/${fid}`} className="chip">📁 {idx.folders.get(fid)?.name}</Link>)}
-          {item.tagIds.map((t) => <Link key={t} to={`/library?tag=${t}`} className="chip"># {idx.tags.get(t)?.name}</Link>)}
-        </div>
-        {f.total ? (
-          <div className="mt-8" style={{ maxWidth: 520 }}>
-            <div className="row between small"><span className="num">{fmtNum(toDisplay(item, f.completed), 1)} / {fmtUnits(item, f.total)}</span><b>{Math.round((f.percent ?? 0) * 100)}%</b></div>
-            <ProgressBar value={f.percent} />
+    <div className="mb-24">
+      <div className="book-hero">
+        <Cover item={item} width={150} author={idx.authorLine(item)} />
+        <div className="col" style={{ gap: 8, minWidth: 0 }}>
+          <div className="eyebrow">{contentLabel(item)}{item.publishedYear !== undefined ? ` · ${formatYear(item.publishedYear)}` : ''}{item.series ? ` · ${item.series}` : ''}</div>
+          <h1 style={{ fontSize: 30 }}>{item.title}</h1>
+          {item.subtitle && <div className="serif muted" style={{ fontSize: 18 }}>{item.subtitle}</div>}
+          <div className="row wrap" style={{ fontWeight: 700 }}>
+            {item.authorIds.map((a) => <Link key={a} to={`/author/${a}`} style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>{idx.authors.get(a)?.name}</Link>)}
+            {!item.authorIds.length && <span className="muted">Unknown author</span>}
           </div>
-        ) : <div className="small muted">Length unknown — add it in Edit to unlock forecasts.</div>}
-        <div className="row wrap mt-8">
-          {hasFile && <button className="btn accent" onClick={() => nav(`/read/${item.id}`)}>📖 {idx.position(item) > 0 ? 'Continue reading' : 'Read'}</button>}
-          {item.status !== 'read' && <button className={`btn ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: item.id })}>Log reading</button>}
-          {item.status !== 'read' && <button className="btn" onClick={async () => { await startTimer(item.id); toast('Timer started'); }}>⏱ Timer</button>}
-          <button className="btn" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'note' })}>✎ Note</button>
-          <button className="btn" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'quote' })}>❝ Quote</button>
-          <select className="select" style={{ width: 150 }} value={item.status} onChange={async (e) => {
-            const s = e.target.value as Status;
-            const prev = item.status;
-            await setStatus(item.id, s);
-            if (s === 'read') open({ kind: 'complete', itemId: item.id });
-            else toast(`Moved to ${STATUS_LABEL[s]}`, { undo: () => setStatus(item.id, prev) });
-          }}>
-            {(Object.keys(STATUS_LABEL) as Status[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-          </select>
-          {item.status === 'read' && <button className="btn" onClick={async () => { await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}>↻ Reread</button>}
-        </div>
-        <div className="row wrap small">
-          <label className="btn xs ghost" style={{ cursor: 'pointer' }}>
-            {hasFile ? '↻ Replace ePub file' : '📎 Attach ePub file'}
-            <input type="file" accept=".epub,application/epub+zip" hidden onChange={async (e) => {
-              const f = e.target.files?.[0];
-              e.target.value = '';
-              if (!f) return;
-              if (!isEpub(f)) return toast('That isn’t an ePub file.', { error: true });
-              await attachEpub(item.id, f, f.name);
-              toast('ePub attached — tap Read to open it');
-            }} />
-          </label>
-          {hasFile && <button className="btn xs ghost" onClick={async () => { if (confirm('Remove the ePub file from this phone? Your progress and notes stay.')) { await removeEbookFile(item.id); toast('File removed'); } }}>Remove file</button>}
+          <div className="row wrap">
+            <button className="chip" onClick={() => setStatusOpen(true)} aria-label="Change status"><StatusDot status={item.status} />{STATUS_LABEL[item.status]} <Icon name="chevronDown" size={14} /></button>
+            {inst && inst.number > 1 && <span className="chip">Reading #{inst.number}</span>}
+            <Stars value={inst?.rating} onChange={inst ? (v) => updateInstance(inst.id, { rating: v }) : undefined} size={20} />
+            <button className={`chip ${item.favorite ? 'bad' : ''}`} onClick={() => updateItem(item.id, { favorite: !item.favorite })} aria-pressed={item.favorite} aria-label="Favorite"><Icon name="heart" size={15} />{item.favorite ? 'Favorite' : ''}</button>
+          </div>
         </div>
       </div>
+
+      <div className="card mt-16">
+        {f.total ? (
+          <>
+            <div className="row between"><span className="num" style={{ fontWeight: 800 }}>{fmtNum(toDisplay(item, f.completed), 1)} <span className="faint" style={{ fontWeight: 600 }}>of {fmtUnits(item, f.total)}</span></span><b className="num">{Math.round((f.percent ?? 0) * 100)}%</b></div>
+            <div className="mt-8"><ProgressBar value={f.percent} /></div>
+            <div className="small muted mt-8">
+              {item.status === 'read' ? 'Finished' : `${fmtUnits(item, f.remaining)} left${left ? ` · about ${left} of reading` : ''}${f.estimatedFinish && f.remaining ? ` · finish ~${formatKey(f.estimatedFinish)}` : ''}`}
+            </div>
+          </>
+        ) : <div className="small muted">Length unknown — add it under <button className="why-link" onClick={onEdit}>Details</button> to see how long is left.</div>}
+        <div className="row wrap mt-16">
+          {hasFile ? (
+            <button className="btn accent lg grow" onClick={() => nav(`/read/${item.id}`)}><Icon name="book" />{idx.position(item) > 0 ? 'Continue reading' : 'Start reading'}</button>
+          ) : item.status !== 'read' ? (
+            <button className="btn primary lg grow" onClick={() => open({ kind: 'log', itemId: item.id })}><Icon name="logPlus" />Log reading</button>
+          ) : (
+            <button className="btn lg grow" onClick={async () => { await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}><Icon name="refresh" />Read again</button>
+          )}
+          {hasFile && item.status !== 'read' && <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })}>Log</button>}
+          {!hasFile && item.status !== 'read' && <button className="btn lg icon" aria-label="Start a timer" onClick={async () => { await startTimer(item.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>}
+        </div>
+        <div className="row wrap mt-8">
+          <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'quote' })}><Icon name="quote" />Quote</button>
+          <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'note' })}><Icon name="pencil" />Note</button>
+          <button className="btn sm" onClick={() => open({ kind: 'organize', itemId: item.id })}><Icon name="folder" />Organize</button>
+          <button className="btn sm ghost" onClick={() => setMore(true)} aria-label="More actions"><Icon name="dots" />More</button>
+        </div>
+        {(item.folderIds.length > 0 || item.tagIds.length > 0 || item.shelfIds.length > 0) && (
+          <div className="row wrap mt-16 gap-4">
+            {item.folderIds.map((fid) => <Link key={fid} to={`/library/folder/${fid}`} className="chip"><Icon name="folder" size={14} />{idx.folders.get(fid)?.name}</Link>)}
+            {item.shelfIds.map((sid) => <Link key={sid} to={`/library/shelf/${sid}`} className="chip"><Icon name="shelf" size={14} />{idx.shelves.get(sid)?.name}</Link>)}
+            {item.tagIds.map((t) => <Link key={t} to={`/library?tag=${t}`} className="chip">#{idx.tags.get(t)?.name}</Link>)}
+          </div>
+        )}
+      </div>
+
+      <div className="chips-scroll mt-16" aria-label="Ask AI about this book">
+        {['What should I know before reading this?', 'What is the historical context?', 'Compare this with my other books'].map((q) => <AskChip key={q} question={q} />)}
+      </div>
+
+      {statusOpen && (
+        <Modal title="Where is this book?" onClose={() => setStatusOpen(false)}>
+          <div className="col gap-8">
+            {(Object.keys(STATUS_LABEL) as Status[]).map((st) => (
+              <button key={st} className={`rabbit-node ${item.status === st ? 'on' : ''}`} onClick={() => changeStatus(st)}>
+                <span className="row"><StatusDot status={st} /><b>{STATUS_LABEL[st]}</b></span>
+                <span className="small muted">{STATUS_HINT[st]}</span>
+              </button>
+            ))}
+          </div>
+        </Modal>
+      )}
+      {more && (
+        <Modal title="More actions" onClose={() => setMore(false)}>
+          <div className="col gap-8">
+            {item.status === 'read' && <button className="rabbit-node" onClick={async () => { setMore(false); await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}>Read it again<span className="small muted">Keeps your earlier reading</span></button>}
+            <label className="rabbit-node" style={{ cursor: 'pointer' }}>
+              {hasFile ? 'Replace the ePub file' : 'Attach an ePub file'}<span className="small muted">Read it here in Shelf</span>
+              <input type="file" accept=".epub,application/epub+zip" hidden onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                if (!file) return;
+                if (!isEpub(file)) return toast('That isn’t an ePub file.', { error: true });
+                await attachEpub(item.id, file, file.name);
+                setMore(false);
+                toast('ePub attached — tap Start reading');
+              }} />
+            </label>
+            {hasFile && <button className="rabbit-node" onClick={async () => { if (confirm('Remove the ePub file from this phone? Your progress and notes stay.')) { await removeEbookFile(item.id); setMore(false); toast('File removed'); } }}>Remove the ePub file<span className="small muted">Progress and notes stay</span></button>}
+            <button className="rabbit-node" onClick={() => { setMore(false); nav(`/explore/connections?item=${item.id}`); }}>See connections<span className="small muted">Books that share authors, subjects, periods</span></button>
+            <button className="rabbit-node" onClick={() => { setMore(false); nav(`/plan/whatif?item=${item.id}`); }}>Plan when to finish<span className="small muted">Try different paces and deadlines</span></button>
+            <button className="rabbit-node" onClick={() => { setMore(false); onEdit(); }}>Edit details<span className="small muted">Title, length, dates, subject period…</span></button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
+}
+
+const STATUS_HINT: Record<Status, string> = {
+  want: 'On your list for later',
+  reading: 'You’re reading it now',
+  read: 'Finished — shows your stats',
+  paused: 'Taking a break from it',
+  dnf: 'Stopped for good — that’s okay',
+};
+
+function StatusDot({ status }: { status: Status }) {
+  const c = status === 'reading' ? 'var(--accent)' : status === 'read' ? 'var(--good)' : status === 'paused' ? 'var(--warn)' : status === 'dnf' ? 'var(--bad)' : 'var(--text-3)';
+  return <span aria-hidden style={{ width: 8, height: 8, borderRadius: 8, background: c, display: 'inline-block' }} />;
 }
 
 function Overview({ idx, item }: { idx: LibraryIndex; item: Item }) {
@@ -142,8 +204,12 @@ function Overview({ idx, item }: { idx: LibraryIndex; item: Item }) {
   return (
     <div className="grid c3">
       <div className="card span-2">
-        <div className="card-head"><h3>Forecast</h3>{item.deadline ? <DeadlineChip status={f.status} delta={f.delta} deadline={f.deadline} /> : <span className="chip">No deadline yet</span>}</div>
-        <div className="stats-row">
+        <div className="card-head"><h3>When you’ll finish</h3>{item.deadline ? <DeadlineChip status={f.status} delta={f.delta} deadline={f.deadline} /> : null}</div>
+        <p style={{ fontSize: 16 }}>{finishSentence(item, f)}</p>
+        {!item.deadline && item.status === 'reading' && f.total ? <p className="small muted mt-8">Want to finish by a certain date? Add a deadline under <b>Details</b> and Shelf will tell you the pace you need.</p> : null}
+        <details className="mt-16">
+        <summary className="small muted" style={{ cursor: 'pointer', fontWeight: 700 }}>All the numbers</summary>
+        <div className="stats-row mt-16">
           <Stat label="Remaining" value={f.remaining !== undefined ? fmtNum(toDisplay(item, f.remaining), 1) : '—'} hint={u} />
           <Stat label="Current pace" value={f.currentPace ? fmtNum(toDisplay(item, f.currentPace), 1) : '—'} hint={`${u}/day (last ${idx.settings.paceWindowDays} days)`} />
           <Stat label="Average pace" value={f.averagePace ? fmtNum(toDisplay(item, f.averagePace), 1) : '—'} hint={`${u}/day since start`} />
@@ -152,6 +218,7 @@ function Overview({ idx, item }: { idx: LibraryIndex; item: Item }) {
           <Stat label="Estimated finish" value={item.status === 'read' ? 'Finished' : f.estimatedFinish ? formatKey(f.estimatedFinish) : '—'} small />
           <Stat label="Time remaining" value={f.timeRemainingSec ? fmtDuration(f.timeRemainingSec) : '—'} hint={f.speedPerHour ? `at ${fmtNum(toDisplay(item, f.speedPerHour))} ${u}/hour` : 'time a session to measure speed'} />
         </div>
+        </details>
         {item.deadline && f.status === 'behind' && f.requiredPace && f.pace && <div className="notice warn mt-16">To finish by {formatKey(item.deadline)} you need about <b>{fmtNum(toDisplay(item, f.requiredPace), 1)} {u}/day</b> — {fmtNum(toDisplay(item, f.requiredPace - f.pace), 1)} more than your current pace.</div>}
       </div>
       <div className="card">
@@ -194,8 +261,8 @@ function Overview({ idx, item }: { idx: LibraryIndex; item: Item }) {
       </div>
       {item.description && <div className="card span-2"><div className="card-head"><h3>About</h3></div><p className="muted" style={{ whiteSpace: 'pre-wrap' }}>{item.description}</p></div>}
       <div className="card">
-        <div className="card-head"><h3>Concepts</h3><ConceptLinker idx={idx} item={item} /></div>
-        {concepts.length === 0 ? <div className="small muted">Link people, places, events or ideas this item covers.</div> : (
+        <div className="card-head"><h3>Topics</h3><ConceptLinker idx={idx} item={item} /></div>
+        {concepts.length === 0 ? <div className="small muted">Link people, places, events or ideas this book covers — they power connections and the timeline.</div> : (
           <div className="row wrap gap-4">
             {concepts.map((l) => {
               const cid = l.fromType === 'concept' ? l.fromId : l.toId;
@@ -207,6 +274,16 @@ function Overview({ idx, item }: { idx: LibraryIndex; item: Item }) {
       </div>
     </div>
   );
+}
+
+function finishSentence(item: Item, f: ReturnType<typeof itemForecast>): string {
+  const u = unitLabel(item);
+  if (item.status === 'read') return f.finishedOn ? `You finished it on ${formatKey(f.finishedOn)}.` : 'You finished it.';
+  if (!f.total) return 'Add the length under Details and Shelf will estimate when you’ll finish.';
+  if (!f.remaining) return 'You’re at the end — mark it as read to see your stats.';
+  if (f.paceSource === 'default' || !f.pace) return `Log some reading and Shelf will estimate a finish date from your own pace.`;
+  const pace = `${fmtNum(toDisplay(item, f.pace), 1)} ${u} a day`;
+  return f.estimatedFinish ? `At your pace (${pace}) you’ll finish around ${formatKey(f.estimatedFinish)} — ${fmtUnits(item, f.remaining)} to go.` : `At your pace (${pace}) you have ${fmtUnits(item, f.remaining)} to go.`;
 }
 
 function Stat({ label, value, hint, small }: { label: string; value: string; hint?: string; small?: boolean }) {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { complete, completeJSON } from '../ai/client';
 import { BASE_SYSTEM } from '../ai/context';
@@ -54,6 +54,11 @@ export default function PlanPage() {
 
 function GoalsTab({ idx }: { idx: LibraryIndex }) {
   const [edit, setEdit] = useState<Partial<Goal> | null>(null);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('new')) { setEdit({ period: 'daily', metric: 'pages', target: 20 }); setParams({}, { replace: true }); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const goals = idx.snap.goals;
   const periods: GoalPeriod[] = ['daily', 'weekly', 'monthly', 'annual'];
   return (
@@ -106,11 +111,29 @@ function GoalEditor({ idx, goal, onClose }: { idx: LibraryIndex; goal: Partial<G
 
 function ProjectsTab({ idx }: { idx: LibraryIndex }) {
   const nav = useNavigate();
-  const create = async () => { const n = prompt('Project name (e.g. “Roman Republic Project”)'); if (n?.trim()) nav(`/plan/project/${await saveProject({ name: n.trim() })}`); };
+  const [params, setParams] = useSearchParams();
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ name: '', deadline: '' });
+  useEffect(() => {
+    if (params.get('new')) { setCreating(true); setParams({}, { replace: true }); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const create = () => { setDraft({ name: '', deadline: '' }); setCreating(true); };
+  const save = async () => { if (!draft.name.trim()) return; const id = await saveProject({ name: draft.name.trim(), deadline: draft.deadline || undefined }); setCreating(false); nav(`/plan/project/${id}`); };
   return (
     <div className="col gap-16">
       <div className="row between"><div><h2>Projects</h2><div className="small muted">A folder organizes; a project is a temporary mission with a goal, books from anywhere, and (optionally) a deadline.</div></div><button className="btn primary" onClick={create}>＋ New project</button></div>
-      {idx.snap.projects.length === 0 ? <div className="card"><Empty icon="🎯" title="No projects yet" action={<button className="btn" onClick={create}>Create a project</button>}>Group books from different folders into a mission, e.g. “Finish 7 books on the Roman Republic by June 1”.</Empty></div> : (
+      {creating && (
+        <Modal title="New project" onClose={() => setCreating(false)} footer={<><button className="btn" onClick={() => setCreating(false)}>Cancel</button><button className="btn primary" disabled={!draft.name.trim()} onClick={save}>Create</button></>}>
+          <div className="col gap-12">
+            <p className="muted">A project is something you want to accomplish, with books from anywhere in your library.</p>
+            <label className="field">What do you want to accomplish?<input autoFocus className="input" placeholder="e.g. Learn about the Roman Republic" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && save()} /></label>
+            <label className="field">By when? (optional)<input className="input" type="date" value={draft.deadline} onChange={(e) => setDraft({ ...draft, deadline: e.target.value })} /></label>
+            <p className="small faint">Next you’ll pick the books. Shelf then shows the pace you need.</p>
+          </div>
+        </Modal>
+      )}
+      {idx.snap.projects.length === 0 ? <div className="card"><Empty illustration="map" title="No projects yet" action={<button className="btn primary" onClick={create}>Create a project</button>}>Group books from different folders into a mission, e.g. “Finish 7 books on the Roman Republic by June 1”.</Empty></div> : (
         <div className="grid auto">
           {idx.snap.projects.map((p) => {
             const f = projectForecast(idx, p.id);
