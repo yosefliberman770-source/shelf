@@ -11,6 +11,9 @@ import { useLibrary } from '../state/library';
 import { Segmented } from './common';
 import { KIND_ICON, KIND_LABEL, useEntity, yearSpan } from './entity';
 import { type Mention, PersonCard, XRayPanel } from './xray';
+import { EntityDetail, findEntity, TYPE_KIND, useBookGraph } from './bookworld';
+import { atOrBefore } from '../lib/book/resolve';
+import { locTitle } from '../lib/book/text';
 import type { MapRequest } from './history/HistoricalMapPanel';
 import { detectPlaces } from '../lib/history/placeDetect';
 import type { EntityCacheRow } from '../db/types';
@@ -20,7 +23,7 @@ import { type AIMode, type ReadingContext, ReaderAI } from './reader-ai';
 import { VisualExplorer } from './visual';
 
 export type ToolTab = 'ai' | 'xray' | 'map' | 'visual' | 'explore' | 'entity';
-export interface Focus { name: string; kind?: ConceptKind; conceptId?: string; passage?: string; entry?: XRayEntry }
+export interface Focus { name: string; kind?: ConceptKind; conceptId?: string; passage?: string; entry?: XRayEntry; /** An entity from the whole-book analysis. */ graphKey?: string }
 export interface ToolState { tab: ToolTab; focus?: Focus; mode?: AIMode; ctx: ReadingContext; scope?: 'page' | 'chapter' | 'book' }
 
 export const TOOLS: { id: Exclude<ToolTab, 'entity'>; icon: IconName; label: string }[] = [
@@ -49,6 +52,10 @@ export function ReaderTools({ state, setState, onClose, found, chapterText, chap
   // Reuse what X-Ray already worked out about this name in this book.
   const xrayRows = useLiveQuery(() => db.entityCache.where('itemId').equals(ctx.itemId).toArray(), [ctx.itemId]);
   const known = (name: string) => xrayRows?.flatMap((r) => r.names as XRayEntry[]).find((n) => n.name.toLowerCase() === name.toLowerCase() || n.full?.toLowerCase() === name.toLowerCase());
+  const graph = useBookGraph(ctx.itemId);
+  const textRows = useLiveQuery(async () => new Map((await db.bookText.where('bookId').equals(ctx.itemId).toArray()).map((t) => [t.chapter, t])), [ctx.itemId]);
+  const chapterTitle = (c: number, para?: number) => locTitle(textRows?.get(c), para) || `Section ${c + 1}`;
+  const graphEntity = tab === 'entity' && focus ? (focus.graphKey ? graph?.entities.find((e) => e.key === focus.graphKey) : findEntity(graph, focus.name, ctx.spine, ctx.spinePara)) : undefined;
   return (
     <div className="col gap-12">
       <div className="row between" style={{ gap: 6 }}>
@@ -67,8 +74,24 @@ export function ReaderTools({ state, setState, onClose, found, chapterText, chap
           <button className="why-link" onClick={() => go({ focus: undefined })}>back to the page</button>
         </div>
       )}
-      {tab === 'xray' && <XRayPanel book={book} itemId={ctx.itemId} chapterHref={chapterHref} chapterText={chapterText} known={found.chapter} onOpen={(e) => go({ tab: 'entity', focus: { name: e.name, kind: e.kind, entry: e } })} />}
-      {tab === 'entity' && focus && xrayRows !== undefined && (() => {
+      {tab === 'xray' && <XRayPanel book={book} itemId={ctx.itemId} chapterHref={chapterHref} chapterText={chapterText} known={found.chapter} spine={ctx.spine} spinePara={ctx.spinePara} onOpen={(e) => go({ tab: 'entity', focus: { name: e.name, kind: e.kind, entry: e } })} onOpenKey={(key, name) => go({ tab: 'entity', focus: { name, graphKey: key } })} />}
+      {tab === 'entity' && focus && graph && graphEntity && (
+        <>
+          <button className="btn sm ghost" style={{ alignSelf: 'flex-start', paddingLeft: 0 }} onClick={() => go({ tab: 'xray', focus: undefined })}><Icon name="chevronLeft" />X-Ray</button>
+          <EntityDetail key={graphEntity.key} bookId={ctx.itemId} graph={graph} entityKey={graphEntity.key} chapter={ctx.spine} para={ctx.spinePara} chapterTitle={chapterTitle} onJump={onJump}
+            onOpenEntity={(k) => go({ tab: 'entity', focus: { name: graph.entities.find((e) => e.key === k)?.name ?? k, graphKey: k } })}
+            onMap={onOpenMap ? (n) => onOpenMap({ name: n, passage: focus.passage }) : undefined}
+            onRemoved={() => go({ tab: 'xray', focus: undefined })} />
+          {graphEntity.real && (
+            <div className="mt-8">
+              <div className="eyebrow mb-8">Real-world background</div>
+              <PersonCard key={graphEntity.real} entry={{ name: graphEntity.name, full: graphEntity.real, kind: TYPE_KIND[graphEntity.type], real: true }} book={book} itemId={ctx.itemId} passage={focus.passage}
+                onAsk={(n) => go({ tab: 'ai', focus: { name: n, kind: TYPE_KIND[graphEntity.type] }, mode: 'explain' })} />
+            </div>
+          )}
+        </>
+      )}
+      {tab === 'entity' && focus && !graphEntity && xrayRows !== undefined && (() => {
         const c = focus.conceptId ? idx.concepts.get(focus.conceptId) : undefined;
         const entry: XRayEntry = focus.entry ?? known(focus.name) ?? (c?.wikidataId ? { name: focus.name, full: c.name, kind: c.kind, real: true } : { name: focus.name, kind: focus.kind ?? 'person', real: true });
         return (
@@ -173,13 +196,19 @@ function Group({ title, terms, onPick, empty, badge }: { title: string; terms: {
 /** The Map tab: places named on this page, and the whole chapter on a map. */
 function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingContext; chapterText: () => string; xrayRows: EntityCacheRow[]; onOpenMap: (r: MapRequest) => void }) {
   const idx = useLibrary();
+  // Places and people the whole-book analysis found (up to where you are).
+  const graph = useBookGraph(ctx.itemId);
+  const seen = (graph?.entities ?? []).filter((e) => e.mentions[0] && atOrBefore(e.mentions[0], ctx.spine, ctx.spinePara));
+  const graphNames = (types: string[]) => seen.filter((e) => types.includes(e.type)).flatMap((e) => [e.name, ...e.aliases]);
   const knownPlaces = [
     ...idx.snap.concepts.filter((c) => c.kind === 'place' || c.kind === 'polity').flatMap((c) => [c.name, ...(c.aliases ?? [])]),
     ...xrayRows.flatMap((r) => r.names).filter((n) => n.kind === 'place' || n.kind === 'polity').map((n) => n.name),
+    ...graphNames(['place', 'region', 'polity']),
   ].filter((n) => n.length >= 3);
   const people = [
     ...idx.snap.concepts.filter((c) => c.kind === 'person').map((c) => c.name),
     ...xrayRows.flatMap((r) => r.names).filter((n) => n.kind === 'person').map((n) => n.name),
+    ...graphNames(['character']),
   ];
   const onPage = detectPlaces(ctx.pageText, knownPlaces, people);
   const inChapter = detectPlaces(chapterText(), knownPlaces, people).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);

@@ -183,6 +183,12 @@ export async function deleteItem(id: string): Promise<void> {
     await db.links.filter((l) => (l.fromType === 'item' && l.fromId === id) || (l.toType === 'item' && l.toId === id)).delete();
     for (const p of await db.projects.toArray()) if (p.itemIds.includes(id)) await db.projects.update(p.id, { itemIds: p.itemIds.filter((x) => x !== id) });
   });
+  // The book's analysis goes with it.
+  await db.transaction('rw', [db.bookText, db.bookChunks, db.bookJobs, db.bookGraph, db.bookXray, db.xrayHidden], async () => {
+    for (const t of [db.bookText, db.bookChunks, db.bookXray, db.xrayHidden]) await t.where('bookId').equals(id).delete();
+    await db.bookJobs.delete(id);
+    await db.bookGraph.delete(id);
+  });
 }
 
 async function currentInstance(item: Item): Promise<ReadingInstance> {

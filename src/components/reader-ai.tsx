@@ -6,6 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { completeJSON, jsonField } from '../ai/client';
 import type { AITask } from '../ai/providers/catalog';
+import { db } from '../db/db';
+import { entityUpTo } from '../lib/book/resolve';
+import { retrievePassages } from '../lib/book/retrieve';
+import { locTitle } from '../lib/book/text';
+import { findEntity } from './bookworld';
 import { BASE_SYSTEM, SPOILER_LEVELS } from '../ai/context';
 import { AIErrorNotice, AISetupCard, useAICall, useAIReady } from '../ai/ui';
 import { addNote, link, saveAIRecord, saveCurriculum } from '../db/actions';
@@ -27,6 +32,10 @@ export interface ReadingContext {
   /** A person, place, event or idea the question is about. */
   focus?: string;
   position?: string;
+  /** Spine index of the chapter being read (for spoiler-safe book knowledge). */
+  spine?: number;
+  /** Paragraph within that chapter. */
+  spinePara?: number;
 }
 
 export type AIMode = 'summary' | 'explain' | 'context' | 'people' | 'place' | 'timeline' | 'compare' | 'primary' | 'debate' | 'simplify' | 'deeper' | 'ask';
@@ -72,6 +81,28 @@ function buildPrompt(ctx: ReadingContext, mode: AIMode, question: string): strin
   ].filter(Boolean).join('\n\n');
 }
 
+/**
+ * Relevant passages from the book itself (only chapters up to where you are),
+ * found locally, so answers can quote the book instead of guessing.
+ */
+async function bookPassages(ctx: ReadingContext, mode: AIMode, question: string): Promise<string> {
+  if (mode !== 'ask' && mode !== 'people' && mode !== 'place' && mode !== 'summary' && !ctx.focus) return '';
+  const rows = await db.bookText.where('bookId').equals(ctx.itemId).toArray().catch(() => []);
+  if (!rows.length) return '';
+  const query = [question, ctx.focus, ctx.selection?.slice(0, 200)].filter(Boolean).join(' ');
+  if (!query.trim()) return '';
+  const graph = ctx.focus ? await db.bookGraph.get(ctx.itemId).catch(() => undefined) : undefined;
+  const ent = graph && ctx.focus ? findEntity(graph, ctx.focus, ctx.spine, ctx.spinePara) : undefined;
+  const found = retrievePassages(rows, query, ctx.spine ?? Infinity, 5, ent ? [ent.name, ...ent.aliases.slice(0, 3)] : [], ctx.spinePara ?? Infinity);
+  const facts = ent ? (ctx.spine === undefined ? ent : entityUpTo(ent, ctx.spine, ctx.spinePara))?.facts.slice(-12) ?? [] : [];
+  if (!found.length && !facts.length) return '';
+  return [
+    found.length ? `PASSAGES FROM THE BOOK (only up to where the reader is):\n${found.map((p) => `[${locTitle(rows.find((r) => r.chapter === p.chapter), p.para) || p.title}] ${p.text}`).join('\n')}` : '',
+    facts.length ? `FACTS ABOUT ${ent!.name.toUpperCase()} GATHERED FROM THE BOOK SO FAR:\n${facts.map((f) => `- ${f.text}`).join('\n')}` : '',
+    'When you use the passages or facts, say “According to the book…”. Put anything from general knowledge under “Additional historical context:”. Never reveal events after the reader’s position.',
+  ].filter(Boolean).join('\n\n');
+}
+
 export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: ReadingContext; initialMode?: AIMode; onEntity?: (name: string, kind: ConceptKind) => void; compact?: boolean }) {
   const ready = useAIReady();
   const { close } = useUI();
@@ -87,7 +118,8 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
     setTurns((t) => [...t, turn]);
     setText('');
     const history = turns.filter((t) => t.answer).slice(-2).map((t) => `Earlier Q: ${t.q}\nEarlier A: ${t.answer!.answer.slice(0, 600)}`).join('\n\n');
-    const r = await run((signal) => completeJSON<AIAnswer>({ task: TASK_FOR[mode], system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal, (t) => ({ answer: jsonField(t, 'answer') ?? t })));
+    const passages = await bookPassages(ctx, mode, question);
+    const r = await run((signal) => completeJSON<AIAnswer>({ task: TASK_FOR[mode], system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${passages ? `\n\n${passages}` : ''}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal, (t) => ({ answer: jsonField(t, 'answer') ?? t })));
     if (r) setTurns((t) => t.map((x) => (x === turn ? { ...x, answer: r.data, model: r.response.model } : x)));
     else setTurns((t) => t.filter((x) => x !== turn));
   };

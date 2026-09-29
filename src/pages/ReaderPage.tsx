@@ -6,7 +6,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import type { Book, Contents, Location, NavItem, Rendition } from 'epubjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { loadReadingPos, paraAtCfi, saveReadingPos } from '../lib/book/text';
 import { addNote, extendSession, logProgress, updateItem } from '../db/actions';
 import { db } from '../db/db';
 import type { Bookmark, Note } from '../db/types';
@@ -265,6 +266,10 @@ type NavTab = 'toc' | 'marks' | 'notes' | 'search';
 
 export default function ReaderPage() {
   const { id } = useParams();
+  // Links from Book World: ?at=<cfi> opens that page, ?map=<place> opens the map.
+  const [urlParams] = useSearchParams();
+  const linkAt = useRef(urlParams.get('at'));
+  const linkMap = useRef(urlParams.get('map'));
   const idx = useLibrary();
   const nav = useNavigate();
   const { toast } = useUI();
@@ -418,6 +423,28 @@ export default function ReaderPage() {
     try { paintHits(c.window, hits); } catch { /* highlights unsupported */ }
   };
 
+  // The book's analysed text (if any), to know exactly which paragraph you're on.
+  const textRows = useLiveQuery(() => db.bookText.where('bookId').equals(id!).toArray(), [id]);
+  const textRowsRef = useRef(textRows);
+  textRowsRef.current = textRows;
+  const posOf = (cfi: string): { spine?: number; para?: number } => {
+    const step = spineStep(cfi);
+    if (step < 0) return {};
+    const spine = step / 2 - 1;
+    const row = textRowsRef.current?.find((r) => r.chapter === spine);
+    const E = epubRef.current?.EpubCFI;
+    if (!row || !E) return { spine };
+    const cmp = new E();
+    return { spine, para: paraAtCfi(row.cfis, cfi, (a, b) => cmp.compare(a, b)) };
+  };
+  /** Remember the furthest point you've reached (spoiler boundary for X-Ray). */
+  const recordPos = (cfi: string) => {
+    const { spine, para } = posOf(cfi);
+    if (spine === undefined || para === undefined) return;
+    const prev = loadReadingPos(id!);
+    if (!prev || spine > prev.chapter || (spine === prev.chapter && para > prev.para)) saveReadingPos(id!, spine, para);
+  };
+
   /** What the tools may see: this page, the chapter name, your selection. */
   const snapshot = () => {
     const r = rendRef.current;
@@ -445,7 +472,7 @@ export default function ReaderPage() {
     const onPage = pageRange ? hits.filter((h) => { try { return pageRange!.compareBoundaryPoints(Range.START_TO_START, h.range) <= 0 && pageRange!.compareBoundaryPoints(Range.END_TO_END, h.range) >= 0; } catch { return false; } }) : [];
     const p = pctRef.current;
     return {
-      ctx: { itemId: id!, title: it?.title ?? '', author: it ? idxRef.current.authorLine(it) : '', chapter: chapterRef.current || undefined, pageText, position: p !== undefined ? `${Math.round(p * 100)}%` : undefined },
+      ctx: { itemId: id!, title: it?.title ?? '', author: it ? idxRef.current.authorLine(it) : '', chapter: chapterRef.current || undefined, pageText, position: p !== undefined ? `${Math.round(p * 100)}%` : undefined, ...(loc?.start?.cfi ? (({ spine, para }) => ({ spine, spinePara: para }))(posOf(loc.start.cfi)) : {}) },
       found: { page: onPage.map((h) => h.term), chapter: hits.map((h) => h.term) },
       href: loc?.start?.href,
       doc,
@@ -461,6 +488,7 @@ export default function ReaderPage() {
     setPanel(null);
     setHint(false);
   };
+  const openMapRef = useRef<(req: MapRequest) => void>(() => {});
   const openMap = (req: MapRequest) => {
     setTool(null);
     setPanel(null);
@@ -469,6 +497,7 @@ export default function ReaderPage() {
     setMapReq(req);
     refreshPagePlaces();
   };
+  openMapRef.current = openMap;
   /** Places on the current page, for the map's "Follow the book". */
   const refreshPagePlaces = () => {
     const snap = snapshot();
@@ -560,10 +589,14 @@ export default function ReaderPage() {
         const it = idxRef.current.items.get(id!);
         let startCfi = it?.readerLocation;
         try { startCfi = localStorage.getItem(readerPosKey(id!)) || startCfi; } catch { /* ignore */ }
+        const savedCfi = startCfi;
+        if (linkAt.current) { startCfi = linkAt.current; jumping.current = true; }
         userNav.current = true;
-        try { await rendition.display(startCfi || undefined); } catch { startCfi = undefined; await rendition.display(); }
+        try { await rendition.display(startCfi || undefined); } catch { startCfi = savedCfi; await rendition.display(startCfi || undefined).catch(() => rendition.display()); }
         if (cancelled) return;
         setStatus('ready');
+        if (linkAt.current && savedCfi && savedCfi !== linkAt.current) setJumpBack(savedCfi);
+        if (linkMap.current) { const name = linkMap.current; linkMap.current = null; setTimeout(() => openMapRef.current({ name }), 300); }
         // Saved highlights and notes.
         for (const n of idxRef.current.notesByItem.get(id!) ?? []) {
           if (n.location) try { rendition.annotations.highlight(n.location, { id: n.id }, () => {}, 'shelf-hl', { fill: '#eda100', 'fill-opacity': '0.3', 'mix-blend-mode': 'multiply' }); } catch { /* stale position */ }
@@ -637,6 +670,7 @@ export default function ReaderPage() {
       const book = bookRef.current;
       if (!book) return;
       const cfi = loc.start.cfi;
+      recordPos(cfi);
       const rend = rendRef.current;
       const relayout = Date.now() < relayoutUntil.current && !userNav.current;
       if (rend && relayout && anchor.current && epubRef.current) {

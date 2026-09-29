@@ -141,6 +141,13 @@ export function cooldownInfo(id: ProviderId): { until: number; reason: FailureKi
   return coolingUntil(id, cfg.providers[id]?.model ?? '');
 }
 
+/** When the soonest resting provider becomes usable again (for "continues at 3:40"). */
+export function nextAvailableAt(cfg = loadConfig()): number | undefined {
+  const now = Date.now();
+  const times = PROVIDER_DEFS.filter((d) => isConfigured(d.id, cfg)).map((d) => coolingUntil(d.id, cfg.providers[d.id]?.model ?? '')?.until).filter((t): t is number => !!t && t > now);
+  return times.length ? Math.min(...times) : undefined;
+}
+
 export function lastTest(id: ProviderId) { return runtime().lastTest[id]; }
 
 // ── Server-reachable providers ─────────────────────────────────────────

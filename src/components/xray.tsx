@@ -4,14 +4,19 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AIErrorNotice, useAICall, useAIReady } from '../ai/ui';
+import { useAIReady } from '../ai/ui';
 import { link } from '../db/actions';
 import { db } from '../db/db';
 import type { ConceptKind } from '../db/types';
 import { resolveEntity } from '../lib/entities';
 import { guessNames, type Term } from '../lib/entityDetect';
-import { type BookCtx, contextWords, type Facts, identifyWithAI, lifeSpan, lookupFacts, scanChapter, type XRayEntry } from '../lib/xray';
-import { AIBadge } from './common';
+import { type BookCtx, contextWords, type Facts, identifyWithAI, lifeSpan, lookupFacts, type XRayEntry } from '../lib/xray';
+import { analyzeBook } from '../lib/book/pipeline';
+import { entityUpTo } from '../lib/book/resolve';
+import { locTitle, partRange } from '../lib/book/text';
+import type { BookEntity } from '../lib/book/types';
+import { AnalysisProgress, EntityRow, hideEntity, isHidden, TYPE_KIND, unhideEntity, useBookGraph, useBookJob, useHidden, setXrayOff, xrayOff } from './bookworld';
+import { AIBadge, Segmented } from './common';
 import { KIND_ICON, KIND_LABEL } from './entity';
 import { Icon } from './icons';
 
@@ -20,66 +25,108 @@ export interface Mention { cfi: string; snippet: string }
 type Filter = 'all' | 'people' | 'places' | 'terms';
 const inFilter = (k: ConceptKind, f: Filter) => f === 'all' || (f === 'people' ? k === 'person' : f === 'places' ? k === 'place' || k === 'polity' : k !== 'person' && k !== 'place' && k !== 'polity');
 
-export function XRayPanel({ book, itemId, chapterHref, chapterText, known, onOpen }: {
+export function XRayPanel({ book, itemId, chapterHref, chapterText, known, spine, spinePara, onOpen, onOpenKey }: {
   book: BookCtx;
   itemId: string;
   chapterHref?: string;
   chapterText: () => string;
   known: Term[];
+  /** Spine index of the section you're on, and the paragraph (nothing after it is shown). */
+  spine?: number;
+  spinePara?: number;
   onOpen: (e: XRayEntry) => void;
+  /** Open an entity from the whole-book analysis. */
+  onOpenKey: (key: string, name: string) => void;
 }) {
-  const ready = useAIReady();
-  const { loading, error, run } = useAICall();
-  const id = `xray|${itemId}|${chapterHref ?? ''}`;
-  const row = useLiveQuery(() => (chapterHref ? db.entityCache.get(id) : undefined), [id]);
+  const graph = useBookGraph(itemId);
+  const job = useBookJob(itemId);
+  const hidden = useHidden(itemId);
+  const textRow = useLiveQuery(() => db.bookText.where('bookId').equals(itemId).filter((r) => (spine !== undefined ? r.chapter === spine : r.href === chapterHref)).first(), [itemId, chapterHref, spine]);
+  const chapter = spine ?? textRow?.chapter;
+  const para = spinePara ?? Infinity;
+  // Many ebooks put several chapters in one file: "this chapter" means between two chapter headings.
+  const [partStart, partEnd] = textRow && Number.isFinite(para) ? partRange(textRow, para) : [0, Infinity];
+  const partTitle = textRow && Number.isFinite(para) ? locTitle(textRow, para) : book.chapter;
+  const [off, setOff] = useState(() => xrayOff(itemId));
+  const [scope, setScope] = useState<'chapter' | 'sofar'>('chapter');
   const [filter, setFilter] = useState<Filter>('all');
-  const scan = async () => {
-    const text = chapterText();
-    const entries = await run((signal) => scanChapter(book, text, signal));
-    if (entries && chapterHref) await db.entityCache.put({ id, itemId, href: chapterHref, names: entries, source: 'ai', createdAt: Date.now() });
-  };
-  // Scan automatically the first time a chapter's X-Ray is opened.
+  const [showRemoved, setShowRemoved] = useState(false);
+  // Keep the chapter you're reading at the front of the analysis queue.
   useEffect(() => {
-    if (ready && chapterHref && row === undefined) {
-      db.entityCache.get(id).then((r) => { if (!r) scan(); });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, id]);
+    if (chapter !== undefined && job && (job.status === 'running' || job.status === 'queued') && job.priorityChapter !== chapter) void analyzeBook(itemId, { priorityChapter: chapter });
+  }, [chapter, job?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Without AI: names you already know plus names spotted in the text.
+  // Without an analysis: names spotted in this chapter's text (no AI).
   const offline = useMemo<XRayEntry[]>(() => {
-    if (ready) return [];
+    if (graph) return [];
     const text = chapterText();
     const seen = new Set<string>();
     const out: XRayEntry[] = [];
     for (const t of known) if (!seen.has(t.name.toLowerCase())) { seen.add(t.name.toLowerCase()); out.push({ name: t.name, kind: t.kind, real: true }); }
-    for (const n of guessNames(text, 20)) if (!seen.has(n.toLowerCase())) { seen.add(n.toLowerCase()); out.push({ name: n, kind: 'person', real: true }); }
+    for (const n of guessNames(text, 30)) if (!seen.has(n.toLowerCase())) { seen.add(n.toLowerCase()); out.push({ name: n, kind: 'person', real: true }); }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, chapterHref, known.length]);
+  }, [!!graph, chapterHref, known.length]);
 
-  const entries: XRayEntry[] = ready ? ((row?.names ?? []) as XRayEntry[]) : offline;
-  const shown = entries.filter((e) => inFilter(e.kind, filter));
+  if (off) {
+    return (
+      <div className="col gap-12">
+        <div className="book-title" style={{ fontSize: 18 }}>X-Ray</div>
+        <div className="notice small">X-Ray is turned off for this book.</div>
+        <button className="btn sm" style={{ alignSelf: 'flex-start' }} onClick={() => { setXrayOff(itemId, false); setOff(false); }}>Turn X-Ray on</button>
+      </div>
+    );
+  }
+
+  const upTo = (e: BookEntity) => (chapter === undefined ? e : entityUpTo(e, chapter, para));
+  const partCount = (e: BookEntity) => e.mentions.filter((m) => m.chapter === chapter && m.para >= partStart && m.para < partEnd).length;
+  const inPart = (e: BookEntity) => e.mentions.some((m) => m.chapter === chapter && m.para >= partStart && m.para < partEnd);
+  const all = graph ? graph.entities.map(upTo).filter((e): e is BookEntity => !!e) : [];
+  const removed = all.filter((e) => isHidden(hidden, e));
+  const visible = all.filter((e) => !isHidden(hidden, e) && (scope === 'sofar' || chapter === undefined || inPart(e)))
+    .sort((a, b) => (scope === 'chapter' ? partCount(b) - partCount(a) : b.mentions.length - a.mentions.length));
+  const shown = visible.filter((e) => inFilter(TYPE_KIND[e.type], filter));
+  const chapterDone = chapter !== undefined && job ? job.status === 'done' || all.some(inPart) : false;
   return (
     <div className="col gap-12">
       <div className="row between">
         <div>
           <div className="book-title" style={{ fontSize: 18 }}>X-Ray</div>
-          <div className="tiny faint">{book.chapter ? `In “${book.chapter}”` : 'In this chapter'}</div>
+          <div className="tiny faint">{scope === 'chapter' ? (partTitle ? `In “${partTitle}”` : 'In this chapter') : 'Everyone so far (no spoilers)'}</div>
         </div>
-        {ready && chapterHref && <button className="btn xs ghost" disabled={loading} onClick={scan}><Icon name="refresh" />{loading ? 'Scanning…' : 'Rescan'}</button>}
+        {graph && <Segmented size="sm" value={scope} onChange={setScope} options={[{ value: 'chapter', label: 'Chapter' }, { value: 'sofar', label: 'So far' }]} />}
       </div>
-      <div className="chips-scroll">
-        {([['all', 'All'], ['people', '👤 People'], ['places', '📍 Places'], ['terms', '◇ Terms']] as [Filter, string][]).map(([f, l]) => <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{l}</button>)}
+      <AnalysisProgress bookId={itemId} priorityChapter={chapter} compact />
+      {graph && (
+        <div className="chips-scroll">
+          {([['all', 'All'], ['people', '👤 People'], ['places', '📍 Places'], ['terms', '◇ Other']] as [Filter, string][]).map(([f, l]) => <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{l}</button>)}
+        </div>
+      )}
+      {graph && job && job.status !== 'done' && !chapterDone && <div className="small muted">This chapter is being analysed…</div>}
+      {graph && chapterDone && !shown.length && <div className="small muted">Nobody here{filter !== 'all' ? ' in this filter' : ''}.</div>}
+      {graph ? (
+        <div className="list-card">
+          {shown.map((e) => <EntityRow key={e.key} e={e} count={scope === 'chapter' ? partCount(e) : e.mentions.length} onOpen={() => onOpenKey(e.key, e.name)} onRemove={() => hideEntity(itemId, e)} />)}
+        </div>
+      ) : (
+        <>
+          {offline.length > 0 && <div className="tiny faint">Names spotted in this chapter (not yet checked by AI):</div>}
+          <div className="list-card">
+            {offline.map((e, i) => <XRayRow key={`${e.name}-${i}`} e={e} book={book} eager={false} onOpen={() => onOpen(e)} />)}
+          </div>
+        </>
+      )}
+      {removed.length > 0 && (
+        <div>
+          <button className="why-link small" onClick={() => setShowRemoved(!showRemoved)}>{showRemoved ? 'Hide' : 'Show'} removed ({removed.length})</button>
+          {showRemoved && <div className="col gap-4 mt-8">{removed.map((e) => <div key={e.key} className="row between small"><span>{e.name}</span><button className="btn xs ghost" onClick={() => unhideEntity(itemId, e.key)}>Restore</button></div>)}</div>}
+        </div>
+      )}
+      {graph && <div className="tiny faint"><AIBadge label="AI" /> Found by AI from the book’s text, with the page for each fact. Tap ✕ to remove anything wrong.</div>}
+      <div className="row between">
+        {graph ? <Link className="why-link small" to={`/world/${itemId}`}>Open Book world →</Link> : <span />}
+        <button className="why-link tiny" onClick={() => { setXrayOff(itemId, true); setOff(true); }}>Turn off X-Ray for this book</button>
       </div>
-      {loading && !entries.length && <div className="small muted">Reading this chapter to find who’s who…</div>}
-      <AIErrorNotice error={error} />
-      {!loading && ready && !entries.length && !error && <div className="small muted">No people or places found in this chapter.</div>}
-      {!ready && <div className="tiny faint">Turn on AI in Settings for a full X-Ray with each person’s part in the story. Without it, these are names spotted in the text.</div>}
-      <div className="list-card">
-        {shown.map((e, i) => <XRayRow key={`${e.name}-${i}`} e={e} book={book} eager={i < 12} onOpen={() => onOpen(e)} />)}
-      </div>
-      {ready && entries.length > 0 && <div className="tiny faint"><AIBadge label="AI" /> Roles are written by AI from this chapter; photos and dates come from Wikipedia and Wikidata.</div>}
     </div>
   );
 }

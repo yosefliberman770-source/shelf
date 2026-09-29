@@ -28,6 +28,7 @@ import type {
   AICacheRow,
   PlaceChoiceRow,
 } from './types';
+import type { BookChunkRow, BookGraphRow, BookJobRow, BookTextRow, BookXRayRow, XRayHiddenRow } from '../lib/book/types';
 
 export class ShelfDB extends Dexie {
   users!: Table<User, string>;
@@ -57,6 +58,12 @@ export class ShelfDB extends Dexie {
   aiUsage!: Table<AIUsageRow, string>;
   aiLog!: Table<AILogRow, number>;
   aiCache!: Table<AICacheRow, string>;
+  bookText!: Table<BookTextRow, string>;
+  bookChunks!: Table<BookChunkRow, string>;
+  bookJobs!: Table<BookJobRow, string>;
+  bookGraph!: Table<BookGraphRow, string>;
+  bookXray!: Table<BookXRayRow, string>;
+  xrayHidden!: Table<XRayHiddenRow, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -88,6 +95,8 @@ export class ShelfDB extends Dexie {
     this.version(4).stores({ placeCache: 'id, placeId, updatedAt', placeChoices: 'id, bookId' });
     // v5: multi-provider AI — usage counts, a request log and cached answers (all local).
     this.version(5).stores({ aiUsage: 'id, day, month, provider', aiLog: '++id, at, provider', aiCache: 'id, createdAt' });
+    // v6: whole-book analysis — the book's text, chunk results, jobs, the resolved graph, X-Ray summaries and removed entries.
+    this.version(6).stores({ bookText: 'id, bookId', bookChunks: 'id, bookId, [bookId+status]', bookJobs: 'id, status', bookGraph: 'id', bookXray: 'id, bookId', xrayHidden: 'id, bookId' });
   }
 }
 
@@ -115,6 +124,7 @@ export const ALL_TABLES = [
   'curricula',
   'media',
   'placeChoices',
+  'xrayHidden',
 ] as const;
 export type TableName = (typeof ALL_TABLES)[number];
 

@@ -37,23 +37,6 @@ export interface BookCtx { title: string; author: string; chapter?: string }
 
 const KINDS: ConceptKind[] = ['person', 'place', 'event', 'polity', 'organization', 'period', 'object', 'source', 'concept'];
 
-/** Scan a chapter with AI: the people (and key places/things) in it. */
-export async function scanChapter(book: BookCtx, chapterText: string, signal?: AbortSignal): Promise<XRayEntry[]> {
-  const { data } = await completeJSON<{ entries: XRayEntry[] }>({
-    task: 'extraction',
-    system: `${BASE_SYSTEM}
-You build an X-Ray for a chapter, like Kindle X-Ray. Return JSON {"entries":[{"name":"name as written in the text","full":"the specific real-world person/place with disambiguation, e.g. 'Edward I of England', or null if fictional","kind":"person|place|event|polity|organization|period|object|concept","real":true,"role":"one or two sentences: who this is and their part in the story so far"}]}.
-List characters/people first (most important first), then important places and terms. Max 25. Work out WHICH real person is meant from the book and context (e.g. which King Edward). Never reveal anything that happens after this chapter.`,
-    messages: [{ role: 'user', content: `Book: "${book.title}" by ${book.author}${book.chapter ? `\nChapter: ${book.chapter}` : ''}\n\nChapter text:\n"""${chapterText.slice(0, 14000)}"""` }],
-    maxTokens: 2500,
-  }, signal, () => ({ entries: [] }));
-  const counts = (n: string) => (chapterText.match(new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g')) ?? []).length;
-  return (data.entries ?? [])
-    .filter((e) => e?.name)
-    .map((e) => ({ ...e, kind: KINDS.includes(e.kind) ? e.kind : 'concept', real: e.real !== false && !!(e.full ?? e.name), full: e.full || undefined, mentions: counts(e.name) }))
-    .slice(0, 25);
-}
-
 /** Ask the AI which person/place a name means in this passage. */
 export async function identifyWithAI(name: string, passage: string, book: BookCtx, signal?: AbortSignal): Promise<XRayEntry> {
   const { data } = await completeJSON<XRayEntry>({
