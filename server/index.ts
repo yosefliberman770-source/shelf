@@ -7,6 +7,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { credentialsFor, keyConfigAllowed, providerStatus, saveCredentials } from './config.ts';
+import { allowQueries, HistoricalError, placeGet, placeSearch, type SearchQuery, whgConfigured } from './historical.ts';
 import { type ChatMessage, getProvider, ProviderError } from './providers.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -57,8 +58,46 @@ function sameOrigin(req: IncomingMessage): boolean {
   }
 }
 
+/**
+ * Historical place routes may be called from the hosted app on another origin
+ * (e.g. GitHub Pages) — but only origins listed in SHELF_ALLOWED_ORIGINS.
+ */
+function historicalCors(req: IncomingMessage, res: ServerResponse): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  if (!sameOrigin(req)) return false;
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'content-type');
+  return true;
+}
+
+async function handleHistorical(req: IncomingMessage, res: ServerResponse, url: URL) {
+  if (!historicalCors(req, res)) return send(res, 403, { error: 'Cross-origin request rejected.' });
+  if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+  try {
+    if (url.pathname === '/api/historical/status' && req.method === 'GET') return send(res, 200, { whg: whgConfigured() });
+    if (url.pathname === '/api/historical/place-search' && req.method === 'POST') {
+      const body = (await readJson(req)) as { queries?: SearchQuery[] };
+      const n = Array.isArray(body.queries) ? body.queries.length : 0;
+      if (!allowQueries(req.socket.remoteAddress ?? 'unknown', n)) return send(res, 429, { error: 'Too many place lookups. Try again in a minute.' });
+      return send(res, 200, await placeSearch(body.queries ?? []));
+    }
+    if (url.pathname === '/api/historical/place' && req.method === 'GET') return send(res, 200, await placeGet(url.searchParams.get('id') ?? ''));
+    return send(res, 404, { error: 'Not found' });
+  } catch (err) {
+    if (err instanceof HistoricalError) {
+      if (err.retryAfter) res.setHeader('Retry-After', String(err.retryAfter));
+      return send(res, err.status, { error: err.message });
+    }
+    throw err;
+  }
+}
+
 async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL) {
   if (url.pathname === '/api/health') return send(res, 200, { ok: true });
+  if (url.pathname.startsWith('/api/historical/')) return handleHistorical(req, res, url);
 
   if (url.pathname === '/api/ai/status' && req.method === 'GET')
     return send(res, 200, { providers: await providerStatus(), keyConfigAllowed: keyConfigAllowed() });

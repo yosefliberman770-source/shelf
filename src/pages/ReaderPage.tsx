@@ -11,7 +11,10 @@ import { addNote, extendSession, logProgress, updateItem } from '../db/actions';
 import { db } from '../db/db';
 import type { Bookmark, Note } from '../db/types';
 import { Icon } from '../components/icons';
+import { HistoricalMapPanel, type MapRequest } from '../components/history/HistoricalMapPanel';
 import { ReaderTools, TOOLS, type ToolState } from '../components/reader-tools';
+import type { DateContext } from '../lib/history/placeDetect';
+import { detectPlaces } from '../lib/history/placeDetect';
 import { getEbookFile, readerPosKey } from '../lib/ebooks';
 import { buildMatcher, findInDocument, hitAt, type Hit, type Matcher, paintHits, type Term, termsFromConcepts } from '../lib/entityDetect';
 import { CHARS_PER_PAGE, fmtMinutes, readingSpeed, recordReading, resetReadingSpeed } from '../lib/readingSpeed';
@@ -196,6 +199,36 @@ function pageAnchor(r: Rendition, cfi: string): string {
   return cfi;
 }
 
+const BLOCK = /^(P|DIV|H[1-6]|LI|BLOCKQUOTE|TR|TD|TH|DT|DD|SECTION|ARTICLE|HEADER|FOOTER|FIGCAPTION|PRE|ASIDE|NAV)$/;
+
+/**
+ * The text of a chapter (or of one page, given a range) with headings and
+ * paragraphs kept apart — so "Chapter 2" and "In 1204…" don't run together
+ * as "Chapter 2In 1204…", which would hide dates and names.
+ */
+function readableText(doc: Document, range?: Range): string {
+  const root = range ? range.commonAncestorContainer : doc.body;
+  const walker = doc.createTreeWalker(root.nodeType === Node.TEXT_NODE ? root.parentNode! : root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.parentElement && /^(SCRIPT|STYLE)$/.test(n.parentElement.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const parts: string[] = [];
+  let lastBlock: Element | null = null;
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (range && !range.intersectsNode(n)) continue;
+    let text = n.textContent ?? '';
+    if (range) {
+      if (n === range.startContainer) text = text.slice(range.startOffset);
+      if (n === range.endContainer) text = text.slice(0, range.endOffset - (n === range.startContainer ? range.startOffset : 0));
+    }
+    let block = n.parentElement;
+    while (block && !BLOCK.test(block.tagName)) block = block.parentElement;
+    if (lastBlock && block !== lastBlock) parts.push('\n');
+    lastBlock = block;
+    parts.push(text);
+  }
+  return parts.join('').replace(/[ \t\r\f\v]+/g, ' ').replace(/ *\n+ */g, '\n').trim();
+}
+
 /** The paragraph around a word, so the AI can tell which "Edward" is meant. */
 function passageAround(r: Range): string {
   const el = (r.startContainer.nodeType === Node.TEXT_NODE ? r.startContainer.parentElement : r.startContainer as Element)?.closest('p, li, blockquote, div');
@@ -274,6 +307,11 @@ export default function ReaderPage() {
   const [isFull, setIsFull] = useState(!!document.fullscreenElement);
   // Ask AI / Map / Images / Explore, opened over the book.
   const [tool, setTool] = useState<ToolState | null>(null);
+  // The historical map, and the year shown on it (kept while you move between places).
+  const [mapReq, setMapReq] = useState<MapRequest | null>(null);
+  const [mapDate, setMapDate] = useState<DateContext | null>(null);
+  const mapDateChapter = useRef('');
+  const [pagePlaces, setPagePlaces] = useState<{ name: string; passage: string }[]>([]);
   const [found, setFound] = useState<{ page: Term[]; chapter: Term[] }>({ page: [], chapter: [] });
   const [wide, setWide] = useState(() => window.matchMedia('(min-width: 700px)').matches);
   const chapterRef = useRef('');
@@ -287,6 +325,9 @@ export default function ReaderPage() {
   toolRef.current = tool;
   const openEntityRef = useRef<(h: Hit) => void>(() => {});
   const refreshToolRef = useRef<() => void>(() => {});
+  const refreshMapRef = useRef<() => void>(() => {});
+  const mapReqRef = useRef<MapRequest | null>(null);
+  mapReqRef.current = mapReq;
 
   // Reading-time accounting for the automatic session.
   const session = useRef({ startPct: 0, lastPct: 0, activeMs: 0, lastTick: Date.now(), startedAt: Date.now(), cfi: '' });
@@ -394,7 +435,7 @@ export default function ReaderPage() {
           pageRange = c.document.createRange();
           pageRange.setStart(a.startContainer, a.startOffset);
           pageRange.setEnd(b.endContainer, b.endOffset);
-          pageText = pageRange.toString().replace(/\s+/g, ' ').trim();
+          pageText = readableText(c.document, pageRange);
           doc = c.document;
           break;
         } catch { /* try the next view */ }
@@ -420,6 +461,22 @@ export default function ReaderPage() {
     setPanel(null);
     setHint(false);
   };
+  const openMap = (req: MapRequest) => {
+    setTool(null);
+    setPanel(null);
+    // A year picked for one chapter doesn't carry into another (unless kept for the whole book).
+    if (mapDateChapter.current !== chapterRef.current) { setMapDate(null); mapDateChapter.current = chapterRef.current; }
+    setMapReq(req);
+    refreshPagePlaces();
+  };
+  /** Places on the current page, for the map's "Follow the book". */
+  const refreshPagePlaces = () => {
+    const snap = snapshot();
+    const known = idxRef.current.snap.concepts.filter((c) => c.kind === 'place' || c.kind === 'polity').map((c) => c.name);
+    const people = idxRef.current.snap.concepts.filter((c) => c.kind === 'person').map((c) => c.name);
+    setPagePlaces(detectPlaces(snap.ctx.pageText, known, people).slice(0, 8).map((p) => ({ name: p.name, passage: snap.ctx.pageText.slice(Math.max(0, p.index - 400), p.index + 400) })));
+  };
+  refreshMapRef.current = () => { if (mapReqRef.current) refreshPagePlaces(); };
   openEntityRef.current = (h: Hit) => openTool({ tab: 'entity', focus: { name: h.term.name, kind: h.term.kind, conceptId: h.term.conceptId, passage: passageAround(h.range) } });
 
   /** Every place a name appears in the chapter, for X-Ray's "Mentions". */
@@ -456,7 +513,7 @@ export default function ReaderPage() {
   const chapterText = () => {
     const r = rendRef.current;
     const c = (r?.getContents() as unknown as Contents[] | undefined)?.[0];
-    return c?.document?.body?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    return c?.document?.body ? readableText(c.document) : '';
   };
 
   const indexLocations = (book: Book) => {
@@ -636,7 +693,7 @@ export default function ReaderPage() {
       setSelection(null);
       setDefine(null);
       setNoteDraft(null);
-      setTimeout(() => refreshToolRef.current(), 0);
+      setTimeout(() => { refreshToolRef.current(); refreshMapRef.current(); }, 0);
     }
 
     let hiddenAt = 0;
@@ -774,14 +831,15 @@ export default function ReaderPage() {
   // Phone back button: first close what's open (a menu, X-Ray, the text
   // selection), then return from a jump (contents, search, footnote), and
   // only after that leave the book.
-  const backLayer = tool ? 'tool' : panel ? 'panel' : selection ? 'selection' : jumpBack ? 'jump' : null;
+  const backLayer = mapReq ? 'map' : tool ? 'tool' : panel ? 'panel' : selection ? 'selection' : jumpBack ? 'jump' : null;
   const backPushed = useRef(false);
   const ignorePop = useRef(false);
   const leaving = useRef(false);
   const [, bump] = useState(0);
   const onBackRef = useRef<() => void>(() => {});
   onBackRef.current = () => {
-    if (tool) { if (tool.tab === 'entity' && tool.focus?.entry) setTool({ ...tool, tab: 'xray', focus: undefined }); else setTool(null); }
+    if (mapReq) setMapReq(null);
+    else if (tool) { if (tool.tab === 'entity' && tool.focus?.entry) setTool({ ...tool, tab: 'xray', focus: undefined }); else setTool(null); }
     else if (panel) setPanel(null);
     else if (selection) clearSelection();
     else if (jumpBack) { const b = jumpBack; setJumpBack(null); jumping.current = true; userNav.current = true; rendRef.current?.display(b); }
@@ -930,8 +988,8 @@ export default function ReaderPage() {
   };
 
   const iconBtn = { color: t.fg, minWidth: 40 } as const;
-  const sidePanel = wide && !!tool;
-  const SIDE_W = 'min(420px, 46vw)';
+  const sidePanel = wide && (!!tool || !!mapReq);
+  const SIDE_W = mapReq ? 'min(560px, 50vw)' : 'min(420px, 46vw)';
   const bar = { position: 'absolute', left: 0, right: 0, zIndex: 6, background: t.panel, color: t.fg, boxShadow: '0 2px 18px rgba(0,0,0,0.18)' } as const;
   const TOP = 'calc(34px + env(safe-area-inset-top))';
   const BOTTOM = 'calc(30px + env(safe-area-inset-bottom))';
@@ -1032,8 +1090,13 @@ export default function ReaderPage() {
       {tool && (
         <div className={`reader-tool-sheet ${wide ? 'side' : 'bottom'}`} role="dialog" aria-label="Reading tools">
           {!wide && <div className="sheet-handle" style={{ margin: '0 auto 10px' }} />}
-          <ReaderTools state={tool} setState={setTool} onClose={() => setTool(null)} found={found} chapterText={chapterText} chapterHref={toolHref} findMentions={findMentions} onJump={(cfi) => { setTool(null); jumpTo(cfi); setChrome(false); }} />
+          <ReaderTools state={tool} setState={setTool} onClose={() => setTool(null)} found={found} chapterText={chapterText} chapterHref={toolHref} findMentions={findMentions} onJump={(cfi) => { setTool(null); jumpTo(cfi); setChrome(false); }} onOpenMap={openMap} />
         </div>
+      )}
+
+      {mapReq && item && (
+        <HistoricalMapPanel request={mapReq} wide={wide} onClose={() => setMapReq(null)} pagePlaces={pagePlaces} chapterText={chapterText}
+          book={{ bookId: item.id, title: item.title, chapter: chapter || undefined, item }} date={mapDate} setDate={setMapDate} />
       )}
 
       {/* Selection actions. */}
@@ -1065,6 +1128,7 @@ export default function ReaderPage() {
             <div className="row wrap" style={{ gap: 4 }}>
               <button className="btn sm primary" onClick={() => saveHighlight()}>❝ Save quote</button>
               <button className="btn sm ai-solid" onClick={() => { const text = selection.text; clearSelection(); openTool({ tab: 'ai', selection: text }); }}>✨ Ask AI</button>
+              {selection.text.split(/\s+/).length <= 5 && <button className="btn sm ghost" style={{ color: t.fg }} aria-label="Show on historical map" onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openMap({ name: text, passage, mentionIndex: Math.max(0, passage.indexOf(text)) }); }}>🗺 Map</button>}
               {selection.text.split(/\s+/).length <= 6 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openTool({ tab: 'entity', focus: { name: text, passage } }); }}>🧭 Explore</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setNoteDraft('')}>✎ Note</button>
               {selection.text.split(/\s+/).length <= 3 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={lookUpSelection}>📖 Define</button>}

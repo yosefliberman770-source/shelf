@@ -3,16 +3,17 @@
 // person you tap in the text is the same person on the map, in images, in
 // your notes and in your Knowledge Atlas.
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { db } from '../db/db';
 import type { Concept, ConceptKind } from '../db/types';
 import type { Term } from '../lib/entityDetect';
 import { useLibrary } from '../state/library';
-import { Atlas } from './atlas';
 import { Segmented } from './common';
 import { KIND_ICON, KIND_LABEL, useEntity, yearSpan } from './entity';
 import { type Mention, PersonCard, XRayPanel } from './xray';
+import type { MapRequest } from './history/HistoricalMapPanel';
+import { detectPlaces } from '../lib/history/placeDetect';
+import type { EntityCacheRow } from '../db/types';
 import type { XRayEntry } from '../lib/xray';
 import { Icon, type IconName } from './icons';
 import { type AIMode, type ReadingContext, ReaderAI } from './reader-ai';
@@ -24,11 +25,12 @@ export interface ToolState { tab: ToolTab; focus?: Focus; mode?: AIMode; ctx: Re
 
 export const TOOLS: { id: Exclude<ToolTab, 'entity'>; icon: IconName; label: string }[] = [
   { id: 'xray', icon: 'user', label: 'X-Ray' },
+  { id: 'map', icon: 'map', label: 'Map' },
   { id: 'ai', icon: 'sparkle', label: 'Ask AI' },
   { id: 'explore', icon: 'compass', label: 'Explore' },
 ];
 
-export function ReaderTools({ state, setState, onClose, found, chapterText, chapterHref, findMentions, onJump }: {
+export function ReaderTools({ state, setState, onClose, found, chapterText, chapterHref, findMentions, onJump, onOpenMap }: {
   state: ToolState;
   setState: (s: ToolState) => void;
   onClose: () => void;
@@ -37,6 +39,7 @@ export function ReaderTools({ state, setState, onClose, found, chapterText, chap
   chapterHref?: string;
   findMentions?: (name: string) => Mention[];
   onJump?: (cfi: string) => void;
+  onOpenMap?: (req: MapRequest) => void;
 }) {
   const { tab, focus, ctx } = state;
   const idx = useLibrary();
@@ -72,12 +75,13 @@ export function ReaderTools({ state, setState, onClose, found, chapterText, chap
           <>
             {focus.entry && <button className="btn sm ghost" style={{ alignSelf: 'flex-start', paddingLeft: 0 }} onClick={() => go({ tab: 'xray', focus: undefined })}><Icon name="chevronLeft" />X-Ray</button>}
             <PersonCard key={focus.name + (focus.entry?.full ?? '')} entry={entry} book={book} itemId={ctx.itemId} passage={focus.passage} mentions={findMentions?.(focus.name)} onJump={onJump}
-              onAsk={(n) => go({ tab: 'ai', focus: { name: n, kind: entry.kind }, mode: 'explain' })} />
+              onAsk={(n) => go({ tab: 'ai', focus: { name: n, kind: entry.kind }, mode: 'explain' })}
+              onMap={onOpenMap ? (n) => onOpenMap({ name: n, passage: focus.passage }) : undefined} />
           </>
         );
       })()}
       {tab === 'ai' && <ReaderAI key={`${focus?.name ?? ''}|${state.mode ?? ''}|${ctx.selection ?? ''}`} ctx={{ ...ctx, focus: focus?.name }} initialMode={state.mode} onEntity={(n, k) => openEntity(n, k)} />}
-      {tab === 'map' && <MapTab ctx={ctx} focus={focus} onPick={(c) => openEntity(c.name, c.kind, c.id)} />}
+      {tab === 'map' && onOpenMap && <PlacesTab ctx={ctx} chapterText={chapterText} xrayRows={xrayRows ?? []} onOpenMap={onOpenMap} />}
       {tab === 'visual' && <VisualTab ctx={ctx} focus={focus} />}
       {tab === 'explore' && <ExploreTab state={state} go={go} found={found} openEntity={openEntity} />}
     </div>
@@ -91,24 +95,6 @@ export function useBookEntities(itemId: string): Concept[] {
   return [...ids].map((id) => idx.concepts.get(id)).filter((c): c is Concept => !!c);
 }
 
-function MapTab({ ctx, focus, onPick }: { ctx: ReadingContext; focus?: Focus; onPick: (c: Concept) => void }) {
-  const idx = useLibrary();
-  const book = useBookEntities(ctx.itemId);
-  const [everything, setEverything] = useState(false);
-  const { concept, busy } = useEntity({ name: focus?.name, conceptId: focus?.conceptId, kind: focus?.kind, itemId: ctx.itemId });
-  const list = everything ? idx.snap.concepts : book;
-  const all = concept && !list.some((c) => c.id === concept.id) ? [...list, concept] : list;
-  return (
-    <div className="col gap-8">
-      {focus && busy && <div className="small muted">Finding {focus.name} on the map…</div>}
-      <div className="row between small">
-        <span className="muted">{everything ? 'Everything in your Knowledge Atlas' : `From “${ctx.title}”`}</span>
-        <button className="why-link" onClick={() => setEverything((v) => !v)}>{everything ? 'Just this book' : 'Show all my atlas'}</button>
-      </div>
-      <Atlas concepts={all} focus={focus ? concept : undefined} height="min(46vh, 380px)" onPick={onPick} compact />
-    </div>
-  );
-}
 
 function VisualTab({ ctx, focus }: { ctx: ReadingContext; focus?: Focus }) {
   const { concept } = useEntity({ name: focus?.name, conceptId: focus?.conceptId, kind: focus?.kind, itemId: ctx.itemId });
@@ -180,6 +166,45 @@ function Group({ title, terms, onPick, empty, badge }: { title: string; terms: {
           {uniq.map((t) => <button key={t.conceptId ?? t.name} className="chip" title={t.kind ? KIND_LABEL[t.kind] : undefined} onClick={() => onPick(t.name, t.kind, t.conceptId)}>{t.kind ? KIND_ICON[t.kind] : '◇'} {t.name}</button>)}
         </div>
       )}
+    </div>
+  );
+}
+
+/** The Map tab: places named on this page, and the whole chapter on a map. */
+function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingContext; chapterText: () => string; xrayRows: EntityCacheRow[]; onOpenMap: (r: MapRequest) => void }) {
+  const idx = useLibrary();
+  const knownPlaces = [
+    ...idx.snap.concepts.filter((c) => c.kind === 'place' || c.kind === 'polity').flatMap((c) => [c.name, ...(c.aliases ?? [])]),
+    ...xrayRows.flatMap((r) => r.names).filter((n) => n.kind === 'place' || n.kind === 'polity').map((n) => n.name),
+  ].filter((n) => n.length >= 3);
+  const people = [
+    ...idx.snap.concepts.filter((c) => c.kind === 'person').map((c) => c.name),
+    ...xrayRows.flatMap((r) => r.names).filter((n) => n.kind === 'person').map((n) => n.name),
+  ];
+  const onPage = detectPlaces(ctx.pageText, knownPlaces, people);
+  const inChapter = detectPlaces(chapterText(), knownPlaces, people).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);
+  const open = (name: string, text: string) => {
+    const i = text.indexOf(name);
+    onOpenMap({ name, passage: i >= 0 ? text.slice(Math.max(0, i - 600), i + 600) : undefined, mentionIndex: i >= 0 ? Math.min(i, 600) : undefined });
+  };
+  return (
+    <div className="col gap-12">
+      <div>
+        <div className="book-title" style={{ fontSize: 18 }}>Historical map</div>
+        <div className="tiny faint">Tap a place to see it on a map of its own time.</div>
+      </div>
+      <div>
+        <div className="eyebrow mb-8">On this page</div>
+        {onPage.length ? <div className="row wrap gap-4">{onPage.map((p) => <button key={p.name} className={`chip ${p.known ? 'accent' : ''}`} onClick={() => open(p.name, ctx.pageText)}>📍 {p.name}</button>)}</div>
+          : <div className="small muted">No place names spotted on this page. You can also select a word in the book and tap 🗺 Map.</div>}
+      </div>
+      {inChapter.length > 0 && (
+        <details>
+          <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>Elsewhere in this chapter ({inChapter.length})</summary>
+          <div className="row wrap gap-4 mt-8">{inChapter.map((p) => <button key={p.name} className="chip" onClick={() => open(p.name, chapterText())}>📍 {p.name}</button>)}</div>
+        </details>
+      )}
+      <button className="btn" onClick={() => onOpenMap({ mode: 'chapter' })}>🗺 Map places in this chapter</button>
     </div>
   );
 }

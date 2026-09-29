@@ -8,6 +8,7 @@ import { download, eraseEverything, exportBackup, restoreBackup, tableRowsForExp
 import type { Settings } from '../db/types';
 import { addDays, formatKey, isValidKey, range, WEEKDAYS } from '../engine/dates';
 import { dueReminders } from '../lib/notifications';
+import { historyApiBase, historyServerStatus, setHistoryApiBase } from '../lib/history/providers';
 import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 
@@ -23,6 +24,7 @@ export default function SettingsPage() {
       {tab === 'general' && <General />}
       {tab === 'notifications' && <Notifications />}
       {tab === 'ai' && <AISettings />}
+      {tab === 'ai' && <HistoricalMapSettings />}
       {tab === 'data' && <DataSettings />}
     </div>
   );
@@ -329,6 +331,28 @@ function DataSettings() {
           <p className="small muted mt-8">“Replace all” deletes your current data and restores the backup exactly. “Merge” adds the backup’s records and overwrites records with the same id.</p>
         </Modal>
       )}
+    </div>
+  );
+}
+
+/** Where historical place lookups go. WHG needs Shelf's server (the token stays there). */
+function HistoricalMapSettings() {
+  const [url, setUrl] = useState(() => historyApiBase());
+  const [status, setStatus] = useState<string>('');
+  const check = async () => {
+    setHistoryApiBase(url);
+    setStatus('Checking…');
+    const s = await historyServerStatus();
+    setStatus(s.whg ? 'Connected — place lookups use the World Historical Gazetteer.' : 'No Shelf server with World Historical Gazetteer access found. Place lookups use Wikidata instead.');
+  };
+  return (
+    <div className="card mt-16">
+      <div className="card-head"><h3>Historical maps</h3></div>
+      <p className="small muted">Places in your books are looked up in the World Historical Gazetteer when a Shelf server with a WHG token is available; otherwise Wikidata is used. Maps come from OpenHistoricalMap. Only the place name is sent — never your book.</p>
+      <label className="field">Shelf server address (optional)
+        <input className="input" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Leave empty when Shelf runs on its own server" />
+      </label>
+      <div className="row mt-8"><button className="btn sm" onClick={check}>Save & check</button>{status && <span className="small muted">{status}</span>}</div>
     </div>
   );
 }

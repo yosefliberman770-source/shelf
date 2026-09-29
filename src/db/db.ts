@@ -22,6 +22,8 @@ import type {
   Curriculum,
   MediaRecord,
   EntityCacheRow,
+  PlaceCacheRow,
+  PlaceChoiceRow,
 } from './types';
 
 export class ShelfDB extends Dexie {
@@ -47,6 +49,8 @@ export class ShelfDB extends Dexie {
   curricula!: Table<Curriculum, string>;
   media!: Table<MediaRecord, string>;
   entityCache!: Table<EntityCacheRow, string>;
+  placeCache!: Table<PlaceCacheRow, string>;
+  placeChoices!: Table<PlaceChoiceRow, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -74,6 +78,8 @@ export class ShelfDB extends Dexie {
     this.version(2).stores({ files: 'id, itemId' });
     // v3: knowledge atlas — curricula, saved images, per-chapter entity cache.
     this.version(3).stores({ concepts: 'id, name, kind, parentId, wikidataId', curricula: 'id, status, updatedAt', media: 'id, provider, objectId', entityCache: 'id, itemId' });
+    // Historical place lookups (a local cache, not part of backups) and places the reader picked.
+    this.version(4).stores({ placeCache: 'id, placeId, updatedAt', placeChoices: 'id, bookId' });
   }
 }
 
@@ -100,6 +106,7 @@ export const ALL_TABLES = [
   'timer',
   'curricula',
   'media',
+  'placeChoices',
 ] as const;
 export type TableName = (typeof ALL_TABLES)[number];
 

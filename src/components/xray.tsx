@@ -120,7 +120,7 @@ function Photo({ src, kind, size }: { src?: string; kind: ConceptKind; size: num
 }
 
 /** Full X-Ray card: photo, dates, short biography, and their part in this book. */
-export function PersonCard({ entry, book, itemId, passage, mentions, onJump, onAsk }: {
+export function PersonCard({ entry, book, itemId, passage, mentions, onJump, onAsk, onMap }: {
   entry: XRayEntry;
   book: BookCtx;
   itemId: string;
@@ -128,6 +128,8 @@ export function PersonCard({ entry, book, itemId, passage, mentions, onJump, onA
   mentions?: Mention[];
   onJump?: (cfi: string) => void;
   onAsk?: (name: string) => void;
+  /** Open the historical map for a place (shown for places, states and events). */
+  onMap?: (name: string) => void;
 }) {
   const ready = useAIReady();
   const [e, setE] = useState<XRayEntry | null>(entry.full || entry.role || !ready ? entry : null);
@@ -153,8 +155,10 @@ export function PersonCard({ entry, book, itemId, passage, mentions, onJump, onA
   if (!e) return <div className="small muted" style={{ padding: 8 }}>Working out who “{entry.name}” is in this book…</div>;
   const kind = facts?.kind && facts.kind !== 'concept' ? facts.kind : e.kind;
   const span = facts ? lifeSpan({ ...facts, kind }) : '';
+  const mappable = kind === 'place' || kind === 'polity' || kind === 'event';
   return (
     <div className="col gap-12">
+      {onMap && mappable && <button className="btn primary block" onClick={() => onMap(e.name)}>🗺 View on Historical Map</button>}
       <div className="row top gap-12">
         <Photo src={facts?.image} kind={kind} size={92} />
         <div style={{ minWidth: 0 }}>
