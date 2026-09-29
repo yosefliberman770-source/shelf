@@ -12,7 +12,7 @@ export function NoteCard({ note, idx, hideItem }: { note: Note; idx: LibraryInde
   const loc = [note.page !== undefined ? `p. ${note.page}` : '', note.chapter ? `ch. ${note.chapter}` : '', note.timestamp ?? ''].filter(Boolean).join(' · ');
   return (
     <div className={`note-card ${note.kind === 'quote' ? 'quote-card' : ''}`}>
-      <div className="text" style={{ whiteSpace: 'pre-wrap' }}>{note.kind === 'quote' ? `“${note.text}”` : note.text}</div>
+      <div className="text selectable" style={{ whiteSpace: 'pre-wrap' }}>{note.kind === 'quote' ? `“${note.text}”` : note.text}</div>
       <div className="row wrap small faint">
         {note.source === 'ai' && <AIBadge />}
         {!hideItem && item && <Link to={`/item/${item.id}?tab=notes`} className="muted ellipsis" style={{ maxWidth: 240 }}>{item.title}</Link>}

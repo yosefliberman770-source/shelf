@@ -118,6 +118,14 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  /* Tapping a label or button shouldn't select words or trigger Chrome's "Touch to Search". */
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Text you may want to copy stays selectable: what you type, AI answers, notes and quotes. */
+input, textarea, [contenteditable], .md, .quote, .selectable, pre, code {
+  -webkit-user-select: text;
+  user-select: text;
 }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
