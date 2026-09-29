@@ -78,3 +78,29 @@ export function parseExtraction(data: unknown, paraRange?: [number, number]): Ch
   }).filter((e) => e.name);
   return { entities, relations, events };
 }
+
+const fold = (s: string) => s.normalize('NFKC').toLowerCase();
+const nameChar = /[\p{L}\p{N}_]/u;
+
+/** True if a name occurs as a whole word or phrase in the text. */
+export function appearsIn(text: string, name: string): boolean {
+  const t = fold(text);
+  const n = fold(name.replace(/['’]s$/, '').trim());
+  if (!n) return false;
+  for (let i = t.indexOf(n); i !== -1; i = t.indexOf(n, i + 1)) {
+    const before = t[i - 1];
+    const after = t[i + n.length];
+    if (!(before && nameChar.test(before)) && !(after && nameChar.test(after))) return true;
+  }
+  return false;
+}
+
+/**
+ * Drop anything the AI invented: an entity is kept only if its name (or one of
+ * its aliases) is actually written in the passage. Aliases that aren't in the
+ * text are kept only as aliases of a name that is.
+ */
+export function keepGrounded(x: ChunkExtraction, passage: string): ChunkExtraction {
+  const entities = x.entities.filter((e) => appearsIn(passage, e.name) || (e.aliases ?? []).some((a) => appearsIn(passage, a)));
+  return { ...x, entities };
+}

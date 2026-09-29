@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { candidateNames, planChunks } from './chunk';
-import { parseExtraction } from './extractPrompt';
+import { appearsIn, keepGrounded, parseExtraction } from './extractPrompt';
 import { entityUpTo, parseName, resolveBook } from './resolve';
 import { retrievePassages } from './retrieve';
 import { locTitle, paraAtCfi, partRange } from './text';
@@ -146,5 +146,16 @@ describe('book text helpers', () => {
     expect(retrievePassages(rows, 'Longbourn garden', 0).map((p) => p.chapter)).toEqual([0]);
     expect(retrievePassages(rows, 'Longbourn garden', 1).map((p) => p.chapter).sort()).toEqual([0, 1]);
     expect(retrievePassages(rows, 'Longbourn garden', 1, 6, [], -1).map((p) => p.chapter)).toEqual([0]);
+  });
+});
+
+describe('grounding', () => {
+  it('drops names the AI made up and keeps ones written in the text', () => {
+    const passage = '[0] Élodie met Mr. Darcy near Pemberley. Darcyville is elsewhere.';
+    expect(appearsIn(passage, 'Darcy')).toBe(true);
+    expect(appearsIn(passage, 'élodie')).toBe(true);
+    expect(appearsIn(passage, 'Arcy')).toBe(false);
+    const r = keepGrounded({ entities: [ent('Mr. Darcy'), ent('Wickham'), ent('Elizabeth Bennet', { aliases: ['Élodie'] })], relations: [], events: [] }, passage);
+    expect(r.entities.map((e) => e.name)).toEqual(['Mr. Darcy', 'Elizabeth Bennet']);
   });
 });

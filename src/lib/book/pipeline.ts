@@ -13,7 +13,7 @@ import { db } from '../../db/db';
 import { savedBookDate } from '../history/placeDetect';
 import { historicalPlaces } from '../history/placeService';
 import { candidateNames, chunkText, hashChunk, planChunks } from './chunk';
-import { EXTRACTION_SYSTEM, extractionPrompt, parseExtraction } from './extractPrompt';
+import { EXTRACTION_SYSTEM, extractionPrompt, keepGrounded, parseExtraction } from './extractPrompt';
 import { resolveBook } from './resolve';
 import { bookText, extractBookText } from './text';
 import { ANALYSIS_VERSION, type BookChunkRow, type BookGraphRow, type BookJobRow, type BookTextRow, type ChunkExtraction } from './types';
@@ -233,7 +233,7 @@ async function extractAll(bookId: string, text: BookTextRow[], signal: AbortSign
         const res = await complete({ task: 'extraction', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: extractionPrompt(book, ch.title, passage, hints) }], json: true, maxTokens: 6000 }, signal);
         let data: unknown;
         try { data = parseJSON(res.text); } catch { data = repairJSON(res.text); }
-        const result: ChunkExtraction = parseExtraction(data, [c.paraStart, c.paraEnd]);
+        const result: ChunkExtraction = keepGrounded(parseExtraction(data, [c.paraStart, c.paraEnd]), passage);
         await db.bookChunks.update(c.id, { status: 'done', result, provider: res.provider, model: res.model, doneAt: Date.now(), error: undefined });
         const ms = performance.now() - t0;
         await patchJob(bookId, (j) => ({ requests: j.requests + (res.cached ? 0 : 1), succeeded: j.succeeded + 1, provider: res.provider, model: res.model, msPerChunk: j.msPerChunk ? j.msPerChunk * 0.7 + ms * 0.3 : ms, cachedChunks: j.cachedChunks + (res.cached ? 1 : 0) }));
