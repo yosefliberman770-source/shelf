@@ -2,6 +2,8 @@
 // engines (forecasting, statistics, streaks, search) read from this.
 import type {
   AIRecord,
+  Curriculum,
+  MediaRecord,
   Author,
   Concept,
   DateKey,
@@ -38,6 +40,8 @@ export interface Snapshot {
   concepts: Concept[];
   links: Link[];
   ai: AIRecord[];
+  curricula: Curriculum[];
+  media: MediaRecord[];
   settings: Settings;
 }
 

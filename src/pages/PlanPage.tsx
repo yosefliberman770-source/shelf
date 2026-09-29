@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { complete, completeJSON } from '../ai/client';
 import { BASE_SYSTEM } from '../ai/context';
-import { AIErrorNotice, AIOff, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
+import { AIErrorNotice, AIOff, AskChip, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { LineChart, SERIES } from '../components/charts';
 import { AIBadge, Cover, DeadlineChip, Empty, ItemPicker, Markdown, Modal, ProgressBar, Tabs } from '../components/common';
 import { ForecastSummary } from '../components/library';
@@ -32,9 +32,9 @@ export default function PlanPage() {
   }, [idx]);
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Plan</h1><div className="sub">Goals, projects and schedules — calculated from your actual reading.</div></div></div>
+      <div className="page-head"><div><h1>Plan</h1><div className="sub">What you’re working towards. Shelf does the maths from your real reading pace.</div></div><AskChip question="Can I finish my current books by the end of next month?" /></div>
       <Tabs<Tab> value={tab} onChange={(t) => nav(`/plan/${t}`)} tabs={[
-        { id: 'goals', label: 'Goals' }, { id: 'projects', label: 'Projects' }, { id: 'simulator', label: 'Plan simulator' }, { id: 'whatif', label: 'What-If Lab' }, { id: 'math', label: 'Library math' }, { id: 'budget', label: 'Time budget' },
+        { id: 'goals', label: 'Goals' }, { id: 'projects', label: 'Projects' }, { id: 'whatif', label: 'What if…?' }, { id: 'simulator', label: 'Compare plans' }, { id: 'budget', label: 'Time I have' }, { id: 'math', label: 'Library maths' },
       ]} />
       <Routes>
         <Route index element={<GoalsTab idx={idx} />} />
@@ -54,6 +54,11 @@ export default function PlanPage() {
 
 function GoalsTab({ idx }: { idx: LibraryIndex }) {
   const [edit, setEdit] = useState<Partial<Goal> | null>(null);
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('new')) { setEdit({ period: 'daily', metric: 'pages', target: 20 }); setParams({}, { replace: true }); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const goals = idx.snap.goals;
   const periods: GoalPeriod[] = ['daily', 'weekly', 'monthly', 'annual'];
   return (
@@ -106,11 +111,29 @@ function GoalEditor({ idx, goal, onClose }: { idx: LibraryIndex; goal: Partial<G
 
 function ProjectsTab({ idx }: { idx: LibraryIndex }) {
   const nav = useNavigate();
-  const create = async () => { const n = prompt('Project name (e.g. “Roman Republic Project”)'); if (n?.trim()) nav(`/plan/project/${await saveProject({ name: n.trim() })}`); };
+  const [params, setParams] = useSearchParams();
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ name: '', deadline: '' });
+  useEffect(() => {
+    if (params.get('new')) { setCreating(true); setParams({}, { replace: true }); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const create = () => { setDraft({ name: '', deadline: '' }); setCreating(true); };
+  const save = async () => { if (!draft.name.trim()) return; const id = await saveProject({ name: draft.name.trim(), deadline: draft.deadline || undefined }); setCreating(false); nav(`/plan/project/${id}`); };
   return (
     <div className="col gap-16">
       <div className="row between"><div><h2>Projects</h2><div className="small muted">A folder organizes; a project is a temporary mission with a goal, books from anywhere, and (optionally) a deadline.</div></div><button className="btn primary" onClick={create}>＋ New project</button></div>
-      {idx.snap.projects.length === 0 ? <div className="card"><Empty icon="🎯" title="No projects yet" action={<button className="btn" onClick={create}>Create a project</button>}>Group books from different folders into a mission, e.g. “Finish 7 books on the Roman Republic by June 1”.</Empty></div> : (
+      {creating && (
+        <Modal title="New project" onClose={() => setCreating(false)} footer={<><button className="btn" onClick={() => setCreating(false)}>Cancel</button><button className="btn primary" disabled={!draft.name.trim()} onClick={save}>Create</button></>}>
+          <div className="col gap-12">
+            <p className="muted">A project is something you want to accomplish, with books from anywhere in your library.</p>
+            <label className="field">What do you want to accomplish?<input autoFocus className="input" placeholder="e.g. Learn about the Roman Republic" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && save()} /></label>
+            <label className="field">By when? (optional)<input className="input" type="date" value={draft.deadline} onChange={(e) => setDraft({ ...draft, deadline: e.target.value })} /></label>
+            <p className="small faint">Next you’ll pick the books. Shelf then shows the pace you need.</p>
+          </div>
+        </Modal>
+      )}
+      {idx.snap.projects.length === 0 ? <div className="card"><Empty illustration="map" title="No projects yet" action={<button className="btn primary" onClick={create}>Create a project</button>}>Group books from different folders into a mission, e.g. “Finish 7 books on the Roman Republic by June 1”.</Empty></div> : (
         <div className="grid auto">
           {idx.snap.projects.map((p) => {
             const f = projectForecast(idx, p.id);
@@ -396,9 +419,25 @@ function WhatIfLab({ idx }: { idx: LibraryIndex }) {
   const toggleWd = (d: number) => setS({ ...s, excludeWeekdays: s.excludeWeekdays?.includes(d) ? s.excludeWeekdays.filter((x) => x !== d) : [...(s.excludeWeekdays ?? []), d] });
   return (
     <div className="col gap-16">
-      <div className="card row wrap">
-        <label className="field" style={{ minWidth: 280, flex: 1 }}>Experiment on<TargetSelect idx={idx} value={target} onChange={(tt) => { setTarget(tt); setS({}); }} /></label>
-        <button className="btn ghost" onClick={() => setS({})}>Reset</button>
+      <div className="card col gap-12">
+        <h2>What would you like to change?</h2>
+        <div className="row wrap gap-8">
+          {([
+            ['Read 10 more pages a day', { paceDelta: 10 }],
+            ['Don’t read on Sundays', { excludeWeekdays: [0] }],
+            ['Only read on weekdays', { weekdaysOnly: true }],
+            ['30 minutes every morning', { morningMinutes: 30 }],
+            ['Add 3 more books', { addCount: 3, addLength: 300 }],
+            ['Give myself 2 more weeks', { deadlineShiftDays: 14 }],
+          ] as [string, Partial<typeof s>][]).map(([label, patch]) => (
+            <button key={label} className="chip" style={{ minHeight: 36 }} onClick={() => setS({ ...s, ...patch })}>{label}</button>
+          ))}
+        </div>
+        <div className="row wrap">
+          <label className="field" style={{ minWidth: 240, flex: 1 }}>For<TargetSelect idx={idx} value={target} onChange={(tt) => { setTarget(tt); setS({}); }} /></label>
+          <button className="btn ghost" onClick={() => setS({})}>Start over</button>
+        </div>
+        <p className="small faint">Nothing changes for real until you press Apply.</p>
       </div>
       <div className="grid c2">
         <div className="card col gap-12">

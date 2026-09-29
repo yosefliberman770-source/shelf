@@ -6,6 +6,8 @@ export interface Toast {
   id: number;
   text: string;
   undo?: () => Promise<void> | void;
+  /** An optional extra button, e.g. “View”. */
+  action?: { label: string; run: () => void };
   error?: boolean;
 }
 
@@ -19,17 +21,20 @@ export interface ConciergeContext {
 }
 
 export type Sheet =
-  | { kind: 'log'; itemId: string }
+  | { kind: 'log'; itemId?: string }
+  | { kind: 'quick' }
+  | { kind: 'pick'; purpose: 'timer' | 'note' | 'quote' }
+  | { kind: 'organize'; itemId: string }
   | { kind: 'note'; itemId?: string; noteKind: 'note' | 'quote'; noteId?: string }
   | { kind: 'add'; preset?: { status?: 'want' | 'reading'; folderId?: string; query?: string; step?: 'epub' | 'free' } }
   | { kind: 'complete'; itemId: string }
   | { kind: 'timer-stop' }
   | { kind: 'search' }
-  | { kind: 'ai' };
+  | { kind: 'ai'; question?: string };
 
 interface UI {
   toasts: Toast[];
-  toast: (text: string, opts?: { undo?: Toast['undo']; error?: boolean }) => void;
+  toast: (text: string, opts?: { undo?: Toast['undo']; action?: Toast['action']; error?: boolean }) => void;
   dismiss: (id: number) => void;
   sheet: Sheet | null;
   open: (s: Sheet) => void;
@@ -49,7 +54,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const toast = useCallback<UI['toast']>((text, opts) => {
     const id = ++tid;
     setToasts((t) => [...t.slice(-2), { id, text, ...opts }]);
-    setTimeout(() => dismiss(id), opts?.undo ? 8000 : 4000);
+    setTimeout(() => dismiss(id), opts?.undo || opts?.action ? 8000 : 4000);
   }, [dismiss]);
   const value = useMemo<UI>(() => ({ toasts, toast, dismiss, sheet, open: setSheet, close: () => setSheet(null), concierge, setConcierge }), [toasts, toast, dismiss, sheet, concierge]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -68,6 +73,7 @@ export function Toasts() {
       {toasts.map((t) => (
         <div key={t.id} className={`toast ${t.error ? 'error' : ''}`}>
           <span>{t.text}</span>
+          {t.action && <button onClick={() => { t.action?.run(); dismiss(t.id); }}>{t.action.label}</button>}
           {t.undo && (
             <button
               onClick={async () => {

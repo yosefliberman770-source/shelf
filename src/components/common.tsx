@@ -5,6 +5,7 @@ import { formatKey } from '../engine/dates';
 import type { DeadlineStatus } from '../engine/forecast';
 import type { LibraryIndex } from '../engine/model';
 import { contentTypeInfo } from '../engine/units';
+import { Illustration, type IllusName } from './illustrations';
 
 // ── Cover ──────────────────────────────────────────────────────────────
 
@@ -27,10 +28,16 @@ export function Cover({ item, width = 64, author, showType = false }: { item: Pi
       {src && !failed ? (
         <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} onLoad={(e) => { if ((e.target as HTMLImageElement).naturalWidth <= 1) setFailed(true); }} />
       ) : (
-        <div className="fallback" style={{ fontSize: Math.max(8, width / 7.5) }}>
-          <span className="t">{item.title}</span>
-          {author && width >= 70 && <span className="a">{author}</span>}
-        </div>
+        width < 56 ? (
+          <div className="fallback" style={{ justifyContent: 'center', alignItems: 'center', fontSize: width * 0.5, padding: 0 }} aria-hidden>
+            <span style={{ fontWeight: 600 }}>{item.title.replace(/^(the|a|an)\s+/i, '').charAt(0).toUpperCase()}</span>
+          </div>
+        ) : (
+          <div className="fallback" style={{ fontSize: Math.max(9, width / 7.5) }}>
+            <span className="t">{item.title}</span>
+            {author && width >= 70 && <span className="a">{author}</span>}
+          </div>
+        )
       )}
       {showType && item.contentType !== 'book' && <span className="type-badge">{contentTypeInfo(item.contentType).icon}</span>}
     </div>
@@ -80,12 +87,12 @@ export function ProgressBar({ value, good, thin }: { value?: number; good?: bool
   );
 }
 
-export function Empty({ icon = '📖', title, children, action }: { icon?: string; title: string; children?: ReactNode; action?: ReactNode }) {
+export function Empty({ icon = '📖', illustration, title, children, action }: { icon?: string; illustration?: IllusName; title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <div className="empty">
-      <div className="ico">{icon}</div>
+      {illustration ? <Illustration name={illustration} /> : <div className="ico" aria-hidden>{icon}</div>}
       <h3>{title}</h3>
-      {children && <div className="small" style={{ maxWidth: 420 }}>{children}</div>}
+      {children && <div style={{ maxWidth: 440, fontSize: 14.5 }}>{children}</div>}
       {action && <div className="mt-8">{action}</div>}
     </div>
   );
@@ -99,7 +106,8 @@ export function Modal({ title, onClose, children, footer, size }: { title: React
   }, [onClose]);
   return (
     <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={`modal ${size ?? ''}`} role="dialog" aria-modal="true">
+      <div className={`modal ${size ?? ''}`} role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
+        <div className="sheet-handle" aria-hidden />
         <div className="modal-head">
           <h2>{title}</h2>
           <button className="btn ghost sm icon" onClick={onClose} aria-label="Close">✕</button>

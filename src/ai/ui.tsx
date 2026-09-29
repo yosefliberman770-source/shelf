@@ -1,10 +1,13 @@
 // Reusable AI UI: an availability gate, a run-and-review panel that shows
-// exactly what will be sent, and the context-aware "Ask AI" concierge.
+// exactly what will be sent, and the context-aware "Ask AI" sheet that the
+// centre button opens from anywhere in the app.
 import { type ReactNode, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { saveAIRecord } from '../db/actions';
 import type { AIKind, AIRecord } from '../db/types';
 import { AIBadge, Markdown } from '../components/common';
+import { Icon, type IconName, TONES, type Tone } from '../components/icons';
+import { Illustration } from '../components/illustrations';
 import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
 import { AIError, type AIMessage, type AIRequest, type AIResponse, complete } from './client';
@@ -23,7 +26,7 @@ export function AIOff({ compact }: { compact?: boolean }) {
   return (
     <div className="notice ai">
       <div className="row between wrap">
-        <span>✦ {msg} {!compact && 'Everything else in Shelf works without AI.'}</span>
+        <span className="row"><Icon name="sparkle" /> {msg} {!compact && 'Everything else in Shelf works without AI.'}</span>
         <Link className="btn sm ai" to="/settings?tab=ai">Set up AI</Link>
       </div>
     </div>
@@ -43,8 +46,8 @@ export function SharedPreview({ req }: { req: AIRequest | null }) {
   const chars = req.system.length + req.messages.reduce((a, m) => a + m.content.length, 0);
   return (
     <details className="small">
-      <summary className="faint" style={{ cursor: 'pointer' }}>What will be shared with the AI provider (~{Math.round(chars / 4).toLocaleString()} tokens)</summary>
-      <pre style={{ whiteSpace: 'pre-wrap', maxHeight: 260, overflow: 'auto', background: 'var(--surface-2)', padding: 10, borderRadius: 8, fontSize: 11.5 }}>
+      <summary className="faint" style={{ cursor: 'pointer' }}>What will be shared with the AI (~{Math.round(chars / 4).toLocaleString()} tokens)</summary>
+      <pre style={{ whiteSpace: 'pre-wrap', maxHeight: 260, overflow: 'auto', background: 'var(--surface-2)', padding: 10, borderRadius: 10, fontSize: 11.5 }}>
         {req.messages.map((m) => `[${m.role}]\n${m.content}`).join('\n\n')}
       </pre>
     </details>
@@ -114,13 +117,13 @@ export function AIPanel({
     <div className="col gap-12">
       {children}
       <div className="row wrap">
-        <button className="btn ai" disabled={loading} onClick={go}>{loading ? 'Thinking…' : `✦ ${res ? 'Regenerate' : buttonLabel}`}</button>
+        <button className="btn ai" disabled={loading} onClick={go}><Icon name="sparkle" />{loading ? 'Thinking…' : res ? 'Regenerate' : buttonLabel}</button>
         {res && !saved && (
-          <button className="btn sm" onClick={async () => { await saveAIRecord({ kind, title, content: res.text, scope, provider: res.provider, model: res.model }); setSaved(true); toast('Saved to AI notebook'); }}>
+          <button className="btn sm" onClick={async () => { await saveAIRecord({ kind, title, content: res.text, scope, provider: res.provider, model: res.model }); setSaved(true); toast('Saved to your AI notebook'); }}>
             Keep
           </button>
         )}
-        {saved && <span className="small faint">Saved to AI notebook</span>}
+        {saved && <span className="small faint">Saved to your AI notebook</span>}
       </div>
       <SharedPreview req={req} />
       <AIErrorNotice error={error} />
@@ -142,19 +145,44 @@ function safeBuild(build: () => AIRequest): AIRequest | null {
   }
 }
 
-// ── Concierge: context-aware Ask AI, available on every screen ──────────
+// ── Ask sheet: context-aware assistant, opened from anywhere ────────────
 
-export function Concierge() {
-  const { concierge, sheet, open, close } = useUI();
+const ANSWER_FORMAT = `Formatting: when you mention the reader's own books, notes or numbers, put that part under a heading "#### From your library". Put interpretations, ideas and books that are NOT in their library under "#### Suggestions". Leave out a heading if there is nothing for it. Keep answers short and friendly.`;
+
+/** One tap for a short, bullet-point overview of whatever you're looking at. */
+export const quickPrompt = (label?: string) => `⚡ Quick summary${label ? ` of ${label}` : ''}: give me the key points in 3–5 short bullets.`;
+
+const GENERAL = ['What should I read next?', 'How is my reading going this month?', 'What have I learned recently?'];
+
+const TOOLS: { to: string; icon: IconName; tone: Tone; label: string }[] = [
+  { to: '/ai/recommend', icon: 'sparkle', tone: 'plum', label: 'Recommendations' },
+  { to: '/ai/ask', icon: 'search', tone: 'terracotta', label: 'Search my library' },
+  { to: '/ai/tutor', icon: 'bulb', tone: 'gold', label: 'Quiz me' },
+  { to: '/plan/whatif', icon: 'target', tone: 'green', label: 'Plan in plain words' },
+  { to: '/ai/notebook', icon: 'bookmark', tone: 'brown', label: 'Saved answers' },
+];
+
+export function AskSheet() {
+  const { concierge, sheet, close } = useUI();
   const idx = useLibrary();
   const ready = useAIReady();
+  const nav = useNavigate();
   const [msgs, setMsgs] = useState<AIMessage[]>([]);
   const [text, setText] = useState('');
   const { loading, error, run } = useAICall();
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const openNow = sheet?.kind === 'ai';
+  const question = sheet?.kind === 'ai' ? sheet.question : undefined;
+  const asked = useRef<string | undefined>(undefined);
   useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, loading]);
   useEffect(() => setMsgs([]), [concierge?.label]);
+  useEffect(() => {
+    if (!openNow) { asked.current = undefined; return; }
+    const k = (e: KeyboardEvent) => e.key === 'Escape' && close();
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [openNow, close]);
 
   const contextText = () => {
     const share = idx.settings.ai.share;
@@ -169,64 +197,116 @@ export function Concierge() {
     setMsgs(history);
     setText('');
     const first = { role: 'user' as const, content: `${contextText()}\n\nQUESTION: ${history[0].content}` };
-    const r = await run((signal) => complete({ system: BASE_SYSTEM, messages: [first, ...history.slice(1)], maxTokens: 1500 }, signal));
+    const r = await run((signal) => complete({ system: `${BASE_SYSTEM}\n${ANSWER_FORMAT}`, messages: [first, ...history.slice(1)], maxTokens: 1500 }, signal));
     if (r) setMsgs([...history, { role: 'assistant', content: r.text }]);
   };
+  // A question passed in when opening (e.g. from a suggestion chip).
+  useEffect(() => {
+    if (openNow && question && ready && asked.current !== question) {
+      asked.current = question;
+      send(question);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openNow, question, ready]);
 
+  if (!openNow) return null;
+  const suggestions = [...new Set([...(concierge?.suggestions ?? []), ...GENERAL])].slice(0, 5);
+  const go = (to: string) => { close(); nav(to); };
   return (
     <>
-      {!openNow && (
-        <button className="btn ai fab" onClick={() => open({ kind: 'ai' })} aria-label="Ask AI">✦ Ask AI</button>
-      )}
-      {openNow && (
-        <div className="drawer" role="dialog" aria-label="Ask AI">
-          <div className="modal-head">
-            <div>
-              <h2>✦ Ask AI</h2>
-              <div className="small faint">{concierge?.label ?? 'Anywhere in Shelf'}</div>
+      <div className="drawer-backdrop" onClick={close} />
+      <div className="drawer" role="dialog" aria-modal="true" aria-label="Ask AI">
+        <div className="sheet-handle" aria-hidden style={{ display: 'block', width: 44, height: 5, borderRadius: 5, background: 'var(--border-strong)', margin: '10px auto 0' }} />
+        <div className="row between" style={{ padding: '12px 18px 10px', gap: 12 }}>
+          <div className="row gap-12" style={{ minWidth: 0 }}>
+            <span className="brand-mark" style={{ background: TONES.ai, color: '#fff' }}><Icon name="sparkle" /></span>
+            <div style={{ minWidth: 0 }}>
+              <h2 style={{ fontSize: 20 }}>Ask Shelf</h2>
+              <div className="small faint ellipsis">{concierge ? `Knows you’re on: ${concierge.label}` : 'Knows your whole library'}</div>
             </div>
-            <button className="btn ghost sm icon" onClick={close} aria-label="Close">✕</button>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-            {!ready ? (
-              <AIOff />
-            ) : (
-              <div className="chat">
-                {msgs.length === 0 && (
-                  <div className="col">
-                    <div className="small muted">Answers use your library data. Numbers come from Shelf’s reading engine; the AI only explains them.</div>
-                    {(concierge?.suggestions ?? ['What should I read next?', 'What patterns do you see in my reading?']).map((s) => (
-                      <button key={s} className="rabbit-node" onClick={() => send(s)}>{s}<span className="faint">→</span></button>
+          <div className="row gap-4">
+            {msgs.length > 0 && <button className="btn sm ghost" onClick={() => setMsgs([])}>New chat</button>}
+            <button className="btn ghost icon round" onClick={close} aria-label="Close"><Icon name="x" /></button>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 18px 16px' }}>
+          {!ready ? (
+            <AISetupCard onGo={() => go('/settings?tab=ai')} />
+          ) : (
+            <div className="chat">
+              {msgs.length === 0 && (
+                <div className="col gap-12">
+                  <p className="qa-big" style={{ marginTop: 6 }}>What would you like to know?</p>
+                  <button className="btn accent lg block" onClick={() => send(quickPrompt(concierge?.label))}>⚡ Quick summary{concierge ? ` of ${concierge.label}` : ''}</button>
+                  <div className="col" style={{ gap: 8 }}>
+                    {suggestions.map((s) => (
+                      <button key={s} className="rabbit-node" onClick={() => send(s)}>{s}<Icon name="arrowRight" className="faint" /></button>
                     ))}
                   </div>
-                )}
-                {msgs.map((m, i) => (
-                  <div key={i} className={`msg ${m.role === 'user' ? 'user' : 'ai'}`}>
-                    {m.role === 'assistant' ? <><AIBadge /><div className="mt-8"><Markdown text={m.content} /></div></> : m.content}
+                  <div className="eyebrow mt-8">More AI tools</div>
+                  <div className="chips-scroll">
+                    {TOOLS.map((t) => (
+                      <button key={t.to} className="chip" style={{ minHeight: 36 }} onClick={() => go(t.to)}><Icon name={t.icon} />{t.label}</button>
+                    ))}
                   </div>
-                ))}
-                {loading && <div className="msg ai faint">Thinking…</div>}
-                <AIErrorNotice error={error} />
-                <div ref={endRef} />
-              </div>
-            )}
-          </div>
-          {ready && (
-            <div style={{ padding: 12, borderTop: '1px solid var(--border)' }} className="col">
-              <form className="row" onSubmit={(e) => { e.preventDefault(); send(text); }}>
-                <input className="input" placeholder="Ask about this screen…" value={text} onChange={(e) => setText(e.target.value)} />
-                <button className="btn primary" disabled={loading || !text.trim()}>Send</button>
-              </form>
-              <SharedPreview req={{ system: BASE_SYSTEM, messages: [{ role: 'user', content: contextText() }] }} />
+                  <p className="tiny faint">Numbers come from Shelf’s own calculations — the AI only explains them. It never changes your books or progress.</p>
+                </div>
+              )}
+              {msgs.map((m, i) => (
+                <div key={i} className={`msg ${m.role === 'user' ? 'user' : 'ai'}`}>
+                  {m.role === 'assistant' ? (
+                    <>
+                      <AIBadge /><div className="mt-8"><Markdown text={m.content} /></div>
+                      {m.content.length > 500 && i === msgs.length - 1 && !loading && <button className="chip accent mt-8" onClick={() => send('⚡ Quick summary of that answer in 3 short bullet points.')}>⚡ Quick summary of this</button>}
+                    </>
+                  ) : m.content}
+                </div>
+              ))}
+              {loading && <div className="msg ai faint">Thinking…</div>}
+              <AIErrorNotice error={error} />
+              <div ref={endRef} />
             </div>
           )}
         </div>
-      )}
+        {ready && (
+          <div style={{ padding: '10px 14px calc(12px + env(safe-area-inset-bottom))', borderTop: '1px solid var(--border)' }} className="col">
+            <form className="row" onSubmit={(e) => { e.preventDefault(); send(text); }}>
+              <input ref={inputRef} className="input" style={{ borderRadius: 999 }} placeholder="Ask about your books, reading, plans…" value={text} onChange={(e) => setText(e.target.value)} aria-label="Your question" />
+              <button className="btn ai-solid icon round" disabled={loading || !text.trim()} aria-label="Send"><Icon name="send" /></button>
+            </form>
+            <SharedPreview req={{ system: BASE_SYSTEM, messages: [{ role: 'user', content: contextText() }] }} />
+          </div>
+        )}
+      </div>
     </>
   );
 }
 
-/** Register context for the concierge while a screen is mounted. */
+export function AISetupCard({ onGo }: { onGo: () => void }) {
+  return (
+    <div className="col gap-12" style={{ alignItems: 'center', textAlign: 'center', padding: '8px 4px 20px' }}>
+      <Illustration name="magic" className="illus" />
+      <h3 className="qa-big">Meet your reading assistant</h3>
+      <p className="muted" style={{ maxWidth: 380 }}>Ask about your books in plain words, get ideas for what to read next, quiz yourself on what you’ve read, and plan your reading.</p>
+      <div className="col" style={{ gap: 6, alignSelf: 'stretch', textAlign: 'left' }}>
+        {['“What should I read next?”', '“What have I learned about Rome?”', '“Can I finish these 3 books by December?”'].map((e) => (
+          <div key={e} className="notice" style={{ fontSize: 14 }}>{e}</div>
+        ))}
+      </div>
+      <button className="btn ai-solid lg block" onClick={onGo}><Icon name="sparkle" />Turn on free AI · 1 minute</button>
+      <p className="tiny faint">Uses a free Google Gemini key. Everything else in Shelf works without it.</p>
+    </div>
+  );
+}
+
+/** A small button that opens the assistant with a ready-made question. */
+export function AskChip({ question, label, className = 'chip ai' }: { question: string; label?: string; className?: string }) {
+  const { open } = useUI();
+  return <button className={className} onClick={() => open({ kind: 'ai', question })}><Icon name="sparkle" />{label ?? question}</button>;
+}
+
+/** Register context for the assistant while a screen is mounted. */
 export function useConcierge(label: string, suggestions: string[], build: () => string, deps: unknown[] = []) {
   const { setConcierge } = useUI();
   useEffect(() => {

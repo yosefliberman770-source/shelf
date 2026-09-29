@@ -96,14 +96,16 @@ export function ItemViews({ idx, items, mode, selected = new Set(), onToggle }: 
         const p = progressOf(idx, it);
         return (
           <div key={it.id} className="cover-tile" draggable onDragStart={(e) => drag(e, it)} style={{ position: 'relative' }}>
-            {onToggle && <label style={{ position: 'absolute', top: 4, left: 4, zIndex: 2, opacity: selected.size ? 1 : undefined }} className="check" onClick={(e) => e.stopPropagation()}>
+            {onToggle && <label style={{ position: 'absolute', top: 6, left: 6, zIndex: 3, background: 'var(--surface)', borderRadius: 8, padding: 4, boxShadow: 'var(--shadow)' }} className="check" onClick={(e) => e.stopPropagation()}>
               <input type="checkbox" checked={selected.has(it.id)} onChange={() => onToggle(it.id)} aria-label="Select" />
             </label>}
-            <Link to={`/item/${it.id}`}><Cover item={it} width={mode === 'compact' ? 92 : 130} author={idx.authorLine(it)} showType /></Link>
+            <div className="shelf-slot"><Link to={`/item/${it.id}`} aria-label={it.title}><Cover item={it} width={mode === 'compact' ? 92 : 128} author={idx.authorLine(it)} showType /></Link></div>
             {it.status === 'reading' && p !== undefined && <ProgressBar value={p} thin />}
-            <div className="ellipsis" style={{ fontWeight: 500, fontSize: mode === 'compact' ? 12 : 13.5 }} title={it.title}>{it.title}</div>
-            {mode === 'grid' && <div className="small muted ellipsis">{idx.authorLine(it)}</div>}
-            {mode === 'grid' && idx.rating(it) && <Stars value={idx.rating(it)} size={12} />}
+            <div className="meta">
+              <div className="ellipsis" style={{ fontWeight: 700, fontSize: mode === 'compact' ? 12.5 : 14 }} title={it.title}>{it.title}</div>
+              {mode === 'grid' && <div className="small muted ellipsis">{idx.authorLine(it)}</div>}
+              {mode === 'grid' && idx.rating(it) && <Stars value={idx.rating(it)} size={12} />}
+            </div>
           </div>
         );
       })}

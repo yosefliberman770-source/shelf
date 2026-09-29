@@ -19,6 +19,9 @@ import type {
   Tag,
   User,
   EbookFile,
+  Curriculum,
+  MediaRecord,
+  EntityCacheRow,
 } from './types';
 
 export class ShelfDB extends Dexie {
@@ -41,6 +44,9 @@ export class ShelfDB extends Dexie {
   ai!: Table<AIRecord, string>;
   timer!: Table<ActiveTimer, string>;
   files!: Table<EbookFile, string>;
+  curricula!: Table<Curriculum, string>;
+  media!: Table<MediaRecord, string>;
+  entityCache!: Table<EntityCacheRow, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -66,6 +72,8 @@ export class ShelfDB extends Dexie {
     });
     // v2: ebook files stored on this device.
     this.version(2).stores({ files: 'id, itemId' });
+    // v3: knowledge atlas — curricula, saved images, per-chapter entity cache.
+    this.version(3).stores({ concepts: 'id, name, kind, parentId, wikidataId', curricula: 'id, status, updatedAt', media: 'id, provider, objectId', entityCache: 'id, itemId' });
   }
 }
 
@@ -90,6 +98,8 @@ export const ALL_TABLES = [
   'links',
   'ai',
   'timer',
+  'curricula',
+  'media',
 ] as const;
 export type TableName = (typeof ALL_TABLES)[number];
 

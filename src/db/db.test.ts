@@ -4,7 +4,7 @@ import { addDays, todayKey } from '../engine/dates';
 import { itemForecast } from '../engine/forecast';
 import { LibraryIndex } from '../engine/model';
 import {
-  addItem, addNote, createFolder, deleteFolder, deleteItem, deleteSession, finishTimer, logProgress, moveInQueue, pauseTimer, readSettings, resumeTimer,
+  addItem, addNote, createFolder, deleteFolder, deleteItem, deleteSession, extendSession, finishTimer, logProgress, moveInQueue, pauseTimer, readSettings, resumeTimer,
   setStatus, startReread, startTimer, updateInstance, updateFolder,
 } from './actions';
 import { db } from './db';
@@ -15,7 +15,7 @@ async function snapshot() {
     items: await db.items.toArray(), instances: await db.instances.toArray(), sessions: await db.sessions.toArray(), notes: await db.notes.toArray(),
     folders: await db.folders.toArray(), shelves: await db.shelves.toArray(), tags: await db.tags.toArray(), authors: await db.authors.toArray(),
     goals: await db.goals.toArray(), projects: await db.projects.toArray(), plans: await db.plans.toArray(), collections: await db.collections.toArray(),
-    concepts: await db.concepts.toArray(), links: await db.links.toArray(), ai: await db.ai.toArray(), settings: await readSettings(),
+    concepts: await db.concepts.toArray(), links: await db.links.toArray(), ai: await db.ai.toArray(), curricula: await db.curricula.toArray(), media: await db.media.toArray(), settings: await readSettings(),
   });
 }
 
@@ -80,6 +80,29 @@ describe('logging', () => {
     expect(res!.session.durationSec).toBeGreaterThanOrEqual(20 * 60 - 1);
     expect(res!.session.amount).toBe(30);
     expect(await db.timer.get('timer')).toBeUndefined();
+  });
+});
+
+describe('automatic ebook logging', () => {
+  it('grows one session as you keep reading, and finishes the book at the end', async () => {
+    const id = await addItem({ title: 'Meditations', total: 100, unit: 'percent' });
+    const first = await logProgress({ itemId: id, to: 10, durationSec: 120, medium: 'ebook' });
+    expect(first!.session.medium).toBe('ebook');
+    await extendSession(first!.session.id, 25, 600);
+    let sessions = await db.sessions.toArray();
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].amount).toBe(25);
+    expect(sessions[0].durationSec).toBe(600);
+    // A paper-copy log in between counts toward the same progress.
+    await logProgress({ itemId: id, to: 40, medium: 'print' });
+    await extendSession(first!.session.id, 38, 700);
+    const idx = await snapshot();
+    expect(idx.position(idx.items.get(id)!)).toBe(40);
+    const done = await extendSession(first!.session.id, 100, 900);
+    expect(done!.completed).toBe(true);
+    expect((await db.items.get(id))!.status).toBe('read');
+    sessions = await db.sessions.toArray();
+    expect(sessions.reduce((a, x) => a + x.amount, 0)).toBe(100);
   });
 });
 

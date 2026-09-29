@@ -5,6 +5,8 @@
 import { todayKey, keyFromMs } from '../engine/dates';
 import { db, defaultSettings, uid } from './db';
 import type {
+  Curriculum,
+  MediaRecord,
   AIRecord,
   Concept,
   DateKey,
@@ -171,8 +173,9 @@ export async function updateItemTags(id: string, names: string[]): Promise<void>
 }
 
 export async function deleteItem(id: string): Promise<void> {
-  await db.transaction('rw', [db.items, db.instances, db.sessions, db.notes, db.links, db.projects, db.files], async () => {
+  await db.transaction('rw', [db.items, db.instances, db.sessions, db.notes, db.links, db.projects, db.files, db.entityCache], async () => {
     await db.items.delete(id);
+    await db.entityCache.where('itemId').equals(id).delete();
     await db.files.where('itemId').equals(id).delete();
     await db.instances.where('itemId').equals(id).delete();
     await db.sessions.where('itemId').equals(id).delete();
@@ -229,6 +232,7 @@ export interface LogInput {
   startedAt?: number;
   note?: string;
   source?: ReadingSession['source'];
+  medium?: ReadingSession['medium'];
 }
 
 export interface LogResult {
@@ -278,6 +282,7 @@ export async function logProgress(input: LogInput): Promise<LogResult | undefine
     to,
     note: input.note?.trim() || undefined,
     source: input.source ?? 'user',
+    medium: input.medium,
     createdAt: now,
   };
   const completed = !!item.total && newPos >= item.total && inst.status !== 'read';
@@ -308,6 +313,32 @@ export async function logProgress(input: LogInput): Promise<LogResult | undefine
     });
   };
   return { session, completed, undo };
+}
+
+/**
+ * Grow an automatic ebook session as you keep reading, instead of creating a
+ * new one every few minutes. Returns undefined when the session can't be
+ * extended (it's gone, or it's from another day) so the caller starts a new one.
+ */
+export async function extendSession(id: string, to: number, durationSec?: number): Promise<{ completed: boolean } | undefined> {
+  const s = await db.sessions.get(id);
+  if (!s || s.date !== todayKey()) return undefined;
+  const item = await db.items.get(s.itemId);
+  const inst = await db.instances.get(s.instanceId);
+  if (!item || !inst) return undefined;
+  const target = item.total ? Math.min(item.total, to) : to;
+  const gain = Math.max(0, target - inst.position);
+  const completed = !!item.total && target >= item.total && inst.status !== 'read';
+  const now = Date.now();
+  await db.transaction('rw', db.items, db.instances, db.sessions, async () => {
+    await db.sessions.update(id, { amount: s.amount + gain, to: Math.max(s.to ?? 0, target), durationSec: durationSec ?? s.durationSec });
+    if (gain > 0) {
+      const status = completed ? 'read' : item.status === 'want' || item.status === 'paused' ? 'reading' : item.status;
+      await db.instances.update(inst.id, { position: target, status, ...(completed ? { finishedOn: s.date } : {}) });
+      await db.items.update(item.id, { status, queue: laneFor(status), lastReadAt: now, updatedAt: now });
+    }
+  });
+  return { completed };
 }
 
 /** Delete a session and recompute the instance position from remaining sessions. */
@@ -615,4 +646,38 @@ export async function deleteAllAIData(): Promise<void> {
     await db.concepts.filter((c) => c.source === 'ai').delete();
     await db.notes.filter((n) => n.source === 'ai').delete();
   });
+}
+
+// ── Curricula ──────────────────────────────────────────────────────────────
+
+export async function saveCurriculum(c: Partial<Curriculum> & Pick<Curriculum, 'name'>): Promise<string> {
+  const id = c.id ?? uid();
+  const prev = c.id ? await db.curricula.get(c.id) : undefined;
+  const now = Date.now();
+  await db.curricula.put({ levels: [], status: 'active', createdAt: now, ...prev, ...c, id, updatedAt: now } as Curriculum);
+  return id;
+}
+
+export async function deleteCurriculum(id: string): Promise<void> {
+  await db.transaction('rw', db.curricula, db.links, async () => {
+    await db.curricula.delete(id);
+    await db.links.filter((l) => (l.fromType === 'curriculum' && l.fromId === id) || (l.toType === 'curriculum' && l.toId === id)).delete();
+  });
+}
+
+// ── Saved images ───────────────────────────────────────────────────────────
+
+export async function saveMedia(m: Omit<MediaRecord, 'id' | 'retrievedAt'> & Partial<Pick<MediaRecord, 'id'>>): Promise<string> {
+  const existing = await db.media.where('objectId').equals(m.objectId).first();
+  if (existing) {
+    await db.media.update(existing.id, { conceptIds: [...new Set([...existing.conceptIds, ...m.conceptIds])], itemIds: [...new Set([...existing.itemIds, ...m.itemIds])] });
+    return existing.id;
+  }
+  const id = uid();
+  await db.media.add({ ...m, id, retrievedAt: Date.now() });
+  return id;
+}
+
+export async function deleteMedia(id: string): Promise<void> {
+  await db.media.delete(id);
 }

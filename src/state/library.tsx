@@ -17,12 +17,12 @@ interface LibraryState {
 const Ctx = createContext<LibraryState | null>(null);
 
 async function loadSnapshot(): Promise<Snapshot> {
-  const [items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, settings] = await Promise.all([
+  const [items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, curricula, media, settings] = await Promise.all([
     db.items.toArray(), db.instances.toArray(), db.sessions.toArray(), db.notes.toArray(), db.folders.toArray(), db.shelves.toArray(),
     db.tags.toArray(), db.authors.toArray(), db.goals.toArray(), db.projects.toArray(), db.plans.toArray(), db.collections.toArray(),
-    db.concepts.toArray(), db.links.toArray(), db.ai.toArray(), readSettings(),
+    db.concepts.toArray(), db.links.toArray(), db.ai.toArray(), db.curricula.toArray(), db.media.toArray(), readSettings(),
   ]);
-  return { items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, settings };
+  return { items, instances, sessions, notes, folders, shelves, tags, authors, goals, projects, plans, collections, concepts, links, ai, curricula, media, settings };
 }
 
 export function LibraryProvider({ children, fallback }: { children: ReactNode; fallback: ReactNode }) {

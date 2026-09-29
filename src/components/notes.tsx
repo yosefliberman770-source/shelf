@@ -21,7 +21,7 @@ export function NoteCard({ note, idx, hideItem }: { note: Note; idx: LibraryInde
         {note.tags.map((t) => <span key={t} className="chip">#{t}</span>)}
         {note.conceptIds.map((c) => idx.concepts.get(c)).filter(Boolean).map((c) => <Link key={c!.id} to={`/knowledge/concept/${c!.id}`} className="chip accent">◇ {c!.name}</Link>)}
         <span className="grow" />
-        <button className="btn xs ghost" onClick={() => open({ kind: 'note', noteKind: note.kind, noteId: note.id, itemId: note.itemId })}>Edit</button>
+        <button className="btn xs ghost" onClick={() => open({ kind: 'note', noteKind: note.kind === 'quote' ? 'quote' : 'note', noteId: note.id, itemId: note.itemId })}>Edit</button>
         <button className="btn xs ghost" onClick={async () => { if (confirm('Delete this note?')) { await deleteNote(note.id); toast('Deleted'); } }}>Delete</button>
       </div>
     </div>

@@ -79,7 +79,8 @@ export function libraryDigest(idx: LibraryIndex, share: Share, items: Item[] = i
 
 export function statsDigest(idx: LibraryIndex, share: Share): string {
   if (!share.readingHistory) return 'READING STATS: (not shared by user privacy settings)';
-  return `READING STATS (computed by the app):\n${brainSummary(idx)}`;
+  const interests = idx.settings.interests?.length ? `\nREADER SAYS THEY USUALLY READ: ${idx.settings.interests.join(', ')}` : '';
+  return `READING STATS (computed by the app):\n${brainSummary(idx)}${interests}`;
 }
 
 export function folderDigest(idx: LibraryIndex): string {

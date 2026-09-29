@@ -2,11 +2,11 @@ import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { brainSummary } from '../ai/summaries';
 import { BASE_SYSTEM } from '../ai/context';
-import { AIPanel, useConcierge } from '../ai/ui';
+import { AIPanel, AskChip, useConcierge } from '../ai/ui';
 import { BarChart, CalendarHeatmap, ChartCard, Donut, LineChart, MatrixHeatmap, Scatter, StackedBars } from '../components/charts';
 import { Cover, DateRangePicker, Empty, type RangeId, Segmented, Tabs } from '../components/common';
 import { download } from '../db/portability';
-import { addDays, formatKey, formatMonth, resolveRange, WEEKDAYS } from '../engine/dates';
+import { addDays, formatKey, formatMonth, resolveRange, startOfMonth, WEEKDAYS } from '../engine/dates';
 import { readingBrain } from '../engine/brain';
 import { overallPace } from '../engine/forecast';
 import { futureYou, simulateQueue } from '../engine/future';
@@ -43,12 +43,13 @@ export default function InsightsPage() {
   return (
     <div className="page">
       <div className="page-head">
-        <div><h1>Insights</h1><div className="sub">Everything here is calculated from what you’ve actually logged.</div></div>
+        <div><h1>Insights</h1><div className="sub">What’s happening in your reading — calculated only from what you’ve logged.</div></div>
         {['overview', 'books', 'habits', 'balance'].includes(tab) && enough && <DateRangePicker value={range} today={idx.today} onChange={(v, c) => { setRange(v); setCustom(c); }} />}
       </div>
+      {enough && tab === 'overview' && <MonthSummary idx={idx} />}
       <Tabs<Tab> value={tab} onChange={(t) => nav(`/insights/${t}`)} tabs={TABS} />
       {!enough && tab !== 'dna' && tab !== 'books' ? (
-        <div className="card"><Empty icon="📊" title="Start your first reading session and your statistics will appear here" action={<Link className="btn" to="/reading">Go to Reading</Link>}>Insights grow with your data — charts first, then patterns, forecasts and your Reading DNA.</Empty></div>
+        <div className="card"><Empty illustration="chart" title="Your statistics will grow here" action={<Link className="btn primary" to="/reading">Go to Reading</Link>}>Insights grow with your data — charts first, then patterns, forecasts and your Reading DNA.</Empty></div>
       ) : (
         <>
           {tab === 'overview' && <Overview idx={idx} r={r} />}
@@ -62,6 +63,35 @@ export default function InsightsPage() {
           {tab === 'balance' && <Balance idx={idx} r={r} />}
         </>
       )}
+    </div>
+  );
+}
+
+function MonthSummary({ idx }: { idx: LibraryIndex }) {
+  const today = idx.today;
+  const from = startOfMonth(today);
+  const day = Number(today.slice(8));
+  const prevFrom = startOfMonth(addDays(from, -1));
+  const prevTo = addDays(prevFrom, day - 1);
+  const now = overview(idx, { from, to: today });
+  const before = overview(idx, { from: prevFrom, to: prevTo < from ? prevTo : addDays(from, -1) });
+  const lines: string[] = [];
+  if (now.minutes >= 1) lines.push(`You’ve read for ${fmtDuration(now.minutes * 60)} this month.`);
+  if (now.pages >= 1) lines.push(`That’s ${fmtNum(now.pages)} pages across ${now.activeDays} day${now.activeDays === 1 ? '' : 's'}.`);
+  if (now.booksFinished) lines.push(`You finished ${now.booksFinished} book${now.booksFinished === 1 ? '' : 's'}.`);
+  if (now.avgSessionMin) lines.push(`Your average session is ${fmtNum(now.avgSessionMin)} minutes.`);
+  if (before.pages > 0 && now.pages > 0) {
+    const ch = (now.pages - before.pages) / before.pages;
+    if (Math.abs(ch) >= 0.05) lines.push(`That’s ${Math.round(Math.abs(ch) * 100)}% ${ch > 0 ? 'more' : 'less'} than at this point last month.`);
+  }
+  if (!lines.length) lines.push('No reading logged yet this month — your summary will appear here.');
+  return (
+    <div className="hero mb-16">
+      <div className="eyebrow">Your month so far</div>
+      <div className="col mt-8" style={{ gap: 6 }}>
+        {lines.map((l) => <p key={l} className="serif" style={{ fontSize: 19, lineHeight: 1.35 }}>{l}</p>)}
+      </div>
+      <div className="row wrap mt-16"><AskChip question="Why has my reading changed recently?" /><AskChip question="When do I read best?" /></div>
     </div>
   );
 }
