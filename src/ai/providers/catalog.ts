@@ -179,7 +179,8 @@ export const TASKS: { id: AITask; label: string; weight: 'light' | 'standard' | 
   { id: 'translation', label: 'Translation', weight: 'light' },
   { id: 'brainstorm', label: 'Brainstorming', weight: 'standard' },
   { id: 'reasoning', label: 'Complex reasoning', weight: 'heavy' },
-  { id: 'extraction', label: 'Book analysis: extraction', weight: 'light' },
+  // Not 'light': the smallest models have per-minute limits too small for one piece of a book.
+  { id: 'extraction', label: 'Book analysis: extraction', weight: 'standard' },
   { id: 'classification', label: 'Simple classification', weight: 'light' },
   { id: 'resolution', label: 'Book analysis: merging names', weight: 'standard' },
   { id: 'synthesis', label: 'Book analysis: character X-Rays', weight: 'heavy' },

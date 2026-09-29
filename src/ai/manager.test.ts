@@ -182,7 +182,9 @@ describe('provider adapters', () => {
 
   it('recognises limits, quotas, bad keys and outages', () => {
     expect(classify(429, 'Too many requests').kind).toBe('rate_limit');
-    expect(classify(429, '{"error":"You exceeded your current quota"}').kind).toBe('quota');
+    // Ambiguous: treated as a short wait (longer each time), never as "done until tomorrow".
+    expect(classify(429, '{"error":"You exceeded your current quota"}').kind).toBe('rate_limit');
+    expect(classify(429, '{"error":"daily limit reached"}').kind).toBe('quota');
     expect(classify(402, 'Payment required').kind).toBe('quota');
     expect(classify(401, 'bad key').kind).toBe('auth');
     expect(classify(404, 'model not found').kind).toBe('model');
@@ -263,5 +265,62 @@ describe('model retired for new users but still listed', () => {
     const { suggestedModel } = await import('./manager');
     expect(suggestedModel('… Please update your code to use models/gemini-3.8-flash instead.')).toBe('gemini-3.8-flash');
     expect(suggestedModel('Model not found.')).toBeUndefined();
+  });
+});
+
+describe('per-minute limits are not “used up for today”', () => {
+  const H = (h: Record<string, string> = {}) => new Headers(h);
+  it('reads the real messages correctly', () => {
+    // Groq, per-minute tokens
+    let f = classify(429, '{"error":{"message":"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_x` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6000, Requested 3500. Please try again in 11.25s.","type":"tokens","code":"rate_limit_exceeded"}}', H());
+    expect(f.kind).toBe('rate_limit');
+    expect(f.retryAfter).toBe(12);
+    // Groq, per-day tokens → really used up
+    f = classify(429, '{"error":{"message":"Rate limit reached for model `llama-3.3-70b-versatile` on tokens per day (TPD): Limit 100000, Used 99000. Please try again in 14m24s.","code":"rate_limit_exceeded"}}', H());
+    expect(f.kind).toBe('quota');
+    // Gemini, per-minute (it says "quota" even for per-minute limits)
+    f = classify(429, '{"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing details. Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 10\\nPlease retry in 36.2s.","status":"RESOURCE_EXHAUSTED","details":[{"quotaId":"GenerateRequestsPerMinutePerProjectPerModel-FreeTier"},{"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"36s"}]}}', H());
+    expect(f.kind).toBe('rate_limit');
+    expect(f.retryAfter).toBe(37);
+    // Gemini, per-day
+    f = classify(429, '{"error":{"code":429,"message":"You exceeded your current quota. Quota exceeded for metric: generate_content_free_tier_requests, limit: 250","status":"RESOURCE_EXHAUSTED","details":[{"quotaId":"GenerateRequestsPerDayPerProjectPerModel-FreeTier"}]}}', H());
+    expect(f.kind).toBe('quota');
+    // Groq 413: one request bigger than the model's per-minute allowance
+    f = classify(413, '{"error":{"message":"Request too large for model `llama-3.1-8b-instant` on tokens per minute (TPM): Limit 6000, Requested 9400, please reduce your message size and try again."}}', H());
+    expect(f.kind).toBe('too_large');
+  });
+
+  it('book analysis waits out a short limit and carries on with the same provider', async () => {
+    setKey('groq', 'q');
+    setup({ groq: { enabled: true, model: 'openai/gpt-oss-120b' } });
+    let n = 0;
+    mockFetch((url) => noServer(url) ?? (++n === 1 ? status(429, '{"error":{"message":"Rate limit reached ... tokens per minute (TPM). Please try again in 1.2s."}}') : ok('{"entities":[]}')));
+    const t0 = Date.now();
+    const r = await runAI('extraction', { ...REQ, json: true }, undefined, { patient: true });
+    expect(r.provider).toBe('groq');
+    expect(Date.now() - t0).toBeGreaterThanOrEqual(1500);
+    expect(providerHealth('groq')).toBe('available');
+  });
+
+  it('uses a normal-size model for book analysis, not the tiny one', async () => {
+    setKey('groq', 'q');
+    setup({ groq: { enabled: true } });
+    const { candidates } = await route('extraction');
+    expect(candidates[0].model).not.toBe('llama-3.1-8b-instant');
+  });
+});
+
+describe('parallel book analysis', () => {
+  it('spreads simultaneous requests across services instead of queuing on one', async () => {
+    setKey('groq', 'q'); setKey('gemini', 'g');
+    setup({ groq: { enabled: true, model: 'openai/gpt-oss-120b' }, gemini: { enabled: true, model: 'gemini-2.5-flash' } }, { order: ['groq', 'gemini', 'cerebras', 'mistral', 'openrouter', 'cloudflare', 'nvidia', 'huggingface', 'cohere', 'ollama'], cache: false });
+    mockFetch((url) => noServer(url) ?? (url.includes('generativelanguage') ? geminiOk('{"a":1}') : ok('{"a":1}')));
+    const { parallelCapacity } = await import('./manager');
+    expect(parallelCapacity()).toBe(2);
+    const [a, b] = await Promise.all([
+      runAI('extraction', { ...REQ, json: true, messages: [{ role: 'user', content: 'part 1' }] }, undefined, { spread: true }),
+      runAI('extraction', { ...REQ, json: true, messages: [{ role: 'user', content: 'part 2' }] }, undefined, { spread: true }),
+    ]);
+    expect(new Set([a.provider, b.provider])).toEqual(new Set(['groq', 'gemini']));
   });
 });

@@ -27,7 +27,7 @@ export interface ChatResult {
   refused?: boolean;
 }
 
-export type FailureKind = 'rate_limit' | 'quota' | 'auth' | 'model' | 'unavailable' | 'network' | 'bad_request' | 'refused' | 'not_configured';
+export type FailureKind = 'rate_limit' | 'quota' | 'auth' | 'model' | 'too_large' | 'unavailable' | 'network' | 'bad_request' | 'refused' | 'not_configured';
 
 export class ProviderFailure extends Error {
   kind: FailureKind;
@@ -45,20 +45,37 @@ export class ProviderFailure extends Error {
 const JSON_HINT = '\n\nRespond with a single valid JSON value only — no prose, no code fences.';
 
 /** Sort an HTTP error into a failure kind, reading the provider's message where it helps. */
+/** Seconds to wait, from a Retry-After header or the provider's own wording ("try again in 7.6s", "retryDelay": "36s"). */
+export function retryHint(body: string, headers?: Headers): number | undefined {
+  const ra = Number(headers?.get('retry-after'));
+  if (Number.isFinite(ra) && ra > 0) return ra;
+  const m = /(?:try again in|retry in|retrydelay"?\s*:\s*"?)\s*(?:(\d+)m)?\s*([\d.]+)\s*(ms|s)?/i.exec(body);
+  if (!m) return undefined;
+  const mins = m[1] ? Number(m[1]) * 60 : 0;
+  const n = Number(m[2]);
+  const secs = m[3]?.toLowerCase() === 'ms' ? n / 1000 : n;
+  const total = mins + secs;
+  return Number.isFinite(total) && total > 0 ? Math.ceil(total) : undefined;
+}
+
+/** Sort an HTTP error into a failure kind, reading the provider's message where it helps. */
 export function classify(status: number, body: string, headers?: Headers): ProviderFailure {
   const text = body.toLowerCase();
-  const ra = Number(headers?.get('retry-after'));
-  const retryAfter = Number.isFinite(ra) && ra > 0 ? ra : undefined;
+  const retryAfter = retryHint(body, headers);
   let detail = body;
   try { const j = JSON.parse(body) as { error?: { message?: string } | string; message?: string }; detail = (typeof j.error === 'object' ? j.error?.message : j.error) ?? j.message ?? body; } catch { /* not JSON */ }
   const short = String(detail).replace(/\s+/g, ' ').slice(0, 300);
-  if (/quota|insufficient|credit|billing|daily limit|per day|exceeded your current|limit reached|out of free/.test(text) && (status === 429 || status === 402 || status === 403 || status === 400)) return new ProviderFailure('quota', 'Free allowance used up for now.', status, retryAfter);
-  if (status === 429) return new ProviderFailure('rate_limit', 'Rate limit reached.', status, retryAfter);
-  if (status === 402) return new ProviderFailure('quota', 'No credits left.', status, retryAfter);
+  // A single request bigger than the model's per-minute allowance (Groq answers 413): use another model, don't retry this one.
+  if (status === 413 || /request too large|reduce your message size/.test(text)) return new ProviderFailure('too_large', 'This request is too big for this model’s free limit.', status);
+  const perMinute = /per.?minute|perminute|\brpm\b|\btpm\b|requests per min|tokens per min/.test(text);
+  const perDay = /per.?day|perday|\brpd\b|\btpd\b|daily|per month|monthly|out of free|no credits|insufficient (credits|balance|funds)|billing/.test(text);
+  if (status === 402 || ((status === 429 || status === 403 || status === 400) && perDay && !perMinute)) return new ProviderFailure('quota', 'Free allowance used up for now.', status, retryAfter);
+  // Anything else that says "slow down" is a short wait, not "done for the day".
+  if (status === 429 || /rate limit|too many requests|resource exhausted|resource_exhausted|exceeded your current quota/.test(text)) return new ProviderFailure('rate_limit', 'Rate limit reached.', status, retryAfter);
   if (status === 401 || status === 403 || /unauthenticated|invalid authentication|api key not valid|invalid api key|access_token_type_unsupported/.test(text)) return new ProviderFailure('auth', 'The API key was rejected.', status);
-  if (status === 404 || /model.*(not found|does not exist|decommission|unknown)|no endpoints found/.test(text)) return new ProviderFailure('model', `Model unavailable (${short}).`, status);
+  if (status === 404 || /model.*(not found|does not exist|decommission|unknown|no longer available)|no endpoints found/.test(text)) return new ProviderFailure('model', `Model unavailable (${short}).`, status);
   if (status >= 500 || status === 408) return new ProviderFailure('unavailable', 'The provider is temporarily unavailable.', status, retryAfter);
-  if (/context length|too many tokens|maximum context|too long/.test(text)) return new ProviderFailure('bad_request', 'The request was too long for this model.', status);
+  if (/context length|too many tokens|maximum context|too long/.test(text)) return new ProviderFailure('too_large', 'The request was too long for this model.', status);
   return new ProviderFailure('bad_request', `Request rejected (${status}): ${short}`, status);
 }
 

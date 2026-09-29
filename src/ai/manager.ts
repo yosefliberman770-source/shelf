@@ -95,7 +95,18 @@ export function setKey(id: ProviderId, key: string | null) {
 export type Health = 'available' | 'limited' | 'unavailable' | 'not-configured';
 interface Runtime { cooldowns: Record<string, { until: number; reason: FailureKind; strikes: number }>; lastTest: Record<string, { ok: boolean; ms?: number; model?: string; message?: string; at: number }>; serverProviders?: string[] }
 
-function runtime(): Runtime { return store.get<Runtime>(STATE_KEY, { cooldowns: {}, lastTest: {} }); }
+function runtime(): Runtime {
+  const r = store.get<Runtime>(STATE_KEY, { cooldowns: {}, lastTest: {} });
+  // Earlier versions mistook per-minute limits for "used up until tomorrow". Lift those rests once.
+  try {
+    if (!localStorage.getItem('shelf.aiCooldownFix1')) {
+      localStorage.setItem('shelf.aiCooldownFix1', '1');
+      for (const [k, v] of Object.entries(r.cooldowns)) if (v.reason === 'quota' || v.reason === 'rate_limit') delete r.cooldowns[k];
+      store.set(STATE_KEY, r);
+    }
+  } catch { /* ignore */ }
+  return r;
+}
 function saveRuntime(r: Runtime) { store.set(STATE_KEY, r); }
 
 function nextUtcMidnight() { const d = new Date(); d.setUTCHours(24, 0, 5, 0); return d.getTime(); }
@@ -105,9 +116,10 @@ function coolDown(key: string, reason: FailureKind, retryAfter?: number) {
   const prev = r.cooldowns[key];
   const strikes = (prev && prev.until > Date.now() - 3600_000 ? prev.strikes : 0) + 1;
   let ms: number;
-  if (retryAfter) ms = retryAfter * 1000;
+  if (retryAfter) ms = Math.min(retryAfter, reason === 'quota' ? 86_400 : 900) * 1000 + 1000;
   else if (reason === 'quota') ms = Math.max(15 * 60_000, nextUtcMidnight() - Date.now());
-  else if (reason === 'rate_limit') ms = [60_000, 5 * 60_000, 15 * 60_000, 60 * 60_000][Math.min(strikes - 1, 3)];
+  else if (reason === 'rate_limit') ms = [30_000, 60_000, 2 * 60_000, 5 * 60_000, 15 * 60_000, 60 * 60_000][Math.min(strikes - 1, 5)];
+  else if (reason === 'too_large') ms = 6 * 3600_000;
   else if (reason === 'auth') ms = 12 * 3600_000;
   else if (reason === 'model') ms = 24 * 3600_000;
   else ms = [2 * 60_000, 10 * 60_000, 30 * 60_000][Math.min(strikes - 1, 2)];
@@ -428,6 +440,7 @@ export function failureMessage(name: string, f: ProviderFailure): string {
     case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.${name === 'Google Gemini' ? ' Gemini API keys come from Google AI Studio (aistudio.google.com).' : ''}`;
     case 'rate_limit': return `${name} is rate-limiting requests right now.`;
     case 'quota': return `${name}’s free allowance is used up for now.`;
+    case 'too_large': return `That request is too big for this ${name} model’s free per-minute limit; another model will be used.`;
     case 'model': return `That model isn’t available on ${name}. Tap “Find models” and pick another one.${f.message ? ` (${name} said: ${f.message.replace(/^Model unavailable \((.*)\)\.$/, '$1').slice(0, 160)})` : ''}`;
     case 'network': return name.startsWith('Ollama') ? 'Ollama wasn’t found. Is it running, and does OLLAMA_ORIGINS allow this site?' : `Couldn’t reach ${name}.`;
     case 'not_configured': return f.message;
@@ -439,7 +452,32 @@ export function failureMessage(name: string, f: ProviderFailure): string {
  * Answer a request with the best eligible provider, falling back through the
  * rest on limits/outages. Throws AIExhausted when nothing free is left.
  */
-export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal): Promise<RunResult> {
+export interface RunOptions {
+  /**
+   * Wait out short rate limits ("try again in 20s") instead of giving up.
+   * For background work such as book analysis, where a pause beats failing.
+   */
+  patient?: boolean;
+  /**
+   * Prefer providers that aren't already busy with another request, so
+   * parallel background work spreads across services (each has its own limits).
+   */
+  spread?: boolean;
+}
+
+/** Requests currently in flight per provider (for spreading parallel work). */
+const inFlight = new Map<string, number>();
+export const busyCount = (provider: string) => inFlight.get(provider) ?? 0;
+
+const sleep = (ms: number, signal?: AbortSignal) => new Promise<void>((resolve, reject) => {
+  const t = setTimeout(resolve, ms);
+  signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Cancelled', 'AbortError')); }, { once: true });
+});
+
+/** Longest pause worth waiting for in patient mode; beyond this the job pauses and resumes later. */
+const MAX_PATIENT_WAIT = 3 * 60_000;
+
+export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal, opts: RunOptions = {}): Promise<RunResult> {
   const cfg = loadConfig();
   const key = cfg.cache ? await cacheKeyFor(task, req) : '';
   if (cfg.cache) {
@@ -453,7 +491,9 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
   const r = runtime();
   r.serverProviders = await serverProviders();
   saveRuntime(r);
-  const { candidates, skipped } = await route(task, cfg);
+  const routed = await route(task, cfg);
+  const { skipped } = routed;
+  let { candidates } = routed;
   if (!candidates.length) {
     const msg = skipped.length
       ? 'No free AI provider is set up for this. Paid options were skipped because “Allow paid AI” is off.'
@@ -462,7 +502,11 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
     throw new AIExhausted(msg);
   }
   let firstFailure: { name: string; reason: FailureKind } | undefined;
-  const waits: number[] = [];
+  let waits: number[] = [];
+  for (let round = 0; ; round++) {
+  waits = [];
+  // Idle providers first (stable, so your priority order still decides between equals).
+  if (opts.spread) candidates = [...candidates].sort((a, b) => busyCount(a.provider) - busyCount(b.provider));
   for (const c of candidates) {
     if (signal?.aborted) throw new AIAborted('Cancelled');
     const cd = coolingUntil(c.provider, c.model);
@@ -470,7 +514,13 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
     const def = providerDef(c.provider)!;
     const t0 = performance.now();
     try {
-      const res = def.transport === 'server' ? await callServer(c.provider, c.model, req, signal) : await chat(c.provider, c.model, req, credsFor(c.provider, cfg), signal);
+      inFlight.set(c.provider, busyCount(c.provider) + 1);
+      let res: ChatResult;
+      try {
+        res = def.transport === 'server' ? await callServer(c.provider, c.model, req, signal) : await chat(c.provider, c.model, req, credsFor(c.provider, cfg), signal);
+      } finally {
+        inFlight.set(c.provider, Math.max(0, busyCount(c.provider) - 1));
+      }
       const inTok = res.inputTokens ?? estimate(req.system + req.messages.map((m) => m.content).join(''));
       const outTok = res.outputTokens ?? estimate(res.text);
       const info = modelsFor(c.provider, cfg).find((m) => m.id === c.model);
@@ -492,16 +542,29 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
         // Next time, use a model this key actually has.
         if (def.transport !== 'server') { markUnavailable(c.provider, c.model, suggestedModel(f.message)); void refreshModels(c.provider).catch(() => {}); }
       }
+      else if (f.kind === 'too_large') coolDown(`${c.provider}:${c.model}`, f.kind);
       else if (f.kind !== 'bad_request' && f.kind !== 'refused') coolDown(c.provider, f.kind, f.retryAfter);
       if (f.kind === 'refused') throw f;
       firstFailure ??= { name: def.name, reason: f.kind };
       if (!cfg.fallback) throw new AIExhausted(failureMessage(def.name, f));
+      const cd2 = coolingUntil(c.provider, c.model);
+      if (cd2) waits.push(cd2.until);
     }
+  }
+  // Everyone is only briefly rate-limited: wait for the first to free up, then try again.
+  const soonest = waits.length ? Math.min(...waits) : undefined;
+  if (!opts.patient || !soonest || soonest - Date.now() > MAX_PATIENT_WAIT || round >= 20) break;
+  await sleep(Math.max(1000, soonest - Date.now()), signal);
   }
   const next = waits.length ? Math.min(...waits) : undefined;
   const msg = `Your free AI capacity is used up for now${next ? ` — the next provider should be available ${new Date(next).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}. No paid AI was used.`;
   emit({ type: 'exhausted', message: msg });
   throw new AIExhausted(msg);
+}
+
+/** How many providers could work in parallel right now (configured and not resting). */
+export function parallelCapacity(cfg = loadConfig()): number {
+  return PROVIDER_DEFS.filter((d) => isConfigured(d.id, cfg) && !coolingUntil(d.id, cfg.providers[d.id]?.model ?? '')).length;
 }
 
 /** True when at least one provider is set up and enabled. */

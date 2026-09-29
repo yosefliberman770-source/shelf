@@ -8,7 +8,7 @@
 // use no AI at all, and requests go through the AI manager, which only uses
 // free providers unless you've allowed paid AI.
 import { AIError, complete, parseJSON, repairJSON } from '../../ai/client';
-import { nextAvailableAt } from '../../ai/manager';
+import { nextAvailableAt, parallelCapacity } from '../../ai/manager';
 import { db } from '../../db/db';
 import { savedBookDate } from '../history/placeDetect';
 import { historicalPlaces } from '../history/placeService';
@@ -18,7 +18,12 @@ import { resolveBook } from './resolve';
 import { bookText, extractBookText } from './text';
 import { ANALYSIS_VERSION, type BookChunkRow, type BookGraphRow, type BookJobRow, type BookTextRow, type ChunkExtraction } from './types';
 
-const CONCURRENCY = 2;
+/**
+ * One worker per AI service you've connected (up to 5): each service has its
+ * own per-minute limit, so spreading parts across them multiplies speed,
+ * while each service still gets only one request at a time.
+ */
+const MAX_WORKERS = 5;
 const MAX_ATTEMPTS = 3;
 const REBUILD_EVERY = 3;
 
@@ -91,7 +96,12 @@ export async function resumePendingJobs() {
   const jobs = await db.bookJobs.toArray().catch(() => [] as BookJobRow[]);
   for (const j of jobs) {
     if (j.status === 'running') await db.bookJobs.update(j.id, { status: 'queued' });
-    if (j.status === 'waiting') scheduleWake(j.id, j.resumeAt);
+    if (j.status === 'waiting') {
+      // If a provider is free again now, carry on straight away.
+      const at = nextAvailableAt();
+      if (!at || at < (j.resumeAt ?? Infinity)) await db.bookJobs.update(j.id, { status: 'queued', resumeAt: undefined, message: undefined });
+      else scheduleWake(j.id, j.resumeAt);
+    }
   }
   void pump();
 }
@@ -207,14 +217,17 @@ async function extractAll(bookId: string, text: BookTextRow[], signal: AbortSign
   let exhausted = false;
   let sinceRebuild = 0;
 
+  // Parts a worker has taken, so parallel workers never do the same part twice.
+  const claimed = new Set<string>();
   const nextChunk = async (): Promise<BookChunkRow | undefined> => {
     const job = await db.bookJobs.get(bookId);
-    const pending = await db.bookChunks.where('[bookId+status]').equals([bookId, 'pending']).toArray();
+    const pending = (await db.bookChunks.where('[bookId+status]').equals([bookId, 'pending']).toArray()).filter((c) => !claimed.has(c.id));
     if (!pending.length) return undefined;
     const pr = job?.priorityChapter;
     // Where you're reading first, then from the start of the book onwards.
     pending.sort((a, b) => (pr !== undefined ? Number(b.chapter === pr) - Number(a.chapter === pr) : 0) || a.index - b.index);
     const c = pending[0];
+    claimed.add(c.id);
     await db.bookChunks.update(c.id, { status: 'running' });
     return c;
   };
@@ -230,7 +243,7 @@ async function extractAll(bookId: string, text: BookTextRow[], signal: AbortSign
       const hints = candidateNames(passage, 60).map((n) => n.name);
       const t0 = performance.now();
       try {
-        const res = await complete({ task: 'extraction', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: extractionPrompt(book, ch.title, passage, hints) }], json: true, maxTokens: 6000 }, signal);
+        const res = await complete({ task: 'extraction', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: extractionPrompt(book, ch.title, passage, hints) }], json: true, maxTokens: 3500, patient: true, spread: true }, signal);
         let data: unknown;
         try { data = parseJSON(res.text); } catch { data = repairJSON(res.text); }
         const result: ChunkExtraction = keepGrounded(parseExtraction(data, [c.paraStart, c.paraEnd]), passage);
@@ -248,13 +261,15 @@ async function extractAll(bookId: string, text: BookTextRow[], signal: AbortSign
         const attempts = c.attempts + 1;
         const failed = attempts >= MAX_ATTEMPTS;
         await db.bookChunks.update(c.id, { status: failed ? 'failed' : 'pending', attempts, error: (e as Error).message });
+        if (!failed) claimed.delete(c.id);
         await patchJob(bookId, (j) => ({ requests: j.requests + 1, retried: j.retried + (failed ? 0 : 1), errors: [...j.errors, { at: Date.now(), chunk: c.index, message: (e as Error).message }].slice(-50) }));
       }
       await updateCounts(bookId);
       if (++sinceRebuild >= REBUILD_EVERY) { sinceRebuild = 0; await rebuildGraph(bookId, text); }
     }
   };
-  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+  const workers = Math.max(1, Math.min(MAX_WORKERS, parallelCapacity() || 1));
+  await Promise.all(Array.from({ length: workers }, (_, i) => new Promise<void>((resolve) => setTimeout(resolve, i * 400)).then(worker)));
   await updateCounts(bookId);
   return exhausted;
 }
