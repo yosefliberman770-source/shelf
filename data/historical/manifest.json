@@ -143,6 +143,12 @@
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
  },
+ "inland-navigation/original/gis/heads_of_navigation.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip",
+  "bytes": 61822,
+  "sha256": "16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303",
+  "downloaded": "2026-09-29"
+ },
  "itinere/nightly-export/route-segments.ndjson": {
   "url": "https://itiner-e.org/route-segments/download",
   "bytes": 39094440,
@@ -279,6 +285,24 @@
   "url": "https://zenodo.org/api/records/7147906/files/README/content",
   "bytes": 143,
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/General_Guide_bridges.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/General_Guide_bridges.pdf",
+  "bytes": 1108662,
+  "sha256": "cc5ac095dceaa5decbab34f9f559bbcec16bae8a01e3555efa14ebc998d94f4b",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/gis/Bridges1250.csv": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.csv",
+  "bytes": 44528,
+  "sha256": "c973522f71fd0776a1ef604ec91e506b4aab9ec523556df31bc9c2b9e0bfd138",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/gis/Bridges1250.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.zip",
+  "bytes": 66959,
+  "sha256": "0d9bd6e76da3fe63204aaf9e4068e1f0316c3f7215329c671ae9cc9c9fc449d1",
   "downloaded": "2026-09-29"
  },
  "pleiades/original/dumps/README.txt": {

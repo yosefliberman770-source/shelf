@@ -24,6 +24,7 @@ raw/*/nightly-export/**
 !raw/historic-england/original/Parks_and_Gardens.gpkg
 !raw/historic-england/original/Protected_Wreck_Sites.gpkg
 !raw/historic-england/original/World_Heritage_Sites.gpkg
+!raw/inland-navigation/original/gis/heads_of_navigation.zip
 !raw/itinere/original/Data field description.docx
 !raw/itinere/original/Itiner-e bibliography.bib
 !raw/itinere/original/itinere_roads.cpg
@@ -37,6 +38,9 @@ raw/*/nightly-export/**
 !raw/living-with-machines/original/annotations-2024_zenodo-11241371/annots_building.csv
 !raw/living-with-machines/original/annotations-2024_zenodo-11241371/annots_railspace_all.csv
 !raw/living-with-machines/original/sigspatial-2022_zenodo-7147906/README
+!raw/medieval-bridges/original/General_Guide_bridges.pdf
+!raw/medieval-bridges/original/gis/Bridges1250.csv
+!raw/medieval-bridges/original/gis/Bridges1250.zip
 !raw/pleiades/original/dumps/README.txt
 !raw/pleiades/original/dumps/pleiades-names-20260929.csv.gz
 !raw/pleiades/original/dumps/pleiades-places-20260929.csv.gz

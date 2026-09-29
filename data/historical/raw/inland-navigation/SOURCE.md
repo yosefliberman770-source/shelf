@@ -7,8 +7,8 @@
 - **Licence:** Creative Commons Attribution 4.0 International (CC BY 4.0) — https://creativecommons.org/licenses/by/4.0/ (see LICENSE.md)
 - **Geographic coverage:** England and Wales.
 - **Historical date range:** 11th century to 1348.
-- **Download date:** not yet downloaded
-- **Total size:** 0 bytes in 0 files
+- **Download date:** 2026-09-29
+- **Total size:** 60.4 KB in 1 files
 
 ## What it contains
 
@@ -20,8 +20,9 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 
 | File | Size | In git | Download URL | SHA-256 |
 | --- | --- | --- | --- | --- |
+| `original/gis/heads_of_navigation.zip` | 60.4 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip | `16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303` |
 
-**Not yet downloaded:** `original/gis/direct_evidence.zip`, `original/gis/heads_of_navigation.zip`, `original/gis/indirect_evidence.zip`, `original/gis/pn_river_traffic.zip`, `original/pdf/general_guide.pdf`, `original/png/inland_navigation.png`
+**Not yet downloaded:** `original/gis/direct_evidence.zip`, `original/gis/indirect_evidence.zip`, `original/gis/pn_river_traffic.zip`, `original/pdf/general_guide.pdf`, `original/png/inland_navigation.png`
 
 ## How to cite
 
