@@ -93,6 +93,8 @@ async function openaiChat(def: ProviderDef, model: string, req: ChatRequest, cre
     max_tokens: req.maxTokens ?? 2000,
     messages: [{ role: 'system', content: req.system + (req.json ? JSON_HINT : '') }, ...req.messages],
     ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
+    // GPT-OSS "thinks" before answering; keep that short so the answer fits (Groq and Cerebras accept this).
+    ...(/gpt-oss/.test(model) && (def.id === 'groq' || def.id === 'cerebras') ? { reasoning_effort: 'low' } : {}),
   });
   let res = await post(`${base}/chat/completions`, headers, body(!!req.json && JSON_MODE.has(def.id)), signal);
   if (res.status === 400 && req.json && JSON_MODE.has(def.id)) {
@@ -105,7 +107,7 @@ async function openaiChat(def: ProviderDef, model: string, req: ChatRequest, cre
   const msg = data.choices?.[0]?.message;
   if (msg?.refusal) return { text: '', model: data.model ?? model, refused: true };
   const text = (msg?.content ?? '').trim();
-  if (!text) throw new ProviderFailure('unavailable', 'The provider returned an empty answer.');
+  if (!text) throw new ProviderFailure('unavailable', data.choices?.[0]?.finish_reason === 'length' ? 'The model ran out of room before answering (it spent it thinking). Try again or pick another model.' : 'The provider returned an empty answer.');
   return { text, model: data.model ?? model, inputTokens: data.usage?.prompt_tokens, outputTokens: data.usage?.completion_tokens };
 }
 

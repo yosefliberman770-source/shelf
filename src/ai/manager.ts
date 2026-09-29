@@ -328,7 +328,8 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
   if (!m) out = { ok: false, message: 'Choose a model first.' };
   else {
     try {
-      const req: ChatRequest = { system: 'Reply with the single word: ok', messages: [{ role: 'user', content: 'ping' }], maxTokens: 5 };
+      // Small, but with room for models that think before answering.
+      const req: ChatRequest = { system: 'Reply with the single word: ok', messages: [{ role: 'user', content: 'ping' }], maxTokens: 300 };
       const res = def.transport === 'server' ? await callServer(id, m, req) : await chat(id, m, req, credsFor(id, cfg));
       out = { ok: true, ms: Math.round(performance.now() - t0), model: res.model };
       clearCooldown(id);
