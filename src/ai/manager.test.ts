@@ -196,3 +196,32 @@ describe('provider adapters', () => {
     expect(models[1].pricePerMTokIn).toBeCloseTo(3);
   });
 });
+
+describe('retired models', () => {
+  it('picks a model the key actually has', async () => {
+    const { pickAvailable } = await import('./manager');
+    const m = (id: string) => ({ id, tier: 'free' as const, quality: 3, speed: 3 });
+    expect(pickAvailable('gemini', [m('gemini-3-flash-preview'), m('gemini-3-flash'), m('gemini-3-flash-lite')])).toBe('gemini-3-flash');
+    expect(pickAvailable('gemini', [m('gemini-9-pro'), m('gemini-2.5-flash')])).toBe('gemini-2.5-flash');
+    expect(pickAvailable('groq', [m('some-model')])).toBe('some-model');
+  });
+});
+
+describe('retired default model', () => {
+  it('Test connection finds a model the key has and switches to it', async () => {
+    setKey('gemini', 'g');
+    setup({ gemini: { enabled: true } });
+    mockFetch((url) => {
+      if (url.includes('/models?')) return new Response(JSON.stringify({ models: [
+        { name: 'models/gemini-3-flash', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-3-flash-lite', supportedGenerationMethods: ['generateContent'] },
+      ] }), { status: 200 });
+      if (url.includes('gemini-2.5')) return status(404, '{"error":{"code":404,"message":"models/gemini-2.5-flash is not found for API version v1beta","status":"NOT_FOUND"}}');
+      return geminiOk('ok');
+    });
+    const r = await testProvider('gemini');
+    expect(r.ok).toBe(true);
+    expect(loadConfig().providers.gemini?.model).toBe('gemini-3-flash');
+    expect(calls.some((c) => c.url.includes('gemini-3-flash:generateContent'))).toBe(true);
+  });
+});
