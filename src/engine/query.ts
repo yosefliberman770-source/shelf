@@ -273,7 +273,7 @@ export interface SearchResults {
   items: Item[];
   authors: { id: string; name: string; count: number }[];
   folders: { id: string; name: string; path: string }[];
-  notes: { id: string; text: string; itemId?: string; kind: 'note' | 'quote' }[];
+  notes: { id: string; text: string; itemId?: string; kind: 'note' | 'quote' | 'question' }[];
   concepts: { id: string; name: string; kind: string }[];
   projects: { id: string; name: string }[];
   timeline: { id: string; label: string; year?: number; kind: 'item' | 'concept' }[];

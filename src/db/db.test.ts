@@ -15,7 +15,7 @@ async function snapshot() {
     items: await db.items.toArray(), instances: await db.instances.toArray(), sessions: await db.sessions.toArray(), notes: await db.notes.toArray(),
     folders: await db.folders.toArray(), shelves: await db.shelves.toArray(), tags: await db.tags.toArray(), authors: await db.authors.toArray(),
     goals: await db.goals.toArray(), projects: await db.projects.toArray(), plans: await db.plans.toArray(), collections: await db.collections.toArray(),
-    concepts: await db.concepts.toArray(), links: await db.links.toArray(), ai: await db.ai.toArray(), settings: await readSettings(),
+    concepts: await db.concepts.toArray(), links: await db.links.toArray(), ai: await db.ai.toArray(), curricula: await db.curricula.toArray(), media: await db.media.toArray(), settings: await readSettings(),
   });
 }
 

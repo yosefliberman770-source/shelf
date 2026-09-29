@@ -16,8 +16,8 @@ import { useUI } from '../state/ui';
 import { NotesOrganizer } from './ItemPage';
 
 type Tab = 'notes' | 'library' | 'graph';
-const KINDS: ConceptKind[] = ['subject', 'concept', 'person', 'place', 'event', 'period'];
-const KIND_ICON: Record<ConceptKind, string> = { subject: '📂', concept: '◇', person: '👤', place: '📍', event: '⚡', period: '🕰' };
+const KINDS: ConceptKind[] = ['subject', 'concept', 'person', 'place', 'event', 'period', 'polity', 'organization', 'object', 'source'];
+const KIND_ICON: Record<ConceptKind, string> = { subject: '📂', concept: '◇', person: '👤', place: '📍', event: '⚡', period: '🕰', polity: '🏛', organization: '👥', object: '🏺', source: '📜' };
 
 export default function KnowledgePage() {
   const idx = useLibrary();

@@ -10,7 +10,7 @@ const id = (p: string) => `${p}${++n}`;
 export function emptySnapshot(): Snapshot {
   return {
     items: [], instances: [], sessions: [], notes: [], folders: [], shelves: [], tags: [], authors: [],
-    goals: [], projects: [], plans: [], collections: [], concepts: [], links: [], ai: [],
+    goals: [], projects: [], plans: [], collections: [], concepts: [], links: [], ai: [], curricula: [], media: [],
     settings: defaultSettings(),
   };
 }

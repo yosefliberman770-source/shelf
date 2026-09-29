@@ -18,8 +18,8 @@ export interface GLink extends SimulationLinkDatum<GNode> {
   relation?: string;
 }
 
-const TYPE_COLOR: Record<NodeType, string> = { item: SERIES[0], author: SERIES[1], concept: SERIES[2], note: SERIES[4], folder: SERIES[6], tag: SERIES[3] };
-export const TYPE_LABEL: Record<NodeType, string> = { item: 'Books', author: 'Authors', concept: 'Concepts', note: 'Notes', folder: 'Folders', tag: 'Tags' };
+const TYPE_COLOR: Record<NodeType, string> = { item: SERIES[0], author: SERIES[1], concept: SERIES[2], note: SERIES[4], folder: SERIES[6], tag: SERIES[3], curriculum: SERIES[5], media: SERIES[7], ai: SERIES[4] };
+export const TYPE_LABEL: Record<NodeType, string> = { item: 'Books', author: 'Authors', concept: 'Concepts', note: 'Notes', folder: 'Folders', tag: 'Tags', curriculum: 'Curricula', media: 'Images', ai: 'AI answers' };
 
 export function buildGraph(idx: LibraryIndex, types: Set<NodeType>, focus?: { type: NodeType; id: string }, depth = 2): { nodes: GNode[]; links: GLink[] } {
   const nodes = new Map<string, GNode>();

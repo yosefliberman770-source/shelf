@@ -320,7 +320,7 @@ function NoteSheet({ itemId, kind: initialKind, noteId }: { itemId?: string; kin
   const idx = useLibrary();
   const { close, toast } = useUI();
   const existing = noteId ? idx.snap.notes.find((n) => n.id === noteId) : undefined;
-  const [kind, setKind] = useState<'note' | 'quote'>(existing?.kind ?? initialKind);
+  const [kind, setKind] = useState<'note' | 'quote'>(existing?.kind === 'quote' ? 'quote' : existing ? 'note' : initialKind);
   const [text, setText] = useState(existing?.text ?? '');
   const [target, setTarget] = useState(existing?.itemId ?? itemId ?? '');
   const item = target ? idx.items.get(target) : undefined;
