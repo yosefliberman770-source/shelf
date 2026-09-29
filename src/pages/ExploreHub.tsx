@@ -68,6 +68,7 @@ function ForYou({ idx, onOpen }: { idx: LibraryIndex; onOpen: (r: MetaResult) =>
     const spec = PICK_MODES.find((x) => x.id === m)!;
     const dnf = idx.itemList().filter((i) => i.status === 'dnf').map((i) => i.title);
     const r = await run((signal) => completeJSON<{ picks: Pick[] }>({
+      task: 'recommendation',
       system: `${BASE_SYSTEM}\nYou recommend books. Only suggest real, published books — never invent titles. Each "why" must point to something specific in the reader's history (a book they rated, a subject they read, their pace). Return JSON {"picks":[{"title":"...","author":"...","itemId":"library id if they already own it, else omit","why":"one or two sentences"}]} with 8 picks.`,
       messages: [{ role: 'user', content: `${spec.prompt}\n\n${brainSummary(idx)}\n\nDID NOT FINISH: ${dnf.join(', ') || 'none'}\n\n${folderDigest(idx)}\n\n${libraryDigest(idx, idx.settings.ai.share, idx.itemList(), 150)}` }],
       maxTokens: 2500,

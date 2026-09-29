@@ -87,7 +87,7 @@ export interface GeminiResult {
  * Keep "thinking" short so it doesn't eat the answer. Flash models can skip it
  * entirely; Pro models need a small budget; Gemini 3 uses a thinking level.
  */
-function thinkingFor(model: string): Record<string, unknown> | undefined {
+export function thinkingFor(model: string): Record<string, unknown> | undefined {
   const m = model.toLowerCase();
   if (/gemini-3/.test(m)) return { thinkingLevel: 'low' };
   if (/gemini-2\.5-.*flash/.test(m) || /gemini-2\.5-flash/.test(m)) return { thinkingBudget: 0 };

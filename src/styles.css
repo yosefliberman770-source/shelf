@@ -625,3 +625,22 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .tl-year { width: 78px; flex: none; font-size: 12.5px; font-weight: 700; color: var(--text-2); text-align: right; }
 .tl-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); flex: none; font-size: 14px; }
 .add-slot { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
+
+/* ── Historical map panel ─────────────────────────────────────── */
+.hmap { position: absolute; z-index: 30; background: var(--bg); color: var(--text); display: flex; flex-direction: column; font-family: var(--font-ui, inherit); }
+.hmap.full { inset: 0; padding-top: env(safe-area-inset-top); }
+.hmap.side { top: 0; right: 0; bottom: 0; width: min(560px, 50vw); border-left: 1px solid var(--border); box-shadow: -8px 0 30px rgba(0,0,0,.14); padding-top: env(safe-area-inset-top); }
+.hmap-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid var(--border); flex: none; }
+.hmap-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 12px 14px calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.hmap-frame { height: min(52vh, 460px); min-height: 260px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #e8e2d4; flex: none; }
+.hmap.side .hmap-frame { height: min(58vh, 560px); }
+.hmap-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.hmap-empty { height: 100%; display: grid; place-items: center; text-align: center; padding: 20px; color: var(--text-2); font-size: 14px; }
+.hmap-year { font-family: var(--serif); font-size: 24px; font-weight: 600; line-height: 1.1; }
+.hmap-facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 12px 0 0; font-size: 14px; }
+.hmap-facts dt { color: var(--text-3); font-weight: 700; font-size: 12.5px; }
+.hmap-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.hmap-sources { font-size: 12.5px; color: var(--text-2); }
+.hmap-sources summary { cursor: pointer; font-weight: 700; }
+.hmap-sources ul { padding-left: 18px; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.hmap-sources a { text-decoration: underline; }

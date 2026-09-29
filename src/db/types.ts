@@ -498,3 +498,67 @@ export interface EbookFile {
   source?: 'file' | 'standardebooks' | 'gutenberg';
   addedAt: number;
 }
+
+/** A cached historical-place lookup: "rome|-3c|wikidata" → the resolution. */
+export interface PlaceCacheRow {
+  id: string;
+  /** Resolved place id once known (e.g. "whg:place:pl:423025"). */
+  placeId?: string;
+  provider: string;
+  dateContext?: number;
+  /** Serialised PlaceResolution (see src/lib/history/types.ts). */
+  resolution: unknown;
+  updatedAt: number;
+}
+
+/** A place the reader picked for an ambiguous name in one book ("Which Alexandria?"). */
+export interface PlaceChoiceRow {
+  id: string;
+  bookId: string;
+  name: string;
+  place: unknown;
+  createdAt: number;
+}
+
+/** AI usage per day, provider and model (counts only — never content or keys). */
+export interface AIUsageRow {
+  id: string;
+  day: string;
+  month: string;
+  provider: string;
+  model: string;
+  requests: number;
+  ok: number;
+  failed: number;
+  rateLimits: number;
+  inTok: number;
+  outTok: number;
+  /** Estimated USD; 0 for free models. */
+  cost: number;
+}
+
+/** One AI request in the local log (no prompts, answers or keys). */
+export interface AILogRow {
+  id?: number;
+  at: number;
+  provider: string;
+  model: string;
+  task: string;
+  ms: number;
+  ok: boolean;
+  error?: string;
+  fallbackFrom?: string;
+  inTok?: number;
+  outTok?: number;
+  cached?: boolean;
+}
+
+/** A cached AI answer, keyed by a hash of the exact request. */
+export interface AICacheRow {
+  id: string;
+  text: string;
+  provider: string;
+  model: string;
+  task: string;
+  createdAt: number;
+}

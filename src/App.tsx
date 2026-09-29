@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { onAIEvent } from './ai/manager';
 import { AskSheet } from './ai/ui';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Icon, type IconName } from './components/icons';
@@ -26,6 +27,7 @@ const PlanPage = lazy(() => import('./pages/PlanPage'));
 const ReadingPage = lazy(() => import('./pages/ReadingPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ReaderPage = lazy(() => import('./pages/ReaderPage'));
+const BookWorldPage = lazy(() => import('./pages/BookWorldPage'));
 
 interface NavEntry { to: string; icon: IconName; label: string; sub?: string }
 
@@ -74,6 +76,14 @@ function Shell() {
     return () => window.removeEventListener('keydown', k);
   }, [open]);
   useEffect(() => window.scrollTo(0, 0), [loc.pathname]);
+  // Tell the reader when AI quietly switched provider, or ran out of free capacity.
+  const { toast } = useUI();
+  useEffect(() => onAIEvent((e) => {
+    if (e.type === 'switched') toast(`${e.from} ${e.reason === 'quota' ? 'free allowance used up' : e.reason === 'rate_limit' ? 'limit reached' : 'unavailable'} — switched to ${e.to}.`);
+    if (e.type === 'exhausted') toast(e.message, { error: true });
+  }), [toast]);
+  // Book analyses that were interrupted (app closed, offline, out of free AI) carry on.
+  useEffect(() => { void import('./lib/book/pipeline').then((m) => m.resumePendingJobs()); }, []);
 
   if (!idx.settings.onboarded) return <Onboarding />;
 
@@ -121,6 +131,8 @@ function Shell() {
           <Route path="/library/*" element={<LibraryPage />} />
           <Route path="/item/:id" element={<ItemPage />} />
           <Route path="/read/:id" element={<ReaderPage />} />
+          <Route path="/world/:id" element={<BookWorldPage />} />
+          <Route path="/world/:id/:key" element={<BookWorldPage />} />
           <Route path="/ebooks" element={<Navigate to="/reading/ebooks" replace />} />
           <Route path="/author/:id" element={<AuthorPage />} />
           <Route path="/reading/*" element={<ReadingPage />} />

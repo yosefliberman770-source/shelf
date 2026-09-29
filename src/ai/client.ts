@@ -2,7 +2,13 @@
 // the API keys. When AI is disabled or unavailable, callers get a clear error
 // and the rest of the app keeps working.
 import { readSettings } from '../db/actions';
-import { DEVICE_GEMINI, geminiComplete } from './gemini';
+import { DEVICE_GEMINI } from './gemini';
+import { AIExhausted, hasUsableProvider, runAI } from './manager';
+import { ProviderFailure } from './providers/adapters';
+import type { AITask } from './providers/catalog';
+
+/** Settings value meaning "let the AI manager choose". */
+export const AUTO = 'auto';
 
 export interface ProviderStatus {
   id: string;
@@ -27,6 +33,8 @@ export interface AIRequest {
   messages: AIMessage[];
   json?: boolean;
   maxTokens?: number;
+  /** What kind of work this is — used to pick a suitable model. */
+  task?: AITask;
 }
 
 export interface AIResponse {
@@ -34,12 +42,15 @@ export interface AIResponse {
   provider: string;
   model: string;
   refused?: boolean;
+  cached?: boolean;
+  /** Set when the first choice was busy and another provider answered. */
+  switchedFrom?: string;
 }
 
 const NO_SERVER = 'AI features need the Shelf server, which isn’t running here (for example on the phone/web-hosted copy). Everything else works normally.';
 
 export class AIError extends Error {
-  kind: 'disabled' | 'unconfigured' | 'network' | 'provider' | 'refused' | 'parse';
+  kind: 'disabled' | 'unconfigured' | 'network' | 'provider' | 'refused' | 'parse' | 'exhausted';
   constructor(kind: AIError['kind'], message: string) {
     super(message);
     this.kind = kind;
@@ -62,19 +73,21 @@ export async function saveProviderConfig(body: { provider: string; apiKey?: stri
 export async function complete(req: AIRequest, signal?: AbortSignal): Promise<AIResponse> {
   const s = await readSettings();
   if (!s.ai.enabled) throw new AIError('disabled', 'AI features are turned off. You can enable them in Settings → AI.');
-  if (!s.ai.provider) throw new AIError('unconfigured', 'Choose an AI provider in Settings → AI.');
-  if (s.ai.provider === DEVICE_GEMINI) {
+  // The multi-provider manager (free-first, automatic fallback). The original
+  // single-provider paths below stay for the Shelf server's own providers.
+  if (s.ai.provider === AUTO || s.ai.provider === DEVICE_GEMINI || (!s.ai.provider && hasUsableProvider())) {
     try {
-      const r = await geminiComplete(req, s.ai.model, signal);
+      const r = await runAI(req.task ?? 'general', { system: req.system, messages: req.messages, json: req.json, maxTokens: req.maxTokens }, signal);
       if (r.refused) throw new AIError('refused', 'The AI model declined this request.');
-      return { text: r.text, model: r.model, provider: DEVICE_GEMINI };
+      return { text: r.text, model: r.model, provider: r.provider, cached: r.cached, switchedFrom: r.switchedFrom };
     } catch (e) {
       if (e instanceof AIError || (e as Error).name === 'AbortError') throw e;
-      if ((e as { kind?: string }).kind === 'unconfigured') throw new AIError('unconfigured', (e as Error).message);
-      if (e instanceof TypeError) throw new AIError('network', 'Couldn’t reach Google. Check your internet connection.');
+      if (e instanceof AIExhausted) throw new AIError(hasUsableProvider() ? 'exhausted' : 'unconfigured', e.message);
+      if (e instanceof ProviderFailure && e.kind === 'refused') throw new AIError('refused', 'The AI model declined this request.');
       throw new AIError('provider', (e as Error).message);
     }
   }
+  if (!s.ai.provider) throw new AIError('unconfigured', 'Choose an AI provider in Settings → AI.');
   let res: Response;
   try {
     res = await fetch('/api/ai/complete', {

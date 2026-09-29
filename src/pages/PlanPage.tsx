@@ -513,7 +513,7 @@ function AIWhatIfPlanner({ idx }: { idx: LibraryIndex }) {
   ].join('\n');
   const go = () => run(async (signal) => {
     // 1. AI parses the request into a structured spec.
-    const { data } = await completeJSON<ParsedPlan>({ system: 'You convert reading-plan requests into JSON. Match the target to the closest entry in the catalog by name. Return {"targetKind":"library|folder|project|item","targetName":"exact catalog name or omitted","days":number|null,"deadline":"YYYY-MM-DD"|null,"maxMinutesPerDay":number|null}.', messages: [{ role: 'user', content: `Today is ${idx.today}.\nCATALOG:\n${catalog}\n\nREQUEST: ${text}` }], maxTokens: 400 }, signal);
+    const { data } = await completeJSON<ParsedPlan>({ task: 'classification', system: 'You convert reading-plan requests into JSON. Match the target to the closest entry in the catalog by name. Return {"targetKind":"library|folder|project|item","targetName":"exact catalog name or omitted","days":number|null,"deadline":"YYYY-MM-DD"|null,"maxMinutesPerDay":number|null}.', messages: [{ role: 'user', content: `Today is ${idx.today}.\nCATALOG:\n${catalog}\n\nREQUEST: ${text}` }], maxTokens: 400 }, signal);
     // 2. Resolve against real data; 3. deterministic calculation.
     let target: PlanTarget = { kind: 'library' };
     if (data.targetKind === 'project') { const p = idx.snap.projects.find((x) => x.name === data.targetName) ?? idx.snap.projects.find((x) => data.targetName && x.name.toLowerCase().includes(data.targetName.toLowerCase())); if (p) target = { kind: 'project', id: p.id }; }
@@ -524,7 +524,7 @@ function AIWhatIfPlanner({ idx }: { idx: LibraryIndex }) {
     const plan = planWithin(idx, info, Math.max(1, days), data.maxMinutesPerDay ?? undefined);
     // 4. AI explains the deterministic result.
     const facts = `Target: ${info.label}. Remaining: ${fmtNum(plan.remaining)} pages. Deadline: ${plan.deadline} (${days} days). Required pace: ${fmtNum(plan.requiredPace, 1)} pages per reading day. Measured speed: ${plan.pagesPerMinute ? `${fmtNum(plan.pagesPerMinute * 60)} pages/hour` : 'unknown'}. Minutes/day needed: ${plan.minutesNeeded !== undefined ? fmtNum(plan.minutesNeeded) : 'unknown'}. Daily limit: ${data.maxMinutesPerDay ?? 'none'}. Feasible within limit: ${plan.feasible === undefined ? 'unknown' : plan.feasible ? 'yes' : 'no'}. Finish if reading exactly the limit: ${plan.finishAtCap ?? 'n/a'}.`;
-    const exp = await complete({ system: BASE_SYSTEM, messages: [{ role: 'user', content: `Explain this reading plan to the reader in 3–5 sentences. Use the numbers exactly as given; do not recompute. If it isn't feasible, suggest realistic options (extend deadline, drop a book, add time on some days).\n\n${facts}` }], maxTokens: 500 }, signal);
+    const exp = await complete({ task: 'general', system: BASE_SYSTEM, messages: [{ role: 'user', content: `Explain this reading plan to the reader in 3–5 sentences. Use the numbers exactly as given; do not recompute. If it isn't feasible, suggest realistic options (extend deadline, drop a book, add time on some days).\n\n${facts}` }], maxTokens: 500 }, signal);
     setOut({ plan, target, label: info.label, explanation: exp.text });
   });
   return (

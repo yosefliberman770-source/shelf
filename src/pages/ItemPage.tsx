@@ -110,6 +110,7 @@ function Header({ idx, item, onEdit }: { idx: LibraryIndex; item: Item; onEdit: 
             <button className="btn lg grow" onClick={async () => { await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}><Icon name="refresh" />Read again</button>
           )}
           {hasFile && item.status !== 'read' && item.format === 'both' && <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })} aria-label="Log paper pages">📖 Paper</button>}
+          {hasFile && <button className="btn lg" onClick={() => nav(`/world/${item.id}`)}><Icon name="user" />Book world</button>}
           {!hasFile && item.status !== 'read' && <button className="btn lg icon" aria-label="Start a timer" onClick={async () => { await startTimer(item.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>}
         </div>
         {item.status !== 'read' && <div className="mt-16"><FormatPicker item={item} /></div>}
