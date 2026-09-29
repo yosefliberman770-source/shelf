@@ -149,7 +149,7 @@ function ProvidersSection({ cfg, update }: SectionProps) {
                 <button className="btn sm ghost" aria-label={`Move ${def.name} down`} disabled={i === cfg.order.length - 1} onClick={() => move(i, 1)} style={{ minHeight: 26, padding: '0 8px' }}>↓</button>
               </div>
               <button className="grow" style={{ textAlign: 'left', background: 'none', border: 0, padding: 0, color: 'inherit', cursor: 'pointer' }} onClick={() => setOpen(expanded ? null : id)}>
-                <div><b>{i + 1}. {def.name}</b> <TierChip tier={def.tier === 'unknown' ? 'unknown' : def.tier} /></div>
+                <div><b>{i + 1}. {def.name}</b> {def.id === 'openrouter' ? <span className="chip accent" style={{ minHeight: 22, fontSize: 11.5, padding: '0 8px' }}>Free + paid</span> : <TierChip tier={def.tier} />}</div>
                 <div className="tiny muted">{HEALTH[health].dot} {HEALTH[health].label}{def.transport === 'server' ? ' · via Shelf server' : ''}</div>
               </button>
               <span className="muted">{expanded ? '▾' : '▸'}</span>
