@@ -4,7 +4,7 @@ import { addItem, addNote, createFolder, createShelf, finishTimer, discardTimer,
 import type { ContentType, Status, UnitKind } from '../db/types';
 import { formatKey, isValidKey, todayKey } from '../engine/dates';
 import { itemForecast } from '../engine/forecast';
-import { searchAll } from '../engine/query';
+import { isEmptyQuery, parseQuestion, runQuery, searchAll } from '../engine/query';
 import { CONTENT_TYPES, fmtDuration, fmtNum, fmtUnits, round, toBase, toDisplay, unitInfo, unitLabel, UNITS } from '../engine/units';
 import { fetchDescription, type MetaResult, searchBooks } from '../lib/openlibrary';
 import { downloadFreeBook, type FreeBook, importEpub, isEpub, searchGutenberg, searchStandardEbooks } from '../lib/ebooks';
@@ -812,10 +812,35 @@ function TimerStopSheet() {
 
 function SearchPalette() {
   const idx = useLibrary();
-  const { close } = useUI();
+  const { close, open } = useUI();
   const nav = useNavigate();
   const [q, setQ] = useState('');
   const res = useMemo(() => searchAll(idx, q, 8), [idx, q]);
+  const smart = useMemo(() => {
+    if (q.trim().split(/\s+/).length < 2) return null;
+    const parsed = parseQuestion(q, idx);
+    if (isEmptyQuery(parsed.query) || !parsed.understood.length) return null;
+    return { understood: parsed.understood, items: runQuery(idx, parsed.query).slice(0, 12) };
+  }, [idx, q]);
+  const commands = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return [];
+    const all: { label: string; icon: IconName; match: RegExp; run: () => void }[] = [
+      { label: 'Add a book', icon: 'plus', match: /^(add|new book|add book)/, run: () => open({ kind: 'add' }) },
+      { label: 'Log reading', icon: 'logPlus', match: /^log/, run: () => open({ kind: 'log' }) },
+      { label: 'Start a timer', icon: 'clock', match: /^(timer|start timer|time)/, run: () => open({ kind: 'pick', purpose: 'timer' }) },
+      { label: 'Save a quote', icon: 'quote', match: /^(quote|save quote)/, run: () => open({ kind: 'note', noteKind: 'quote' }) },
+      { label: 'Write a note', icon: 'pencil', match: /^(note|write)/, run: () => open({ kind: 'note', noteKind: 'note' }) },
+      { label: 'Create a goal', icon: 'target', match: /^(goal|new goal|create goal)/, run: () => go('/plan/goals?new=1') },
+      { label: 'Create a project', icon: 'layers', match: /^(project|new project|create project)/, run: () => go('/plan/projects?new=1') },
+      { label: 'Import from Goodreads', icon: 'download', match: /^(import|goodreads)/, run: () => go('/library/import') },
+      { label: 'Open settings', icon: 'settings', match: /^(settings|dark|theme|backup)/, run: () => go('/settings') },
+    ];
+    const hits = all.filter((c) => c.match.test(t));
+    hits.push({ label: `Ask AI: “${q.trim()}”`, icon: 'sparkle', match: /./, run: () => open({ kind: 'ai', question: q.trim() }) });
+    return hits;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
   const go = (to: string) => { close(); nav(to); };
   const Group = ({ title, children, show }: { title: string; children: React.ReactNode; show: boolean }) =>
     show ? <><div className="palette-group">{title}</div>{children}</> : null;
@@ -826,8 +851,17 @@ function SearchPalette() {
           <input autoFocus className="input" style={{ border: 0, boxShadow: 'none', fontSize: 16 }} placeholder="Search books, authors, notes, quotes, concepts, projects…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <div className="palette-results">
-          {!q && <div className="small faint" style={{ padding: 12 }}>Try an author, a subject like “Caesar”, a tag, or words from a note.</div>}
-          {q && res.total === 0 && <div className="small faint" style={{ padding: 12 }}>Nothing found for “{q}”.</div>}
+          {!q && <div className="small faint" style={{ padding: 12 }}>Try an author, a subject like “Rome”, words from a note — or a question like “unfinished books over 400 pages”. Type “log” or “add” for quick actions.</div>}
+          {smart && (
+            <Group title={`Books that are ${smart.understood.join(' · ')}`} show>
+              {smart.items.length === 0 ? <div className="small faint" style={{ padding: '6px 10px' }}>No books match that.</div> : smart.items.map((i) => (
+                <div key={i.id} className="palette-item" onClick={() => go(`/item/${i.id}`)}>
+                  <Cover item={i} width={24} /><span className="ellipsis grow">{i.title}</span><span className="small faint ellipsis" style={{ maxWidth: '40%' }}>{idx.authorLine(i)}</span>
+                </div>
+              ))}
+            </Group>
+          )}
+          {q && res.total === 0 && !smart && <div className="small faint" style={{ padding: 12 }}>Nothing found for “{q}”.</div>}
           <Group title="Books & items" show={res.items.length > 0}>
             {res.items.map((i) => (
               <div key={i.id} className="palette-item" onClick={() => go(`/item/${i.id}`)}>
@@ -854,6 +888,9 @@ function SearchPalette() {
           </Group>
           <Group title="Timeline" show={res.timeline.length > 0}>
             {res.timeline.map((t) => <div key={t.kind + t.id} className="palette-item" onClick={() => go(`/explore/timeline`)}>🕰 <span className="grow">{t.label}</span><span className="small faint">{t.year !== undefined ? (t.year < 0 ? `${-t.year} BCE` : t.year) : ''}</span></div>)}
+          </Group>
+          <Group title="Actions" show={commands.length > 0}>
+            {commands.map((c) => <div key={c.label} className="palette-item" onClick={c.run}><Icon name={c.icon} /><span className="grow ellipsis">{c.label}</span></div>)}
           </Group>
           <Group title="Tags" show={res.tags.length > 0}>
             {res.tags.map((t) => <div key={t.id} className="palette-item" onClick={() => go(`/library?tag=${t.id}`)}># <span className="grow">{t.name}</span></div>)}

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { complete, completeJSON } from '../ai/client';
 import { BASE_SYSTEM } from '../ai/context';
-import { AIErrorNotice, AIOff, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
+import { AIErrorNotice, AIOff, AskChip, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { LineChart, SERIES } from '../components/charts';
 import { AIBadge, Cover, DeadlineChip, Empty, ItemPicker, Markdown, Modal, ProgressBar, Tabs } from '../components/common';
 import { ForecastSummary } from '../components/library';
@@ -32,9 +32,9 @@ export default function PlanPage() {
   }, [idx]);
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Plan</h1><div className="sub">Goals, projects and schedules — calculated from your actual reading.</div></div></div>
+      <div className="page-head"><div><h1>Plan</h1><div className="sub">What you’re working towards. Shelf does the maths from your real reading pace.</div></div><AskChip question="Can I finish my current books by the end of next month?" /></div>
       <Tabs<Tab> value={tab} onChange={(t) => nav(`/plan/${t}`)} tabs={[
-        { id: 'goals', label: 'Goals' }, { id: 'projects', label: 'Projects' }, { id: 'simulator', label: 'Plan simulator' }, { id: 'whatif', label: 'What-If Lab' }, { id: 'math', label: 'Library math' }, { id: 'budget', label: 'Time budget' },
+        { id: 'goals', label: 'Goals' }, { id: 'projects', label: 'Projects' }, { id: 'whatif', label: 'What if…?' }, { id: 'simulator', label: 'Compare plans' }, { id: 'budget', label: 'Time I have' }, { id: 'math', label: 'Library maths' },
       ]} />
       <Routes>
         <Route index element={<GoalsTab idx={idx} />} />
@@ -419,9 +419,25 @@ function WhatIfLab({ idx }: { idx: LibraryIndex }) {
   const toggleWd = (d: number) => setS({ ...s, excludeWeekdays: s.excludeWeekdays?.includes(d) ? s.excludeWeekdays.filter((x) => x !== d) : [...(s.excludeWeekdays ?? []), d] });
   return (
     <div className="col gap-16">
-      <div className="card row wrap">
-        <label className="field" style={{ minWidth: 280, flex: 1 }}>Experiment on<TargetSelect idx={idx} value={target} onChange={(tt) => { setTarget(tt); setS({}); }} /></label>
-        <button className="btn ghost" onClick={() => setS({})}>Reset</button>
+      <div className="card col gap-12">
+        <h2>What would you like to change?</h2>
+        <div className="row wrap gap-8">
+          {([
+            ['Read 10 more pages a day', { paceDelta: 10 }],
+            ['Don’t read on Sundays', { excludeWeekdays: [0] }],
+            ['Only read on weekdays', { weekdaysOnly: true }],
+            ['30 minutes every morning', { morningMinutes: 30 }],
+            ['Add 3 more books', { addCount: 3, addLength: 300 }],
+            ['Give myself 2 more weeks', { deadlineShiftDays: 14 }],
+          ] as [string, Partial<typeof s>][]).map(([label, patch]) => (
+            <button key={label} className="chip" style={{ minHeight: 36 }} onClick={() => setS({ ...s, ...patch })}>{label}</button>
+          ))}
+        </div>
+        <div className="row wrap">
+          <label className="field" style={{ minWidth: 240, flex: 1 }}>For<TargetSelect idx={idx} value={target} onChange={(tt) => { setTarget(tt); setS({}); }} /></label>
+          <button className="btn ghost" onClick={() => setS({})}>Start over</button>
+        </div>
+        <p className="small faint">Nothing changes for real until you press Apply.</p>
       </div>
       <div className="grid c2">
         <div className="card col gap-12">

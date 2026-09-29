@@ -1,49 +1,88 @@
+// A short welcome: pick how to start, optionally say what you read, then
+// straight to Today. Goals, reading days and AI are discovered later.
 import { useState } from 'react';
-import { saveGoal, updateSettings } from '../db/actions';
+import { useNavigate } from 'react-router-dom';
+import { Icon, type IconName, TONES, type Tone } from '../components/icons';
+import { Illustration } from '../components/illustrations';
+import { updateSettings } from '../db/actions';
 import { loadSampleLibrary } from '../db/seed';
-import { WEEKDAYS } from '../engine/dates';
+import { useUI } from '../state/ui';
+
+type Start = 'add' | 'epub' | 'import' | 'sample' | 'empty';
+
+const STARTS: { id: Start; icon: IconName; tone: Tone; title: string; sub: string }[] = [
+  { id: 'add', icon: 'plus', tone: 'terracotta', title: 'Add my books', sub: 'Search by title and add what you’re reading' },
+  { id: 'epub', icon: 'file', tone: 'blue', title: 'Open an ebook', sub: 'Read an ePub file right here' },
+  { id: 'import', icon: 'download', tone: 'green', title: 'Import from Goodreads', sub: 'Bring your shelves, ratings and dates' },
+  { id: 'sample', icon: 'sparkle', tone: 'plum', title: 'Look around first', sub: 'A sample library you can erase any time' },
+];
+
+const INTERESTS = ['Fiction', 'Fantasy', 'Science fiction', 'Mystery & thriller', 'Romance', 'Classics', 'History', 'Biography', 'Science', 'Philosophy', 'Religion & spirituality', 'Self-improvement', 'Business', 'Poetry', 'Comics', 'Audiobooks'];
 
 export default function Onboarding() {
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [start, setStart] = useState<Start>('empty');
+  const [interests, setInterests] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [goal, setGoal] = useState('20');
-  const [metric, setMetric] = useState<'pages' | 'minutes'>('pages');
-  const [skip, setSkip] = useState<number[]>([]);
-  const start = async () => {
+  const { open } = useUI();
+  const nav = useNavigate();
+
+  const finish = async (skip = false) => {
     setBusy(true);
-    if (Number(goal) > 0) await saveGoal({ period: 'daily', metric, target: Number(goal) });
-    await updateSettings({ onboarded: true, nonReadingWeekdays: skip, streakSkipWeekdays: skip, defaultPace: metric === 'pages' && Number(goal) > 0 ? Number(goal) : 20 });
+    if (start === 'sample') await loadSampleLibrary();
+    await updateSettings({ onboarded: true, ...(!skip && interests.length ? { interests } : {}) });
+    if (start === 'add') open({ kind: 'add' });
+    if (start === 'epub') open({ kind: 'add', preset: { step: 'epub' } });
+    if (start === 'import') nav('/library/import');
   };
-  const sample = async () => {
-    setBusy(true);
-    await loadSampleLibrary();
-  };
+
   return (
-    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 16 }}>
-      <div className="card" style={{ maxWidth: 560, width: '100%', padding: 32 }}>
-        <div className="brand" style={{ padding: 0, marginBottom: 20 }}><span className="brand-mark">S</span>Shelf</div>
-        <h1>Your reading life, in one place.</h1>
-        <p className="muted mt-8">Shelf keeps track of what you own, what you’re reading, how fast you read, what you want to accomplish, and what you’ve learned — and forecasts when you’ll get there.</p>
-        <div className="divider" style={{ margin: '24px 0' }} />
-        <h3>A gentle daily goal (optional)</h3>
-        <div className="row mt-8">
-          <input className="input" style={{ width: 90 }} type="number" min={0} value={goal} onChange={(e) => setGoal(e.target.value)} />
-          <select className="select" style={{ width: 140 }} value={metric} onChange={(e) => setMetric(e.target.value as 'pages' | 'minutes')}>
-            <option value="pages">pages / day</option>
-            <option value="minutes">minutes / day</option>
-          </select>
-        </div>
-        <h3 className="mt-24">Days you usually don’t read</h3>
-        <p className="small muted">Plans and required paces skip these days, and they won’t break your streak. You can change this later.</p>
-        <div className="row wrap mt-8">
-          {WEEKDAYS.map((d, i) => (
-            <button key={d} className={`chip ${skip.includes(i) ? 'on' : ''}`} onClick={() => setSkip(skip.includes(i) ? skip.filter((x) => x !== i) : [...skip, i])}>{d}</button>
-          ))}
-        </div>
-        <div className="row wrap mt-24" style={{ justifyContent: 'space-between' }}>
-          <button className="btn ghost" disabled={busy} onClick={sample} title="Loads a clearly-marked sample library you can erase later">Explore with a sample library</button>
-          <button className="btn primary" disabled={busy} onClick={start}>{busy ? 'Setting up…' : 'Start with an empty library'}</button>
-        </div>
-        <p className="tiny faint mt-16">Everything is stored locally in this browser. AI features are optional and off until you turn them on.</p>
+    <div style={{ minHeight: '100dvh', display: 'grid', placeItems: 'center', padding: '24px 16px' }}>
+      <div style={{ maxWidth: 520, width: '100%' }}>
+        {step === 1 && (
+          <div className="col gap-16" style={{ alignItems: 'center', textAlign: 'center' }}>
+            <span className="brand-mark" style={{ width: 52, height: 52, borderRadius: 16 }}><Icon name="book" size={28} /></span>
+            <Illustration name="shelf" className="illus" />
+            <h1 style={{ fontSize: 34 }}>Your whole reading life, in one cosy place.</h1>
+            <p className="muted" style={{ fontSize: 16.5, maxWidth: 420 }}>Keep track of what you’re reading, read ebooks, save quotes, and see when you’ll finish — without spreadsheets.</p>
+            <button className="btn primary lg block mt-8" onClick={() => setStep(2)}>Get started</button>
+            <p className="tiny faint">Everything stays on this phone. AI is optional and off until you turn it on.</p>
+          </div>
+        )}
+        {step === 2 && (
+          <div className="col gap-16">
+            <div className="eyebrow">Step 1 of 2</div>
+            <h1>What would you like to do first?</h1>
+            <div className="list-card">
+              {STARTS.map((s) => (
+                <button key={s.id} className="li" onClick={() => { setStart(s.id); setStep(3); }}>
+                  <span className="li-ico" style={{ background: TONES[s.tone] }}><Icon name={s.icon} /></span>
+                  <span className="grow" style={{ minWidth: 0 }}><span className="li-title" style={{ display: 'block' }}>{s.title}</span><span className="li-sub" style={{ display: 'block' }}>{s.sub}</span></span>
+                  <Icon name="chevronRight" className="faint" />
+                </button>
+              ))}
+            </div>
+            <button className="btn ghost" onClick={() => { setStart('empty'); setStep(3); }}>Start with an empty library</button>
+          </div>
+        )}
+        {step === 3 && (
+          <div className="col gap-16">
+            <div className="eyebrow">Step 2 of 2 · optional</div>
+            <h1>What do you usually read?</h1>
+            <p className="muted">Pick any that fit. It only helps suggestions — you can skip this.</p>
+            <div className="row wrap gap-8">
+              {INTERESTS.map((i) => (
+                <button key={i} className={`chip ${interests.includes(i) ? 'on' : ''}`} style={{ minHeight: 40, padding: '0 16px', fontSize: 14.5 }} aria-pressed={interests.includes(i)} onClick={() => setInterests(interests.includes(i) ? interests.filter((x) => x !== i) : [...interests, i])}>{i}</button>
+              ))}
+            </div>
+            <div className="row mt-8">
+              <button className="btn ghost" onClick={() => setStep(2)}>Back</button>
+              <span className="grow" />
+              <button className="btn" disabled={busy} onClick={() => finish(true)}>Skip</button>
+              <button className="btn primary" disabled={busy} onClick={() => finish()}>{busy ? 'Setting up…' : 'Done'}</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

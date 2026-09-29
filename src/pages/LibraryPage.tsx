@@ -127,17 +127,19 @@ function ItemsView({ title, base, header, emptyText }: { title: string; base?: R
       </div>
       <LibraryChips />
       {header}
-      <div className="row wrap mb-16 mt-16">
-        <div className="row" style={{ flex: '1 1 260px', position: 'relative' }}>
+      <div className="col mb-16 mt-16" style={{ gap: 10 }}>
+        <div className="row" style={{ position: 'relative' }}>
           <span style={{ position: 'absolute', left: 14, color: 'var(--text-3)', display: 'grid' }}><Icon name="search" /></span>
           <input className="input" style={{ paddingLeft: 42 }} placeholder="Search title, author, notes, tags…" value={text} onChange={(e) => setText(e.target.value)} aria-label="Search this list" />
         </div>
-        <button className={`btn ${fc ? 'accent' : ''}`} onClick={() => setShowFilters(true)}><Icon name="filter" />Filter{fc ? ` · ${fc}` : ''}</button>
-        <select className="select" style={{ width: 'auto', minWidth: 150 }} value={`${sort}:${dir}`} onChange={(e) => { const [k, d] = e.target.value.split(':'); setSort(k as SortKey); setDir(d as 'asc' | 'desc'); }} aria-label="Sort by">
-          {([['added:desc', 'Newest first'], ['recent:desc', 'Recently read'], ['title:asc', 'Title A–Z'], ['author:asc', 'Author A–Z'], ['progress:desc', 'Most progress'], ['rating:desc', 'Highest rated'], ['pages:asc', 'Shortest'], ['pages:desc', 'Longest'], ['finished:desc', 'Recently finished'], ['deadline:asc', 'Deadline soonest'], ['estimate:asc', 'Finishing soonest']] as [string, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-        </select>
-        <Segmented value={mode} onChange={setView} options={[{ value: 'grid', label: <Icon name="grid" title="Covers" /> }, { value: 'compact', label: <Icon name="library" title="Compact" /> }, { value: 'list', label: <Icon name="list" title="List" /> }]} />
-        <button className={`btn ${selecting ? 'primary' : 'ghost'}`} onClick={() => (selecting ? stopSelecting() : setSelecting(true))}>{selecting ? 'Done' : 'Select'}</button>
+        <div className="row" style={{ gap: 8 }}>
+          <button className={`btn sm ${fc ? 'accent' : ''}`} onClick={() => setShowFilters(true)}><Icon name="filter" />Filter{fc ? ` · ${fc}` : ''}</button>
+          <select className="select sm grow" style={{ width: 'auto', minWidth: 0 }} value={`${sort}:${dir}`} onChange={(e) => { const [k, d] = e.target.value.split(':'); setSort(k as SortKey); setDir(d as 'asc' | 'desc'); }} aria-label="Sort by">
+            {([['added:desc', 'Newest'], ['recent:desc', 'Recent'], ['title:asc', 'A–Z'], ['author:asc', 'Author'], ['progress:desc', 'Progress'], ['rating:desc', 'Rating'], ['pages:asc', 'Shortest'], ['pages:desc', 'Longest'], ['finished:desc', 'Finished'], ['deadline:asc', 'Deadline'], ['estimate:asc', 'Ends soon']] as [string, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          </select>
+          <Segmented size="sm" value={mode} onChange={setView} options={[{ value: 'grid', label: <Icon name="grid" title="Covers" /> }, { value: 'compact', label: <Icon name="library" title="Compact" /> }, { value: 'list', label: <Icon name="list" title="List" /> }]} />
+          <button className={`btn sm ${selecting ? 'primary' : ''}`} onClick={() => (selecting ? stopSelecting() : setSelecting(true))}>{selecting ? 'Done' : 'Select'}</button>
+        </div>
       </div>
       {fc > 0 && <div className="row wrap mb-16"><span className="small muted">Filtered</span><button className="chip" onClick={() => setQ({})}>Clear filters ✕</button></div>}
       {selecting && <BulkBar idx={idx} ids={[...selected]} onDone={stopSelecting} onAll={() => setSelected(new Set(items.map((i) => i.id)))} />}
@@ -235,7 +237,7 @@ function BulkBar({ idx, ids, onDone, onAll }: { idx: LibraryIndex; ids: string[]
     <div className="notice row wrap mb-16" style={{ position: 'sticky', top: 70, zIndex: 5, boxShadow: 'var(--shadow)' }}>
       <b>{ids.length ? `${ids.length} selected` : 'Tap books to select them'}</b>
       <button className="btn xs ghost" onClick={onAll}>Select all</button>
-      <select className="select sm" style={{ width: 160 }} value="" onChange={async (e) => { const s = e.target.value as Status; if (!s) return; for (const id of ids) await setStatus(id, s); toast(`Moved to ${STATUS_LABEL[s]}`); onDone(); }}>
+      <select className="select sm" style={{ width: 160 }} value="" onChange={async (e) => { const s = e.target.value as Status; if (!s || !ids.length) return; for (const id of ids) await setStatus(id, s); toast(`Moved to ${STATUS_LABEL[s]}`); onDone(); }}>
         <option value="">Set status…</option>{(Object.keys(STATUS_LABEL) as Status[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
       </select>
       <button className="btn sm" onClick={() => setFolderPick(true)}>Add to folder…</button>

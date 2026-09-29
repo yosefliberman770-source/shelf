@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { type AIMessage, complete, completeJSON } from '../ai/client';
 import { BASE_SYSTEM, folderDigest, itemContext, itemLine, libraryDigest, relevantItems } from '../ai/context';
 import { brainSummary } from '../ai/summaries';
-import { AIErrorNotice, AIOff, SharedPreview, useAICall, useAIReady } from '../ai/ui';
+import { AIErrorNotice, AIOff, AISetupCard, SharedPreview, useAICall, useAIReady } from '../ai/ui';
 import { AIBadge, Cover, Empty, ItemPicker, Markdown, Segmented, Tabs } from '../components/common';
 import { addItem, deleteAIRecord, deleteAllAIData, saveAIRecord } from '../db/actions';
 import type { ContentType, Item, Status } from '../db/types';
@@ -22,16 +22,19 @@ export default function AIPage() {
   const loc = useLocation();
   const nav = useNavigate();
   const seg = loc.pathname.split('/')[2] as Tab | undefined;
-  const tab: Tab = ['assistant', 'ask', 'recommend', 'tutor', 'notebook'].includes(seg ?? '') ? seg! : 'ask';
+  const tab: Tab = ['assistant', 'ask', 'recommend', 'tutor', 'notebook'].includes(seg ?? '') ? seg! : 'assistant';
   const ready = useAIReady();
   return (
     <div className="page">
-      <div className="page-head">
-        <div><h1>✨ AI</h1><div className="sub">An assistant that works from your real library. Shelf’s engine does the maths; the AI explains, recommends and connects.</div></div>
-        <Link className="btn sm" to="/settings?tab=ai">AI settings & privacy</Link>
+      <div className="ai-card mb-24">
+        <div className="row between wrap">
+          <h1 style={{ color: '#fff' }}>Your reading assistant</h1>
+          <Link className="chip" to="/settings?tab=ai">Settings & privacy</Link>
+        </div>
+        <p style={{ opacity: 0.92, marginTop: 8, maxWidth: 620 }}>It works from your real library. Shelf calculates every number; the assistant explains, recommends and connects — and never changes your books by itself.</p>
       </div>
-      {!ready && <div className="mb-16"><AIOff /></div>}
-      <Tabs<Tab> value={tab} onChange={(t) => nav(`/ai/${t}`)} tabs={[{ id: 'ask', label: 'Ask my library' }, { id: 'assistant', label: 'Assistant' }, { id: 'recommend', label: 'Recommendations' }, { id: 'tutor', label: 'Tutor' }, { id: 'notebook', label: `AI notebook (${idx.snap.ai.length})` }]} />
+      {!ready && <div className="card mb-16"><AISetupCard onGo={() => nav('/settings?tab=ai')} /></div>}
+      <Tabs<Tab> value={tab} onChange={(t) => nav(`/ai/${t}`)} tabs={[{ id: 'assistant', label: 'Chat' }, { id: 'recommend', label: 'What to read' }, { id: 'ask', label: 'Search my library' }, { id: 'tutor', label: 'Quiz me' }, { id: 'notebook', label: `Saved · ${idx.snap.ai.length}` }]} />
       {tab === 'ask' && <AskLibrary idx={idx} />}
       {tab === 'assistant' && <Assistant idx={idx} />}
       {tab === 'recommend' && <Recommendations idx={idx} />}

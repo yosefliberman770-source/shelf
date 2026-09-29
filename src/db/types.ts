@@ -384,6 +384,8 @@ export interface Settings {
   notifications: NotificationPrefs;
   ai: AISettings;
   onboarded: boolean;
+  /** What the reader said they usually read (optional, from onboarding). */
+  interests?: string[];
   /** True while the optional sample library is loaded. */
   sampleData?: boolean;
   createdAt: number;

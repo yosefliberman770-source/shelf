@@ -599,7 +599,7 @@ export default function ReaderPage() {
       ? { itemId: it.id, kind: 'note', text: `${note}\n\n“${selection.text}”`, chapter: chapter || undefined, page: p, location: selection.cfi }
       : { itemId: it.id, kind: 'quote', text: selection.text, chapter: chapter || undefined, page: p, location: selection.cfi });
     try { rendRef.current?.annotations.highlight(selection.cfi, { id: noteId }, () => {}, 'shelf-hl', { fill: '#eda100', 'fill-opacity': '0.3', 'mix-blend-mode': 'multiply' }); } catch { /* ignore */ }
-    toast(note ? 'Note saved' : 'Highlight saved');
+    toast(note ? 'Note saved to Knowledge' : 'Quote saved to your quotes', { action: { label: 'View', run: () => { flush(); nav('/knowledge'); } } });
     clearSelection();
   };
 
@@ -790,7 +790,7 @@ export default function ReaderPage() {
             </div>
           ) : (
             <div className="row wrap" style={{ gap: 4 }}>
-              <button className="btn sm primary" onClick={() => saveHighlight()}>🖍 Highlight</button>
+              <button className="btn sm primary" onClick={() => saveHighlight()}>❝ Save quote</button>
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setNoteDraft('')}>✎ Note</button>
               {selection.text.split(/\s+/).length <= 3 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={lookUpSelection}>📖 Define</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { navigator.clipboard?.writeText(selection.text).then(() => toast('Copied')).catch(() => {}); clearSelection(); }}>Copy</button>
@@ -836,10 +836,10 @@ export default function ReaderPage() {
           )}
           {navTab === 'notes' && (
             <div className="col" style={{ gap: 4 }}>
-              {!itemNotes.length && <p className="small" style={{ color: t.muted }}>Press and hold on a word, drag to select text, then choose Highlight or Note.</p>}
+              {!itemNotes.length && <p className="small" style={{ color: t.muted }}>Press and hold on a word, drag to select text, then tap Save quote or Note. Quotes also appear in Knowledge and on Today.</p>}
               {itemNotes.map((n: Note) => (
                 <button key={n.id} style={{ textAlign: 'left', background: 'transparent', border: 0, borderBottom: `1px solid ${t.line}`, color: t.fg, padding: '8px 0', font: 'inherit', cursor: 'pointer' }} onClick={() => jumpTo(n.location!)}>
-                  <div className="small" style={{ whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{n.kind === 'quote' ? `🖍 ${n.text}` : `✎ ${n.text}`}</div>
+                  <div className="small" style={{ whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{n.kind === 'quote' ? `❝ ${n.text}` : `✎ ${n.text}`}</div>
                   <div className="tiny" style={{ color: t.muted }}>{[n.chapter, n.page ? `page ${n.page}` : ''].filter(Boolean).join(' · ')}</div>
                 </button>
               ))}

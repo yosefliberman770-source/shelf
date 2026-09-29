@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { completeJSON } from '../ai/client';
 import { BASE_SYSTEM, noteLine } from '../ai/context';
-import { AIErrorNotice, AIOff, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
+import { AIErrorNotice, AIOff, AskChip, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { AIBadge, Cover, Empty, Modal, Segmented, Tabs } from '../components/common';
 import { KnowledgeGraph } from '../components/graph';
 import { NoteCard } from '../components/notes';
@@ -28,8 +28,8 @@ export default function KnowledgePage() {
   useConcierge('Knowledge', ['Organize these thoughts.', 'What themes keep coming up in my notes?', 'Which concepts connect my books?'], () => `CONCEPTS: ${idx.snap.concepts.map((c) => `${c.name} (${c.kind})`).join(', ') || 'none'}\n\nRECENT NOTES:\n${idx.settings.ai.share.notes ? [...idx.snap.notes].sort((a, b) => b.createdAt - a.createdAt).slice(0, 60).map(noteLine).join('\n') : '(notes not shared)'}`, [idx]);
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Knowledge</h1><div className="sub">What you’ve learned and recorded — notes, quotes, concepts and how they connect.</div></div></div>
-      <Tabs<Tab> value={tab} onChange={(t) => nav(`/knowledge/${t === 'notes' ? '' : t}`)} tabs={[{ id: 'notes', label: `Notes & quotes (${idx.snap.notes.length})` }, { id: 'library', label: `Knowledge library (${idx.snap.concepts.length})` }, { id: 'graph', label: 'Graph' }]} />
+      <div className="page-head"><div><h1>Knowledge</h1><div className="sub">Things you’ve learned — your quotes, notes and the topics that tie them together.</div></div><AskChip question="What themes keep coming up in my notes?" /></div>
+      <Tabs<Tab> value={tab} onChange={(t) => nav(`/knowledge/${t === 'notes' ? '' : t}`)} tabs={[{ id: 'notes', label: `Quotes & notes · ${idx.snap.notes.length}` }, { id: 'library', label: `Topics · ${idx.snap.concepts.length}` }, { id: 'graph', label: 'Map' }]} />
       <Routes>
         <Route index element={<NotesDB idx={idx} />} />
         <Route path="library" element={<ConceptLibrary idx={idx} />} />
@@ -74,7 +74,7 @@ function NotesDB({ idx }: { idx: LibraryIndex }) {
   const ready = useAIReady();
   const [organize, setOrganize] = useState(false);
   const exportCSV = async (k: 'notes' | 'quotes') => { const rows = await tableRowsForExport(); download(`shelf-${k}.csv`, toCSV(rows[k]), 'text/csv'); };
-  if (!idx.snap.notes.length) return <div className="card"><Empty icon="✎" title="Your notes and quotes will appear here as you read" action={<button className="btn" onClick={() => open({ kind: 'note', noteKind: 'note' })}>Write a note</button>}>Capture thoughts and highlights while reading — they’re searchable and connect to concepts.</Empty></div>;
+  if (!idx.snap.notes.length) return <div className="card"><Empty illustration="notes" title="Your quotes and notes will live here" action={<div className="row wrap" style={{ justifyContent: 'center' }}><button className="btn primary" onClick={() => open({ kind: 'note', noteKind: 'quote' })}>Save a quote</button><button className="btn" onClick={() => open({ kind: 'note', noteKind: 'note' })}>Write a note</button></div>}>In the ebook reader, press and hold on text and tap Save quote. You can also add them by hand.</Empty></div>;
   return (
     <div className="col gap-16">
       <div className="card flat col gap-12">
@@ -83,7 +83,9 @@ function NotesDB({ idx }: { idx: LibraryIndex }) {
           <Segmented value={kind} onChange={setKind} options={[{ value: 'all', label: 'All' }, { value: 'note', label: 'Notes' }, { value: 'quote', label: 'Quotes' }]} />
           <button className="btn" onClick={() => open({ kind: 'note', noteKind: 'note' })}>＋ New</button>
         </div>
-        <div className="fields c3">
+        <details>
+        <summary className="small muted" style={{ cursor: 'pointer', fontWeight: 700 }}>Filter by book, folder, author, tag, topic or date</summary>
+        <div className="fields c3 mt-8">
           <label className="field">Book<select className="select sm" value={book} onChange={(e) => setBook(e.target.value)}><option value="">Any</option>{idx.itemList().filter((i) => idx.notesByItem.has(i.id)).map((i) => <option key={i.id} value={i.id}>{i.title}</option>)}</select></label>
           <label className="field">Folder<select className="select sm" value={folder} onChange={(e) => setFolder(e.target.value)}><option value="">Any</option>{idx.snap.folders.map((f) => <option key={f.id} value={f.id}>{idx.folderPath(f.id).map((x) => x.name).join(' / ')}</option>)}</select></label>
           <label className="field">Author<select className="select sm" value={author} onChange={(e) => setAuthor(e.target.value)}><option value="">Any</option>{idx.snap.authors.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
@@ -92,6 +94,7 @@ function NotesDB({ idx }: { idx: LibraryIndex }) {
           <label className="field">Date<div className="row"><input className="input sm" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /><input className="input sm" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div></label>
           <label className="field">Created by<select className="select sm" value={source} onChange={(e) => setSource(e.target.value as typeof source)}><option value="all">Anyone</option><option value="user">Me</option><option value="ai">AI</option></select></label>
         </div>
+        </details>
         <div className="row wrap">
           <span className="small muted grow">{notes.length} result{notes.length === 1 ? '' : 's'}</span>
           <button className="btn sm ghost" onClick={() => exportCSV('notes')}>Export notes CSV</button>
@@ -129,7 +132,7 @@ function ConceptLibrary({ idx }: { idx: LibraryIndex }) {
         <button className="btn primary" onClick={() => setEdit({ kind: 'concept' })}>＋ New concept</button>
       </div>
       {idx.snap.concepts.length === 0 ? (
-        <div className="card"><Empty icon="🧠" title="Turn books into knowledge" action={<button className="btn" onClick={() => setEdit({ kind: 'subject' })}>Create a subject</button>}>Create subjects (e.g. “Ancient Rome”), concepts, people, places, events and periods. Link books and notes to them to build your knowledge library.</Empty></div>
+        <div className="card"><Empty illustration="notes" title="Turn books into knowledge" action={<button className="btn" onClick={() => setEdit({ kind: 'subject' })}>Create a subject</button>}>Create subjects (e.g. “Ancient Rome”), concepts, people, places, events and periods. Link books and notes to them to build your knowledge library.</Empty></div>
       ) : (
         <div className="card">{roots.map((c) => <Node key={c.id} c={c} depth={0} />)}</div>
       )}

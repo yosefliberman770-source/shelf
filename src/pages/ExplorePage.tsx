@@ -4,6 +4,7 @@ import { completeJSON } from '../ai/client';
 import { BASE_SYSTEM, itemLine, libraryDigest, relevantItems } from '../ai/context';
 import { AIErrorNotice, AIOff, AIPanel, SharedPreview, useAICall, useAIReady, useConcierge } from '../ai/ui';
 import { SEQ } from '../components/charts';
+import { Icon, type IconName, TONES, type Tone } from '../components/icons';
 import { AIBadge, Cover, Empty, ItemPicker, Modal, Segmented, Stars, Tabs, useDebounced } from '../components/common';
 import { FilterPanel, FolderTree, ItemViews } from '../components/library';
 import { addItem, link, saveAIRecord, saveConcept, saveProject } from '../db/actions';
@@ -30,12 +31,13 @@ export default function ExplorePage() {
   const loc = useLocation();
   const nav = useNavigate();
   const seg = loc.pathname.split('/')[2] as Tab | undefined;
-  const tab: Tab = TABS.some((t) => t.id === seg) ? seg! : 'subjects';
+  const tab: Tab | undefined = TABS.some((t) => t.id === seg) ? seg! : undefined;
   useConcierge('Explore', ['What should I explore next?', 'Take me somewhere new.', 'Connect my books.'], () => libraryDigest(idx, idx.settings.ai.share, idx.itemList(), 120), [idx]);
   return (
     <div className="page" style={{ maxWidth: 1320 }}>
-      <div className="page-head"><div><h1>Explore</h1><div className="sub">Discover subjects, connections and paths — starting from what you already own.</div></div></div>
-      <Tabs<Tab> value={tab} onChange={(t) => nav(`/explore/${t}`)} tabs={TABS} />
+      <div className="page-head"><div><h1>Explore</h1><div className="sub">What are you curious about? Everything here starts from books you already have.</div></div></div>
+      {!tab && <ExploreHome />}
+      {tab && <Tabs<Tab> value={tab} onChange={(t) => nav(`/explore/${t}`)} tabs={TABS} />}
       {tab === 'subjects' && <Subjects idx={idx} />}
       {tab === 'connections' && <Connections idx={idx} />}
       {tab === 'timeline' && <Timeline idx={idx} />}
@@ -47,6 +49,37 @@ export default function ExplorePage() {
       {tab === 'gaps' && <Gaps idx={idx} />}
       {tab === 'authors' && <Authors idx={idx} />}
     </div>
+  );
+}
+
+const EXPLORE_TILES: { id: Tab; icon: IconName; tone: Tone; title: string; sub: string }[] = [
+  { id: 'connections', icon: 'layers', tone: 'blue', title: 'Connections', sub: 'Which of your books share authors, subjects, topics or eras' },
+  { id: 'timeline', icon: 'calendar', tone: 'brown', title: 'History timeline', sub: 'Your books placed on the years they’re about' },
+  { id: 'subjects', icon: 'folder', tone: 'green', title: 'Subjects', sub: 'Browse your library by folder and genre' },
+  { id: 'map', icon: 'map', tone: 'teal', title: 'Reading map', sub: 'Where you’ve read deeply — and what’s unexplored' },
+  { id: 'paths', icon: 'arrowRight', tone: 'terracotta', title: 'Reading paths', sub: 'Beginner to advanced, in a sensible order' },
+  { id: 'rabbit', icon: 'compass', tone: 'plum', title: 'Rabbit hole', sub: 'Follow one idea to the next' },
+  { id: 'gaps', icon: 'search', tone: 'gold', title: 'What to explore', sub: 'Gaps next to what you already know' },
+  { id: 'discover', icon: 'sparkle', tone: 'ai', title: 'Discover', sub: 'Find books by length, era, rating and more' },
+  { id: 'compare', icon: 'book', tone: 'rose', title: 'Compare books', sub: 'How two books complement each other' },
+  { id: 'authors', icon: 'user', tone: 'brown', title: 'Authors', sub: 'Everyone on your shelves' },
+];
+
+function ExploreHome() {
+  const nav = useNavigate();
+  return (
+    <>
+      <div className="tile-grid">
+        {EXPLORE_TILES.map((t) => (
+          <button key={t.id} className="tile" onClick={() => nav(`/explore/${t.id}`)}>
+            <span className="t-ico" style={{ background: TONES[t.tone] }}><Icon name={t.icon} /></span>
+            <span className="t-title">{t.title}</span>
+            <span className="t-sub">{t.sub}</span>
+          </button>
+        ))}
+      </div>
+      <p className="small faint mt-24">Connections come from what you record: shared authors, folders, genres, tags, linked topics and overlapping history. <Link to="/help" style={{ textDecoration: 'underline' }}>How this works</Link></p>
+    </>
   );
 }
 
