@@ -390,7 +390,7 @@ export async function testProvider(id: ProviderId, model?: string): Promise<{ ok
 
 export function failureMessage(name: string, f: ProviderFailure): string {
   switch (f.kind) {
-    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.`;
+    case 'auth': return `${name} didn’t accept the API key. Check that you copied the whole key, and that it’s a ${name} key.${name === 'Google Gemini' ? ' Gemini API keys come from Google AI Studio and start with “AIza”.' : ''}`;
     case 'rate_limit': return `${name} is rate-limiting requests right now.`;
     case 'quota': return `${name}’s free allowance is used up for now.`;
     case 'model': return `That model isn’t available on ${name}. Tap “Find models” and pick another one.${f.message ? ` (${name} said: ${f.message.replace(/^Model unavailable \((.*)\)\.$/, '$1').slice(0, 160)})` : ''}`;

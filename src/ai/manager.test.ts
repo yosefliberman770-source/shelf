@@ -227,18 +227,19 @@ describe('retired default model', () => {
 });
 
 describe('keys pasted in the wrong place', () => {
-  it('explains a Google Cloud key in Gemini or a Groq key in Gemini, without calling the provider', async () => {
+  it('warns about the wrong kind of key, but still asks the provider and reports its answer', async () => {
     const { keyMismatch } = await import('./providers/catalog');
-    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc')).toMatch(/Vertex AI/);
+    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc')).toMatch(/AIza/);
+    expect(keyMismatch('gemini', 'AQ.Ab8RN6abc', true)).toBeUndefined();
     expect(keyMismatch('gemini', 'gsk_abc')).toMatch(/Groq key/);
     expect(keyMismatch('gemini', 'AIzaSyabc')).toBeUndefined();
     expect(keyMismatch('groq', 'weird-key', true)).toBeUndefined();
     setKey('gemini', 'AQ.Ab8RN6abc');
     setup({ gemini: { enabled: true } });
-    mockFetch(() => geminiOk('ok'));
+    // What Google really returns for such a key.
+    mockFetch(() => status(401, '{"error":{"code":401,"message":"Request had invalid authentication credentials.","status":"UNAUTHENTICATED","details":[{"reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED"}]}}'));
     const r = await testProvider('gemini');
     expect(r.ok).toBe(false);
-    expect(r.message).toMatch(/AI Studio/);
-    expect(calls).toHaveLength(0);
+    expect(r.message).toMatch(/didn’t accept the API key.*AIza/);
   });
 });

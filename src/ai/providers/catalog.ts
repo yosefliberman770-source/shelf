@@ -197,7 +197,7 @@ export function keyMismatch(id: ProviderId, key: string, onlyCertain = false): s
   const def = providerDef(id);
   const k = key.trim();
   if (!def?.keyPrefix || !k || k.startsWith(def.keyPrefix)) return undefined;
-  if (id === 'gemini' && k.startsWith('AQ.')) return 'This looks like a Google Cloud (Vertex AI) key. Shelf needs a Gemini API key from Google AI Studio — it starts with “AIza”. Tap “Get API key”, then “Create API key”.';
+  if (id === 'gemini' && k.startsWith('AQ.')) return onlyCertain ? undefined : 'Keys starting with “AQ.” are usually Google sign-in tokens, not Gemini API keys, and Google rejects them here. In Google AI Studio tap “Create API key” — the key starts with “AIza”.';
   const other = keyOwner(k);
   if (other) return `This looks like a ${other.name} key. Paste it under ${other.name} instead. ${def.name} keys start with “${def.keyPrefix}”.`;
   return onlyCertain ? undefined : `${def.name} keys usually start with “${def.keyPrefix}”. Check you copied the right key.`;
