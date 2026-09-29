@@ -373,7 +373,7 @@ export interface EntityCacheRow {
   id: string;
   itemId: ID;
   href: string;
-  names: { name: string; kind: ConceptKind; conceptId?: ID }[];
+  names: { name: string; kind: ConceptKind; conceptId?: ID; full?: string; real?: boolean; role?: string; mentions?: number }[];
   source: Source;
   createdAt: number;
 }

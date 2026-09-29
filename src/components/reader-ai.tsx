@@ -4,7 +4,7 @@
 // ideas link into your Knowledge Atlas, and you choose what to keep.
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { completeJSON } from '../ai/client';
+import { completeJSON, jsonField } from '../ai/client';
 import { BASE_SYSTEM, SPOILER_LEVELS } from '../ai/context';
 import { AIErrorNotice, AISetupCard, useAICall, useAIReady } from '../ai/ui';
 import { addNote, link, saveAIRecord, saveCurriculum } from '../db/actions';
@@ -81,7 +81,7 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
     setTurns((t) => [...t, turn]);
     setText('');
     const history = turns.filter((t) => t.answer).slice(-2).map((t) => `Earlier Q: ${t.q}\nEarlier A: ${t.answer!.answer.slice(0, 600)}`).join('\n\n');
-    const r = await run((signal) => completeJSON<AIAnswer>({ system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal));
+    const r = await run((signal) => completeJSON<AIAnswer>({ system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal, (t) => ({ answer: jsonField(t, 'answer') ?? t })));
     if (r) setTurns((t) => t.map((x) => (x === turn ? { ...x, answer: r.data, model: r.response.model } : x)));
     else setTurns((t) => t.filter((x) => x !== turn));
   };
