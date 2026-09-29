@@ -60,5 +60,5 @@ don’t tell apps how much free allowance remains, so that isn’t shown.
 
 `npx vitest run src/ai` covers routing, free-only rules, fallback and
 cooldowns with mocked providers. “Test connection” in Settings sends the
-smallest possible request (a 5-token “ok”). Live providers can only be
+smallest sensible request (asks for the word “ok”, with room for models that think first). Live providers can only be
 verified with real keys.

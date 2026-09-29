@@ -151,7 +151,7 @@ describe('AI manager', () => {
     mockFetch(() => ok('ok'));
     const r = await testProvider('groq');
     expect(r.ok).toBe(true);
-    expect(calls[0].body.max_tokens).toBe(5);
+    expect(calls[0].body.max_tokens).toBe(300);
     mockFetch(() => status(401));
     expect((await testProvider('groq')).message).toMatch(/didn’t accept the API key/);
   });
