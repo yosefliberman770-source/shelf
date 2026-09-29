@@ -18,7 +18,8 @@ import { resolveBook } from './resolve';
 import { bookText, extractBookText } from './text';
 import { ANALYSIS_VERSION, type BookChunkRow, type BookGraphRow, type BookJobRow, type BookTextRow, type ChunkExtraction } from './types';
 
-const CONCURRENCY = 2;
+/** One request at a time: free plans limit tokens per minute, so parallel requests only hit limits sooner. */
+const CONCURRENCY = 1;
 const MAX_ATTEMPTS = 3;
 const REBUILD_EVERY = 3;
 
@@ -91,7 +92,12 @@ export async function resumePendingJobs() {
   const jobs = await db.bookJobs.toArray().catch(() => [] as BookJobRow[]);
   for (const j of jobs) {
     if (j.status === 'running') await db.bookJobs.update(j.id, { status: 'queued' });
-    if (j.status === 'waiting') scheduleWake(j.id, j.resumeAt);
+    if (j.status === 'waiting') {
+      // If a provider is free again now, carry on straight away.
+      const at = nextAvailableAt();
+      if (!at || at < (j.resumeAt ?? Infinity)) await db.bookJobs.update(j.id, { status: 'queued', resumeAt: undefined, message: undefined });
+      else scheduleWake(j.id, j.resumeAt);
+    }
   }
   void pump();
 }
@@ -230,7 +236,7 @@ async function extractAll(bookId: string, text: BookTextRow[], signal: AbortSign
       const hints = candidateNames(passage, 60).map((n) => n.name);
       const t0 = performance.now();
       try {
-        const res = await complete({ task: 'extraction', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: extractionPrompt(book, ch.title, passage, hints) }], json: true, maxTokens: 6000 }, signal);
+        const res = await complete({ task: 'extraction', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: extractionPrompt(book, ch.title, passage, hints) }], json: true, maxTokens: 3500, patient: true }, signal);
         let data: unknown;
         try { data = parseJSON(res.text); } catch { data = repairJSON(res.text); }
         const result: ChunkExtraction = keepGrounded(parseExtraction(data, [c.paraStart, c.paraEnd]), passage);

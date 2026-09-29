@@ -35,6 +35,8 @@ export interface AIRequest {
   maxTokens?: number;
   /** What kind of work this is — used to pick a suitable model. */
   task?: AITask;
+  /** Background work: wait out short rate limits instead of failing. */
+  patient?: boolean;
 }
 
 export interface AIResponse {
@@ -77,7 +79,7 @@ export async function complete(req: AIRequest, signal?: AbortSignal): Promise<AI
   // single-provider paths below stay for the Shelf server's own providers.
   if (s.ai.provider === AUTO || s.ai.provider === DEVICE_GEMINI || (!s.ai.provider && hasUsableProvider())) {
     try {
-      const r = await runAI(req.task ?? 'general', { system: req.system, messages: req.messages, json: req.json, maxTokens: req.maxTokens }, signal);
+      const r = await runAI(req.task ?? 'general', { system: req.system, messages: req.messages, json: req.json, maxTokens: req.maxTokens }, signal, { patient: req.patient });
       if (r.refused) throw new AIError('refused', 'The AI model declined this request.');
       return { text: r.text, model: r.model, provider: r.provider, cached: r.cached, switchedFrom: r.switchedFrom };
     } catch (e) {
