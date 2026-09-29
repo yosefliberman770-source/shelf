@@ -23,6 +23,9 @@ import type {
   MediaRecord,
   EntityCacheRow,
   PlaceCacheRow,
+  AIUsageRow,
+  AILogRow,
+  AICacheRow,
   PlaceChoiceRow,
 } from './types';
 
@@ -51,6 +54,9 @@ export class ShelfDB extends Dexie {
   entityCache!: Table<EntityCacheRow, string>;
   placeCache!: Table<PlaceCacheRow, string>;
   placeChoices!: Table<PlaceChoiceRow, string>;
+  aiUsage!: Table<AIUsageRow, string>;
+  aiLog!: Table<AILogRow, number>;
+  aiCache!: Table<AICacheRow, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -80,6 +86,8 @@ export class ShelfDB extends Dexie {
     this.version(3).stores({ concepts: 'id, name, kind, parentId, wikidataId', curricula: 'id, status, updatedAt', media: 'id, provider, objectId', entityCache: 'id, itemId' });
     // Historical place lookups (a local cache, not part of backups) and places the reader picked.
     this.version(4).stores({ placeCache: 'id, placeId, updatedAt', placeChoices: 'id, bookId' });
+    // v5: multi-provider AI — usage counts, a request log and cached answers (all local).
+    this.version(5).stores({ aiUsage: 'id, day, month, provider', aiLog: '++id, at, provider', aiCache: 'id, createdAt' });
   }
 }
 

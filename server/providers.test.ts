@@ -5,7 +5,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('provider abstraction', () => {
   it('exposes the same interface for every provider', () => {
-    expect(PROVIDERS.map((p) => p.id)).toEqual(['anthropic', 'openai', 'gemini', 'compatible']);
+    expect(PROVIDERS.map((p) => p.id)).toEqual(['anthropic', 'openai', 'gemini', 'compatible', 'cloudflare', 'nvidia']);
     for (const p of PROVIDERS) expect(typeof p.complete).toBe('function');
   });
 

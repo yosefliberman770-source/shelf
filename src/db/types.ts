@@ -519,3 +519,46 @@ export interface PlaceChoiceRow {
   place: unknown;
   createdAt: number;
 }
+
+/** AI usage per day, provider and model (counts only — never content or keys). */
+export interface AIUsageRow {
+  id: string;
+  day: string;
+  month: string;
+  provider: string;
+  model: string;
+  requests: number;
+  ok: number;
+  failed: number;
+  rateLimits: number;
+  inTok: number;
+  outTok: number;
+  /** Estimated USD; 0 for free models. */
+  cost: number;
+}
+
+/** One AI request in the local log (no prompts, answers or keys). */
+export interface AILogRow {
+  id?: number;
+  at: number;
+  provider: string;
+  model: string;
+  task: string;
+  ms: number;
+  ok: boolean;
+  error?: string;
+  fallbackFrom?: string;
+  inTok?: number;
+  outTok?: number;
+  cached?: boolean;
+}
+
+/** A cached AI answer, keyed by a hash of the exact request. */
+export interface AICacheRow {
+  id: string;
+  text: string;
+  provider: string;
+  model: string;
+  task: string;
+  createdAt: number;
+}

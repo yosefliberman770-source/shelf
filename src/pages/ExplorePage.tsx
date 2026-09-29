@@ -349,7 +349,7 @@ function RabbitHole({ idx }: { idx: LibraryIndex }) {
   };
   const expandAI = (b: Branch, depth: number) => run(async (signal) => {
     const trail = path.slice(0, depth + 1).map((p) => p.label).join(' → ');
-    const { data } = await completeJSON<{ branches: { name: string; kind: ConceptKind; relation: string }[] }>({ system: BASE_SYSTEM, messages: [{ role: 'user', content: `Intellectual exploration trail: ${trail}. Give 6–9 next branches to explore from "${b.label}" (sub-topics, people, events, schools of thought, works, primary sources — whatever fits the subject). Return JSON {"branches":[{"name":"...","kind":"concept|person|place|event|period|subject","relation":"short"}]}.` }], maxTokens: 700 }, signal);
+    const { data } = await completeJSON<{ branches: { name: string; kind: ConceptKind; relation: string }[] }>({ task: 'brainstorm', system: BASE_SYSTEM, messages: [{ role: 'user', content: `Intellectual exploration trail: ${trail}. Give 6–9 next branches to explore from "${b.label}" (sub-topics, people, events, schools of thought, works, primary sources — whatever fits the subject). Return JSON {"branches":[{"name":"...","kind":"concept|person|place|event|period|subject","relation":"short"}]}.` }], maxTokens: 700 }, signal);
     setAiBranches((m) => ({ ...m, [b.key]: data.branches.map((x) => ({ key: `ai:${b.key}:${x.name}`, label: x.name, ai: true, relation: x.relation })) }));
   });
   const roots: Branch[] = [

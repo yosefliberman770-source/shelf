@@ -15,6 +15,8 @@ const ENV: Record<string, { key?: string; base?: string }> = {
   openai: { key: 'OPENAI_API_KEY', base: 'OPENAI_BASE_URL' },
   gemini: { key: 'GEMINI_API_KEY' },
   compatible: { key: 'COMPATIBLE_API_KEY', base: 'COMPATIBLE_BASE_URL' },
+  cloudflare: { key: 'CLOUDFLARE_API_KEY' },
+  nvidia: { key: 'NVIDIA_API_KEY' },
 };
 
 type Stored = Record<string, ProviderCredentials & { models?: string[] }>;

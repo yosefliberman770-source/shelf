@@ -40,6 +40,7 @@ const KINDS: ConceptKind[] = ['person', 'place', 'event', 'polity', 'organizatio
 /** Scan a chapter with AI: the people (and key places/things) in it. */
 export async function scanChapter(book: BookCtx, chapterText: string, signal?: AbortSignal): Promise<XRayEntry[]> {
   const { data } = await completeJSON<{ entries: XRayEntry[] }>({
+    task: 'extraction',
     system: `${BASE_SYSTEM}
 You build an X-Ray for a chapter, like Kindle X-Ray. Return JSON {"entries":[{"name":"name as written in the text","full":"the specific real-world person/place with disambiguation, e.g. 'Edward I of England', or null if fictional","kind":"person|place|event|polity|organization|period|object|concept","real":true,"role":"one or two sentences: who this is and their part in the story so far"}]}.
 List characters/people first (most important first), then important places and terms. Max 25. Work out WHICH real person is meant from the book and context (e.g. which King Edward). Never reveal anything that happens after this chapter.`,
@@ -56,6 +57,7 @@ List characters/people first (most important first), then important places and t
 /** Ask the AI which person/place a name means in this passage. */
 export async function identifyWithAI(name: string, passage: string, book: BookCtx, signal?: AbortSignal): Promise<XRayEntry> {
   const { data } = await completeJSON<XRayEntry>({
+    task: 'classification',
     system: `${BASE_SYSTEM}
 Identify who or what a name in a book refers to. Return JSON {"name":"...","full":"specific real-world identity with disambiguation (e.g. 'Edward II of England'), or null if fictional","kind":"person|place|event|polity|organization|period|object|concept","real":true,"role":"one or two sentences about who this is in this book so far"}. Use the book and passage to pick the right one. No spoilers beyond the passage.`,
     messages: [{ role: 'user', content: `Book: "${book.title}" by ${book.author}${book.chapter ? ` (chapter: ${book.chapter})` : ''}\nName: "${name}"\nPassage: """${passage.slice(0, 1500)}"""` }],

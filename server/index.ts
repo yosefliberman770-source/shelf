@@ -99,6 +99,11 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL) {
   if (url.pathname === '/api/health') return send(res, 200, { ok: true });
   if (url.pathname.startsWith('/api/historical/')) return handleHistorical(req, res, url);
 
+  // Let the hosted app (an origin listed in SHELF_ALLOWED_ORIGINS) use the AI routes too.
+  if (url.pathname.startsWith('/api/ai/')) {
+    if (!historicalCors(req, res)) return send(res, 403, { error: 'Cross-origin request rejected.' });
+    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+  }
   if (url.pathname === '/api/ai/status' && req.method === 'GET')
     return send(res, 200, { providers: await providerStatus(), keyConfigAllowed: keyConfigAllowed() });
 
@@ -164,7 +169,9 @@ const server = createServer(async (req, res) => {
     const status = err instanceof ProviderError ? err.status : 500;
     const message = err instanceof Error ? err.message : 'Server error';
     if (!(err instanceof ProviderError)) console.error(err);
-    if (!res.headersSent) send(res, status, { error: message });
+    const kind = status === 429 ? 'rate_limit' : status === 401 ? 'auth' : status === 400 ? 'not_configured' : 'unavailable';
+    const retryAfter = (err as { retryAfter?: number }).retryAfter;
+    if (!res.headersSent) send(res, status, { error: message, kind, retryAfter });
   }
 });
 

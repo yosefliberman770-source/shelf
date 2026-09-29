@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { completeJSON, jsonField } from '../ai/client';
+import type { AITask } from '../ai/providers/catalog';
 import { BASE_SYSTEM, SPOILER_LEVELS } from '../ai/context';
 import { AIErrorNotice, AISetupCard, useAICall, useAIReady } from '../ai/ui';
 import { addNote, link, saveAIRecord, saveCurriculum } from '../db/actions';
@@ -29,6 +30,11 @@ export interface ReadingContext {
 }
 
 export type AIMode = 'summary' | 'explain' | 'context' | 'people' | 'place' | 'timeline' | 'compare' | 'primary' | 'debate' | 'simplify' | 'deeper' | 'ask';
+
+const TASK_FOR: Record<AIMode, AITask> = {
+  summary: 'page-summary', explain: 'paragraph', context: 'history', people: 'character', place: 'history', timeline: 'history',
+  compare: 'compare', primary: 'history', debate: 'reasoning', simplify: 'sentence', deeper: 'reasoning', ask: 'book-question',
+};
 
 export const MODES: { id: AIMode; label: string; prompt: string }[] = [
   { id: 'summary', label: '⚡ Quick summary', prompt: 'Give a quick summary of {T} in 3–5 short bullet points.' },
@@ -81,7 +87,7 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
     setTurns((t) => [...t, turn]);
     setText('');
     const history = turns.filter((t) => t.answer).slice(-2).map((t) => `Earlier Q: ${t.q}\nEarlier A: ${t.answer!.answer.slice(0, 600)}`).join('\n\n');
-    const r = await run((signal) => completeJSON<AIAnswer>({ system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal, (t) => ({ answer: jsonField(t, 'answer') ?? t })));
+    const r = await run((signal) => completeJSON<AIAnswer>({ task: TASK_FOR[mode], system: `${BASE_SYSTEM}\n${SHAPE}`, messages: [{ role: 'user', content: `${buildPrompt(ctx, mode, question)}${history ? `\n\n${history}` : ''}` }], maxTokens: 1800 }, signal, (t) => ({ answer: jsonField(t, 'answer') ?? t })));
     if (r) setTurns((t) => t.map((x) => (x === turn ? { ...x, answer: r.data, model: r.response.model } : x)));
     else setTurns((t) => t.filter((x) => x !== turn));
   };

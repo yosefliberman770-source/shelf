@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { onAIEvent } from './ai/manager';
 import { AskSheet } from './ai/ui';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Icon, type IconName } from './components/icons';
@@ -74,6 +75,12 @@ function Shell() {
     return () => window.removeEventListener('keydown', k);
   }, [open]);
   useEffect(() => window.scrollTo(0, 0), [loc.pathname]);
+  // Tell the reader when AI quietly switched provider, or ran out of free capacity.
+  const { toast } = useUI();
+  useEffect(() => onAIEvent((e) => {
+    if (e.type === 'switched') toast(`${e.from} ${e.reason === 'quota' ? 'free allowance used up' : e.reason === 'rate_limit' ? 'limit reached' : 'unavailable'} — switched to ${e.to}.`);
+    if (e.type === 'exhausted') toast(e.message, { error: true });
+  }), [toast]);
 
   if (!idx.settings.onboarded) return <Onboarding />;
 

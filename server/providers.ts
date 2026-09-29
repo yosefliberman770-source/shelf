@@ -22,6 +22,8 @@ export interface CompletionResult {
   text: string;
   model: string;
   refused?: boolean;
+  inputTokens?: number;
+  outputTokens?: number;
 }
 
 export interface ProviderCredentials {
@@ -157,7 +159,37 @@ const gemini: AIProvider = {
   },
 };
 
-export const PROVIDERS: AIProvider[] = [anthropic, openai, gemini, compatible];
+// ── Hosted OpenAI-compatible providers (also reachable from Shelf's
+// multi-provider manager; Cloudflare and NVIDIA *must* go through here
+// because they don't accept calls from a browser) ─────────────────────────
+
+function hosted(id: string, name: string, base: string, defaultModel: string, extraHeaders: Record<string, string> = {}): AIProvider {
+  return {
+    id, name, models: [defaultModel], defaultModel,
+    async complete(req, creds) {
+      if (!creds.apiKey) throw new ProviderError(`${name} API key is not configured on the server.`, 400);
+      const b = (creds.baseUrl ?? base).replace('{account}', encodeURIComponent(process.env.CLOUDFLARE_ACCOUNT_ID ?? ''));
+      const res = await fetch(`${b.replace(/\/$/, '')}/chat/completions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${creds.apiKey}`, ...extraHeaders },
+        body: JSON.stringify({ model: req.model, max_tokens: req.maxTokens, messages: [{ role: 'system', content: req.system + (req.json ? JSON_HINT : '') }, ...req.messages] }),
+      });
+      if (!res.ok) {
+        const body = (await res.text()).slice(0, 300);
+        const e = new ProviderError(`${name} error ${res.status}: ${body}`, res.status === 401 || res.status === 403 ? 401 : res.status === 429 ? 429 : 502);
+        (e as ProviderError & { retryAfter?: number }).retryAfter = Number(res.headers.get('retry-after')) || undefined;
+        throw e;
+      }
+      const data = (await res.json()) as { model?: string; choices?: { message?: { content?: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+      return { text: (data.choices?.[0]?.message?.content ?? '').trim(), model: data.model ?? req.model, inputTokens: data.usage?.prompt_tokens, outputTokens: data.usage?.completion_tokens };
+    },
+  };
+}
+
+const cloudflare = hosted('cloudflare', 'Cloudflare Workers AI', 'https://api.cloudflare.com/client/v4/accounts/{account}/ai/v1', '@cf/meta/llama-3.1-8b-instruct');
+const nvidia = hosted('nvidia', 'NVIDIA NIM', 'https://integrate.api.nvidia.com/v1', 'meta/llama-3.3-70b-instruct');
+
+export const PROVIDERS: AIProvider[] = [anthropic, openai, gemini, compatible, cloudflare, nvidia];
 
 export function getProvider(id: string): AIProvider | undefined {
   return PROVIDERS.find((p) => p.id === id);

@@ -10,14 +10,20 @@ import { Icon, type IconName, TONES, type Tone } from '../components/icons';
 import { Illustration } from '../components/illustrations';
 import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
-import { AIError, type AIMessage, type AIRequest, type AIResponse, complete } from './client';
+import { AIError, type AIMessage, type AIRequest, type AIResponse, AUTO, complete } from './client';
+import { hasUsableProvider, onAIEvent } from './manager';
 import { BASE_SYSTEM, statsDigest } from './context';
-import { DEVICE_GEMINI, getGeminiKey } from './gemini';
+import { DEVICE_GEMINI } from './gemini';
 
 export function useAIReady(): boolean {
   const idx = useLibrary();
   const { enabled, provider } = idx.settings.ai;
-  return enabled && !!provider && (provider !== DEVICE_GEMINI || !!getGeminiKey());
+  const [, bump] = useState(0);
+  useEffect(() => onAIEvent((e) => { if (e.type === 'config') bump((n) => n + 1); }), []);
+  if (!enabled) return false;
+  // "auto" (and the original on-device Gemini) use the multi-provider manager.
+  if (!provider || provider === AUTO || provider === DEVICE_GEMINI) return hasUsableProvider();
+  return true;
 }
 
 export function AIOff({ compact }: { compact?: boolean }) {

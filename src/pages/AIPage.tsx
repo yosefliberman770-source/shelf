@@ -252,6 +252,7 @@ function Recommendations({ idx }: { idx: LibraryIndex }) {
   const m = MODES.find((x) => x.id === mode)!;
   const dnf = idx.itemList().filter((i) => i.status === 'dnf');
   const req = useMemo(() => ({
+    task: 'recommendation' as const,
     system: `${BASE_SYSTEM}\nEvery recommendation must explain why it fits, referencing the reader's actual history (ratings, genres, authors, notes, goals, abandoned books, reading speed).`,
     messages: [{ role: 'user' as const, content: `${m.prompt}\nReturn JSON {"recommendations":[{"title":"...","author":"...","itemId":"library id if owned, else omit","why":"one or two sentences","length":"e.g. 240 pages"}]} with 5–8 items; owned books first.\n\n${brainSummary(idx)}\n\nABANDONED: ${dnf.map((i) => i.title).join(', ') || 'none'}\n\n${folderDigest(idx)}\n\n${libraryDigest(idx, idx.settings.ai.share, idx.itemList(), 160)}` }],
     maxTokens: 2500,
@@ -329,7 +330,7 @@ function Tutor({ idx }: { idx: LibraryIndex }) {
     setCards(null); setFlip({}); setChosen({}); setChat([]);
     if (conversational) {
       const first: AIMessage = { role: 'user', content: `${mode === 'explain' ? 'Ask me to explain one key idea from this material in my own words, then give feedback on my explanation (accuracy, gaps) and ask the next.' : 'Lead a Socratic discussion: ask one probing question at a time about ideas in this material and respond to my answers with further questions.'} ${scopeRule}\n\nMATERIAL:\n${material()}` };
-      const r = await run((s) => complete({ system: `${BASE_SYSTEM}\nYou are a patient tutor.`, messages: [first], maxTokens: 800 }, s));
+      const r = await run((s) => complete({ task: 'general', system: `${BASE_SYSTEM}\nYou are a patient tutor.`, messages: [first], maxTokens: 800 }, s));
       if (r) setChat([first, { role: 'assistant', content: r.text }]);
       return;
     }
