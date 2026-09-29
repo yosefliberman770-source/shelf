@@ -309,3 +309,18 @@ describe('per-minute limits are not “used up for today”', () => {
     expect(candidates[0].model).not.toBe('llama-3.1-8b-instant');
   });
 });
+
+describe('parallel book analysis', () => {
+  it('spreads simultaneous requests across services instead of queuing on one', async () => {
+    setKey('groq', 'q'); setKey('gemini', 'g');
+    setup({ groq: { enabled: true, model: 'openai/gpt-oss-120b' }, gemini: { enabled: true, model: 'gemini-2.5-flash' } }, { order: ['groq', 'gemini', 'cerebras', 'mistral', 'openrouter', 'cloudflare', 'nvidia', 'huggingface', 'cohere', 'ollama'], cache: false });
+    mockFetch((url) => noServer(url) ?? (url.includes('generativelanguage') ? geminiOk('{"a":1}') : ok('{"a":1}')));
+    const { parallelCapacity } = await import('./manager');
+    expect(parallelCapacity()).toBe(2);
+    const [a, b] = await Promise.all([
+      runAI('extraction', { ...REQ, json: true, messages: [{ role: 'user', content: 'part 1' }] }, undefined, { spread: true }),
+      runAI('extraction', { ...REQ, json: true, messages: [{ role: 'user', content: 'part 2' }] }, undefined, { spread: true }),
+    ]);
+    expect(new Set([a.provider, b.provider])).toEqual(new Set(['groq', 'gemini']));
+  });
+});

@@ -458,7 +458,16 @@ export interface RunOptions {
    * For background work such as book analysis, where a pause beats failing.
    */
   patient?: boolean;
+  /**
+   * Prefer providers that aren't already busy with another request, so
+   * parallel background work spreads across services (each has its own limits).
+   */
+  spread?: boolean;
 }
+
+/** Requests currently in flight per provider (for spreading parallel work). */
+const inFlight = new Map<string, number>();
+export const busyCount = (provider: string) => inFlight.get(provider) ?? 0;
 
 const sleep = (ms: number, signal?: AbortSignal) => new Promise<void>((resolve, reject) => {
   const t = setTimeout(resolve, ms);
@@ -482,7 +491,9 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
   const r = runtime();
   r.serverProviders = await serverProviders();
   saveRuntime(r);
-  const { candidates, skipped } = await route(task, cfg);
+  const routed = await route(task, cfg);
+  const { skipped } = routed;
+  let { candidates } = routed;
   if (!candidates.length) {
     const msg = skipped.length
       ? 'No free AI provider is set up for this. Paid options were skipped because “Allow paid AI” is off.'
@@ -494,6 +505,8 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
   let waits: number[] = [];
   for (let round = 0; ; round++) {
   waits = [];
+  // Idle providers first (stable, so your priority order still decides between equals).
+  if (opts.spread) candidates = [...candidates].sort((a, b) => busyCount(a.provider) - busyCount(b.provider));
   for (const c of candidates) {
     if (signal?.aborted) throw new AIAborted('Cancelled');
     const cd = coolingUntil(c.provider, c.model);
@@ -501,7 +514,13 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
     const def = providerDef(c.provider)!;
     const t0 = performance.now();
     try {
-      const res = def.transport === 'server' ? await callServer(c.provider, c.model, req, signal) : await chat(c.provider, c.model, req, credsFor(c.provider, cfg), signal);
+      inFlight.set(c.provider, busyCount(c.provider) + 1);
+      let res: ChatResult;
+      try {
+        res = def.transport === 'server' ? await callServer(c.provider, c.model, req, signal) : await chat(c.provider, c.model, req, credsFor(c.provider, cfg), signal);
+      } finally {
+        inFlight.set(c.provider, Math.max(0, busyCount(c.provider) - 1));
+      }
       const inTok = res.inputTokens ?? estimate(req.system + req.messages.map((m) => m.content).join(''));
       const outTok = res.outputTokens ?? estimate(res.text);
       const info = modelsFor(c.provider, cfg).find((m) => m.id === c.model);
@@ -541,6 +560,11 @@ export async function runAI(task: AITask, req: ChatRequest, signal?: AbortSignal
   const msg = `Your free AI capacity is used up for now${next ? ` — the next provider should be available ${new Date(next).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}. No paid AI was used.`;
   emit({ type: 'exhausted', message: msg });
   throw new AIExhausted(msg);
+}
+
+/** How many providers could work in parallel right now (configured and not resting). */
+export function parallelCapacity(cfg = loadConfig()): number {
+  return PROVIDER_DEFS.filter((d) => isConfigured(d.id, cfg) && !coolingUntil(d.id, cfg.providers[d.id]?.model ?? '')).length;
 }
 
 /** True when at least one provider is set up and enabled. */
