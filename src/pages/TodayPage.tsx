@@ -22,6 +22,7 @@ import type { LibraryIndex } from '../engine/model';
 import { activeDays, minutesByDay, pagesByDay } from '../engine/stats';
 import { computeStreaks, momentum } from '../engine/streaks';
 import { fmtDuration, fmtNum, fmtUnits, toDisplay, unitLabel } from '../engine/units';
+import { readingFormat } from '../lib/ebooks';
 import { timeForChars } from '../lib/readingSpeed';
 import { useEbookIds, useLibrary, useTimer } from '../state/library';
 import { useUI } from '../state/ui';
@@ -129,6 +130,8 @@ export default function TodayPage() {
         </div>
       )}
 
+      <EbookShelf idx={idx} ebookIds={ebookIds} skip={current?.id} />
+
       {others.length > 0 && (
         <>
           <div className="section-row"><h2 className="section-title">Also reading</h2><Link to="/reading">See all</Link></div>
@@ -138,7 +141,6 @@ export default function TodayPage() {
         </>
       )}
 
-      <EbookShelf idx={idx} ebookIds={ebookIds} skip={current?.id} />
       <Universe idx={idx} hasEbooks={ebookIds.size > 0} />
 
       <div className="section-title">Today</div>
@@ -221,6 +223,7 @@ function ContinueHero({ item, f, idx, hasFile }: { item: Item; f: ItemForecast; 
   useTick(!!mine && !!timer?.runningSince);
   const left = timeLeft(item, f, hasFile);
   const budget = timeBudget(idx, 20, item).amount;
+  const format = readingFormat(item, hasFile);
   return (
     <div className="hero">
       <div className="hero-body">
@@ -252,11 +255,12 @@ function ContinueHero({ item, f, idx, hasFile }: { item: Item; f: ItemForecast; 
         {mine ? (
           <button className="btn lg" onClick={() => open({ kind: 'timer-stop' })}><Icon name="clock" />{fmtClock(timerElapsedMs(timer!))}</button>
         ) : hasFile ? (
-          <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })} aria-label="Log reading">Log</button>
+          format === 'both' ? <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })} aria-label="Log pages read in your paper copy">📖 Paper</button> : null
         ) : (
           <button className="btn lg" onClick={async () => { if (timer && !confirm('Another timer is running. Replace it?')) return; await startTimer(item.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" />Timer</button>
         )}
       </div>
+      {hasFile && format !== 'print' && <div className="tiny faint mt-8">📱 Logged automatically while you read{format === 'both' ? ' — tap Paper for pages read in your paper copy' : ''}.</div>}
       {budget !== undefined && budget > 0 && f.remaining ? <div className="tiny faint mt-8">Got 20 minutes? That’s about {fmtUnits(item, Math.min(budget, f.remaining), 0)} at your speed.</div> : null}
     </div>
   );
@@ -276,7 +280,7 @@ function MiniCard({ item, f, hasFile }: { item: Item; f: ItemForecast; hasFile: 
       </div>
       <div className="row mt-8">
         {hasFile && <button className="btn sm accent grow" onClick={() => nav(`/read/${item.id}`)}>Read</button>}
-        <button className={`btn sm grow ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: item.id })}>Log</button>
+        {readingFormat(item, hasFile) !== 'ebook' && <button className={`btn sm grow ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: item.id })}>{hasFile ? '📖 Paper' : 'Log'}</button>}
       </div>
     </div>
   );

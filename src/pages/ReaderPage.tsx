@@ -7,7 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import type { Book, Contents, Location, NavItem, Rendition } from 'epubjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addNote, logProgress, updateItem } from '../db/actions';
+import { addNote, extendSession, logProgress, updateItem } from '../db/actions';
 import { db } from '../db/db';
 import type { Bookmark, Note } from '../db/types';
 import { Icon } from '../components/icons';
@@ -299,26 +299,54 @@ export default function ReaderPage() {
     r.lastAt = Date.now();
   };
 
-  /** Save position and log the session (only when progress was made). */
-  const flush = useCallback(async () => {
-    const s = session.current;
-    tick();
-    commitRun();
-    const cur = idxRef.current;
-    const it = cur.items.get(id!);
-    if (!it) return;
-    if (s.cfi && s.cfi !== it.readerLocation) await updateItem(it.id, { readerLocation: s.cfi, lastReadAt: Date.now() });
-    const total = it.total ?? 100;
-    const to = Math.round(s.lastPct * total * 100) / 100;
-    const current = cur.position(it);
-    if (s.lastPct > s.startPct && to > current) {
-      const res = await logProgress({ itemId: it.id, to, durationSec: s.activeMs >= 30_000 ? Math.round(s.activeMs / 1000) : undefined, startedAt: s.startedAt }).catch(() => undefined);
-      if (res) toast(`Progress saved · ${Math.round(s.lastPct * 1000) / 10}%${s.activeMs >= 60_000 ? ` · ${Math.round(s.activeMs / 60000)} min reading` : ''}`, { undo: res.undo });
-    }
-    s.startPct = s.lastPct;
-    s.activeMs = 0;
-    s.startedAt = Date.now();
+  // This visit's automatic session: created on the first real progress, then
+  // grown as you keep reading — no need to log ebook reading by hand.
+  const autoSession = useRef<string | undefined>(undefined);
+  // Progress when the book opened — ahead of the ebook if you read on paper.
+  const openFrac = useRef(0);
+  const [paperAhead, setPaperAhead] = useState<number | null>(null);
+  const aheadChecked = useRef(false);
+  const flushing = useRef<Promise<void> | null>(null);
+
+  /** Save position and log reading automatically (only when progress was made). */
+  const flush = useCallback(async (notify = false) => {
+    // Never run two saves at once (a timer tick and leaving the reader).
+    while (flushing.current) await flushing.current;
+    const job = (async () => {
+      const s = session.current;
+      tick();
+      commitRun();
+      const cur = idxRef.current;
+      const it = cur.items.get(id!);
+      if (!it) return;
+      if (s.cfi && s.cfi !== it.readerLocation) await updateItem(it.id, { readerLocation: s.cfi, lastReadAt: Date.now() });
+      const total = it.total ?? 100;
+      const to = Math.round(s.lastPct * total * 100) / 100;
+      const current = (await db.instances.get(it.currentInstanceId ?? ''))?.position ?? cur.position(it);
+      const secs = s.activeMs >= 30_000 ? Math.round(s.activeMs / 1000) : undefined;
+      let completed = false;
+      if (autoSession.current) {
+        const r = await extendSession(autoSession.current, Math.max(to, current), secs).catch(() => undefined);
+        if (r) completed = r.completed;
+        else autoSession.current = undefined;
+      }
+      if (!autoSession.current && s.lastPct > s.startPct && to > current) {
+        const res = await logProgress({ itemId: it.id, to, durationSec: secs, startedAt: s.startedAt, medium: 'ebook' }).catch(() => undefined);
+        if (res) { autoSession.current = res.session.id; completed = res.completed; }
+      }
+      if (completed) toast(`Finished “${it.title}” 🎉 — logged automatically`);
+      else if (notify && autoSession.current && s.lastPct > s.startPct) toast(`Reading logged automatically · ${Math.round(s.lastPct * 1000) / 10}%${s.activeMs >= 60_000 ? ` · ${Math.round(s.activeMs / 60000)} min` : ''}`);
+      if (notify) s.startPct = s.lastPct;
+    })();
+    flushing.current = job;
+    try { await job; } finally { flushing.current = null; }
   }, [id, toast]);
+
+  // Save every minute while reading, so nothing is lost if the phone kills the app.
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === 'visible') flush(); }, 60_000);
+    return () => clearInterval(t);
+  }, [flush]);
 
   /** Go back to your place after the layout changed (it checks it landed right). */
   const returnToAnchor = (delay: number) => {
@@ -467,6 +495,7 @@ export default function ReaderPage() {
         } else saveLength();
         const it0 = idxRef.current.items.get(id!);
         const startFrac = it0 && it0.total ? Math.min(1, idxRef.current.position(it0) / it0.total) : 0;
+        openFrac.current = startFrac;
         session.current = { startPct: startFrac, lastPct: startFrac, activeMs: 0, lastTick: Date.now(), startedAt: Date.now(), cfi: startCfi ?? '' };
         const loc0 = rendition.currentLocation() as unknown as Location;
         if (loc0?.start) onRelocated(loc0);
@@ -575,12 +604,24 @@ export default function ReaderPage() {
       setTimeout(() => refreshToolRef.current(), 0);
     }
 
-    const onHide = () => { if (document.visibilityState === 'hidden') flush(); else { session.current.lastTick = Date.now(); run.current.lastAt = Date.now(); } };
+    let hiddenAt = 0;
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') { hiddenAt = Date.now(); flush(); return; }
+      // Back after a long break: that's a new reading session.
+      if (hiddenAt && Date.now() - hiddenAt > 30 * 60_000) {
+        autoSession.current = undefined;
+        session.current.activeMs = 0;
+        session.current.startedAt = Date.now();
+        session.current.startPct = session.current.lastPct;
+      }
+      session.current.lastTick = Date.now();
+      run.current.lastAt = Date.now();
+    };
     document.addEventListener('visibilitychange', onHide);
     return () => {
       cancelled = true;
       document.removeEventListener('visibilitychange', onHide);
-      flush();
+      flush(true);
       rendRef.current?.destroy();
       bookRef.current?.destroy();
     };
@@ -658,6 +699,13 @@ export default function ReaderPage() {
     return () => clearTimeout(t1);
   }, [prefs.size, prefs.font, prefs.spacing, prefs.align]);
 
+  // Read some of the paper copy since last time? Offer to catch the ebook up.
+  useEffect(() => {
+    if (aheadChecked.current || pct === undefined || preparing) return;
+    aheadChecked.current = true;
+    if (openFrac.current - pct > 0.01 && openFrac.current < 1) setPaperAhead(openFrac.current);
+  }, [pct, preparing]);
+
   // Keep the screen on while reading.
   useEffect(() => {
     if (!prefs.keepAwake || !('wakeLock' in navigator)) return;
@@ -689,7 +737,7 @@ export default function ReaderPage() {
   useEffect(() => { if (panel === 'aa') for (const f of FONTS) loadAppFont(fontUrl(f)); }, [panel]);
 
   const close = async () => {
-    await flush();
+    await flush(true);
     if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
     if ((window.history.state as { idx?: number } | null)?.idx) nav(-1);
     else nav('/ebooks');
@@ -837,6 +885,15 @@ export default function ReaderPage() {
         <span className="num">{pctText}</span>
       </button>
 
+      {paperAhead !== null && status === 'ready' && (
+        <div style={{ position: 'absolute', left: 10, right: 10, top: 'calc(40px + env(safe-area-inset-top))', zIndex: 8, background: t.panel, color: t.fg, borderRadius: 14, boxShadow: '0 6px 28px rgba(0,0,0,0.25)', padding: 12 }}>
+          <div className="small">📖 You’re further along in your paper copy — <b>{printPages ? `page ${pageAt(paperAhead)}` : `${Math.round(paperAhead * 100)}%`}</b>. Jump the ebook there?</div>
+          <div className="row mt-8" style={{ justifyContent: 'flex-end', gap: 6 }}>
+            <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setPaperAhead(null)}>Stay here</button>
+            <button className="btn sm primary" onClick={() => { const f = paperAhead; setPaperAhead(null); if (bookRef.current) { jumping.current = true; userNav.current = true; rendRef.current?.display(bookRef.current.locations.cfiFromPercentage(f)); } }}>Jump there</button>
+          </div>
+        </div>
+      )}
       {hint && !chrome && !panel && status === 'ready' && (
         <div style={{ position: 'absolute', left: '50%', top: '42%', transform: 'translate(-50%, -50%)', width: 'max-content', maxWidth: '80%', background: 'rgba(20,20,20,0.82)', color: '#fff', padding: '12px 18px', borderRadius: 16, fontSize: 14, lineHeight: 1.45, zIndex: 7, pointerEvents: 'none', textAlign: 'center' }}>
           Tap the <b>middle</b> of the page for menus.<br />Tap the <b>sides</b> or swipe to turn pages.<br />Tap <u style={{ textDecorationStyle: 'dotted' }}>underlined</u> names to explore them.

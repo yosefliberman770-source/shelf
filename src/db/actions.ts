@@ -232,6 +232,7 @@ export interface LogInput {
   startedAt?: number;
   note?: string;
   source?: ReadingSession['source'];
+  medium?: ReadingSession['medium'];
 }
 
 export interface LogResult {
@@ -281,6 +282,7 @@ export async function logProgress(input: LogInput): Promise<LogResult | undefine
     to,
     note: input.note?.trim() || undefined,
     source: input.source ?? 'user',
+    medium: input.medium,
     createdAt: now,
   };
   const completed = !!item.total && newPos >= item.total && inst.status !== 'read';
@@ -311,6 +313,32 @@ export async function logProgress(input: LogInput): Promise<LogResult | undefine
     });
   };
   return { session, completed, undo };
+}
+
+/**
+ * Grow an automatic ebook session as you keep reading, instead of creating a
+ * new one every few minutes. Returns undefined when the session can't be
+ * extended (it's gone, or it's from another day) so the caller starts a new one.
+ */
+export async function extendSession(id: string, to: number, durationSec?: number): Promise<{ completed: boolean } | undefined> {
+  const s = await db.sessions.get(id);
+  if (!s || s.date !== todayKey()) return undefined;
+  const item = await db.items.get(s.itemId);
+  const inst = await db.instances.get(s.instanceId);
+  if (!item || !inst) return undefined;
+  const target = item.total ? Math.min(item.total, to) : to;
+  const gain = Math.max(0, target - inst.position);
+  const completed = !!item.total && target >= item.total && inst.status !== 'read';
+  const now = Date.now();
+  await db.transaction('rw', db.items, db.instances, db.sessions, async () => {
+    await db.sessions.update(id, { amount: s.amount + gain, to: Math.max(s.to ?? 0, target), durationSec: durationSec ?? s.durationSec });
+    if (gain > 0) {
+      const status = completed ? 'read' : item.status === 'want' || item.status === 'paused' ? 'reading' : item.status;
+      await db.instances.update(inst.id, { position: target, status, ...(completed ? { finishedOn: s.date } : {}) });
+      await db.items.update(item.id, { status, queue: laneFor(status), lastReadAt: now, updatedAt: now });
+    }
+  });
+  return { completed };
 }
 
 /** Delete a session and recompute the instance position from remaining sessions. */

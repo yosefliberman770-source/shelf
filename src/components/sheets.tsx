@@ -8,7 +8,7 @@ import { isEmptyQuery, parseQuestion, runQuery, searchAll } from '../engine/quer
 import { CONTENT_TYPES, fmtDuration, fmtNum, fmtUnits, round, toBase, toDisplay, unitInfo, unitLabel, UNITS } from '../engine/units';
 import { fetchDescription, type MetaResult, searchBooks } from '../lib/openlibrary';
 import { downloadFreeBook, type FreeBook, importEpub, isEpub, searchGutenberg, searchStandardEbooks } from '../lib/ebooks';
-import { useLibrary, useTimer } from '../state/library';
+import { useEbookIds, useLibrary, useTimer } from '../state/library';
 import { useUI } from '../state/ui';
 import { Cover, Empty, FolderPicker, Modal, Segmented, Stars, TagInput, useDebounced } from './common';
 import { Icon, type IconName, TONES, type Tone } from './icons';
@@ -151,6 +151,9 @@ function LogSheet({ itemId: initial }: { itemId?: string }) {
   const reading = idx.itemList().filter((i) => i.status === 'reading');
   const [itemId, setItemId] = useState<string | undefined>(initial ?? (reading.length === 1 ? reading[0].id : undefined));
   const item = itemId ? idx.items.get(itemId) : undefined;
+  // Books that also have the ePub in Shelf: manual logs are the paper copy.
+  const ebookIds = useEbookIds();
+  const medium = item && ebookIds.has(item.id) ? ('print' as const) : undefined;
   const [mode, setMode] = useState<'amount' | 'to' | 'range'>(() => {
     try { return (JSON.parse(localStorage.getItem(LOG_PREFS) ?? '{}').mode as 'amount' | 'to' | 'range') ?? 'amount'; } catch { return 'amount'; }
   });
@@ -176,19 +179,19 @@ function LogSheet({ itemId: initial }: { itemId?: string }) {
       const durationSec = minutes ? Math.round(Number(minutes) * 60) : undefined;
       if (durationSec !== undefined && (!Number.isFinite(durationSec) || durationSec < 0)) throw new Error('Minutes must be a positive number.');
       let res: LogResult | undefined;
-      if (quickAmt !== undefined) res = await logProgress({ itemId: item.id, amount: toBase(item, quickAmt), date, durationSec, note });
+      if (quickAmt !== undefined) res = await logProgress({ itemId: item.id, amount: toBase(item, quickAmt), date, durationSec, note, medium });
       else if (mode === 'amount') {
         const v = Number(amount);
         if (!(v > 0)) throw new Error(`Enter how many ${u} you read.`);
-        res = await logProgress({ itemId: item.id, amount: toBase(item, v), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, amount: toBase(item, v), date, durationSec, note, medium });
       } else if (mode === 'to') {
         const v = Number(to);
         if (!(v > dPos)) throw new Error(`Enter a position after ${fmtNum(dPos, 2)}.`);
-        res = await logProgress({ itemId: item.id, to: toBase(item, v), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, to: toBase(item, v), date, durationSec, note, medium });
       } else {
         const a = Number(from), b = Number(to);
         if (!(a > 0 && b >= a)) throw new Error('Enter a valid range, e.g. 120 – 145.');
-        res = await logProgress({ itemId: item.id, from: toBase(item, a), to: toBase(item, b), date, durationSec, note });
+        res = await logProgress({ itemId: item.id, from: toBase(item, a), to: toBase(item, b), date, durationSec, note, medium });
       }
       remember();
       close();
@@ -199,7 +202,8 @@ function LogSheet({ itemId: initial }: { itemId?: string }) {
   };
 
   return (
-    <Modal title="Log reading" onClose={close}>
+    <Modal title={medium ? 'Log your paper copy' : 'Log reading'} onClose={close}>
+      {medium && <div className="notice small mb-16">📖 For pages read in your paper copy. Reading in Shelf’s ebook reader is logged automatically.</div>}
       <div className="row gap-12 mb-16">
         <Cover item={item} width={48} />
         <div className="grow" style={{ minWidth: 0 }}>

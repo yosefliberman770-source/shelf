@@ -2,7 +2,7 @@
 // free, legal ebooks (Standard Ebooks, Project Gutenberg).
 import { addItem, updateItem } from '../db/actions';
 import { db, uid } from '../db/db';
-import type { EbookFile } from '../db/types';
+import type { EbookFile, Item, ReadingFormat } from '../db/types';
 
 export interface EpubMeta {
   title?: string;
@@ -184,4 +184,13 @@ export async function downloadFreeBook(b: FreeBook, folderIds: string[] = []): P
   const blob = await res.blob();
   const name = b.epubUrl.split('/').pop()!.split('?')[0];
   return importEpub(blob, name, { title: b.title, authors: b.authors, coverData: b.coverUrl, source: b.source, folderIds });
+}
+
+/**
+ * How a book is being read. Without an ePub in Shelf it can only be a paper
+ * (or other outside) copy; with one, the ebook is the default.
+ */
+export function readingFormat(item: Pick<Item, 'format'>, hasFile: boolean): ReadingFormat {
+  if (!hasFile) return 'print';
+  return item.format ?? 'ebook';
 }

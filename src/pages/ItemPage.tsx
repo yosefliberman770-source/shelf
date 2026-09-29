@@ -6,6 +6,7 @@ import { AIErrorNotice, AIOff, AIPanel, AskChip, SharedPreview, useAICall, useAI
 import { BarChart, LineChart } from '../components/charts';
 import { AIBadge, Cover, DeadlineChip, Empty, FolderPicker, Markdown, Modal, ProgressBar, Segmented, Stars, STATUS_LABEL, StatusChip, TagInput, Tabs } from '../components/common';
 import { Icon } from '../components/icons';
+import { FormatPicker } from '../components/format';
 import { NoteCard } from '../components/notes';
 import { timeLeft } from './TodayPage';
 import { deleteItem, deleteSession, link, saveAIRecord, saveConcept, setPosition, setStatus, startReread, startTimer, unlink, updateInstance, updateItem, updateItemAuthors, updateItemTags } from '../db/actions';
@@ -108,9 +109,10 @@ function Header({ idx, item, onEdit }: { idx: LibraryIndex; item: Item; onEdit: 
           ) : (
             <button className="btn lg grow" onClick={async () => { await startReread(item.id); toast('Started a new reading — your earlier history is kept.'); }}><Icon name="refresh" />Read again</button>
           )}
-          {hasFile && item.status !== 'read' && <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })}>Log</button>}
+          {hasFile && item.status !== 'read' && item.format === 'both' && <button className="btn lg" onClick={() => open({ kind: 'log', itemId: item.id })} aria-label="Log paper pages">📖 Paper</button>}
           {!hasFile && item.status !== 'read' && <button className="btn lg icon" aria-label="Start a timer" onClick={async () => { await startTimer(item.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>}
         </div>
+        {item.status !== 'read' && <div className="mt-16"><FormatPicker item={item} /></div>}
         <div className="row wrap mt-8">
           <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'quote' })}><Icon name="quote" />Quote</button>
           <button className="btn sm" onClick={() => open({ kind: 'note', itemId: item.id, noteKind: 'note' })}><Icon name="pencil" />Note</button>
@@ -406,7 +408,7 @@ function SessionsTab({ idx, item }: { idx: LibraryIndex; item: Item }) {
                   <td className="r num">{s.durationSec ? fmtDuration(s.durationSec) : '—'}</td>
                   <td className="r num small">{s.durationSec && s.durationSec >= 60 && s.amount ? `${fmtNum(toDisplay(item, s.amount / (s.durationSec / 3600)))}/h` : ''}</td>
                   <td className="small">#{idx.instances.get(s.instanceId)?.number ?? '?'}</td>
-                  <td className="small ellipsis" style={{ maxWidth: 200 }}>{s.note}</td>
+                  <td className="small ellipsis" style={{ maxWidth: 200 }}>{s.medium === 'ebook' ? <span title="Logged automatically in the ebook reader">📱 </span> : s.medium === 'print' ? <span title="Paper copy">📖 </span> : null}{s.note ?? (s.medium === 'ebook' ? 'Read in Shelf' : '')}</td>
                   <td><button className="btn xs ghost" onClick={async () => { if (confirm('Delete this session? Statistics will be recalculated.')) { await deleteSession(s.id); toast('Session deleted'); } }}>Delete</button></td>
                 </tr>
               ))}

@@ -40,6 +40,8 @@ export type Status = 'want' | 'reading' | 'read' | 'paused' | 'dnf';
 export type QueueLane = 'now' | 'next' | 'later' | 'paused' | 'finished';
 export type Source = 'user' | 'ai' | 'import';
 
+export type ReadingFormat = 'ebook' | 'print' | 'both';
+
 export interface Author {
   id: ID;
   name: string;
@@ -88,6 +90,8 @@ export interface Item {
   language?: string;
   currentInstanceId?: ID;
   lastReadAt?: number;
+  /** How you're reading it: the ePub in Shelf, a paper copy, or both. */
+  format?: ReadingFormat;
   openLibraryKey?: string;
   /** Last reading position inside an attached ebook file (EPUB CFI). */
   readerLocation?: string;
@@ -138,6 +142,8 @@ export interface ReadingSession {
   to?: number;
   note?: string;
   source: Source;
+  /** Where the reading happened: in Shelf's ebook reader (logged automatically) or a paper copy. */
+  medium?: 'ebook' | 'print';
   createdAt: number;
 }
 

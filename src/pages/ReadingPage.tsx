@@ -4,6 +4,7 @@ import { itemContext } from '../ai/context';
 import { useConcierge } from '../ai/ui';
 import { Cover, DeadlineChip, Empty, Modal, ProgressBar, Segmented, Tabs } from '../components/common';
 import { Icon } from '../components/icons';
+import { readingFormat } from '../lib/ebooks';
 import { EbooksShelf } from './EbooksPage';
 import { timeLeft } from './TodayPage';
 import { moveInQueue, startTimer } from '../db/actions';
@@ -79,8 +80,8 @@ function NowTab({ idx, reading }: { idx: LibraryIndex; reading: Item[] }) {
               </div>
               <div className="row mt-16">
                 {hasFile && <button className="btn accent grow" onClick={() => nav(`/read/${i.id}`)}><Icon name="book" />Read</button>}
-                <button className={`btn grow ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: i.id })}><Icon name="logPlus" />Log</button>
-                <button className="btn icon" aria-label={`Start a timer for ${i.title}`} onClick={async () => { await startTimer(i.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>
+                {readingFormat(i, hasFile) !== 'ebook' && <button className={`btn grow ${hasFile ? '' : 'primary'}`} onClick={() => open({ kind: 'log', itemId: i.id })}><Icon name="logPlus" />{hasFile ? 'Paper' : 'Log'}</button>}
+                {!hasFile && <button className="btn icon" aria-label={`Start a timer for ${i.title}`} onClick={async () => { await startTimer(i.id); toast('Timer started — tap Stop when you’re done'); }}><Icon name="clock" /></button>}
               </div>
             </div>
           );
