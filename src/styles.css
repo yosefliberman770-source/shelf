@@ -652,3 +652,29 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .hmap-sources summary { cursor: pointer; font-weight: 700; }
 .hmap-sources ul { padding-left: 18px; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
 .hmap-sources a { text-decoration: underline; }
+
+/* ── Historical Atlas (layered map) ───────────────────────────── */
+.atlas { display: flex; flex-direction: column; gap: 10px; }
+.atlas .atlas-map { position: relative; height: min(56vh, 480px); min-height: 280px; flex: none; }
+.hmap.side .atlas .atlas-map { height: min(60vh, 580px); }
+.atlas .atlas-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.atlas-canvas .maplibregl-ctrl-attrib { font-size: 10px; }
+.atlas-layers-btn { position: absolute; top: 10px; left: 10px; z-index: 3; box-shadow: 0 2px 10px rgba(0,0,0,.2); background: var(--surface); }
+.atlas-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; font-size: 13px; color: #4a5a60; pointer-events: none; }
+.atlas-panel { position: absolute; top: 8px; left: 8px; bottom: 8px; z-index: 4; width: min(330px, calc(100% - 16px)); overflow-y: auto; overscroll-behavior: contain; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; box-shadow: 0 6px 26px rgba(0,0,0,.25); font-size: 13.5px; }
+.atlas-group { padding: 8px 0; border-top: 1px solid var(--border); }
+.atlas-group:first-of-type { border-top: 0; }
+.atlas-group .eyebrow { margin: 0 0 4px; }
+.atlas-layer { padding: 3px 0; }
+.atlas-layer input { margin-top: 3px; accent-color: var(--accent); width: 18px; height: 18px; flex: none; }
+.atlas-hint { margin: 2px 0 4px 26px; line-height: 1.4; }
+.atlas-war { display: block; width: 100%; text-align: left; font: inherit; font-size: 12.5px; padding: 6px 8px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--text); cursor: pointer; }
+.atlas-war.on { border-color: var(--accent); background: var(--surface-2); font-weight: 700; }
+.atlas-card { position: relative; }
+.atlas-timeline { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.atlas-tl-row { display: flex; align-items: center; gap: 4px; }
+.atlas-tl-track { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; height: 32px; }
+.atlas-tl-track input[type=range] { width: 100%; accent-color: var(--accent); }
+.atlas-tl-mark { position: absolute; top: 0; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; border: 2px solid var(--surface); background: var(--primary); padding: 0; cursor: pointer; }
+.atlas-tl-foot { justify-content: space-between; }
+.atlas-tl-year { font-size: 20px; font-weight: 900; letter-spacing: -.01em; }

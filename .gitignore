@@ -5,3 +5,6 @@ dist
 !.env.example
 server/.data
 *.log
+
+# Atlas build downloads
+scripts/atlas-build/.cache/

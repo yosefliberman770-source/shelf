@@ -16,6 +16,14 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('./index.html', { ignoreSearch: true }).then((r) => r || caches.match('./'))));
     return;
   }
+  // Atlas data changes when it's rebuilt: network first, the cached copy offline.
+  if (url.pathname.includes('/atlas/')) {
+    e.respondWith(fetch(req).then((res) => {
+      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+      return res;
+    }).catch(() => caches.match(req).then((r) => r || Response.error())));
+    return;
+  }
   // Cache first for hashed assets and icons.
   e.respondWith(
     caches.match(req).then((hit) => hit || fetch(req).then((res) => {

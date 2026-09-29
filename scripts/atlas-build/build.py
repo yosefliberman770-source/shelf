@@ -1,0 +1,647 @@
+#!/usr/bin/env python3
+"""
+Build the Historical Atlas data packs in public/atlas/ from scholarly sources.
+
+Nothing here invents data. Every feature comes from a named dataset, keeps its
+own dates, certainty and identifiers, and every pack records its licence and
+attribution in public/atlas/manifest.json.
+
+Sources (see docs/HISTORICAL_ATLAS.md for what each provides and why):
+  Pleiades        CC BY 3.0   places, names, roads, rivers, provinces, dates, precision
+  AWMC geodata    ODbL 1.0    Roman roads, ancient shoreline by period, inland water, empire snapshots
+  Cliopatria      CC BY 4.0   polity borders 3400 BCE - 2024 CE
+  Wikidata        CC0         battles, sieges, wars; polity classification (empire/kingdom/republic)
+  Natural Earth   public dom. modern land outline for the base map
+
+Usage:  python3 scripts/atlas-build/build.py            (downloads into scripts/atlas-build/.cache)
+Needs:  pip install shapely pyshp
+"""
+from __future__ import annotations
+
+import csv
+import io
+import json
+import os
+import re
+import sys
+import time
+import urllib.parse
+import urllib.request
+import zipfile
+from collections import defaultdict
+from datetime import date
+
+from shapely.geometry import mapping, shape
+from shapely.ops import unary_union
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CACHE = os.path.join(HERE, '.cache')
+OUT = os.path.join(HERE, '..', '..', 'public', 'atlas')
+UA = 'ShelfAtlasBuild/1.0 (https://github.com/yosefliberman770-source/shelf)'
+csv.field_size_limit(10**9)
+
+AWMC_RAW = 'https://raw.githubusercontent.com/AWMC/geodata/master/'
+SOURCES = {
+    'pleiades_gis': 'https://atlantides.org/downloads/pleiades/gis/pleiades_gis_data.zip',
+    'cliopatria': 'https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/main/cliopatria.geojson.zip',
+    'ne_land': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson',
+    'ne_rivers': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson',
+    'awmc_roads': AWMC_RAW + 'Cultural-Data/roads/roads.geojson',
+    'awmc_shoreline': AWMC_RAW + 'Physical Data/shoreline/shoreline.geojson',
+    'awmc_inland': AWMC_RAW + 'Physical Data/inland_water/inland-water-OSM.geojson',
+}
+AWMC_SNAPSHOTS = {
+    # file → (label, from, to, date basis). Roman dates are in the dataset titles; the
+    # others are the conventional dates of the extent each title names, marked approximate.
+    'roman_empire_bce_60/roman_empire_bce_60': ('Roman territory, 60 BCE', -60, -60, 'title'),
+    'roman_empire_ce_117_extent/roman_empire_ce_117_extent': ('Roman Empire at its greatest extent, 117 CE', 117, 117, 'title'),
+    'roman_empire_ce_200_extent/roman_empire_ce_200_extent': ('Roman Empire, 200 CE', 200, 200, 'title'),
+    'alexanders_empire/alexanders_empire': ("Alexander's empire (at his death, c. 323 BCE)", -323, -323, 'approximate'),
+    'persian_extent/extent_of_the_persian_empire': ('Achaemenid Persian Empire at its greatest extent (c. 500 BCE)', -500, -500, 'approximate'),
+    'hasmonean/hasmonean_kingdom': ('Hasmonean kingdom (greatest extent, c. 76 BCE)', -76, -76, 'approximate'),
+    'herod/herods_kingdom': ("Herod's kingdom (c. 4 BCE)", -4, -4, 'approximate'),
+}
+AWMC_PROVINCE_SNAPSHOTS = {
+    'roman_empire_ce_200_provinces/roman_empire_ce_200_provinces': ('Roman provinces, 200 CE', 200, 200, 'title'),
+    'roman_empire_provinces post_diocletian/roman_empire_provinces post_diocletian': ('Roman provinces after Diocletian (c. 300 CE)', 300, 300, 'approximate'),
+}
+
+# Barrington Atlas period letters used by AWMC (and Pleiades' period bounds).
+BARRINGTON = {'A': (-750, -550), 'C': (-550, -330), 'H': (-330, -30), 'R': (-30, 300), 'L': (300, 640)}
+
+# ── Pleiades place types → atlas layers (a place can be in several) ──────────
+PLACE_LAYERS = {
+    'settlement': {'settlement', 'urban', 'vicus', 'polis', 'fortified-settlement', 'townhouse-settlement'},
+    'port': {'port', 'harbor', 'anchorage', 'lighthouse', 'shipshed'},
+    'fort': {'fort', 'fort-2', 'fortlet', 'fort-group', 'castellum', 'castle', 'hillfort', 'fortified-settlement',
+             'military-installation-or-camp-temporary', 'military-base', 'barracks', 'citadel', 'tower-defensive'},
+    'archaeological': {'archaeological-site', 'tell', 'ruin', 'tumulus', 'nuraghe', 'cairn', 'earthwork', 'earthworks'},
+    'mountain': {'mountain', 'hill', 'volcano'},
+    'pass': {'pass'},
+    'lake': {'lake', 'lagoon', 'water-inland', 'reservoir'},
+    'bridge': {'bridge', 'bridge-group'},
+    'religious': {'temple', 'temple-2', 'sanctuary', 'shrine', 'church', 'church-2', 'mosque', 'synagogue', 'monastery',
+                  'abbey', 'abbey-church', 'priory', 'altar', 'ziggurat', 'stupa', 'fortified-church'},
+    'market': {'agora', 'forum', 'macellum', 'taberna-shop'},
+    'cultural': {'theatre', 'odeon', 'amphitheatre', 'circus', 'stadion', 'gymnasium', 'palaestra', 'stoa', 'lesche'},
+}
+SKIP_TYPES = {'settlement-modern', 'label', 'unlabeled', 'false toponym', 'false', 'fiction', 'unlocated', 'unlocated-group'}
+LINE_LAYERS = {'road': 'road', 'river': 'river', 'aqueduct': 'aqueduct', 'canal': 'canal'}
+
+
+def log(*a):
+    print(*a, flush=True)
+
+
+def fetch(key: str, url: str) -> str:
+    """Download once into the cache; return the local path."""
+    os.makedirs(CACHE, exist_ok=True)
+    name = key + os.path.splitext(urllib.parse.urlparse(url).path)[1]
+    path = os.path.join(CACHE, name)
+    if not os.path.exists(path):
+        log('  downloading', url)
+        req = urllib.request.Request(urllib.parse.quote(url, safe=':/?=&%'), headers={'User-Agent': UA})
+        with urllib.request.urlopen(req, timeout=300) as r, open(path + '.part', 'wb') as f:
+            f.write(r.read())
+        os.replace(path + '.part', path)
+    return path
+
+
+def rnd(geom, digits=4):
+    """Round coordinates to keep files small (4 decimals ≈ 11 m)."""
+    def r(c):
+        if isinstance(c, (list, tuple)) and c and isinstance(c[0], (int, float)):
+            return [round(c[0], digits), round(c[1], digits)]
+        return [r(x) for x in c]
+    g = mapping(geom) if not isinstance(geom, dict) else geom
+    return {'type': g['type'], 'coordinates': r(g['coordinates'])}
+
+
+def simplify(geom_json, tol, digits=4):
+    g = shape(geom_json)
+    if tol:
+        g = g.simplify(tol, preserve_topology=True)
+    if g.is_empty:
+        return None
+    return rnd(g, digits)
+
+
+def write(name: str, fc: dict) -> int:
+    os.makedirs(OUT, exist_ok=True)
+    path = os.path.join(OUT, name)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(fc, f, ensure_ascii=False, separators=(',', ':'))
+    size = os.path.getsize(path)
+    log(f'  wrote {name}: {len(fc["features"])} features, {size/1e6:.2f} MB')
+    return size
+
+
+def fc(features):
+    return {'type': 'FeatureCollection', 'features': features}
+
+
+def year(v):
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return None
+
+
+def period_range(code: str | None):
+    """'HRL' → (-330, 640). '?' marks uncertainty. Unknown → (None, None)."""
+    if not code:
+        return None, None, False
+    letters = [c for c in code.upper() if c in BARRINGTON]
+    if not letters:
+        return None, None, '?' in code
+    return min(BARRINGTON[c][0] for c in letters), max(BARRINGTON[c][1] for c in letters), '?' in code
+
+
+# ── Pleiades ─────────────────────────────────────────────────────────────────
+
+def pleiades():
+    log('Pleiades')
+    z = zipfile.ZipFile(fetch('pleiades_gis', SOURCES['pleiades_gis']))
+
+    def rows(name):
+        member = next(n for n in z.namelist() if n.endswith('/' + name) or n == name)
+        return csv.DictReader(io.TextIOWrapper(z.open(member), encoding='utf-8-sig'))
+
+    places = {r['id']: r for r in rows('places.csv')}
+    types = defaultdict(set)
+    for r in rows('places_place_types.csv'):
+        types[r['place_id']].add(r['place_type'])
+
+    # Dates come from dated *locations*; names only as a fallback, and never
+    # modern names (they'd stretch every ancient place to the present day).
+    loc_dates = defaultdict(lambda: [None, None])
+    radius = {}
+    certainty = {}
+    lines = []
+    polys = []
+    for fname, kind in (('location_points.csv', 'point'), ('location_linestrings.csv', 'line'), ('location_polygons.csv', 'poly')):
+        for r in rows(fname):
+            pid = r['place_id']
+            a, b = year(r['year_after_which']), year(r['year_before_which'])
+            if b is not None and b >= 1700:
+                if kind == 'point':
+                    continue  # a modern location record for the place
+                b = None  # a river or road outline recorded today: still valid, open-ended
+            d = loc_dates[pid]
+            if a is not None:
+                d[0] = a if d[0] is None else min(d[0], a)
+            if b is not None:
+                d[1] = b if d[1] is None else max(d[1], b)
+            rad = year(r.get('accuracy_radius'))
+            if rad:
+                radius[pid] = min(radius.get(pid, rad), rad)
+            c = r.get('association_certainty') or 'certain'
+            rank = {'certain': 0, 'less-certain': 1, 'uncertain': 2}.get(c, 0)
+            certainty[pid] = max(certainty.get(pid, 0), rank)
+            if kind == 'line':
+                lines.append((pid, r['geometry_wkt'], a, b, rank))
+            elif kind == 'poly':
+                polys.append((pid, r['geometry_wkt'], a, b, rank))
+
+    name_dates = defaultdict(lambda: [None, None])
+    alt = defaultdict(list)
+    for r in rows('names.csv'):
+        pid = r['place_id']
+        a, b = year(r['year_after_which']), year(r['year_before_which'])
+        if b is not None and b < 1700:
+            d = name_dates[pid]
+            if a is not None:
+                d[0] = a if d[0] is None else min(d[0], a)
+            d[1] = b if d[1] is None else max(d[1], b)
+        for k in ('romanized_form_1', 'attested_form'):
+            v = (r.get(k) or '').strip()
+            if v and v not in alt[pid] and len(alt[pid]) < 6:
+                alt[pid].append(v)
+
+    from shapely import wkt as shp_wkt
+
+    feats = []
+    for pid, p in places.items():
+        t = types.get(pid, set())
+        if not p['representative_latitude'] or t & SKIP_TYPES and not (t - SKIP_TYPES):
+            continue
+        layers = sorted(l for l, ts in PLACE_LAYERS.items() if t & ts)
+        if not layers:
+            continue
+        a, b = loc_dates.get(pid, [None, None])
+        basis = 'location'
+        if a is None and b is None:
+            a, b = name_dates.get(pid, [None, None])
+            basis = 'names' if a is not None or b is not None else 'none'
+        props = {
+            'i': int(pid), 'n': p['title'],
+            'l': ','.join(layers),
+            'ty': ','.join(sorted(t - SKIP_TYPES))[:80],
+            'p': 1 if p['location_precision'] == 'precise' else 0,
+        }
+        names = [x for x in alt.get(pid, []) if x != p['title']]
+        if names:
+            props['a'] = '|'.join(names[:5])
+        if a is not None:
+            props['f'] = a
+        if b is not None:
+            props['t'] = b
+        if basis != 'location':
+            props['db'] = basis
+        if certainty.get(pid):
+            props['u'] = certainty[pid]
+        if radius.get(pid):
+            props['r'] = radius[pid]
+        feats.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(float(p['representative_longitude']), 4), round(float(p['representative_latitude']), 4)]}, 'properties': props})
+    write('pleiades-places.json', fc(feats))
+
+    # Lines: roads, rivers, aqueducts, canals.
+    line_feats = []
+    for pid, w, a, b, rank in lines:
+        t = types.get(pid, set())
+        kind = next((LINE_LAYERS[x] for x in t if x in LINE_LAYERS), None)
+        if not kind or pid not in places:
+            continue
+        try:
+            g = simplify(mapping(shp_wkt.loads(w)), 0.002)
+        except Exception:
+            continue
+        if not g:
+            continue
+        props = {'i': int(pid), 'n': places[pid]['title'], 'k': kind}
+        if a is not None:
+            props['f'] = a
+        if b is not None:
+            props['t'] = b
+        if rank:
+            props['u'] = rank
+        line_feats.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('pleiades-lines.json', fc(line_feats))
+
+    # Named provinces and regions with outlines.
+    prov = []
+    for pid, w, a, b, rank in polys:
+        t = types.get(pid, set())
+        if not t & {'province', 'province-2', 'regio-augusti', 'diocese-roman', 'satrapy', 'nome-gr', 'nome-egyptian', 'kingdom', 'state', 'territory'}:
+            continue
+        try:
+            g = simplify(mapping(shp_wkt.loads(w)), 0.01, 3)
+        except Exception:
+            continue
+        if not g:
+            continue
+        props = {'i': int(pid), 'n': places[pid]['title'], 'ty': ','.join(sorted(t))[:60]}
+        if a is not None:
+            props['f'] = a
+        if b is not None:
+            props['t'] = b
+        if rank:
+            props['u'] = rank
+        prov.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('pleiades-provinces.json', fc(prov))
+    return {'places': len(feats), 'lines': len(line_feats), 'provinces': len(prov)}
+
+
+# ── AWMC ─────────────────────────────────────────────────────────────────────
+
+def awmc():
+    log('AWMC')
+    stats = {}
+    roads = json.load(open(fetch('awmc_roads', SOURCES['awmc_roads']), encoding='utf-8'))
+    out = []
+    for f in roads['features']:
+        if not f.get('geometry'):
+            continue
+        p = f['properties'] or {}
+        code = p.get('timeperiod') or p.get('timeperi_1')
+        a, b, q = period_range(code)
+        g = simplify(f['geometry'], 0.003)
+        if not g:
+            continue
+        props = {'k': 'road'}
+        if p.get('Name'):
+            props['n'] = p['Name']
+        if a is not None:
+            props['f'], props['t'] = a, b
+        if code:
+            props['pc'] = code
+        # The "Known_or_a…" and "Major_or_M…" flags aren't documented (which value means
+        # known/assumed isn't stated), so they're not used. Only the period code is.
+        if q:
+            props['u'] = 1
+        out.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('awmc-roads.json', fc(out))
+    stats['roads'] = len(out)
+
+    shore = json.load(open(fetch('awmc_shoreline', SOURCES['awmc_shoreline']), encoding='utf-8'))
+    out = []
+    for f in shore['features']:
+        if not f.get('geometry'):
+            continue
+        p = f['properties'] or {}
+        a, b, q = period_range(p.get('TIMEPERIOD'))
+        g = simplify(f['geometry'], 0.004)
+        if not g:
+            continue
+        props = {'k': 'coast'}
+        if a is not None:
+            props['f'], props['t'] = a, b
+        if p.get('TIMEPERIOD'):
+            props['pc'] = p['TIMEPERIOD']
+        if p.get('acc') not in (1, None):
+            props['u'] = 1  # not marked "Accurate"
+        if p.get('exs') not in (1, None):
+            props['as'] = 1  # not marked "Definite"
+        out.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('awmc-shoreline.json', fc(out))
+    stats['shoreline'] = len(out)
+
+    inland = json.load(open(fetch('awmc_inland', SOURCES['awmc_inland']), encoding='utf-8'))
+    out = []
+    for f in inland['features']:
+        if not f.get('geometry'):
+            continue
+        p = f['properties'] or {}
+        g = simplify(f['geometry'], 0.004)
+        if not g:
+            continue
+        props = {'k': (p.get('TYPE') or 'water').lower()}
+        title = p.get('TITLE')
+        if title and title != 'Untitled':
+            props['n'] = title
+        if p.get('ACCURATE') not in (1, None):
+            props['u'] = 1
+        out.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('awmc-inland-water.json', fc(out))
+    stats['inland'] = len(out)
+
+    snaps = []
+    for path, (label, a, b, basis) in {**AWMC_SNAPSHOTS, **AWMC_PROVINCE_SNAPSHOTS}.items():
+        url = AWMC_RAW + 'Cultural-Data/political_shading/' + path + '.geojson'
+        d = json.load(open(fetch('snap_' + os.path.basename(path).replace(' ', '_'), url), encoding='utf-8'))
+        geoms = [shape(f['geometry']) for f in d['features'] if f.get('geometry')]
+        kind = 'province' if path in AWMC_PROVINCE_SNAPSHOTS else 'extent'
+        if kind == 'extent':
+            geoms = [unary_union(geoms)]
+        for g in geoms:
+            s = simplify(mapping(g), 0.01, 3)
+            if s:
+                snaps.append({'type': 'Feature', 'geometry': s, 'properties': {'n': label, 'k': kind, 'f': a, 't': b, 'db': basis}})
+    write('awmc-snapshots.json', fc(snaps))
+    stats['snapshots'] = len(snaps)
+    return stats
+
+
+# ── Wikidata ─────────────────────────────────────────────────────────────────
+
+PREFIXES = """PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+"""
+# Two independent public endpoints over the same Wikidata graph, so the build
+# doesn't depend on one service (WDQS has been rate-limited during outages).
+SPARQL_ENDPOINTS = ['https://qlever.dev/api/wikidata', 'https://query.wikidata.org/sparql']
+
+
+def sparql(query: str):
+    body = PREFIXES + query
+    last = None
+    for endpoint in SPARQL_ENDPOINTS:
+        for attempt in range(2):
+            try:
+                url = endpoint + '?' + urllib.parse.urlencode({'query': body})
+                req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': 'application/sparql-results+json'})
+                with urllib.request.urlopen(req, timeout=300) as r:
+                    return json.load(r)['results']['bindings']
+            except Exception as e:  # noqa: BLE001 — try again, then the other endpoint
+                last = e
+                log('   sparql', endpoint.split('/')[2], 'failed:', str(e)[:120])
+                time.sleep(5 * (attempt + 1))
+    raise RuntimeError(f'All SPARQL endpoints failed: {last}')
+
+
+def wd_year(v: str | None, precision: str | None = None):
+    """'-0217-01-01T00:00:00Z' → -218 (Wikidata stores 218 BCE as -0217 astronomically)."""
+    if not v:
+        return None
+    m = re.match(r'^([+-]?)(\d+)-', v)
+    if not m:
+        return None
+    y = int(m.group(2)) * (-1 if m.group(1) == '-' else 1)
+    return y - 1 if y <= 0 else y  # astronomical → historical (no year 0)
+
+
+def wikidata_events():
+    log('Wikidata battles, sieges, campaigns')
+    feats = {}
+    for cls, kind in (('Q178561', 'battle'), ('Q188055', 'siege'), ('Q831663', 'campaign')):
+        rows = sparql(f"""SELECT ?e ?label ?coord ?time ?prec ?start ?sprec WHERE {{
+  ?e wdt:P31/wdt:P279* wd:{cls} ; wdt:P625 ?coord ; rdfs:label ?label . FILTER(LANG(?label) = "en")
+  OPTIONAL {{ ?e p:P585/psv:P585 ?tv . ?tv wikibase:timeValue ?time ; wikibase:timePrecision ?prec }}
+  OPTIONAL {{ ?e p:P580/psv:P580 ?sv . ?sv wikibase:timeValue ?start ; wikibase:timePrecision ?sprec }}
+  FILTER(BOUND(?time) || BOUND(?start))
+}}""")
+        for r in rows:
+            qid = r['e']['value'].rsplit('/', 1)[1]
+            if qid in feats:
+                continue
+            m = re.match(r'(?i)point\(([-\d.eE]+) ([-\d.eE]+)\)', r['coord']['value'])
+            if not m:
+                continue
+            t = r.get('time') or r.get('start')
+            y = wd_year(t['value'] if t else None)
+            if y is None:
+                continue
+            prec = int((r.get('prec') or r.get('sprec') or {}).get('value') or 9)
+            props = {'q': qid, 'n': r['label']['value'], 'k': kind, 'y': y}
+            if prec < 9:
+                props['u'] = 1  # date known only to the decade / century
+                props['yp'] = {8: 'decade', 7: 'century', 6: 'millennium'}.get(prec, 'approximate')
+            feats[qid] = {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(float(m.group(1)), 4), round(float(m.group(2)), 4)]}, 'properties': props}
+        log(f'  {kind}: {sum(1 for f in feats.values() if f["properties"]["k"] == kind)}')
+
+    # Which war each event was part of, and the war's own dates.
+    rows = sparql("""SELECT ?e ?war ?wlabel ?ws ?we WHERE {
+  ?e wdt:P361 ?war . ?war wdt:P31/wdt:P279* wd:Q198 ; rdfs:label ?wlabel . FILTER(LANG(?wlabel) = "en")
+  ?e wdt:P625 ?c .
+  OPTIONAL { ?war wdt:P580 ?ws } OPTIONAL { ?war wdt:P582 ?we }
+}""")
+    wars = {}
+    for r in rows:
+        qid = r['e']['value'].rsplit('/', 1)[1]
+        f = feats.get(qid)
+        if not f:
+            continue
+        wq = r['war']['value'].rsplit('/', 1)[1]
+        f['properties'].setdefault('w', wq)
+        f['properties'].setdefault('wn', r['wlabel']['value'])
+        wars.setdefault(wq, {'q': wq, 'n': r['wlabel']['value'], 'f': wd_year((r.get('ws') or {}).get('value')), 't': wd_year((r.get('we') or {}).get('value'))})
+    write('wikidata-events.json', fc(list(feats.values())))
+    with open(os.path.join(OUT, 'wikidata-wars.json'), 'w', encoding='utf-8') as fh:
+        json.dump(sorted(wars.values(), key=lambda w: (w['f'] if w['f'] is not None else 9999)), fh, ensure_ascii=False, separators=(',', ':'))
+    log(f'  wrote wikidata-wars.json: {len(wars)} wars')
+    return {'events': len(feats), 'wars': len(wars)}
+
+
+POLITY_CLASSES = [
+    # (class, Wikidata items whose instances/subclasses count). Order = precedence.
+    ('empire', ['Q48349']),
+    ('republic', ['Q7270']),
+    ('kingdom', ['Q417175', 'Q1250464']),  # kingdom, realm
+    ('city-state', ['Q133442', 'Q148837']),  # city-state, polis
+    ('confederation', ['Q170156', 'Q11691', 'Q1207437']),  # confederation, league, tribal confederation
+    ('province', ['Q34876', 'Q1348006']),  # province, Roman province
+]
+
+
+def cliopatria():
+    log('Cliopatria + Wikidata classification')
+    z = zipfile.ZipFile(fetch('cliopatria', SOURCES['cliopatria']))
+    member = next(n for n in z.namelist() if n.endswith('.geojson'))
+    d = json.load(z.open(member))
+    qids = sorted({f['properties'].get('Wikidata') for f in d['features'] if f['properties'].get('Wikidata')})
+    cls = {}
+    for i in range(0, len(qids), 300):
+        chunk = ' '.join('wd:' + q for q in qids[i:i + 300])
+        for c, items in POLITY_CLASSES:
+            vals = ' '.join('wd:' + x for x in items)
+            rows = sparql(f'SELECT DISTINCT ?p WHERE {{ VALUES ?p {{ {chunk} }} VALUES ?c {{ {vals} }} ?p wdt:P31/wdt:P279* ?c . }}')
+            for r in rows:
+                q = r['p']['value'].rsplit('/', 1)[1]
+                cls.setdefault(q, c)  # first (highest precedence) class wins
+            time.sleep(2)  # be polite to the public endpoints
+        time.sleep(3)
+    out = []
+    for f in d['features']:
+        p = f['properties']
+        if p.get('Type') != 'POLITY' or not f.get('geometry'):
+            continue
+        g = shape(f['geometry']).simplify(0.06, preserve_topology=True)
+        # Drop specks (islets, slivers) under ~50 km² unless that is the whole polity.
+        parts = list(getattr(g, 'geoms', [g]))
+        keep = [x for x in parts if x.area >= 0.005] or parts
+        g = unary_union(keep) if len(keep) > 1 else keep[0]
+        if g.is_empty:
+            continue
+        q = p.get('Wikidata') or ''
+        props = {'n': p['Name'], 'f': int(p['FromYear']), 't': int(p['ToYear'])}
+        if q:
+            props['q'] = q
+            if q in cls:
+                props['c'] = cls[q]
+        out.append({'type': 'Feature', 'geometry': rnd(g, 2), 'properties': props})
+    # Split by time so the app downloads only the era on screen. Borders change
+    # almost yearly in recent centuries, so those slices are shorter.
+    def slice_len(y):
+        return 100 if y < 1500 else 50 if y < 1700 else 20 if y < 1800 else 10
+
+    edges = []
+    y = -3400
+    while y <= 2024:
+        n = slice_len(y)
+        edges.append((y, min(y + n - 1, 2024)))
+        y += n
+    os.makedirs(os.path.join(OUT, 'cliopatria'), exist_ok=True)
+    for old in os.listdir(os.path.join(OUT, 'cliopatria')):
+        os.remove(os.path.join(OUT, 'cliopatria', old))
+    index = []
+    total = 0
+    for a, b in edges:
+        fs = [f for f in out if f['properties']['f'] <= b and f['properties']['t'] >= a]
+        if not fs:
+            continue
+        name = f'{a}_{b}.json'
+        total += write(f'cliopatria/{name}', fc(fs))
+        index.append({'from': a, 'to': b, 'file': f'cliopatria/{name}', 'count': len(fs)})
+    with open(os.path.join(OUT, 'cliopatria', 'index.json'), 'w') as fh:
+        json.dump(index, fh, separators=(',', ':'))
+    log(f'  cliopatria: {len(index)} time slices, {total/1e6:.1f} MB in all')
+    counts = defaultdict(int)
+    for f in out:
+        counts[f['properties'].get('c', 'unclassified')] += 1
+    log('  classes:', dict(counts))
+    return {'polities': len(out), 'classified': sum(v for k, v in counts.items() if k != 'unclassified')}
+
+
+def natural_earth():
+    log('Natural Earth land')
+    d = json.load(open(fetch('ne_land', SOURCES['ne_land']), encoding='utf-8'))
+    out = []
+    for f in d['features']:
+        g = simplify(f['geometry'], 0.01, 3)
+        if g:
+            out.append({'type': 'Feature', 'geometry': g, 'properties': {}})
+    write('ne-land.json', fc(out))
+    rv = json.load(open(fetch('ne_rivers', SOURCES['ne_rivers']), encoding='utf-8'))
+    rivers = []
+    for f in rv['features']:
+        p = f['properties'] or {}
+        if (p.get('featurecla') or '').lower().startswith('lake'):
+            continue
+        g = simplify(f['geometry'], 0.005, 3)
+        if g:
+            props = {'k': 'river', 'sr': int(p.get('scalerank') or 10)}
+            if p.get('name_en') or p.get('name'):
+                props['n'] = p.get('name_en') or p.get('name')
+            rivers.append({'type': 'Feature', 'geometry': g, 'properties': props})
+    write('ne-rivers.json', fc(rivers))
+    return {'land': len(out), 'rivers': len(rivers)}
+
+
+def manifest(stats):
+    today = date.today().isoformat()
+    m = {
+        'version': today,
+        'datasets': [
+            {'id': 'pleiades', 'name': 'Pleiades', 'url': 'https://pleiades.stoa.org/', 'license': 'CC BY 3.0',
+             'licenseUrl': 'https://creativecommons.org/licenses/by/3.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'Pleiades: A Gazetteer of Past Places, pleiades.stoa.org (CC BY 3.0)',
+             'files': ['pleiades-places.json', 'pleiades-lines.json', 'pleiades-provinces.json'],
+             'notes': 'Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.',
+             'retrieved': today, 'counts': stats.get('pleiades')},
+            {'id': 'awmc', 'name': 'Ancient World Mapping Center', 'url': 'https://awmc.unc.edu/', 'license': 'ODbL 1.0',
+             'licenseUrl': 'https://opendatacommons.org/licenses/odbl/1-0/', 'commercial': True, 'shareAlike': True,
+             'attribution': 'Ancient World Mapping Center, UNC Chapel Hill — geodata derived from the Barrington Atlas (ODbL)',
+             'files': ['awmc-roads.json', 'awmc-shoreline.json', 'awmc-inland-water.json', 'awmc-snapshots.json'],
+             'notes': 'Road and shoreline dates are Barrington periods. Inland water is modern-based (OSM). Dates for non-Roman snapshots are the conventional dates of the extents their titles name.',
+             'retrieved': today, 'counts': stats.get('awmc')},
+            {'id': 'cliopatria', 'name': 'Cliopatria (Seshat Global History Databank)', 'url': 'https://github.com/Seshat-Global-History-Databank/cliopatria',
+             'license': 'CC BY 4.0', 'licenseUrl': 'https://creativecommons.org/licenses/by/4.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'Cliopatria, Seshat Global History Databank (CC BY 4.0); simplified by Shelf',
+             'files': ['cliopatria/index.json'],
+             'notes': 'One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.',
+             'retrieved': today, 'counts': stats.get('cliopatria')},
+            {'id': 'wikidata', 'name': 'Wikidata', 'url': 'https://www.wikidata.org/', 'license': 'CC0',
+             'licenseUrl': 'https://creativecommons.org/publicdomain/zero/1.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'Wikidata (CC0)', 'files': ['wikidata-events.json', 'wikidata-wars.json'],
+             'notes': 'Battles, sieges and campaigns with a location and a date. Crowd-sourced; check important facts.',
+             'retrieved': today, 'counts': stats.get('wikidata')},
+            {'id': 'naturalearth', 'name': 'Natural Earth', 'url': 'https://www.naturalearthdata.com/', 'license': 'Public domain',
+             'licenseUrl': 'https://www.naturalearthdata.com/about/terms-of-use/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'Made with Natural Earth', 'files': ['ne-land.json', 'ne-rivers.json'], 'notes': 'Modern coastline and modern river courses. Rivers and coasts have moved since antiquity; ancient coastlines come from AWMC.',
+             'retrieved': today, 'counts': stats.get('naturalearth')},
+        ],
+    }
+    with open(os.path.join(OUT, 'manifest.json'), 'w', encoding='utf-8') as fh:
+        json.dump(m, fh, ensure_ascii=False, indent=1)
+    log('  wrote manifest.json')
+
+
+def main():
+    only = set(sys.argv[1:])
+    stats = {}
+    old = {}
+    mpath = os.path.join(OUT, 'manifest.json')
+    if os.path.exists(mpath):
+        old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
+    steps = [('pleiades', pleiades), ('awmc', awmc), ('cliopatria', cliopatria), ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
+    for key, fn in steps:
+        stats[key] = fn() if not only or key in only else old.get(key)
+    manifest(stats)
+
+
+if __name__ == '__main__':
+    main()
