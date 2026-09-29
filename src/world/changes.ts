@@ -6,7 +6,8 @@
 import { type AtlasEvent, eventsNear, type Polity, politiesAt } from '../atlas/context';
 import type { Pos } from '../atlas/data';
 import { existedAround, type GazPlace, gazetteerInfo, namesAround, nearbyPlaces } from '../atlas/gazetteer';
-import type { HistYear } from '../atlas/time';
+import { type HistYear, yearLabel } from '../atlas/time';
+import { AROUND_KINDS } from '../atlas/context';
 import { histogisWhereWas, type HistogisUnit } from './live';
 
 export interface Change { kind: 'political' | 'administrative' | 'settlement' | 'name' | 'event'; text: string; source: string }
@@ -25,7 +26,7 @@ export async function whatChanged(at: Pos, a: HistYear, b: HistYear, radiusKm = 
   const na = names(pa);
   const nb = names(pb);
   if (na.join('|') === nb.join('|')) unchanged.push(na.length ? `Political entity: ${na.join(' / ')} at both dates (Cliopatria).` : 'No polity recorded here at either date (Cliopatria).');
-  else changes.push({ kind: 'political', text: `${na.length ? na.join(' / ') : 'No polity recorded'} (${lo}) → ${nb.length ? nb.join(' / ') : 'no polity recorded'} (${hi})`, source: 'Cliopatria' });
+  else changes.push({ kind: 'political', text: `${na.length ? na.join(' / ') : 'No polity recorded'} (${yearLabel(lo)}) → ${nb.length ? nb.join(' / ') : 'no polity recorded'} (${yearLabel(hi)})`, source: 'Cliopatria' });
 
   // Administrative: HistoGIS where it covers both dates.
   if (lo >= 1815 && hi <= 1920) {
@@ -37,14 +38,16 @@ export async function whatChanged(at: Pos, a: HistYear, b: HistYear, radiusKm = 
   }
 
   // Settlements recorded around each date (dated records only).
-  const near = await nearbyPlaces(at, radiusKm, { filter: (p) => (p.from !== undefined || p.to !== undefined) && !p.datasetPeriod && p.title !== 'Untitled' }).catch(() => [] as { place: GazPlace; km: number }[]);
+  // Settlements only (not monuments or finds), and only dated records.
+  const settle = AROUND_KINDS[0].types;
+  const near = await nearbyPlaces(at, radiusKm, { filter: (p) => (p.from !== undefined || p.to !== undefined) && !p.datasetPeriod && p.title !== 'Untitled' && p.types.some((t) => settle.includes(t)) }).catch(() => [] as { place: GazPlace; km: number }[]);
   const inA = near.filter((n) => existedAround(n.place, lo));
   const inB = near.filter((n) => existedAround(n.place, hi));
   const onlyB = inB.filter((n) => !inA.includes(n)).slice(0, 8);
   const onlyA = inA.filter((n) => !inB.includes(n)).slice(0, 8);
   const src = (xs: { place: GazPlace }[]) => [...new Set(xs.map((x) => gazetteerInfo(x.place.gazetteer).name))].join(', ');
   if (onlyB.length) changes.push({ kind: 'settlement', text: `First recorded between the dates (within ${radiusKm} km): ${onlyB.map((n) => n.place.title).join(', ')}`, source: src(onlyB) });
-  if (onlyA.length) changes.push({ kind: 'settlement', text: `Recorded at ${lo} but no longer at ${hi}: ${onlyA.map((n) => n.place.title).join(', ')}`, source: src(onlyA) });
+  if (onlyA.length) changes.push({ kind: 'settlement', text: `Recorded in ${yearLabel(lo)} but no longer by ${yearLabel(hi)}: ${onlyA.map((n) => n.place.title).join(', ')}`, source: src(onlyA) });
 
   // Names recorded for one date and not the other.
   for (const n of inA.filter((x) => inB.includes(x)).slice(0, 30)) {
@@ -52,13 +55,13 @@ export async function whatChanged(at: Pos, a: HistYear, b: HistYear, radiusKm = 
     const at2 = namesAround(n.place, hi).filter((x) => x.from !== undefined || x.to !== undefined).map((x) => x.name);
     const gained = at2.filter((x) => !at1.includes(x));
     const lost = at1.filter((x) => !at2.includes(x));
-    if (gained.length || lost.length) changes.push({ kind: 'name', text: `${n.place.title}: ${lost.length ? `recorded as ${lost.slice(0, 3).join(', ')} at ${lo}` : ''}${lost.length && gained.length ? '; ' : ''}${gained.length ? `as ${gained.slice(0, 3).join(', ')} at ${hi}` : ''}`, source: gazetteerInfo(n.place.gazetteer).name });
+    if (gained.length || lost.length) changes.push({ kind: 'name', text: `${n.place.title}: ${lost.length ? `recorded as ${lost.slice(0, 3).join(', ')} in ${yearLabel(lo)}` : ''}${lost.length && gained.length ? '; ' : ''}${gained.length ? `as ${gained.slice(0, 3).join(', ')} by ${yearLabel(hi)}` : ''}`, source: gazetteerInfo(n.place.gazetteer).name });
     if (changes.filter((c) => c.kind === 'name').length >= 5) break;
   }
 
   // Events in between.
   const ev = (await eventsNear(at, 300).catch(() => [] as (AtlasEvent & { km: number })[])).filter((e) => e.y >= lo && e.y <= hi).sort((x, y) => x.y - y.y);
-  if (ev.length) changes.push({ kind: 'event', text: `${ev.length} recorded battle${ev.length === 1 ? '' : 's'}, siege${ev.length === 1 ? '' : 's'} or campaign${ev.length === 1 ? '' : 's'} within 190 miles: ${ev.slice(0, 6).map((e) => `${e.n} (${e.y})`).join('; ')}${ev.length > 6 ? '…' : ''}`, source: 'Wikidata' });
+  if (ev.length) changes.push({ kind: 'event', text: `${ev.length} recorded event${ev.length === 1 ? '' : 's'} within 190 miles in between: ${ev.slice(0, 6).map((e) => `${e.n} (${yearLabel(e.y)})`).join('; ')}${ev.length > 6 ? '…' : ''}`, source: 'Wikidata' });
 
   notes.push('Roads and routes are drawn as map tiles — switch between the two dates on the map to see them change.');
   return { a: lo, b: hi, changes, unchanged, notes };

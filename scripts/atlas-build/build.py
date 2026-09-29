@@ -437,15 +437,19 @@ def wd_year(v: str | None, precision: str | None = None):
 
 
 def wikidata_events():
-    log('Wikidata battles, sieges, campaigns')
+    log('Wikidata battles, sieges, campaigns, revolts, expeditions, coups, treaties')
     feats = {}
-    for cls, kind in (('Q178561', 'battle'), ('Q188055', 'siege'), ('Q831663', 'campaign')):
-        rows = sparql(f"""SELECT ?e ?label ?coord ?time ?prec ?start ?sprec WHERE {{
+    # Classes in order of precedence (an item that is both a battle and a revolt counts as a battle).
+    for cls, kind in (('Q178561', 'battle'), ('Q188055', 'siege'), ('Q831663', 'campaign'), ('Q124734', 'revolt'),
+                      ('Q2401485', 'expedition'), ('Q45382', 'coup'), ('Q131569', 'treaty')):
+        rows = sparql(f"""SELECT ?e ?label ?coord ?time ?prec ?start ?sprec ?end WHERE {{
   ?e wdt:P31/wdt:P279* wd:{cls} ; wdt:P625 ?coord ; rdfs:label ?label . FILTER(LANG(?label) = "en")
   OPTIONAL {{ ?e p:P585/psv:P585 ?tv . ?tv wikibase:timeValue ?time ; wikibase:timePrecision ?prec }}
   OPTIONAL {{ ?e p:P580/psv:P580 ?sv . ?sv wikibase:timeValue ?start ; wikibase:timePrecision ?sprec }}
+  OPTIONAL {{ ?e wdt:P582 ?end }}
   FILTER(BOUND(?time) || BOUND(?start))
 }}""")
+        time.sleep(2)
         for r in rows:
             qid = r['e']['value'].rsplit('/', 1)[1]
             if qid in feats:
@@ -459,6 +463,9 @@ def wikidata_events():
                 continue
             prec = int((r.get('prec') or r.get('sprec') or {}).get('value') or 9)
             props = {'q': qid, 'n': r['label']['value'], 'k': kind, 'y': y}
+            y2 = wd_year((r.get('end') or {}).get('value'))
+            if y2 is not None and y2 > y:
+                props['y2'] = y2  # a date range (campaigns, expeditions, revolts)
             if prec < 9:
                 props['u'] = 1  # date known only to the decade / century
                 props['yp'] = {8: 'decade', 7: 'century', 6: 'millennium'}.get(prec, 'approximate')

@@ -39,11 +39,11 @@ export function existedIn(y: HistYear, opts: { from?: string; to?: string; undat
   return show ? ['any', ['!', dated], inRange] : ['all', dated, inRange];
 }
 
-/** Events (single-year features) within ±window years of y. */
+/** Events within ±window years of y. Events with an end year (y2) count for their whole span. */
 export function eventNear(y: HistYear, window: number, field = 'y'): ExpressionSpecification {
   const lo = shiftYear(y, -window);
   const hi = shiftYear(y, window);
-  return ['all', ['>=', ['get', field], lo], ['<=', ['get', field], hi]];
+  return ['all', ['<=', ['get', field], hi], ['>=', ['coalesce', ['get', `${field}2`], ['get', field]], lo]];
 }
 
 /**

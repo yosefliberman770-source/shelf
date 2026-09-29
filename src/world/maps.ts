@@ -87,23 +87,40 @@ export async function searchRumsey(q: string, from?: number, to?: number, signal
 
 interface AllmapsMap { id: string; resource: { id: string; width: number; height: number; partOf?: { label?: Record<string, string[]>; partOf?: { id: string; label?: Record<string, string[]> }[] }[] }; gcps: { resource: [number, number]; geo: [number, number] }[]; resourceMask?: [number, number][]; transformation?: { type: string }; _allmaps?: { area?: number } }
 const label = (l?: Record<string, string[]>) => (l ? Object.values(l)[0]?.[0] : undefined);
+/** Diagonal of the area a map's control points cover, in km. */
+function extentKm(geo: [number, number][]): number {
+  const lons = geo.map((g) => g[0]);
+  const lats = geo.map((g) => g[1]);
+  const dx = (Math.max(...lons) - Math.min(...lons)) * 111.32 * Math.cos(((Math.max(...lats) + Math.min(...lats)) / 2) * (Math.PI / 180));
+  const dy = (Math.max(...lats) - Math.min(...lats)) * 110.57;
+  return Math.hypot(dx, dy);
+}
 
 /** Georeferenced maps covering an area, most local first (world maps last). */
 export async function searchAllmaps(bbox: [number, number, number, number], signal?: AbortSignal): Promise<HistMap[]> {
-  const d = await cachedJSON<AllmapsMap[]>(`https://api.allmaps.org/maps?intersects=${bbox.map((v) => v.toFixed(3)).join(',')}&limit=60`, 14, signal);
-  const viewArea = Math.abs((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])) * 111 * 111 * 1e6;
-  return d
-    .filter((m) => m.gcps?.length >= 3)
-    .sort((a, b) => (a._allmaps?.area ?? Infinity) - (b._allmaps?.area ?? Infinity))
-    .filter((m) => (m._allmaps?.area ?? 0) < viewArea * 400)
+  // Allmaps takes the box latitude first: minLat,minLon,maxLat,maxLon (verified against its API).
+  const box = [bbox[1], bbox[0], bbox[3], bbox[2]].map((v) => v.toFixed(3)).join(',');
+  const viewArea = Math.abs((bbox[2] - bbox[0]) * (bbox[3] - bbox[1])) * 111 * 111 * 1e6 * Math.cos((((bbox[1] + bbox[3]) / 2) * Math.PI) / 180);
+  // Local maps first (maps covering at most ~50× the view), then — if there are few — the smallest regional ones.
+  const local = await cachedJSON<AllmapsMap[]>(`https://api.allmaps.org/maps?intersects=${box}&limit=40&maxarea=${Math.round(Math.max(viewArea * 50, 5e8))}`, 14, signal).catch(() => [] as AllmapsMap[]);
+  const wide = local.length >= 8 ? [] : await cachedJSON<AllmapsMap[]>(`https://api.allmaps.org/maps?intersects=${box}&limit=60`, 14, signal);
+  const seenIds = new Set<string>();
+  return [...local, ...wide]
+    .filter((m) => m.gcps?.length >= 3 && !seenIds.has(m.id) && (seenIds.add(m.id), true))
+    // Safety check: keep only maps whose own control points reach the area asked about.
+    .filter((m) => { const g = m.gcps.map((c) => c.geo); const pad = 2; return Math.min(...g.map((x) => x[0])) <= bbox[2] + pad && Math.max(...g.map((x) => x[0])) >= bbox[0] - pad && Math.min(...g.map((x) => x[1])) <= bbox[3] + pad && Math.max(...g.map((x) => x[1])) >= bbox[1] - pad; })
+    .map((m) => ({ m, extent: extentKm(m.gcps.map((g) => g.geo)) }))
+    .sort((a, b) => a.extent - b.extent)
     .slice(0, 20)
+    .map(({ m }) => m)
     .map((m) => {
       const canvas = m.resource.partOf?.[0];
       const manifest = canvas?.partOf?.[0];
       const title = label(manifest?.label) ?? label(canvas?.label) ?? 'Untitled map';
       const holder = m.resource.id.includes('davidrumsey') ? COLLECTION.rumsey.name : m.resource.id.includes('loc.gov') ? COLLECTION.loc.name : new URL(m.resource.id).hostname;
+      const across = extentKm(m.gcps.map((g) => g.geo));
       return {
-        id: `allmaps:${m.id}`, title, date: yearFrom(title), subjects: [], collection: 'allmaps' as const, holder,
+        id: `allmaps:${m.id}`, title: `${title}${across > 800 ? ` (spans about ${Math.round(across / 100) * 100} km)` : ''}`, date: yearFrom(title), subjects: [], collection: 'allmaps' as const, holder,
         thumb: `${m.resource.id}/full/300,/0/default.jpg`, iiif: m.resource.id, manifest: manifest?.id, page: m.id.replace('annotations.allmaps.org/maps', 'viewer.allmaps.org/?url=https://annotations.allmaps.org/maps'),
         rights: m.resource.id.includes('davidrumsey') ? COLLECTION.rumsey.rights : COLLECTION.allmaps.rights,
         georef: { annotation: m.id, imageService: m.resource.id, width: m.resource.width, height: m.resource.height, gcps: m.gcps.map((g) => ({ px: g.resource, geo: g.geo })), mask: m.resourceMask, transformation: m.transformation?.type },
@@ -159,9 +176,44 @@ function solve(A: number[][], b: number[]): number[] | undefined {
   return M.map((row, i) => row[n] / row[i]);
 }
 
-export interface Overlay { url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; points: number; note: string }
+export interface Overlay { url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; extentKm: number; points: number; note: string }
+/** Why a georeferenced map can't be laid over the map (too few points, or too distorted for a simple fit). */
+export type OverlayResult = { ok: true; overlay: Overlay } | { ok: false; reason: string };
 
-export function fitOverlay(g: Georef, maxWidth = 1600): Overlay | undefined {
+/** Fit, then refuse overlays whose measured error is large for the map's size — a misplaced old map is worse than none. */
+export function overlayFor(g: Georef, limits: ImageLimits = {}): OverlayResult {
+  if (g.gcps.length < 4) return { ok: false, reason: `Georeferenced with only ${g.gcps.length} control points — too few to place reliably.` };
+  const o = fitOverlay(g, 1600, limits);
+  if (!o) return { ok: false, reason: 'Its control points can’t be fitted (they may lie almost in a line).' };
+  if (o.errorKm > Math.max(5, o.extentKm * 0.04)) return { ok: false, reason: `Too distorted to place with a simple fit (typical error ≈ ${Math.round(o.errorKm)} km on a map ${Math.round(o.extentKm)} km across). View it instead, or open it in Allmaps.` };
+  return { ok: true, overlay: o };
+}
+
+/** An image server's own size limits (IIIF info.json: maxArea / maxWidth / maxHeight), so requests stay within them. */
+export interface ImageLimits { maxArea?: number; maxWidth?: number; maxHeight?: number }
+export async function imageLimits(service: string, signal?: AbortSignal): Promise<ImageLimits> {
+  try {
+    const d = await cachedJSON<{ maxArea?: number; maxWidth?: number; maxHeight?: number; profile?: unknown[] }>(`${service}/info.json`, 30, signal);
+    const p = (Array.isArray(d.profile) ? d.profile.find((x) => typeof x === 'object') : undefined) as ImageLimits | undefined;
+    return { maxArea: d.maxArea ?? p?.maxArea, maxWidth: d.maxWidth ?? p?.maxWidth, maxHeight: d.maxHeight ?? p?.maxHeight };
+  } catch { return {}; }
+}
+/** The largest output width for a region that the server allows. */
+export function allowedWidth(rw: number, rh: number, want: number, lim: ImageLimits = {}): number {
+  let w = Math.min(want, rw, lim.maxWidth ?? Infinity);
+  if (lim.maxHeight) w = Math.min(w, Math.floor((lim.maxHeight * rw) / rh));
+  if (lim.maxArea) w = Math.min(w, Math.floor(Math.sqrt((lim.maxArea * rw) / rh)));
+  return Math.max(1, Math.floor(w));
+}
+/** A viewer-size image URL (whole map) within the server's limits. */
+export async function viewerUrl(service: string, signal?: AbortSignal): Promise<string> {
+  const lim = await imageLimits(service, signal);
+  if (!lim.maxArea && !lim.maxWidth) return `${service}/full/!2000,2000/0/default.jpg`;
+  const side = Math.floor(Math.min(2000, lim.maxWidth ?? 2000, lim.maxArea ? Math.sqrt(lim.maxArea) : 2000));
+  return `${service}/full/!${side},${side}/0/default.jpg`;
+}
+
+export function fitOverlay(g: Georef, maxWidth = 1600, limits: ImageLimits = {}): Overlay | undefined {
   if (g.gcps.length < 4) return undefined;
   // Normalise pixel and map coordinates for numerical stability.
   const P = g.gcps.map((c) => c.px);
@@ -171,32 +223,33 @@ export function fitOverlay(g: Georef, maxWidth = 1600): Overlay | undefined {
   const q0 = [mean(Q.map((q) => q[0])), mean(Q.map((q) => q[1]))];
   const ps = Math.max(...P.map((p) => Math.hypot(p[0] - px0[0], p[1] - px0[1]))) || 1;
   const qs = Math.max(...Q.map((q) => Math.hypot(q[0] - q0[0], q[1] - q0[1]))) || 1;
+  const norm = g.gcps.map((_, i) => ({ x: (P[i][0] - px0[0]) / ps, y: (P[i][1] - px0[1]) / ps, X: (Q[i][0] - q0[0]) / qs, Y: (Q[i][1] - q0[1]) / qs }));
+  const toGeo = (fx: (x: number, y: number) => [number, number]) => ([u, v]: [number, number]): [number, number] => {
+    const [X, Y] = fx((u - px0[0]) / ps, (v - px0[1]) / ps);
+    return unmerc([X * qs + q0[0], Y * qs + q0[1]]);
+  };
+  // Affine fit (no perspective): stable even when the control points cover only part of the sheet.
+  const ax = solve(norm.map((n) => [n.x, n.y, 1]), norm.map((n) => n.X));
+  const ay = solve(norm.map((n) => [n.x, n.y, 1]), norm.map((n) => n.Y));
+  if (!ax || !ay) return undefined;
+  const affine = toGeo((x, y) => [ax[0] * x + ax[1] * y + ax[2], ay[0] * x + ay[1] * y + ay[2]]);
+  // Projective fit: used only if clearly better and its corners stay sane (perspective can blow up outside the points).
   const A: number[][] = [];
   const b: number[] = [];
-  g.gcps.forEach((_, i) => {
-    const x = (P[i][0] - px0[0]) / ps;
-    const y = (P[i][1] - px0[1]) / ps;
-    const X = (Q[i][0] - q0[0]) / qs;
-    const Y = (Q[i][1] - q0[1]) / qs;
-    A.push([x, y, 1, 0, 0, 0, -x * X, -y * X]); b.push(X);
-    A.push([0, 0, 0, x, y, 1, -x * Y, -y * Y]); b.push(Y);
-  });
-  const h = solve(A, b);
-  if (!h) return undefined;
-  const map = ([u, v]: [number, number]): [number, number] => {
-    const x = (u - px0[0]) / ps;
-    const y = (v - px0[1]) / ps;
-    const w = h[6] * x + h[7] * y + 1;
-    return unmerc([((h[0] * x + h[1] * y + h[2]) / w) * qs + q0[0], ((h[3] * x + h[4] * y + h[5]) / w) * qs + q0[1]]);
-  };
+  for (const n of norm) {
+    A.push([n.x, n.y, 1, 0, 0, 0, -n.x * n.X, -n.y * n.X]); b.push(n.X);
+    A.push([0, 0, 0, n.x, n.y, 1, -n.x * n.Y, -n.y * n.Y]); b.push(n.Y);
+  }
+  const h = g.gcps.length >= 6 ? solve(A, b) : undefined;
+  const projective = h ? toGeo((x, y) => { const w = h[6] * x + h[7] * y + 1; return [(h[0] * x + h[1] * y + h[2]) / w, (h[3] * x + h[4] * y + h[5]) / w]; }) : undefined;
   // Error: fitted vs. stated position of each control point, in km.
-  const errs = g.gcps.map((c) => {
-    const [lon, lat] = map(c.px);
-    const dx = (lon - c.geo[0]) * 111.32 * Math.cos((c.geo[1] * Math.PI) / 180);
-    const dy = (lat - c.geo[1]) * 110.57;
-    return Math.hypot(dx, dy);
-  });
-  const errorKm = Math.sqrt(errs.reduce((s, e) => s + e * e, 0) / errs.length);
+  const rms = (f: (p: [number, number]) => [number, number]) => {
+    const errs = g.gcps.map((c) => {
+      const [lon, lat] = f(c.px);
+      return Math.hypot((lon - c.geo[0]) * 111.32 * Math.cos((c.geo[1] * Math.PI) / 180), (lat - c.geo[1]) * 110.57);
+    });
+    return Math.sqrt(errs.reduce((s2, e) => s2 + e * e, 0) / errs.length);
+  };
   // Crop to the map's own area (its mask) so margins and titles aren't stretched over the land.
   const xs = (g.mask ?? [[0, 0], [g.width, g.height]]).map((p) => p[0]);
   const ys = (g.mask ?? [[0, 0], [g.width, g.height]]).map((p) => p[1]);
@@ -204,12 +257,25 @@ export function fitOverlay(g: Georef, maxWidth = 1600): Overlay | undefined {
   const y0 = Math.max(0, Math.floor(Math.min(...ys)));
   const x1 = Math.min(g.width, Math.ceil(Math.max(...xs)));
   const y1 = Math.min(g.height, Math.ceil(Math.max(...ys)));
-  const coords = [map([x0, y0]), map([x1, y0]), map([x1, y1]), map([x0, y1])] as Overlay['coordinates'];
+  const corners = (f: (p: [number, number]) => [number, number]) => [f([x0, y0]), f([x1, y0]), f([x1, y1]), f([x0, y1])] as Overlay['coordinates'];
+  const area = (c: Overlay['coordinates']) => Math.abs(c.reduce((s2, p, i) => { const q = c[(i + 1) % 4]; return s2 + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+  const convex = (c: Overlay['coordinates']) => { const sg = c.map((p, i) => { const q = c[(i + 1) % 4]; const r = c[(i + 2) % 4]; return Math.sign((q[0] - p[0]) * (r[1] - q[1]) - (q[1] - p[1]) * (r[0] - q[0])); }); return sg.every((v) => v === sg[0]); };
+  const aErr = rms(affine);
+  const aC = corners(affine);
+  let useProjective = false;
+  let coords = aC;
+  let errorKm = aErr;
+  if (projective) {
+    const pErr = rms(projective);
+    const pC = corners(projective);
+    const ratio = area(pC) / Math.max(1e-12, area(aC));
+    if (pErr < aErr * 0.6 && convex(pC) && ratio > 0.6 && ratio < 1.6 && pC.flat().every(Number.isFinite)) { useProjective = true; coords = pC; errorKm = pErr; }
+  }
   if (coords.flat().some((v) => !Number.isFinite(v))) return undefined;
-  const width = Math.min(maxWidth, x1 - x0);
+  const width = allowedWidth(x1 - x0, y1 - y0, maxWidth, limits);
   return {
-    url: `${g.imageService}/${x0},${y0},${x1 - x0},${y1 - y0}/${width},/0/default.jpg`, coordinates: coords, errorKm, points: g.gcps.length,
-    note: `Placed with a best-fit projective transform from ${g.gcps.length} control points (Allmaps georeference${g.transformation ? `, drawn there with a ${g.transformation === 'thinPlateSpline' ? 'thin-plate spline' : g.transformation}` : ''}). Typical error here ≈ ${errorKm < 1 ? `${Math.round(errorKm * 1000)} m` : `${errorKm.toFixed(errorKm < 10 ? 1 : 0)} km`}.`,
+    url: `${g.imageService}/${x0},${y0},${x1 - x0},${y1 - y0}/${width},/0/default.jpg`, coordinates: coords, errorKm, extentKm: extentKm(g.gcps.map((c) => c.geo)), points: g.gcps.length,
+    note: `Placed with a best-fit ${useProjective ? 'projective' : 'affine'} transform from ${g.gcps.length} control points (Allmaps georeference${g.transformation ? `, drawn there with a ${g.transformation === 'thinPlateSpline' ? 'thin-plate spline' : g.transformation}` : ''}). Typical error here ≈ ${errorKm < 1 ? `${Math.round(errorKm * 1000)} m` : `${errorKm.toFixed(errorKm < 10 ? 1 : 0)} km`}.`,
   };
 }
 
@@ -227,10 +293,12 @@ export async function searchMaps(opts: { q?: string; bbox?: [number, number, num
   const inRange = (m: HistMap) => opts.from === undefined || m.date.precision === 'unknown' || ((m.date.latest ?? Infinity) >= opts.from && (m.date.earliest ?? -Infinity) <= (opts.to ?? Infinity));
   const seen = new Set<string>();
   const maps = all.filter((m) => inRange(m) && !seen.has(m.iiif ?? m.id) && (seen.add(m.iiif ?? m.id), true));
-  // Closest in date first; undated last.
+  // Maps whose title names the place first, then ones that can be overlaid, then closest in date (undated last).
   const mid = opts.from !== undefined && opts.to !== undefined ? (opts.from + opts.to) / 2 : undefined;
   const dist = (m: HistMap) => (m.date.precision === 'unknown' || mid === undefined ? 1e9 : Math.abs((m.date.preferred ?? m.date.earliest ?? 0) - mid));
-  maps.sort((a, b) => Number(!!b.georef) - Number(!!a.georef) || dist(a) - dist(b));
+  const needle = (opts.q ?? '').toLowerCase().trim();
+  const named = (m: HistMap) => (needle && m.title.toLowerCase().includes(needle) ? 0 : 1);
+  maps.sort((a, b) => named(a) - named(b) || Number(!!b.georef) - Number(!!a.georef) || dist(a) - dist(b));
   return { maps, errors };
 }
 

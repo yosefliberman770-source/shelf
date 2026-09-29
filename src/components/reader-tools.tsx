@@ -234,7 +234,9 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
         </details>
       )}
       <div className="row wrap gap-8">
+        <button className="btn primary" onClick={() => onOpenMap({ mode: 'world' })}>🌍 Show me this world</button>
         <button className="btn" onClick={() => onOpenMap({ mode: 'chapter' })}>🗺 Map this chapter</button>
+        <button className="btn ghost" onClick={() => onOpenMap({ mode: 'maps' })}>📜 Historical maps</button>
         <button className="btn ghost" onClick={() => onOpenMap({ mode: 'search' })}><Icon name="search" />Search the map</button>
         <button className="btn ghost" onClick={() => onOpenMap({ mode: 'saved' })}>🔖 Saved & places you’ve met</button>
       </div>

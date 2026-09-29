@@ -11,7 +11,7 @@ import { type HistYear, shiftYear } from './time';
 const span = (x: { f?: number; t?: number }) => ({ from: x.f, to: x.t });
 
 export interface Polity { n: string; q?: string; c?: string; f: HistYear; t: HistYear; /** The point is just outside the (simplified) outline, not inside it. */ edge?: boolean }
-export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | string; y: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
+export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
 export interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 
 /**
@@ -47,7 +47,7 @@ export async function eventsNear(p: Pos, radiusKm: number, year?: HistYear, wind
   const ev = await allEvents();
   const lo = year !== undefined ? shiftYear(year, -window) : -Infinity;
   const hi = year !== undefined ? shiftYear(year, window) : Infinity;
-  return ev.filter((e) => e.y >= lo && e.y <= hi).map((e) => ({ ...e, km: km(p, e.pos) })).filter((e) => e.km <= radiusKm)
+  return ev.filter((e) => e.y <= hi && (e.y2 ?? e.y) >= lo).map((e) => ({ ...e, km: km(p, e.pos) })).filter((e) => e.km <= radiusKm)
     .sort((a, b) => (year !== undefined ? Math.abs(a.y - year) - Math.abs(b.y - year) : 0) || a.km - b.km);
 }
 

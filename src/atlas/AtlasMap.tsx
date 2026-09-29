@@ -93,7 +93,7 @@ function circleRing(lat: number, lon: number, radiusKm: number): [number, number
   return pts;
 }
 
-export function AtlasMap({ view, year, onYearChange, focus, pins, marks, className, overlay, war: warProp, onWarChange, onReady, onPickPlace, onPickEvent, onPickMarker, layersRequest, onLayersChange, children }: {
+export function AtlasMap({ view, year, onYearChange, focus, pins, marks, className, overlay, war: warProp, onWarChange, onReady, onPickPlace, onPickEvent, onPickMarker, layersRequest, onLayersChange, mapOverlays, children }: {
   view?: AtlasView;
   year: HistYear;
   onYearChange: (y: HistYear) => void;
@@ -114,6 +114,8 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   /** Switch to these layers (e.g. from a bookmark); n changes each time. */
   layersRequest?: { layers: string[]; n: number };
   onLayersChange?: (layers: string[]) => void;
+  /** Original historical maps laid over the reconstruction (image placed by its four corners). */
+  mapOverlays?: { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number }[];
   /** Shown over the map (e.g. the "What am I looking at?" chip). */
   children?: React.ReactNode;
 }) {
@@ -268,12 +270,33 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     (map.getSource('radius') as GeoJSONSource).setData(c ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [circleRing(c.lat, c.lon, c.km)] }, properties: {} } : EMPTY);
   }, [ready, focus?.name, focus?.lat, focus?.lon, focus?.certainty, pins, overlay]);
 
+  // ── Original maps over the reconstruction ──
+  const shownOverlays = useRef(new Set<string>());
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const want = new Map((mapOverlays ?? []).map((o) => [o.id, o]));
+    for (const id of [...shownOverlays.current]) {
+      if (want.has(id)) continue;
+      if (map.getLayer(`ov-${id}`)) map.removeLayer(`ov-${id}`);
+      if (map.getSource(`ov-${id}`)) map.removeSource(`ov-${id}`);
+      shownOverlays.current.delete(id);
+    }
+    for (const o of want.values()) {
+      if (!map.getSource(`ov-${o.id}`)) {
+        map.addSource(`ov-${o.id}`, { type: 'image', url: o.url, coordinates: o.coordinates });
+        map.addLayer({ id: `ov-${o.id}`, type: 'raster', source: `ov-${o.id}`, paint: { 'raster-opacity': o.opacity, 'raster-fade-duration': 0 } }, TOP);
+        shownOverlays.current.add(o.id);
+      } else map.setPaintProperty(`ov-${o.id}`, 'raster-opacity', o.opacity);
+    }
+  }, [ready, mapOverlays]);
+
   // ── Move to a new place ──
   const viewKey = view ? `${view.lat.toFixed(4)},${view.lon.toFixed(4)},${view.zoom}` : '';
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !view) return;
-    if (view.bbox) map.fitBounds([[view.bbox[0], view.bbox[1]], [view.bbox[2], view.bbox[3]]], { padding: 40, maxZoom: 9, duration: 700 });
+    if (view.bbox) map.fitBounds([[view.bbox[0], view.bbox[1]], [view.bbox[2], view.bbox[3]]], { padding: 40, maxZoom: view.zoom > 9 ? view.zoom : 9, duration: 700 });
     else map.flyTo({ center: [view.lon, view.lat], zoom: view.zoom, duration: 700 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewKey, ready]);
@@ -453,7 +476,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'war-sequence': {
       const y = num('y');
       return {
-        title: str('n') ?? 'Event', lines: [`${str('k') ?? 'event'}${y !== undefined ? ` · ${yearLabel(y)}${str('yp') ? ` (to the ${str('yp')})` : ''}` : ''}`, ...(str('wn') ? [`Part of: ${str('wn')}`] : [])],
+        title: str('n') ?? 'Event', lines: [`${str('k') ?? 'event'}${y !== undefined ? ` · ${yearLabel(y)}${num('y2') !== undefined ? ` – ${yearLabel(num('y2')!)}` : ''}${str('yp') ? ` (to the ${str('yp')})` : ''}` : ''}`, ...(str('wn') ? [`Part of: ${str('wn')}`] : [])],
         link: { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' }, source: credit('wikidata'), event: str('q'),
         caution: num('u') ? 'The date is only known approximately.' : undefined,
       };

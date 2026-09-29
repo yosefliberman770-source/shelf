@@ -113,4 +113,50 @@ AI (the optional whole-book analysis) may supply place names found in the text, 
 
 - **Gazetteers:** register them in `GAZETTEERS` (`src/atlas/gazetteer.ts`) with a coverage span and a loader. `gazetteersFor(year)` picks the ones to use, so a medieval or early-modern gazetteer plugs in without reader changes.
 - **Map layers:** add them to `LAYERS` in `src/atlas/catalog.ts` with `coverage`, `datasets` and credits.
-- **Data packs:** built by `scripts/atlas-build/build.py`. The `gazetteer` step writes `pleiades-gazetteer.json` (all names with dates, "part of" and other relationships). The `polities` step writes `cliopatria/names.json` for search.
+- **Data packs:** built by `scripts/atlas-build/build.py`. The `gazetteer` step prepares the Pleiades records (all names with dates, "part of" and other relationships); the `world` step splits them, with Viabundus and al‑Ṯurayyā, into the tiled packs in `public/world/`. The `polities` step writes `cliopatria/names.json` for search.
+
+## The historical world system
+
+The atlas sits on a wider data system in `src/world/` and `public/world/`. The
+full source audit — every dataset considered, its tier, licence, and whether it
+is used offline, fetched live, only catalogued, or excluded — is in
+[HISTORICAL_DATA_AUDIT.md](HISTORICAL_DATA_AUDIT.md).
+
+| File | What it does |
+| --- | --- |
+| `src/world/histdate.ts` | Uncertain dates: earliest, latest, preferred year, precision (day to period), source, and conflicts. Parsing, formatting and comparison ("within", "possible", "outside"). |
+| `src/world/axes.ts` | The regions, periods and data types used by the coverage matrix. |
+| `src/world/registry.ts` | The source registry: each source's tier (A–D), access (offline, live, catalogued, excluded), coverage, licence, and what was verified. |
+| `src/world/coverage.ts` | The coverage matrix (region × period × data type) built from the registry. |
+| `src/world/select.ts` | Picks the best usable source for a place, date and data type, and names better sources that can't be used. |
+| `src/world/evidence.ts` | Evidence labels and the "why is this empty?" explanation. An empty result is never presented as proof that nothing existed. |
+| `src/world/live.ts` | Live lookups (CHGIS/TGAZ, HistoGIS, World Historical Gazetteer), cached in IndexedDB. Failures are not cached. No keys are used or stored. |
+| `src/world/crosscheck.ts` | Compares a place with other gazetteers and shows agreements and disagreements side by side. |
+| `src/world/changes.ts` | "What changed?" between two dates at one place. |
+| `src/world/maps.ts` | The historical map archive: Library of Congress, David Rumsey, and georeferenced maps from Allmaps. Original maps are kept apart from reconstructions. |
+| `src/world/bookWorld.ts` | "The world of this book": reads the book section by section in the background, collects places, dates, wars and events with their positions in the text, and resolves them. |
+| `scripts/atlas-build/world.py`, `tiler.py` | Build the tiled place index and the vector tiles. |
+
+### Performance
+
+The whole world is never loaded. Places are stored in 2° cells
+(`public/world/places/c/`), with a sharded name index (`places/n/`) and an id
+index (`places/i/`); only the cells in view or near a place are fetched, and
+recently used cells stay in memory. Dense layers (Pleiades, Itiner-e, Viabundus,
+al‑Ṯurayyā) are PMTiles vector tiles, so the map only requests the tiles for the
+current view and zoom. The service worker keeps what was fetched for offline use.
+
+### Old maps over the modern map
+
+A scanned map can be laid over the map only when Allmaps has control points for
+it. Shelf fits an affine transform (or a projective one, when it is clearly
+better) to those points, states the fitting error, and refuses maps with too few
+points or too large an error. The image is requested at a size the IIIF server
+allows. Placement is approximate: it is only as good as the georeference.
+
+### Limits
+
+- Allmaps coverage varies a lot by place; many regions have no georeferenced maps.
+- GB1900, DAMAST, CShapes, HGIS de las Indias, the NLS map layers and Old Maps Online are catalogued but not used. CShapes is non-commercial only.
+- In "What changed?", roads and routes are shown on the map only, not listed.
+- Live sources (maps, CHGIS, HistoGIS, World Historical Gazetteer) need an internet connection.

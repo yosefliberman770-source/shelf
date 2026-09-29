@@ -22,10 +22,7 @@
     "places": 20340,
     "lines": 612,
     "provinces": 193,
-    "gazetteer": {
-     "places": 34458,
-     "withParents": 2434
-    }
+    "gazetteer": null
    }
   },
   {
@@ -89,8 +86,8 @@
    "notes": "Battles, sieges and campaigns with a location and a date. Crowd-sourced; check important facts.",
    "retrieved": "2026-09-29",
    "counts": {
-    "events": 11256,
-    "wars": 882
+    "events": 11670,
+    "wars": 888
    }
   },
   {

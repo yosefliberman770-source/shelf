@@ -20,7 +20,7 @@ export interface MapRequest {
   name?: string;
   passage?: string;
   mentionIndex?: number;
-  mode?: 'place' | 'chapter' | 'section' | 'search' | 'saved';
+  mode?: 'place' | 'chapter' | 'section' | 'search' | 'saved' | 'world' | 'maps';
   /** The selected passage, for "Map this section". */
   text?: string;
   /** How the name was found (for "Why is this place here?"). */

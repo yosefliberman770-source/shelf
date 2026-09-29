@@ -173,8 +173,8 @@ function polityClass(id: string, match: ExpressionSpecification, color: string, 
   ];
 }
 
-function events(id: string, kind: string, color: string, ctx: LayerCtx): LayerSpecification[] {
-  const filter = ['all', ['==', ['get', 'k'], kind], eventNear(ctx.year, ctx.eventWindow)] as FilterSpecification;
+function events(id: string, kind: string | string[], color: string, ctx: LayerCtx): LayerSpecification[] {
+  const filter = ['all', typeof kind === 'string' ? ['==', ['get', 'k'], kind] : ['in', ['get', 'k'], ['literal', kind]], eventNear(ctx.year, ctx.eventWindow)] as FilterSpecification;
   return [
     { id: `${id}-pt`, type: 'circle', source: 'wikidata-events', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 3, 8, 6], 'circle-color': color, 'circle-opacity': ['case', ['>=', u(), 1], 0.5, 0.9], 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.2 } },
     { id: `${id}-label`, type: 'symbol', source: 'wikidata-events', filter, minzoom: 4, layout: { 'text-field': ['concat', ['get', 'n'], '\n', ['case', ['<', ['get', 'y'], 0], ['concat', ['to-string', ['-', 0, ['get', 'y']]], ' BCE'], ['concat', ['to-string', ['get', 'y']], ' CE']]], 'text-font': FONT_BOLD, 'text-size': 11, 'text-offset': [0, 1], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.5 } },
@@ -390,6 +390,10 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
+    id: 'political-events', group: 'political', label: 'Coups & treaties', datasets: ['wikidata'], defaultOn: false,
+    hint: 'Coups and treaties Wikidata places at a location with a date (a treaty’s place is usually where it was signed).', sources: ['wikidata-events'], specs: (c) => events('political-events', ['coup', 'treaty'], '#4e342e', c),
+  },
+  {
     id: 'borders', group: 'political', label: 'Historical borders', datasets: ['cliopatria', 'ohm'], defaultOn: true,
     hint: 'Outlines of every polity in the chosen year (Cliopatria), plus country borders mapped in OpenHistoricalMap (dated features, mainly after 1500).', sources: ['cliopatria', 'ohm'],
     specs: (c) => [
@@ -410,6 +414,14 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'campaigns', group: 'military', label: 'Campaigns', datasets: ['wikidata'], defaultOn: false,
     hint: 'Military campaigns Wikidata places at a single point (usually where they began or were centred) — not their route.', sources: ['wikidata-events'], specs: (c) => events('campaigns', 'campaign', C.campaign, c),
+  },
+  {
+    id: 'revolts', group: 'military', label: 'Revolts & rebellions', datasets: ['wikidata'], defaultOn: false,
+    hint: 'Revolts and rebellions with a recorded place and date (Wikidata); shown for their whole span where an end date is recorded.', sources: ['wikidata-events'], specs: (c) => events('revolts', 'revolt', '#ad1457', c),
+  },
+  {
+    id: 'expeditions', group: 'military', label: 'Expeditions', datasets: ['wikidata'], defaultOn: false,
+    hint: 'Expeditions placed at one point by Wikidata (usually where they began or were centred) — not their route.', sources: ['wikidata-events'], specs: (c) => events('expeditions', 'expedition', '#00838f', c),
   },
   {
     id: 'wars', group: 'military', label: 'Wars', datasets: ['wikidata'], defaultOn: true,
@@ -459,6 +471,6 @@ export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable
 
 /** Order in which layers are drawn, bottom to top (areas under lines under points). */
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'coast-modern', 'coast-ancient', 'rivers', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'campaigns', 'sieges', 'battles', 'wars'];
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

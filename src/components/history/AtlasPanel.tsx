@@ -18,23 +18,31 @@ import { unionBBox, zoomForBBox } from '../../lib/history/geometry';
 import { type DateContext, dateContextFor, detectPlaces, saveBookDate } from '../../lib/history/placeDetect';
 import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
-import { CompareDates, EventCard, LookingAtCard, NearbyPanel, PlaceHistory, SavedPanel, SearchPanel, WarEvents } from './atlasParts';
+import { EventCard, LookingAtCard, NearbyPanel, PlaceHistory, SavedPanel, SearchPanel, WarEvents } from './atlasParts';
+import { type ActiveOverlay, BookWorldPanel, CoveragePanel, EmptyNote, MapArchivePanel, PlaceWorldExtras, WhatChangedPanel } from './worldParts';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../db/db';
+import { LAYERS } from '../../atlas/catalog';
+import { bookPeriod, buildBookWorld, resolveBookWorld, type SectionText, type WorldProfile, worldProfile } from '../../world/bookWorld';
 import { DateControls, type MapBook, type MapRequest } from './HistoricalMapPanel';
 
-type Tab = 'place' | 'chapter' | 'events' | 'nearby' | 'search' | 'saved';
+type Tab = 'place' | 'chapter' | 'world' | 'events' | 'nearby' | 'maps' | 'search' | 'saved' | 'data';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'place', label: 'Place' },
   { id: 'chapter', label: 'Chapter' },
+  { id: 'world', label: 'World' },
   { id: 'events', label: 'Events' },
   { id: 'nearby', label: 'Nearby' },
+  { id: 'maps', label: 'Maps' },
   { id: 'search', label: 'Search' },
   { id: 'saved', label: 'Saved' },
+  { id: 'data', label: 'Data' },
 ];
 const FOLLOW_KEY = 'shelf.followBook';
 const LOOK_KEY = 'shelf.atlas.lookingOpen';
 type Mention = { cfi: string; snippet: string };
 
-export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDate, wide, onClose, findMentions, onJump, position }: {
+export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDate, wide, onClose, findMentions, onJump, position, loadSection, sectionCount }: {
   request: MapRequest;
   book: MapBook;
   chapterText: () => string;
@@ -48,9 +56,13 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   /** Close the map and go to that spot in the book (the reader can jump back). */
   onJump: (cfi: string) => void;
   position?: { spine?: number; para?: number; cfi?: string };
+  /** Read one section of the book off-screen (for "The world of this book"). */
+  loadSection?: (i: number) => Promise<SectionText | undefined>;
+  sectionCount?: number;
 }) {
   const names = useBookPlaceNames(book.bookId, position?.spine, position?.para);
-  const [tab, setTab] = useState<Tab>(request.mode === 'chapter' || request.mode === 'section' ? 'chapter' : request.mode === 'search' ? 'search' : request.mode === 'saved' ? 'saved' : 'place');
+  const allNames = useBookPlaceNames(book.bookId);
+  const [tab, setTab] = useState<Tab>(request.mode === 'chapter' || request.mode === 'section' ? 'chapter' : request.mode === 'search' || request.mode === 'saved' || request.mode === 'world' || request.mode === 'maps' ? request.mode : 'place');
 
   // ── The year: the book's date, or the reader's own ──
   useEffect(() => {
@@ -136,12 +148,57 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
     ...(book.item?.histEnd !== undefined ? [{ year: book.item.histEnd, label: 'Book’s period ends', kind: 'book' as const }] : []),
     ...warMarks,
   ], [book.item?.histStart, book.item?.histEnd, warMarks]);
+  // ── Original maps laid over the reconstruction ──
+  const [mapOverlays, setMapOverlays] = useState<ActiveOverlay[]>([]);
+  const overlayImages = useMemo(() => mapOverlays.map((o) => ({ id: o.id, url: o.overlay.url, coordinates: o.overlay.coordinates, opacity: o.opacity })), [mapOverlays]);
+  // A newly added original map: bring it into view.
+  const overlayCount = useRef(0);
+  useEffect(() => {
+    if (mapOverlays.length > overlayCount.current) {
+      const c = mapOverlays[mapOverlays.length - 1].overlay.coordinates;
+      const b: [number, number, number, number] = [Math.min(...c.map((x) => x[0])), Math.min(...c.map((x) => x[1])), Math.max(...c.map((x) => x[0])), Math.max(...c.map((x) => x[1]))];
+      setView({ lat: (b[1] + b[3]) / 2, lon: (b[0] + b[2]) / 2, zoom: Math.min(zoomForBBox(b), 16), bbox: b });
+    }
+    overlayCount.current = mapOverlays.length;
+  }, [mapOverlays]);
+  const viewBox = (): [number, number, number, number] | undefined => { const b = mapRef.current?.getBounds(); return b ? [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()] : undefined; };
+
+  // ── The world of this book (built once, on request) ──
+  const worldRow = useLiveQuery(() => db.bookWorld.get(book.bookId), [book.bookId]);
+  const [profile, setProfile] = useState<WorldProfile | null>(null);
+  const [building, setBuilding] = useState<{ stage: string; done: number; total: number } | null>(null);
+  const [worldPins, setWorldPins] = useState<AtlasPin[]>([]);
+  useEffect(() => {
+    if (!worldRow?.done) { setProfile(null); return; }
+    let dead = false;
+    worldProfile(worldRow, book.item).then((p) => !dead && setProfile(p)).catch(() => {});
+    return () => { dead = true; };
+  }, [worldRow?.updatedAt, worldRow?.done]); // eslint-disable-line react-hooks/exhaustive-deps
+  const buildWorld = async () => {
+    if (!loadSection || !sectionCount || building) return;
+    setBuilding({ stage: 'Reading the book', done: 0, total: sectionCount });
+    try {
+      const row = await buildBookWorld(book.bookId, sectionCount, loadSection, allNames, (d, t) => setBuilding({ stage: 'Reading the book', done: d, total: t }));
+      const period = bookPeriod(row, book.item);
+      await resolveBookWorld(row, period.preferred ?? known, book.bookId, (d, t) => setBuilding({ stage: 'Identifying places', done: d, total: t }));
+    } finally { setBuilding(null); }
+  };
+  const showWorld = () => {
+    if (!profile) return;
+    const y = profile.period.preferred ?? profile.period.earliest;
+    if (y !== undefined) setDate({ year: y, approximate: true, source: 'book' });
+    setWorldPins(profile.places.slice(0, 150).map((p) => ({ key: p.key, name: p.title, lat: p.lat, lon: p.lon })));
+    if (profile.bbox) { const b = profile.bbox; const pad: [number, number, number, number] = [b[0] - 0.7, b[1] - 0.7, b[2] + 0.7, b[3] + 0.7]; setView({ lat: (pad[1] + pad[3]) / 2, lon: (pad[0] + pad[2]) / 2, zoom: Math.min(zoomForBBox(pad), 9), bbox: pad }); }
+    // Layers suited to the book's period: datasets whose coverage includes it, plus borders and wars.
+    if (y !== undefined) ensureLayers([...LAYERS.filter((l) => l.coverage && y >= l.coverage[0] && y <= l.coverage[1] && ['places', 'infrastructure'].includes(l.group) && l.defaultOn).map((l) => l.id), 'borders', 'empires', 'kingdoms', 'republics', 'other-states', 'battles', 'sieges']);
+  };
+
   const overlay = useMemo<AtlasOverlay>(() => ({
     route: tab === 'chapter' && chapterPins.route ? chapterPins.pins : undefined,
     routeLine: chapterPins.line,
-    markers: tab === 'chapter' && !chapterPins.route ? chapterPins.pins : tab === 'nearby' ? nearbyPins : undefined,
+    markers: tab === 'chapter' && !chapterPins.route ? chapterPins.pins : tab === 'nearby' ? nearbyPins : tab === 'world' ? worldPins : undefined,
     circle: tab === 'nearby' && place ? { lat: place.lat, lon: place.lon, km: radiusMi * 1.609344 } : undefined,
-  }), [tab, chapterPins, nearbyPins, place, radiusMi]);
+  }), [tab, chapterPins, nearbyPins, place, radiusMi, worldPins]);
   const focus = place ? { name: place.title, lat: place.lat, lon: place.lon, certainty: place.certainty } : eventAt ? { name: eventAt.n, lat: eventAt.pos[1], lon: eventAt.pos[0], certainty: 'known' as const } : undefined;
 
   const pickWar = (q: string, name: string) => { setWar({ q, name }); ensureLayers(['wars', 'battles', 'sieges']); setTab('events'); };
@@ -193,12 +250,12 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
             <button type="button" className="btn sm ghost" onClick={() => setSaving(null)}>Cancel</button>
           </form>
         )}
-        <AtlasMap view={view} year={year} onYearChange={setYear} focus={focus} marks={marks} overlay={overlay}
+        <AtlasMap view={view} year={year} onYearChange={setYear} focus={focus} marks={marks} overlay={overlay} mapOverlays={overlayImages}
           war={war?.q} onWarChange={(q) => setWar(q ? { q, name: war?.q === q ? war.name : '' } : undefined)}
           onReady={(m) => { mapRef.current = m; }} onLayersChange={setLayers} layersRequest={layersRequest}
           onPickPlace={(p) => openKey(p.key, p.name, 'map')}
           onPickEvent={(q) => { setEventQ(q); setTab('events'); }}
-          onPickMarker={(key) => { const pin = [...chapterPins.pins, ...nearbyPins].find((p) => p.key === key); if (pin) openKey(key, pin.name, tab === 'chapter' ? 'cue' : 'map'); }} />
+          onPickMarker={(key) => { const pin = [...chapterPins.pins, ...nearbyPins, ...worldPins].find((p) => p.key === key); if (pin) openKey(key, pin.name, tab === 'chapter' || tab === 'world' ? 'cue' : 'map'); }} />
 
         <LookingAtCard at={at} year={year} open={lookOpen} setOpen={setLookOpen} />
         {!place && !eventAt && lookOpen && <button className="btn xs" style={{ alignSelf: 'flex-start' }} onClick={describeCentre}>Describe the map centre</button>}
@@ -223,9 +280,10 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
                   onOpenPlace={(k, n) => openKey(k, n)} onEvent={(q) => { setEventQ(q); setTab('events'); }} onNearby={() => setTab('nearby')}
                   onBookmark={() => setSaving(`${place.title} — ${yearLabel(year)}`)}
                   onNotRight={res && res.candidates.length ? () => setRes({ ...res, place: undefined, status: 'AMBIGUOUS' }) : undefined} />
+                <PlaceWorldExtras place={place} year={year} onOpenMaps={() => setTab('maps')} onOpenPlace={(k, n) => openKey(k, n)} />
                 <details className="card tight">
-                  <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>Compare dates here</summary>
-                  <div className="mt-8"><CompareDates at={{ name: place.title, lat: place.lat, lon: place.lon }} year={year} onShow={(y) => setYear(y)} /></div>
+                  <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>What changed here? Compare two dates</summary>
+                  <div className="mt-8"><WhatChangedPanel at={{ name: place.title, lat: place.lat, lon: place.lon }} year={year} onShow={(y) => setYear(y)} /></div>
                 </details>
               </>
             )}
@@ -266,9 +324,20 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
 
         {tab === 'saved' && (
           <SavedPanel bookId={book.bookId} onOpenBookmark={openBookmark} onJump={onJump}
-            onOpenVisit={(key, name, written) => openKey(key.startsWith('pleiades:') ? key : '', written || name, 'selection')}
+            onOpenVisit={(key, name, written) => openKey(/^(pleiades|viabundus|althurayya):/.test(key) ? key : '', written || name, 'selection')}
             onOpenPlace={(k, n) => openKey(k, n)} />
         )}
+
+        {tab === 'world' && (
+          loadSection && sectionCount
+            ? <BookWorldPanel row={worldRow} profile={profile} building={!!building} progress={building ?? undefined} onBuild={buildWorld} onShow={showWorld} year={year}
+                onOpenPlace={(k, n) => openKey(/^(pleiades|viabundus|althurayya):/.test(k) ? k : '', n, 'cue')} onJumpChapter={onJump} onWar={pickWar} />
+            : <div className="small muted">The world of a book can be built while reading an ebook.</div>
+        )}
+
+        {tab === 'maps' && <MapArchivePanel at={at} year={year} bbox={viewBox} overlays={mapOverlays} setOverlays={setMapOverlays} />}
+
+        {tab === 'data' && <CoveragePanel at={at} year={year} />}
 
         <details className="hmap-sources">
           <summary>About this atlas</summary>
@@ -454,7 +523,7 @@ function EventsPanel({ at, year, chapterText, war, eventQ, findMentions, onJump,
         <div className="eyebrow">Wars in {yearLabel(year)}{at ? ` with battles near ${at.name}` : ''}</div>
         {!at ? <div className="small muted">Choose a place to see conflicts around it.</div> : !near ? <div className="small muted">Loading…</div> : near.length ? near.map((w) => (
           <button key={w.q} className={`atlas-war ${war?.q === w.q ? 'on' : ''}`} onClick={() => onWar(w.q, w.n)}>⚔ {w.n} <span className="faint">{w.events} recorded within 300 mi</span></button>
-        )) : <div className="small muted">None recorded by Wikidata for this year and area.</div>}
+        )) : <><div className="small muted">None recorded by Wikidata for this year and area.</div><EmptyNote type="battles" at={at} year={year} /></>}
       </div>
       <div className="tiny faint">Events come from Wikidata items with a place and a date. Choosing a war adds its battles and sieges to the map as optional layers (turn them off under Layers).</div>
     </div>

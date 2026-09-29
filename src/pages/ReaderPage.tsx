@@ -19,6 +19,7 @@ import { webglAvailable } from '../atlas/AtlasMap';
 import { type GazPlace, gazetteersFor, normName } from '../atlas/gazetteer';
 import { useBookPlaceNames } from '../atlas/readerNames';
 import { type Detection, offlineUnique } from '../atlas/resolve';
+import type { SectionText } from '../world/bookWorld';
 import { recordVisit } from '../atlas/store';
 import { ReaderTools, TOOLS, type ToolState } from '../components/reader-tools';
 import { type DateContext, dateContextFor, detectPlaces } from '../lib/history/placeDetect';
@@ -599,6 +600,35 @@ export default function ReaderPage() {
   };
   refreshMapRef.current = () => { if (mapReqRef.current) refreshPagePlaces(); };
   openEntityRef.current = (h: Hit) => openTool({ tab: 'entity', focus: { name: h.term.name, kind: h.term.kind, conceptId: h.term.conceptId, passage: passageAround(h.range) } });
+
+  /**
+   * Read one section of the book off-screen, for "The world of this book".
+   * The rendition (your page, layout, highlights) is never touched; the
+   * previous section is released before the next is loaded.
+   */
+  const lastSection = useRef<{ unload?: () => void } | null>(null);
+  const loadSection = async (i: number): Promise<SectionText | undefined> => {
+    const book = bookRef.current;
+    const section = book?.spine.get(i) as unknown as { href: string; load: (l: unknown) => Promise<unknown>; unload: () => void; document?: Document; cfiFromRange: (r: Range) => string } | undefined;
+    if (!book || !section) return undefined;
+    lastSection.current?.unload?.();
+    await section.load(book.load.bind(book));
+    lastSection.current = section;
+    const doc = section.document;
+    if (!doc?.body) return undefined;
+    const label = flatToc(bookRef.current?.navigation?.toc ?? []).find((t) => t.href.split('#')[0].endsWith(section.href.split('/').pop() ?? section.href))?.label.trim();
+    const cfiOf = (name: string) => {
+      const re = new RegExp(`(?<![\\p{L}])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}])`, 'u');
+      const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const m = (n.textContent ?? '').match(re);
+        if (!m || m.index === undefined) continue;
+        try { const r = doc.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); return section.cfiFromRange(r); } catch { return undefined; }
+      }
+      return undefined;
+    };
+    return { href: section.href, label, text: readableText(doc), cfiOf };
+  };
 
   /** Every place a name appears in the chapter, for X-Ray's "Mentions". */
   const findMentions = (name: string) => {
@@ -1229,7 +1259,7 @@ export default function ReaderPage() {
       {mapReq && item && (atlasOk ? (
         <AtlasPanel request={mapReq} wide={wide} onClose={() => setMapReq(null)} pagePlaces={pagePlaces} chapterText={chapterText}
           book={{ bookId: item.id, title: item.title, chapter: chapter || undefined, item }} date={mapDate} setDate={setMapDate}
-          findMentions={findMentions} onJump={(cfi) => { setMapReq(null); jumpTo(cfi); }}
+          findMentions={findMentions} onJump={(cfi) => { setMapReq(null); jumpTo(cfi); }} loadSection={loadSection} sectionCount={(bookRef.current?.spine as unknown as { length?: number } | undefined)?.length}
           position={{ ...posOf(session.current.cfi), cfi: session.current.cfi || undefined }} />
       ) : (
         <HistoricalMapPanel request={mapReq} wide={wide} onClose={() => setMapReq(null)} pagePlaces={pagePlaces} chapterText={chapterText}

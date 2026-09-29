@@ -709,3 +709,30 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .atlas-tl-mark.event { background: #c62828; }
 .atlas-tl-mark.book { background: var(--accent); }
 .atlas-tl-row.wrap { flex-wrap: wrap; }
+
+/* ── Historical World ─────────────────────────────────────────── */
+.atlas-gap { font-size: 12px; line-height: 1.45; color: var(--text-2); background: var(--surface-2); border-radius: 10px; padding: 6px 8px; margin-top: 4px; }
+.atlas-note-box { font-size: 12.5px; line-height: 1.45; background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 8px; padding: 8px 10px; }
+.atlas-maps { display: flex; flex-direction: column; gap: 8px; }
+.atlas-mapcard { display: flex; gap: 10px; align-items: flex-start; padding: 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.atlas-mapthumb { flex: none; width: 84px; height: 84px; padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: var(--surface-2); cursor: pointer; display: grid; place-items: center; }
+.atlas-mapthumb img { width: 100%; height: 100%; object-fit: cover; }
+.map-viewer { position: fixed; inset: 0; z-index: 60; background: #1b1814; color: #f4efe6; display: flex; flex-direction: column; }
+.map-viewer-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(8px + env(safe-area-inset-top)) 10px 8px; }
+.map-viewer-bar .btn { color: #f4efe6; }
+.map-viewer-stage { flex: 1; overflow: hidden; display: grid; place-items: center; touch-action: none; cursor: grab; }
+.map-viewer-stage img { max-width: 100%; max-height: 100%; transform-origin: center; user-select: none; }
+.map-viewer-caption { padding: 8px 12px calc(12px + env(safe-area-inset-bottom)); font-size: 13px; line-height: 1.4; background: rgba(0,0,0,.35); }
+.map-viewer-caption a { color: #f4efe6; text-decoration: underline; }
+.atlas-matrix { display: flex; flex-direction: column; font-size: 11px; overflow-x: auto; }
+.atlas-matrix-row { display: grid; grid-template-columns: 112px repeat(7, minmax(34px, 1fr)); align-items: center; border-bottom: 1px solid var(--border); }
+.atlas-matrix-row > span { padding: 3px 2px; text-align: center; white-space: nowrap; }
+.atlas-matrix-row > span:first-child { text-align: left; white-space: normal; font-weight: 700; }
+.atlas-matrix-row.head > span { font-size: 9.5px; color: var(--text-2); white-space: normal; line-height: 1.15; }
+.atlas-matrix-row > span.now { background: var(--surface-2); }
+.atlas-src-row { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.atlas-src-row a { text-decoration: underline; }
+.atlas-disagree { border: 1px dashed var(--warn, #b26a00); border-radius: 10px; padding: 6px 8px; }
+.atlas-ai { border-left: 3px solid #7e57c2; background: var(--surface-2); border-radius: 8px; padding: 6px 10px; }
+.atlas-bar { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+.atlas-bar > span { display: block; height: 100%; background: var(--accent); }

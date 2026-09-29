@@ -5,7 +5,7 @@ import { regionAt } from './axes';
 import { cellAt } from './coverage';
 import { explainEmpty } from './evidence';
 import { century, circa, formatDate, parseDate, period, relation } from './histdate';
-import { fitOverlay } from './maps';
+import { fitOverlay, overlayFor } from './maps';
 import { SOURCES } from './registry';
 import { selectSources } from './select';
 
@@ -71,5 +71,11 @@ describe('overlaying an original map', () => {
     const bent = gcps.map((g, i) => ({ ...g, geo: [g.geo[0] + (i === 4 ? 0.2 : 0), g.geo[1]] as [number, number] }));
     expect(fitOverlay({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps: bent })!.errorKm).toBeGreaterThan(1);
     expect(fitOverlay({ annotation: 'a', imageService: 'x', width: 10, height: 10, gcps: gcps.slice(0, 3) })).toBeUndefined();
+    // Overlays are refused, with a reason, when too few points or too distorted for their size.
+    expect(overlayFor({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps: gcps.slice(0, 3) })).toMatchObject({ ok: false });
+    const wild = gcps.map((g, i) => ({ ...g, geo: [g.geo[0] + (i === 4 ? 0.6 : 0), g.geo[1]] as [number, number] }));
+    const r = overlayFor({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps: wild });
+    expect(r.ok).toBe(false);
+    expect(overlayFor({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps }).ok).toBe(true);
   });
 });

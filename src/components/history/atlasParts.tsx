@@ -17,6 +17,7 @@ import { parseHistoricalDate } from '../../lib/history/dates';
 import { historicalPlaces } from '../../lib/history/placeService';
 import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
+import { EmptyNote } from './worldParts';
 
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 const polityType = (c?: string) => (c ? ` (${c})` : '');
@@ -85,7 +86,7 @@ export function LookingAtCard({ at, year, open, setOpen }: { at?: { name: string
       {open && at && (
         busy && !la ? <div className="small muted mt-4">Reading the datasets…</div> : la && (
           <ul className="atlas-facts">
-            <li><span>Political entity</span>{la.polities.length ? la.polities.map(polityName).join(' / ') : <i className="faint">none recorded for this spot and year</i>}<small>Cliopatria</small></li>
+            <li><span>Political entity</span>{la.polities.length ? la.polities.map(polityName).join(' / ') : <><i className="faint">none recorded for this spot and year</i><EmptyNote type="political" at={at} year={year} /></>}<small>Cliopatria</small></li>
             {la.regions.length > 0 && <li><span>Region</span>{la.regions.slice(0, 3).join(' · ')}<small>Pleiades</small></li>}
             <li><span>Nearest recorded settlements</span>{la.nearest.length ? la.nearest.map((n) => `${n.place.title} (${kmLabel(n.km)})`).join(', ') : <i className="faint">none dated to this period within 40 mi</i>}<small>Pleiades</small></li>
             {la.wars.length > 0 && <li><span>Conflict nearby in this year</span>{la.wars.map((w) => w.n).join(', ')}<small>Wikidata</small></li>}
@@ -274,7 +275,7 @@ export function EventCard({ q, onShow, mentions, onJump, onWar, onClose }: { q: 
     <div className="card tight">
       <div className="row between"><b>{ev.n}</b><button className="btn xs ghost" onClick={onClose} aria-label="Close">✕</button></div>
       <dl className="hmap-facts">
-        <dt>Date</dt><dd>{yearLabel(ev.y)}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
+        <dt>Date</dt><dd>{yearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
         <dt>Location</dt><dd>{det && det !== 'failed' && det.locationName ? `${det.locationName} · ` : ''}{formatCoords(ev.pos[1], ev.pos[0])}</dd>
         <dt>Type</dt><dd>{ev.k}</dd>
         {ev.wn && <><dt>Part of</dt><dd><button className="why-link" onClick={() => onWar(ev.w!)}>{ev.wn}</button></dd></>}
@@ -363,7 +364,7 @@ export function NearbyPanel({ at, year, radiusMi, setRadiusMi, onResults, onOpen
             </button>
           ))}
           {shown.length > 60 && <div className="tiny faint">…and {shown.length - 60} more on the map.</div>}
-          {!shown.length && <div className="small muted">None recorded in this radius.</div>}
+          {!shown.length && <><div className="small muted">None recorded in this radius.</div><EmptyNote type="settlements" at={at} year={year} /></>}
           {unnamed > 0 && <div className="tiny faint">{unnamed} unnamed site{unnamed === 1 ? '' : 's'} (recorded by Pleiades as “Untitled”) not listed.</div>}
         </div>
       )}
