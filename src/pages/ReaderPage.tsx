@@ -3,13 +3,17 @@
 // Kindle-style extras: fonts, themes, spacing, page numbers, time left
 // (learned from your own reading speed), bookmarks, highlights, notes,
 // dictionary look-up and search inside the book.
+import { useLiveQuery } from 'dexie-react-hooks';
 import type { Book, Contents, Location, NavItem, Rendition } from 'epubjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addNote, logProgress, updateItem } from '../db/actions';
 import { db } from '../db/db';
 import type { Bookmark, Note } from '../db/types';
+import { Icon } from '../components/icons';
+import { ReaderTools, TOOLS, type ToolState } from '../components/reader-tools';
 import { getEbookFile, readerPosKey } from '../lib/ebooks';
+import { buildMatcher, findInDocument, hitAt, type Hit, type Matcher, paintHits, type Term, termsFromConcepts } from '../lib/entityDetect';
 import { CHARS_PER_PAGE, fmtMinutes, readingSpeed, recordReading, resetReadingSpeed } from '../lib/readingSpeed';
 import { useLibrary } from '../state/library';
 import { useUI } from '../state/ui';
@@ -60,9 +64,11 @@ interface Prefs {
   dim: number;
   keepAwake: boolean;
   footer: FooterMode;
+  /** Underline people, places and events you've met before. */
+  entities: boolean;
 }
 const PREFS = 'shelf.readerPrefs';
-const DEFAULT_PREFS: Prefs = { theme: 'white', size: 100, font: 'publisher', spacing: 0, margin: 'normal', align: 'publisher', dim: 0, keepAwake: true, footer: 'page' };
+const DEFAULT_PREFS: Prefs = { theme: 'white', size: 100, font: 'publisher', spacing: 0, margin: 'normal', align: 'publisher', dim: 0, keepAwake: true, footer: 'page', entities: true };
 
 function loadPrefs(): Prefs {
   try {
@@ -88,7 +94,8 @@ function readerCss(p: Prefs): string {
     a, a:link, a:visited { color: inherit !important; text-decoration: none !important; }
     sup a, a sup { color: ${t.muted} !important; }
     img, svg, video { max-width: 100% !important; max-height: 92vh !important; height: auto; object-fit: contain; }
-    ::selection { background: rgba(237, 161, 0, 0.35); }`;
+    ::selection { background: rgba(237, 161, 0, 0.35); }
+    ::highlight(shelf-entity) { text-decoration: underline dotted rgba(200, 121, 58, 0.85); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }`;
   if (font?.css) css += `\n    body, ${text}, body a { font-family: ${font.css} !important; }`;
   if (p.spacing) css += `\n    body, body p, body li, body blockquote, body div { line-height: ${p.spacing} !important; }`;
   if (p.align === 'justify') css += '\n    body p { text-align: justify !important; hyphens: auto; -webkit-hyphens: auto; }';
@@ -256,6 +263,21 @@ export default function ReaderPage() {
   const [search, setSearch] = useState<{ q: string; results: { cfi: string; excerpt: string; chapter: string }[]; done: boolean; progress: number } | null>(null);
   const searchToken = useRef(0);
   const [isFull, setIsFull] = useState(!!document.fullscreenElement);
+  // Ask AI / Map / Images / Explore, opened over the book.
+  const [tool, setTool] = useState<ToolState | null>(null);
+  const [found, setFound] = useState<{ page: Term[]; chapter: Term[] }>({ page: [], chapter: [] });
+  const [wide, setWide] = useState(() => window.matchMedia('(min-width: 700px)').matches);
+  const chapterRef = useRef('');
+  chapterRef.current = chapter;
+  const pctRef = useRef<number | undefined>(undefined);
+  pctRef.current = pct;
+  // Recognised names in each loaded chapter, and the names to look for.
+  const hitsRef = useRef(new Map<Document, Hit[]>());
+  const matcherRef = useRef<Matcher | null>(null);
+  const toolRef = useRef<ToolState | null>(null);
+  toolRef.current = tool;
+  const openEntityRef = useRef<(h: Hit) => void>(() => {});
+  const refreshToolRef = useRef<() => void>(() => {});
 
   // Reading-time accounting for the automatic session.
   const session = useRef({ startPct: 0, lastPct: 0, activeMs: 0, lastTick: Date.now(), startedAt: Date.now(), cfi: '' });
@@ -307,6 +329,76 @@ export default function ReaderPage() {
     if (a && r) setTimeout(() => { if (rendRef.current === r) r.display(a); }, delay);
   };
 
+  /** Find and underline known names in one loaded chapter. */
+  const detectIn = (c: Contents) => {
+    const doc = c.document;
+    if (!doc) return;
+    const m = prefsRef.current.entities ? matcherRef.current : null;
+    let hits: Hit[] = [];
+    try { hits = m ? findInDocument(doc, m) : []; } catch { hits = []; }
+    hitsRef.current.set(doc, hits);
+    try { paintHits(c.window, hits); } catch { /* highlights unsupported */ }
+  };
+
+  /** What the tools may see: this page, the chapter name, your selection. */
+  const snapshot = () => {
+    const r = rendRef.current;
+    const it = idxRef.current.items.get(id!);
+    const loc = r?.currentLocation() as unknown as Location | undefined;
+    let pageText = '';
+    let pageRange: Range | undefined;
+    let doc: Document | undefined;
+    if (r && loc?.start) {
+      for (const c of r.getContents() as unknown as Contents[]) {
+        try {
+          const a = c.range(loc.start.cfi);
+          const b = c.range(loc.end.cfi);
+          if (!a || !b) continue;
+          pageRange = c.document.createRange();
+          pageRange.setStart(a.startContainer, a.startOffset);
+          pageRange.setEnd(b.endContainer, b.endOffset);
+          pageText = pageRange.toString().replace(/\s+/g, ' ').trim();
+          doc = c.document;
+          break;
+        } catch { /* try the next view */ }
+      }
+    }
+    const hits = doc ? hitsRef.current.get(doc) ?? [] : [];
+    const onPage = pageRange ? hits.filter((h) => { try { return pageRange!.compareBoundaryPoints(Range.START_TO_START, h.range) <= 0 && pageRange!.compareBoundaryPoints(Range.END_TO_END, h.range) >= 0; } catch { return false; } }) : [];
+    const p = pctRef.current;
+    return {
+      ctx: { itemId: id!, title: it?.title ?? '', author: it ? idxRef.current.authorLine(it) : '', chapter: chapterRef.current || undefined, pageText, position: p !== undefined ? `${Math.round(p * 100)}%` : undefined },
+      found: { page: onPage.map((h) => h.term), chapter: hits.map((h) => h.term) },
+      href: loc?.start?.href,
+      doc,
+    };
+  };
+  const [toolHref, setToolHref] = useState<string | undefined>();
+  const openTool = (patch: Omit<ToolState, 'ctx'> & { selection?: string }) => {
+    const snap = snapshot();
+    const { selection: sel, ...rest } = patch;
+    setFound(snap.found);
+    setToolHref(snap.href);
+    setTool({ ...rest, ctx: { ...snap.ctx, selection: sel } });
+    setPanel(null);
+    setHint(false);
+  };
+  openEntityRef.current = (h: Hit) => openTool({ tab: 'entity', focus: { name: h.term.name, kind: h.term.kind, conceptId: h.term.conceptId } });
+  // With the side panel open on a big screen, the tools follow your page.
+  refreshToolRef.current = () => {
+    const cur = toolRef.current;
+    if (!cur) return;
+    const snap = snapshot();
+    setFound(snap.found);
+    setToolHref(snap.href);
+    setTool({ ...cur, ctx: { ...snap.ctx, selection: cur.ctx.selection } });
+  };
+  const chapterText = () => {
+    const r = rendRef.current;
+    const c = (r?.getContents() as unknown as Contents[] | undefined)?.[0];
+    return c?.document?.body?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+  };
+
   const indexLocations = (book: Book) => {
     try {
       const cfis = JSON.parse(book.locations.save()) as string[];
@@ -342,6 +434,7 @@ export default function ReaderPage() {
             }
           }
           styleContents(contents, prefsRef.current);
+          detectIn(contents);
         });
         applyTheme(rendition, prefsRef.current);
         setToc((await book.loaded.navigation).toc);
@@ -385,9 +478,14 @@ export default function ReaderPage() {
           const text = contents.window.getSelection()?.toString().trim() ?? '';
           if (text) { setSelection({ cfi, text, contents }); setNoteDraft(null); setDefine(null); }
         });
-        rendition.on('click', () => {
+        rendition.on('click', (e: MouseEvent) => {
           const all = rendition.getContents() as unknown as Contents[];
           if (all.some((c) => c.window.getSelection()?.toString())) return;
+          // Tapped an underlined name? Show who or what it is.
+          const doc = (e.target as Node | null)?.ownerDocument ?? (e.target as Document | null);
+          const hits = doc ? hitsRef.current.get(doc) : undefined;
+          const h = doc && hits?.length ? hitAt(doc, hits, e.clientX, e.clientY) : undefined;
+          if (h) { openEntityRef.current(h); return; }
           setHint(false);
           setPanel((p) => {
             if (!p) setChrome((c) => !c);
@@ -474,6 +572,7 @@ export default function ReaderPage() {
       setSelection(null);
       setDefine(null);
       setNoteDraft(null);
+      setTimeout(() => refreshToolRef.current(), 0);
     }
 
     const onHide = () => { if (document.visibilityState === 'hidden') flush(); else { session.current.lastTick = Date.now(); run.current.lastAt = Date.now(); } };
@@ -510,6 +609,28 @@ export default function ReaderPage() {
     ro.observe(el);
     return () => { ro.disconnect(); clearTimeout(t); };
   }, [status]);
+
+  // Names to recognise: your Knowledge Atlas plus names found in this book.
+  const cachedNames = useLiveQuery(() => db.entityCache.where('itemId').equals(id!).toArray(), [id]);
+  const terms = useMemo(() => [
+    ...termsFromConcepts(idx.snap.concepts),
+    ...(cachedNames ?? []).flatMap((row) => row.names.map((n) => ({ name: n.name, kind: n.kind, conceptId: n.conceptId }))),
+  ], [idx.snap.concepts, cachedNames]);
+  const termsKey = terms.map((t) => t.name).join('|');
+  useEffect(() => {
+    matcherRef.current = buildMatcher(terms);
+    const r = rendRef.current;
+    if (!r || status !== 'ready') return;
+    for (const c of r.getContents() as unknown as Contents[]) detectIn(c);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [termsKey, prefs.entities, status]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 700px)');
+    const f = () => setWide(mq.matches);
+    mq.addEventListener('change', f);
+    return () => mq.removeEventListener('change', f);
+  }, []);
 
   // Apply display preferences.
   useEffect(() => {
@@ -687,6 +808,8 @@ export default function ReaderPage() {
   };
 
   const iconBtn = { color: t.fg, minWidth: 40 } as const;
+  const sidePanel = wide && !!tool;
+  const SIDE_W = 'min(420px, 46vw)';
   const bar = { position: 'absolute', left: 0, right: 0, zIndex: 6, background: t.panel, color: t.fg, boxShadow: '0 2px 18px rgba(0,0,0,0.18)' } as const;
   const TOP = 'calc(34px + env(safe-area-inset-top))';
   const BOTTOM = 'calc(30px + env(safe-area-inset-bottom))';
@@ -700,11 +823,11 @@ export default function ReaderPage() {
       {hereMark && <div aria-label="Bookmarked" style={{ position: 'absolute', top: 0, right: 18, width: 16, height: 30, background: '#d9534f', clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%)', zIndex: 4 }} />}
 
       {/* The book. */}
-      <div ref={host} style={{ position: 'absolute', top: TOP, bottom: BOTTOM, left: MARGINS[prefs.margin], right: MARGINS[prefs.margin], overflow: 'hidden' }} />
+      <div ref={host} style={{ position: 'absolute', top: TOP, bottom: BOTTOM, left: MARGINS[prefs.margin], right: sidePanel ? `calc(${SIDE_W} + ${MARGINS[prefs.margin]}px)` : MARGINS[prefs.margin], overflow: 'hidden' }} />
       {status === 'ready' && (
         <>
           <button aria-label="Previous page" onClick={() => { setPanel(null); setChrome(false); setHint(false); userNav.current = true; rendRef.current?.prev(); }} style={{ position: 'absolute', left: 0, top: TOP, bottom: BOTTOM, width: '22%', background: 'transparent', border: 0, zIndex: 2 }} />
-          <button aria-label="Next page" onClick={() => { setPanel(null); setChrome(false); setHint(false); userNav.current = true; rendRef.current?.next(); }} style={{ position: 'absolute', right: 0, top: TOP, bottom: BOTTOM, width: '22%', background: 'transparent', border: 0, zIndex: 2 }} />
+          <button aria-label="Next page" onClick={() => { setPanel(null); setChrome(false); setHint(false); userNav.current = true; rendRef.current?.next(); }} style={{ position: 'absolute', right: sidePanel ? SIDE_W : 0, top: TOP, bottom: BOTTOM, width: '22%', background: 'transparent', border: 0, zIndex: 2 }} />
         </>
       )}
 
@@ -716,7 +839,7 @@ export default function ReaderPage() {
 
       {hint && !chrome && !panel && status === 'ready' && (
         <div style={{ position: 'absolute', left: '50%', top: '42%', transform: 'translate(-50%, -50%)', width: 'max-content', maxWidth: '80%', background: 'rgba(20,20,20,0.82)', color: '#fff', padding: '12px 18px', borderRadius: 16, fontSize: 14, lineHeight: 1.45, zIndex: 7, pointerEvents: 'none', textAlign: 'center' }}>
-          Tap the <b>middle</b> of the page for menus.<br />Tap the <b>sides</b> or swipe to turn pages.
+          Tap the <b>middle</b> of the page for menus.<br />Tap the <b>sides</b> or swipe to turn pages.<br />Tap <u style={{ textDecorationStyle: 'dotted' }}>underlined</u> names to explore them.
         </div>
       )}
       {prefs.dim > 0 && <div style={{ position: 'absolute', inset: 0, background: '#000', opacity: prefs.dim, pointerEvents: 'none', zIndex: 5 }} />}
@@ -739,6 +862,11 @@ export default function ReaderPage() {
             </div>
           </div>
           <div style={{ ...bar, bottom: 0, paddingBottom: 'calc(10px + env(safe-area-inset-bottom))' }}>
+            {!wide && (
+              <div className="reader-toolrow" role="toolbar" aria-label="Reading tools" style={{ borderBottom: `1px solid ${t.line}`, paddingBottom: 6 }}>
+                {TOOLS.map((x) => <button key={x.id} style={{ color: t.fg }} onClick={() => openTool({ tab: x.id })}><Icon name={x.icon} />{x.label}</button>)}
+              </div>
+            )}
             <div style={{ padding: '10px 16px 0' }}>
               {jumpBack && <div className="row" style={{ justifyContent: 'center', marginBottom: 8 }}><button className="btn sm" onClick={() => { const b = jumpBack; setJumpBack(null); jumping.current = true; userNav.current = true; rendRef.current?.display(b); }}>↩ Back to where you were</button></div>}
               <div className="row between small" style={{ marginBottom: 4, gap: 12 }}>
@@ -761,6 +889,20 @@ export default function ReaderPage() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Reading tools: a side toolbar on big screens. */}
+      {wide && status === 'ready' && (chrome || tool) && !panel && (
+        <div className="reader-vbar" role="toolbar" aria-label="Reading tools" style={{ background: t.panel, right: sidePanel ? `calc(${SIDE_W} + 8px)` : 8 }}>
+          {TOOLS.map((x) => <button key={x.id} style={{ color: tool?.tab === x.id ? '#c8793a' : t.fg }} onClick={() => (tool ? setTool({ ...tool, tab: x.id, mode: undefined }) : openTool({ tab: x.id }))}><Icon name={x.icon} />{x.label}</button>)}
+        </div>
+      )}
+      {tool && !wide && <div onClick={() => setTool(null)} style={{ position: 'absolute', inset: 0, zIndex: 11, background: 'rgba(0,0,0,0.3)' }} />}
+      {tool && (
+        <div className={`reader-tool-sheet ${wide ? 'side' : 'bottom'}`} role="dialog" aria-label="Reading tools">
+          {!wide && <div className="sheet-handle" style={{ margin: '0 auto 10px' }} />}
+          <ReaderTools state={tool} setState={setTool} onClose={() => setTool(null)} found={found} chapterText={chapterText} chapterHref={toolHref} />
+        </div>
       )}
 
       {/* Selection actions. */}
@@ -791,6 +933,8 @@ export default function ReaderPage() {
           ) : (
             <div className="row wrap" style={{ gap: 4 }}>
               <button className="btn sm primary" onClick={() => saveHighlight()}>❝ Save quote</button>
+              <button className="btn sm ai-solid" onClick={() => { const text = selection.text; clearSelection(); openTool({ tab: 'ai', selection: text }); }}>✨ Ask AI</button>
+              {selection.text.split(/\s+/).length <= 6 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); clearSelection(); openTool({ tab: 'entity', focus: { name: text } }); }}>🧭 Explore</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setNoteDraft('')}>✎ Note</button>
               {selection.text.split(/\s+/).length <= 3 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={lookUpSelection}>📖 Define</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { navigator.clipboard?.writeText(selection.text).then(() => toast('Copied')).catch(() => {}); clearSelection(); }}>Copy</button>
@@ -944,6 +1088,10 @@ function DisplaySettings({ prefs, setPrefs, t, speed, isFull }: { prefs: Prefs; 
       </div>
 
       <div style={label}>More</div>
+      <label className="row between" style={{ padding: '6px 0' }}>
+        <span className="small">Underline people, places & events I’ve met</span>
+        <input type="checkbox" checked={prefs.entities} onChange={(e) => set({ entities: e.target.checked })} />
+      </label>
       <label className="row between" style={{ padding: '6px 0' }}>
         <span className="small">Keep screen on while reading</span>
         <input type="checkbox" checked={prefs.keepAwake} onChange={(e) => set({ keepAwake: e.target.checked })} />

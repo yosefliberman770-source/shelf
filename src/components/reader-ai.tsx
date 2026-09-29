@@ -23,6 +23,8 @@ export interface ReadingContext {
   chapter?: string;
   pageText: string;
   selection?: string;
+  /** A person, place, event or idea the question is about. */
+  focus?: string;
   position?: string;
 }
 
@@ -53,7 +55,7 @@ interface Turn { q: string; mode: AIMode; target: string; answer?: AIAnswer; aiI
 const SHAPE = `Return JSON: {"answer":"markdown answer","related":{"people":["full names"],"places":["names"],"events":["names"],"concepts":["short names"]},"books":[{"title":"...","author":"...","why":"one line"}]}. "related" lists only things actually relevant to the answer (at most 6 each). "books": up to 4 well-known real books worth reading on this, or [] if unsure.`;
 
 function buildPrompt(ctx: ReadingContext, mode: AIMode, question: string): string {
-  const target = ctx.selection ? 'the selected text' : 'the page I’m reading';
+  const target = ctx.focus ? `“${ctx.focus}” (as it relates to this book and page)` : ctx.selection ? 'the selected text' : 'the page I’m reading';
   const ask = mode === 'ask' ? question : MODES.find((m) => m.id === mode)!.prompt.replace('{T}', target) + (question ? `\n\nMy question: ${question}` : '');
   return [
     `BOOK: "${ctx.title}" by ${ctx.author}${ctx.chapter ? ` — chapter: ${ctx.chapter}` : ''}${ctx.position ? ` (reader is ${ctx.position} through)` : ''}`,
@@ -75,7 +77,7 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
 
   const ask = async (mode: AIMode, question = '') => {
     const q = mode === 'ask' ? question : `${MODES.find((m) => m.id === mode)!.label.replace('⚡ ', '')}${question ? `: ${question}` : ''}`;
-    const turn: Turn = { q, mode, target: ctx.selection ? `“${ctx.selection.slice(0, 80)}${ctx.selection.length > 80 ? '…' : ''}”` : 'this page' };
+    const turn: Turn = { q, mode, target: ctx.focus ? ctx.focus : ctx.selection ? `“${ctx.selection.slice(0, 80)}${ctx.selection.length > 80 ? '…' : ''}”` : 'this page' };
     setTurns((t) => [...t, turn]);
     setText('');
     const history = turns.filter((t) => t.answer).slice(-2).map((t) => `Earlier Q: ${t.q}\nEarlier A: ${t.answer!.answer.slice(0, 600)}`).join('\n\n');
@@ -92,7 +94,7 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
   return (
     <div className="col gap-12">
       <div className="small muted">
-        {ctx.selection ? <>About your selection: <i>“{ctx.selection.slice(0, 120)}{ctx.selection.length > 120 ? '…' : ''}”</i></> : <>About this page{ctx.chapter ? ` in “${ctx.chapter}”` : ''}. Select text first to ask about a specific passage.</>}
+        {ctx.focus ? <>About <b>{ctx.focus}</b>, in the context of this book.</> : ctx.selection ? <>About your selection: <i>“{ctx.selection.slice(0, 120)}{ctx.selection.length > 120 ? '…' : ''}”</i></> : <>About this page{ctx.chapter ? ` in “${ctx.chapter}”` : ''}. Select text first to ask about a specific passage.</>}
       </div>
       <div className="chips-scroll" role="toolbar" aria-label="Question types">
         {MODES.map((m) => <button key={m.id} className={`chip ${m.id === 'summary' ? 'accent' : ''}`} style={{ minHeight: 34 }} disabled={loading} onClick={() => ask(m.id)}>{m.label}</button>)}
@@ -101,7 +103,7 @@ export function ReaderAI({ ctx, initialMode, onEntity, compact }: { ctx: Reading
       {loading && <div className="msg ai faint">Thinking…</div>}
       <AIErrorNotice error={error} />
       <form className="row" onSubmit={(e) => { e.preventDefault(); if (text.trim()) ask('ask', text.trim()); }}>
-        <input className="input" style={{ borderRadius: 999 }} placeholder={ctx.selection ? 'Ask about the selection…' : 'Ask anything about this page…'} value={text} onChange={(e) => setText(e.target.value)} aria-label="Your question" />
+        <input className="input" style={{ borderRadius: 999 }} placeholder={ctx.focus ? `Ask about ${ctx.focus}…` : ctx.selection ? 'Ask about the selection…' : 'Ask anything about this page…'} value={text} onChange={(e) => setText(e.target.value)} aria-label="Your question" />
         <button className="btn ai-solid icon round" disabled={loading || !text.trim()} aria-label="Ask"><Icon name="send" /></button>
       </form>
       {!compact && <p className="tiny faint">Shares only the book title, chapter, this page{ctx.selection ? ' and your selection' : ''} — never the whole book.</p>}

@@ -73,7 +73,18 @@ export const wikidata: EntityProvider = {
     const time = (p: string) => parseTime(claim<{ time: string; precision: number }>(c, p));
     const start = time('P569').year !== undefined ? time('P569') : time('P580').year !== undefined ? time('P580') : time('P571').year !== undefined ? time('P571') : time('P585');
     const end = time('P570').year !== undefined ? time('P570') : time('P582').year !== undefined ? time('P582') : time('P576');
-    const coord = claim<{ latitude: number; longitude: number }>(c, 'P625');
+    let coord = claim<{ latitude: number; longitude: number }>(c, 'P625');
+    // Events usually name where they happened (P276) rather than a coordinate.
+    const where = claim<{ id: string }>(c, 'P276')?.id;
+    if (!coord && where) {
+      try {
+        const lr = await fetch(`${WD}/wiki/Special:EntityData/${where}.json`, { signal });
+        if (lr.ok) {
+          const lj = (await lr.json()) as { entities: Record<string, { claims: Claims }> };
+          coord = claim<{ latitude: number; longitude: number }>(Object.values(lj.entities)[0]?.claims ?? {}, 'P625');
+        }
+      } catch { /* no location */ }
+    }
     if (kind === 'concept' && time('P569').year !== undefined) kind = 'person';
     else if (kind === 'concept' && coord && time('P585').year !== undefined) kind = 'event';
     else if (kind === 'concept' && coord) kind = 'place';

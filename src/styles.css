@@ -578,3 +578,35 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 @media (max-width: 860px) {
   .search-trigger .kbd { display: none; }
 }
+
+/* ── Historical Atlas ─────────────────────────────────────────── */
+.atlas-map { width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #cfdde0; z-index: 0; }
+.atlas-map .leaflet-control-attribution { font-size: 9.5px; }
+.atlas-pin span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 2px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 15px; }
+.atlas-pin span.on { border-color: var(--accent); transform: scale(1.25); background: var(--accent-soft, #fbe8dc); }
+.atlas-time { display: flex; flex-direction: column; gap: 6px; }
+.leaflet-popup-content { font-family: var(--font-ui, inherit); font-size: 13px; }
+
+/* ── Visual Explorer ──────────────────────────────────────────── */
+.visual-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 560px) { .visual-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.visual-cell { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; text-align: left; padding: 6px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font: inherit; cursor: pointer; min-width: 0; }
+.visual-cell img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: var(--surface-2); }
+.visual-cell .ellipsis { max-width: 100%; }
+
+/* ── Reader tools ─────────────────────────────────────────────── */
+.why-link { background: none; border: 0; padding: 0; font: inherit; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; font-weight: 700; }
+.tool-tabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.tool-tabs button { flex: 1; min-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 4px; border: 0; border-radius: 12px; background: transparent; color: var(--text-2); font: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer; }
+.tool-tabs button svg { width: 20px; height: 20px; }
+.tool-tabs button.on { background: var(--surface-2); color: var(--text); }
+.reader-tool-sheet { position: absolute; z-index: 12; background: var(--bg); color: var(--text); overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px calc(18px + env(safe-area-inset-bottom)); font-family: var(--font-ui, inherit); }
+.reader-tool-sheet.bottom { left: 0; right: 0; bottom: 0; max-height: 86%; min-height: 55%; border-radius: 22px 22px 0 0; box-shadow: 0 -8px 34px rgba(0,0,0,.28); }
+.reader-tool-sheet.side { top: 0; right: 0; bottom: 0; width: min(420px, 46vw); border-left: 1px solid var(--border); box-shadow: -8px 0 30px rgba(0,0,0,.14); padding-top: calc(12px + env(safe-area-inset-top)); }
+.reader-toolrow { display: flex; justify-content: space-around; gap: 4px; padding: 6px 8px 0; }
+.reader-toolrow button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border: 0; background: transparent; font: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer; border-radius: 12px; }
+.reader-toolrow button svg { width: 22px; height: 22px; }
+.reader-vbar { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); z-index: 7; display: flex; flex-direction: column; gap: 6px; padding: 6px; border-radius: 18px; box-shadow: 0 4px 22px rgba(0,0,0,.2); }
+.reader-vbar button { width: 56px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 0; background: transparent; font: inherit; font-size: 10.5px; font-weight: 800; cursor: pointer; border-radius: 12px; }
+.reader-vbar button svg { width: 22px; height: 22px; }
+.reader-tool-sheet .sheet-handle { display: block; width: 44px; height: 5px; border-radius: 5px; background: var(--border-strong); }
