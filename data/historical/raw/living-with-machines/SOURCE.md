@@ -8,7 +8,7 @@
 - **Geographic coverage:** England, Wales and Scotland.
 - **Historical date range:** Ordnance Survey six-inch 2nd edition maps, 1888–1913.
 - **Download date:** 2026-09-29
-- **Total size:** 466.5 MB in 8 files
+- **Total size:** 5.1 GB in 11 files
 
 ## What it contains
 
@@ -27,9 +27,10 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 | `original/annotations-2024_zenodo-11241371/annots_building_georeferenced.csv` | 40.6 MB | no | https://zenodo.org/api/records/11241371/files/annots_building_georeferenced.csv/content | `add9efc59b38fb2f0a7f5a4962212c2b3516a9cb014bc5af3352570e5747be25` |
 | `original/annotations-2024_zenodo-11241371/annots_railspace_all.csv` | 7.5 MB | yes | https://zenodo.org/api/records/11241371/files/annots_railspace_all.csv/content | `438aac9e17ad29dfcb42a1332d9fdfaa696ccc2320c55253a7ed3da7cd9c6730` |
 | `original/annotations-2024_zenodo-11241371/annots_railspace_all_georeferenced.csv` | 37.2 MB | no | https://zenodo.org/api/records/11241371/files/annots_railspace_all_georeferenced.csv/content | `53d4ff2d354b639c9782cc373edd58e96491f3b17d0fe588501c7d435f063ef8` |
+| `original/railspace-v2_zenodo-14522926/post_processed_railspace_predictions_patch_df.csv` | 344.2 MB | no | https://zenodo.org/api/records/14522926/files/post_processed_railspace_predictions_patch_df.csv/content | `26a075bc08ba51c0024c214b5a27a85b289e17c8ce786cd7daf53bd3dd4c51bf` |
 | `original/railspace-v2_zenodo-14522926/railspace_predictions_patch_df.csv` | 329.4 MB | no | https://zenodo.org/api/records/14522926/files/railspace_predictions_patch_df.csv/content | `9727e5d6423d256b76ca7c5cf83f9e1998bcdd7bac0c3814341435630bd17329` |
-
-**Not yet downloaded:** `original/railspace-v2_zenodo-14522926/post_processed_railspace_predictions_patch_df.csv`, `original/sigspatial-2022_zenodo-7147906/README`, `original/sigspatial-2022_zenodo-7147906/MapReader_Data_SIGSPATIAL_2022.zip`
+| `original/sigspatial-2022_zenodo-7147906/MapReader_Data_SIGSPATIAL_2022.zip` | 4.3 GB | no | https://zenodo.org/api/records/7147906/files/MapReader_Data_SIGSPATIAL_2022.zip/content | `9aa4682f949064b73326d1663ba266136c932060321037da6a465059d2ea4b15` |
+| `original/sigspatial-2022_zenodo-7147906/README` | 143 bytes | yes | https://zenodo.org/api/records/7147906/files/README/content | `43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da` |
 
 ## How to cite
 

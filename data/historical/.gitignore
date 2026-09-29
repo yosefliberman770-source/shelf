@@ -16,6 +16,10 @@ raw/*/nightly-export/**
 !raw/al-thurayya/original/master/regions.json
 !raw/al-thurayya/original/master/routes.json
 !raw/al-thurayya/original/master/routes_full.json
+!raw/cshapes/original/CShapes-2.0.zip
+!raw/cshapes/original/CShapes-2.0_Codebook.pdf
+!raw/cshapes/original/CShapes-Europe.geojson
+!raw/cshapes/original/ChangeLog.txt
 !raw/historic-england/original/Battlefields.gpkg
 !raw/historic-england/original/Parks_and_Gardens.gpkg
 !raw/historic-england/original/Protected_Wreck_Sites.gpkg
@@ -32,6 +36,11 @@ raw/*/nightly-export/**
 !raw/living-with-machines/original/annotations-2024_zenodo-11241371/annots_all.csv
 !raw/living-with-machines/original/annotations-2024_zenodo-11241371/annots_building.csv
 !raw/living-with-machines/original/annotations-2024_zenodo-11241371/annots_railspace_all.csv
+!raw/living-with-machines/original/sigspatial-2022_zenodo-7147906/README
+!raw/pleiades/original/dumps/README.txt
+!raw/pleiades/original/dumps/pleiades-names-20260929.csv.gz
+!raw/pleiades/original/dumps/pleiades-places-20260929.csv.gz
+!raw/pleiades/original/json/pleiades-errata-20260929.json.gz
 !raw/tribal-hidage/original/Individuals_Data.csv
 !raw/tribal-hidage/original/Objects_Data.csv
 !raw/tribal-hidage/original/Sites_data.csv

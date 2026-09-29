@@ -59,6 +59,48 @@
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
  },
+ "cshapes/original/CShapes-2.0.csv": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
+  "bytes": 44501172,
+  "sha256": "e78d0b3a40605631f5a136c6155e0dd5290996c59765999e159385fdeaf7b157",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.geojson": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson",
+  "bytes": 26344671,
+  "sha256": "384b1ea90b9419f30a858d7ec237c85a22c60d1b35b5f85f215a1204f9989d42",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.txt": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.txt",
+  "bytes": 44501140,
+  "sha256": "5e5e5d328666b74270944dd41ee40b4196bf3e5152ede8353a84d1282eb19533",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.zip": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.zip",
+  "bytes": 13009920,
+  "sha256": "7048e08742648c8ed5a99454bba17de845746e90035c23d5efcf6d1751f3deb6",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0_Codebook.pdf": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0_Codebook.pdf",
+  "bytes": 120346,
+  "sha256": "e132b84d6df02b58eef3c10845ca2b87b1816fa18c5b4a64104cc124afa3ebbd",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-Europe.geojson": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-Europe.geojson",
+  "bytes": 4574391,
+  "sha256": "9831764d2ad17e37bc009031829265621534de097f7b3e8d6928d1a828436279",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/ChangeLog.txt": {
+  "url": "https://icr.ethz.ch/data/cshapes/ChangeLog.txt",
+  "bytes": 3722,
+  "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
+  "downloaded": "2026-09-29"
+ },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
   "bytes": 630784,
@@ -215,16 +257,70 @@
   "sha256": "53d4ff2d354b639c9782cc373edd58e96491f3b17d0fe588501c7d435f063ef8",
   "downloaded": "2026-09-29"
  },
+ "living-with-machines/original/railspace-v2_zenodo-14522926/post_processed_railspace_predictions_patch_df.csv": {
+  "url": "https://zenodo.org/api/records/14522926/files/post_processed_railspace_predictions_patch_df.csv/content",
+  "bytes": 360897240,
+  "sha256": "26a075bc08ba51c0024c214b5a27a85b289e17c8ce786cd7daf53bd3dd4c51bf",
+  "downloaded": "2026-09-29"
+ },
  "living-with-machines/original/railspace-v2_zenodo-14522926/railspace_predictions_patch_df.csv": {
   "url": "https://zenodo.org/api/records/14522926/files/railspace_predictions_patch_df.csv/content",
   "bytes": 345393130,
   "sha256": "9727e5d6423d256b76ca7c5cf83f9e1998bcdd7bac0c3814341435630bd17329",
   "downloaded": "2026-09-29"
  },
+ "living-with-machines/original/sigspatial-2022_zenodo-7147906/MapReader_Data_SIGSPATIAL_2022.zip": {
+  "url": "https://zenodo.org/api/records/7147906/files/MapReader_Data_SIGSPATIAL_2022.zip/content",
+  "bytes": 4605817680,
+  "sha256": "9aa4682f949064b73326d1663ba266136c932060321037da6a465059d2ea4b15",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/sigspatial-2022_zenodo-7147906/README": {
+  "url": "https://zenodo.org/api/records/7147906/files/README/content",
+  "bytes": 143,
+  "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/README.txt": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
+  "bytes": 2042,
+  "sha256": "17f99a59f8d53417ff6fb0c3ff8ebc5184c2ae8a7a466971cf656af24e98c492",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-locations-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-locations-20260929.csv.gz",
+  "bytes": 39551537,
+  "sha256": "92d4dd7cbf1c2a86c025a99334939f836d182730485f5ac1d89a1b972bc5fb3b",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-names-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-names-20260929.csv.gz",
+  "bytes": 3806872,
+  "sha256": "9dded1fa1603a305ac2632022263c45a170c2e1cce7a164dfaf28ed49377a981",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-places-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-places-20260929.csv.gz",
+  "bytes": 6806706,
+  "sha256": "5c9703bfed29de46a54c4a7310fc7fb9459339a5cc537028c073240e5aac84ec",
+  "downloaded": "2026-09-29"
+ },
  "pleiades/original/gis/pleiades_gis_data.zip": {
   "url": "https://atlantides.org/downloads/pleiades/gis/pleiades_gis_data.zip",
   "bytes": 35593577,
   "sha256": "7c0ef2f1483cec0618e0a7c41cfbb15a66307fac46ec5a839fb3672e7eecaf28",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/json/pleiades-errata-20260929.json.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/json/pleiades-errata-20260929.json.gz",
+  "bytes": 84175,
+  "sha256": "25c5648847a034e88c3273e232aefd7ec81c5fb018108f38c89b16afc3a4b001",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/json/pleiades-places-20260929.json.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/json/pleiades-places-20260929.json.gz",
+  "bytes": 136020531,
+  "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
   "downloaded": "2026-09-29"
  },
  "tribal-hidage/original/Individuals_Data.csv": {
