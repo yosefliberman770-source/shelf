@@ -127,7 +127,8 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
     {
       id: `${id}-label`, type: 'symbol', source: 'pleiades-places', filter, minzoom: opts.labelZoom ?? 7,
       layout: {
-        'text-field': ['case', ['>=', u(), 1], ['concat', ['get', 'n'], ' ?'], ['get', 'n']],
+        // Pleiades titles unnamed sites "Untitled": keep the dot, skip the label.
+        'text-field': ['case', ['==', ['get', 'n'], 'Untitled'], '', ['>=', u(), 1], ['concat', ['get', 'n'], ' ?'], ['get', 'n']],
         'text-font': FONT,
         'text-size': 11.5, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true,
       },

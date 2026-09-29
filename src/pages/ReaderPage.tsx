@@ -13,9 +13,15 @@ import { db } from '../db/db';
 import type { Bookmark, Note } from '../db/types';
 import { Icon } from '../components/icons';
 import { HistoricalMapPanel, type MapRequest } from '../components/history/HistoricalMapPanel';
+import { AtlasPanel } from '../components/history/AtlasPanel';
+import { PlacePopup } from '../components/history/PlacePopup';
+import { webglAvailable } from '../atlas/AtlasMap';
+import { type GazPlace, gazetteersFor, normName } from '../atlas/gazetteer';
+import { useBookPlaceNames } from '../atlas/readerNames';
+import { type Detection, offlineUnique } from '../atlas/resolve';
+import { recordVisit } from '../atlas/store';
 import { ReaderTools, TOOLS, type ToolState } from '../components/reader-tools';
-import type { DateContext } from '../lib/history/placeDetect';
-import { detectPlaces } from '../lib/history/placeDetect';
+import { type DateContext, dateContextFor, detectPlaces } from '../lib/history/placeDetect';
 import { getEbookFile, readerPosKey } from '../lib/ebooks';
 import { buildMatcher, findInDocument, hitAt, type Hit, type Matcher, paintHits, type Term, termsFromConcepts } from '../lib/entityDetect';
 import { CHARS_PER_PAGE, fmtMinutes, readingSpeed, recordReading, resetReadingSpeed } from '../lib/readingSpeed';
@@ -99,7 +105,8 @@ function readerCss(p: Prefs): string {
     sup a, a sup { color: ${t.muted} !important; }
     img, svg, video { max-width: 100% !important; max-height: 92vh !important; height: auto; object-fit: contain; }
     ::selection { background: rgba(237, 161, 0, 0.35); }
-    ::highlight(shelf-entity) { text-decoration: underline dotted rgba(200, 121, 58, 0.85); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }`;
+    ::highlight(shelf-entity) { text-decoration: underline dotted rgba(200, 121, 58, 0.85); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+    ::highlight(shelf-place) { text-decoration: underline dotted rgba(46, 125, 150, 0.9); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }`;
   if (font?.css) css += `\n    body, ${text}, body a { font-family: ${font.css} !important; }`;
   if (p.spacing) css += `\n    body, body p, body li, body blockquote, body div { line-height: ${p.spacing} !important; }`;
   if (p.align === 'justify') css += '\n    body p { text-align: justify !important; hyphens: auto; -webkit-hyphens: auto; }';
@@ -207,6 +214,9 @@ const BLOCK = /^(P|DIV|H[1-6]|LI|BLOCKQUOTE|TR|TD|TH|DT|DD|SECTION|ARTICLE|HEADE
  * paragraphs kept apart — so "Chapter 2" and "In 1204…" don't run together
  * as "Chapter 2In 1204…", which would hide dates and names.
  */
+/** A place name in the text that one gazetteer place clearly matches. */
+type PlaceHit = Hit & { place: GazPlace };
+
 function readableText(doc: Document, range?: Range): string {
   const root = range ? range.commonAncestorContainer : doc.body;
   const walker = doc.createTreeWalker(root.nodeType === Node.TEXT_NODE ? root.parentNode! : root, NodeFilter.SHOW_TEXT, {
@@ -317,6 +327,16 @@ export default function ReaderPage() {
   const [mapDate, setMapDate] = useState<DateContext | null>(null);
   const mapDateChapter = useRef('');
   const [pagePlaces, setPagePlaces] = useState<{ name: string; passage: string }[]>([]);
+  // Place names in the text that one dataset place clearly matches (tap for a popup).
+  const placeHitsRef = useRef(new Map<Document, PlaceHit[]>());
+  const [placePop, setPlacePop] = useState<{ written: string; place: GazPlace; passage: string; cfi?: string; date: DateContext; detection: Detection } | null>(null);
+  const [atlasOk] = useState(webglAvailable);
+  const placeNames = useBookPlaceNames(id!);
+  const placeNamesRef = useRef(placeNames);
+  placeNamesRef.current = placeNames;
+  const seenPlaces = useRef(new Set<string>());
+  const placePopRef = useRef(placePop);
+  placePopRef.current = placePop;
   const [found, setFound] = useState<{ page: Term[]; chapter: Term[] }>({ page: [], chapter: [] });
   const [wide, setWide] = useState(() => window.matchMedia('(min-width: 700px)').matches);
   const chapterRef = useRef('');
@@ -421,6 +441,77 @@ export default function ReaderPage() {
     try { hits = m ? findInDocument(doc, m) : []; } catch { hits = []; }
     hitsRef.current.set(doc, hits);
     try { paintHits(c.window, hits); } catch { /* highlights unsupported */ }
+    void detectPlacesIn(c);
+  };
+
+  /**
+   * Dotted links under place names — only where the chapter gives a date in a
+   * period a gazetteer covers, the name reads as a place (a place word before
+   * it, or a place you already know), and exactly one recorded place has that
+   * name. Everything else stays plain text.
+   */
+  const detectPlacesIn = async (c: Contents) => {
+    const doc = c.document;
+    if (!doc?.body) return;
+    placeHitsRef.current.delete(doc);
+    try { paintHits(c.window, [], 'shelf-place'); } catch { /* unsupported */ }
+    if (!prefsRef.current.entities) return;
+    const text = readableText(doc);
+    const dc = dateContextFor({ bookId: id!, item: idxRef.current.items.get(id!), chapterText: text });
+    if (dc.year === undefined || !gazetteersFor(dc.year).length) return;
+    const n = placeNamesRef.current;
+    const found = detectPlaces(text, n.known.map((k) => k.name), n.people).map((m) => m.name);
+    if (!found.length) return;
+    const uniq = await offlineUnique(found, dc.year).catch(() => new Map<string, GazPlace>());
+    if (!uniq.size || !doc.body) return;
+    const m = buildMatcher(found.filter((f) => uniq.has(normName(f))).map((name) => ({ name, kind: 'place' as const })));
+    if (!m) return;
+    let hits: PlaceHit[] = [];
+    try { hits = findInDocument(doc, m).map((h) => ({ ...h, place: uniq.get(normName(h.term.name))! })).filter((h) => h.place); } catch { hits = []; }
+    placeHitsRef.current.set(doc, hits);
+    try { paintHits(c.window, hits, 'shelf-place'); } catch { /* unsupported */ }
+    recordPageVisitsRef.current();
+  };
+  const recordPageVisitsRef = useRef<() => void>(() => {});
+  /** Places whose names are on the page you're reading are remembered as "met" in this book. */
+  recordPageVisitsRef.current = () => {
+    const r = rendRef.current;
+    const loc = r?.currentLocation() as unknown as Location | undefined;
+    if (!r || !loc?.start) return;
+    for (const c of r.getContents() as unknown as Contents[]) {
+      const hits = placeHitsRef.current.get(c.document);
+      if (!hits?.length) continue;
+      try {
+        const a = c.range(loc.start.cfi);
+        const b = c.range(loc.end.cfi);
+        if (!a || !b) continue;
+        const page = c.document.createRange();
+        page.setStart(a.startContainer, a.startOffset);
+        page.setEnd(b.endContainer, b.endOffset);
+        for (const h of hits) {
+          const k = `${h.place.key}`;
+          if (seenPlaces.current.has(k)) continue;
+          if (page.compareBoundaryPoints(Range.START_TO_START, h.range) > 0 || page.compareBoundaryPoints(Range.END_TO_END, h.range) < 0) continue;
+          seenPlaces.current.add(k);
+          let cfi: string | undefined;
+          try { cfi = c.cfiFromRange(h.range); } catch { /* ignore */ }
+          recordVisit({ bookId: id!, placeKey: h.place.key, name: h.place.title, written: h.term.name, lat: h.place.lat, lon: h.place.lon, chapter: chapterRef.current || undefined, cfi }).catch(() => {});
+        }
+      } catch { /* chapter not laid out */ }
+    }
+  };
+  const openPlacePopRef = useRef<(h: PlaceHit, c?: Contents) => void>(() => {});
+  openPlacePopRef.current = (h, c) => {
+    const passage = passageAround(h.range);
+    let cfi: string | undefined;
+    try { cfi = c?.cfiFromRange(h.range); } catch { /* ignore */ }
+    const sameChapter = mapDateChapter.current === chapterRef.current;
+    const date = mapDate && sameChapter ? mapDate : dateContextFor({ bookId: id!, item: idxRef.current.items.get(id!), passage, mentionIndex: passage.indexOf(h.term.name), chapterText: chapterText() });
+    const detection = placeNamesRef.current.known.find((k) => k.name === h.term.name)?.detection ?? 'cue';
+    setPlacePop({ written: h.term.name, place: h.place, passage, cfi, date, detection });
+    setChrome(false);
+    setHint(false);
+    recordVisit({ bookId: id!, placeKey: h.place.key, name: h.place.title, written: h.term.name, lat: h.place.lat, lon: h.place.lon, chapter: chapterRef.current || undefined, cfi }).catch(() => {});
   };
 
   // The book's analysed text (if any), to know exactly which paragraph you're on.
@@ -492,6 +583,7 @@ export default function ReaderPage() {
   const openMap = (req: MapRequest) => {
     setTool(null);
     setPanel(null);
+    setPlacePop(null);
     // A year picked for one chapter doesn't carry into another (unless kept for the whole book).
     if (mapDateChapter.current !== chapterRef.current) { setMapDate(null); mapDateChapter.current = chapterRef.current; }
     setMapReq(req);
@@ -636,8 +728,12 @@ export default function ReaderPage() {
           // Tapped an underlined name? Show who or what it is.
           const doc = (e.target as Node | null)?.ownerDocument ?? (e.target as Document | null);
           const hits = doc ? hitsRef.current.get(doc) : undefined;
+          const ph = doc ? placeHitsRef.current.get(doc) : undefined;
+          const p = doc && ph?.length ? (hitAt(doc, ph, e.clientX, e.clientY) as PlaceHit | undefined) : undefined;
+          if (p) { openPlacePopRef.current(p, all.find((c) => c.document === doc)); return; }
           const h = doc && hits?.length ? hitAt(doc, hits, e.clientX, e.clientY) : undefined;
           if (h) { openEntityRef.current(h); return; }
+          if (placePopRef.current) { setPlacePop(null); return; }
           setHint(false);
           setPanel((p) => {
             if (!p) setChrome((c) => !c);
@@ -727,7 +823,8 @@ export default function ReaderPage() {
       setSelection(null);
       setDefine(null);
       setNoteDraft(null);
-      setTimeout(() => { refreshToolRef.current(); refreshMapRef.current(); }, 0);
+      setTimeout(() => { refreshToolRef.current(); refreshMapRef.current(); recordPageVisitsRef.current(); }, 0);
+      setPlacePop(null);
     }
 
     let hiddenAt = 0;
@@ -790,7 +887,7 @@ export default function ReaderPage() {
     if (!r || status !== 'ready') return;
     for (const c of r.getContents() as unknown as Contents[]) detectIn(c);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [termsKey, prefs.entities, status]);
+  }, [termsKey, prefs.entities, status, placeNames.known.length]);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 700px)');
@@ -865,7 +962,7 @@ export default function ReaderPage() {
   // Phone back button: first close what's open (a menu, X-Ray, the text
   // selection), then return from a jump (contents, search, footnote), and
   // only after that leave the book.
-  const backLayer = mapReq ? 'map' : tool ? 'tool' : panel ? 'panel' : selection ? 'selection' : jumpBack ? 'jump' : null;
+  const backLayer = mapReq ? 'map' : placePop ? 'place' : tool ? 'tool' : panel ? 'panel' : selection ? 'selection' : jumpBack ? 'jump' : null;
   const backPushed = useRef(false);
   const ignorePop = useRef(false);
   const leaving = useRef(false);
@@ -873,6 +970,7 @@ export default function ReaderPage() {
   const onBackRef = useRef<() => void>(() => {});
   onBackRef.current = () => {
     if (mapReq) setMapReq(null);
+    else if (placePop) setPlacePop(null);
     else if (tool) { if (tool.tab === 'entity' && tool.focus?.entry) setTool({ ...tool, tab: 'xray', focus: undefined }); else setTool(null); }
     else if (panel) setPanel(null);
     else if (selection) clearSelection();
@@ -1128,9 +1226,21 @@ export default function ReaderPage() {
         </div>
       )}
 
-      {mapReq && item && (
+      {mapReq && item && (atlasOk ? (
+        <AtlasPanel request={mapReq} wide={wide} onClose={() => setMapReq(null)} pagePlaces={pagePlaces} chapterText={chapterText}
+          book={{ bookId: item.id, title: item.title, chapter: chapter || undefined, item }} date={mapDate} setDate={setMapDate}
+          findMentions={findMentions} onJump={(cfi) => { setMapReq(null); jumpTo(cfi); }}
+          position={{ ...posOf(session.current.cfi), cfi: session.current.cfi || undefined }} />
+      ) : (
         <HistoricalMapPanel request={mapReq} wide={wide} onClose={() => setMapReq(null)} pagePlaces={pagePlaces} chapterText={chapterText}
           book={{ bookId: item.id, title: item.title, chapter: chapter || undefined, item }} date={mapDate} setDate={setMapDate} />
+      ))}
+
+      {/* A place name tapped in the text. */}
+      {placePop && !mapReq && (
+        <PlacePopup written={placePop.written} place={placePop.place} date={placePop.date} detection={placePop.detection} colors={{ bg: t.panel, fg: t.fg, muted: t.muted, line: t.line }}
+          onClose={() => setPlacePop(null)}
+          onMap={() => { const p = placePop; openMap({ name: p.written, passage: p.passage, mentionIndex: Math.max(0, p.passage.indexOf(p.written)), placeKey: p.place.key, detection: p.detection }); }} />
       )}
 
       {/* Selection actions. */}
@@ -1162,7 +1272,8 @@ export default function ReaderPage() {
             <div className="row wrap" style={{ gap: 4 }}>
               <button className="btn sm primary" onClick={() => saveHighlight()}>❝ Save quote</button>
               <button className="btn sm ai-solid" onClick={() => { const text = selection.text; clearSelection(); openTool({ tab: 'ai', selection: text }); }}>✨ Ask AI</button>
-              {selection.text.split(/\s+/).length <= 5 && <button className="btn sm ghost" style={{ color: t.fg }} aria-label="Show on historical map" onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openMap({ name: text, passage, mentionIndex: Math.max(0, passage.indexOf(text)) }); }}>🗺 Map</button>}
+              {selection.text.split(/\s+/).length <= 5 && <button className="btn sm ghost" style={{ color: t.fg }} aria-label="Show on historical map" onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openMap({ name: text, passage, mentionIndex: Math.max(0, passage.indexOf(text)), detection: 'selection' }); }}>🗺 Map</button>}
+              {selection.text.split(/\s+/).length > 5 && <button className="btn sm ghost" style={{ color: t.fg }} aria-label="Map the places in this passage" onClick={() => { const text = selection.text; clearSelection(); openMap({ mode: 'section', text }); }}>🗺 Map this passage</button>}
               {selection.text.split(/\s+/).length <= 6 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => { const text = selection.text.replace(/[“”"'’.,;:!?()]+$|^[“”"'‘(]+/g, ''); let passage = ''; try { const rg = selection.contents.range(selection.cfi); passage = rg ? passageAround(rg) : ''; } catch { /* ignore */ } clearSelection(); openTool({ tab: 'entity', focus: { name: text, passage } }); }}>🧭 Explore</button>}
               <button className="btn sm ghost" style={{ color: t.fg }} onClick={() => setNoteDraft('')}>✎ Note</button>
               {selection.text.split(/\s+/).length <= 3 && <button className="btn sm ghost" style={{ color: t.fg }} onClick={lookUpSelection}>📖 Define</button>}

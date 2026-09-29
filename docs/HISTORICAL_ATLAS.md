@@ -72,3 +72,45 @@ Attribution for datasets appears in three places:
 - **Missing data.** Layers with no data for the chosen year show a coverage note in the layer panel. Layers with no suitable dataset are listed but disabled, with the reason given.
 
 Nothing is drawn unless it is in one of these datasets. The atlas does not interpolate, guess or generate any data with AI.
+
+## The atlas in the reader
+
+The atlas opens over the book as an overlay (`src/components/history/AtlasPanel.tsx`). The EPUB is never reloaded, and the reading position, chapter, text size, settings, highlights and bookmarks are left alone. "Jump to passage" closes the atlas and goes to the passage, and "Back to where you were" returns to the previous page. Phones without WebGL keep the simpler OpenHistoricalMap panel.
+
+| Feature | How it works | Source of truth |
+| --- | --- | --- |
+| Dotted place names in the text | Underlined only when all of these hold: the chapter gives a date inside a gazetteer's coverage; the name follows a place word ("to", "siege of"…) or is already a known place; exactly one place in the gazetteer carries that name, with a certain location. Ambiguous names such as "Alexandria" stay plain. | Pleiades |
+| Place popup | Shows the historical names used around the year, the year and where it came from, the recorded date range, the polity (Cliopatria) and the "part of" region (Pleiades). "Why this place?" explains the match. | Pleiades, Cliopatria |
+| Map this chapter / Map this passage | Finds names in reading order and resolves them offline first, then online (WHG or Wikidata). Only confident matches are pinned; unresolved names appear only if you ask. | Pleiades, WHG, Wikidata |
+| Route mode | Numbers the places in the order the text names them. An optional dashed line is always labelled "Route reconstructed from the text". | The book's own order |
+| Place history | Shows names with their dates, date range, coordinates and certainty, region, polity, recorded events within 20 miles, related places ("succeeds", "port of"…), sources, "Why is this place here?" and private notes. | Pleiades, Cliopatria, Wikidata |
+| What am I looking at? | Shows the polity, region, nearest dated settlements and wars with battles nearby in that year. When a simplified border misses a coastal point, it says "at the edge of" instead. Places are listed by distance only, because Pleiades records no city sizes. | Cliopatria, Pleiades, Wikidata |
+| Nearby / what's around | Searches a radius of 10, 25, 50 or 100 miles. It can filter to places recorded around the year (undated places are included and marked), and lists roads, rivers and battles. Places that no longer exist are included. | Pleiades, AWMC, Wikidata |
+| Events | Lists wars and events named in the chapter and wars with battles near the place. Choosing a war numbers its battles on the map; these numbers are not a route. An event card shows the date, location, part-of, participants (read live from the same Wikidata item) and the source. | Wikidata |
+| Timeline | Play/pause, adjustable speed, step ±1 or ±10 years, and "Jump to…" a battle of the selected war or the book's dates. A note while playing says border dates are approximate. | — |
+| Compare dates | For one spot, shows the polity at two years and the recorded events in between. | Cliopatria, Wikidata |
+| Historical search | Searches places by any recorded name, wars, battles, and kingdoms/empires, plus modern names online. | Pleiades, Wikidata, Cliopatria |
+| Saved views, notes, places met | Stored in the app database: `mapBookmarks`, `mapNotes`, `placeVisits` (schema v7). They are included in backups and never sent to any service. | You |
+
+### Names across time
+
+Two names are linked only when a dataset records the link. Pleiades lists "Constantinople" and "Istanbul" as names of Constantinopolis, and records that Constantinopolis *succeeds* Byzantium, which is a separate record. The atlas shows that chain, but it never merges places because their names look alike.
+
+### Certainty on the map
+
+Each certainty level is drawn only when the source says so:
+
+- **Known:** a solid dot.
+- **Approximate:** a soft area.
+- **Uncertain:** a hollow dot, a dashed ring and "?" after the name.
+- **Disputed:** has its own style, but no current dataset marks disputes, so it is not used yet.
+
+### AI
+
+AI (the optional whole-book analysis) may supply place names found in the text, and "Why is this place here?" says so. Coordinates, names, dates, borders, roads and events always come from the datasets above.
+
+### Adding a dataset for another period
+
+- **Gazetteers:** register them in `GAZETTEERS` (`src/atlas/gazetteer.ts`) with a coverage span and a loader. `gazetteersFor(year)` picks the ones to use, so a medieval or early-modern gazetteer plugs in without reader changes.
+- **Map layers:** add them to `LAYERS` in `src/atlas/catalog.ts` with `coverage`, `datasets` and credits.
+- **Data packs:** built by `scripts/atlas-build/build.py`. The `gazetteer` step writes `pleiades-gazetteer.json` (all names with dates, "part of" and other relationships). The `polities` step writes `cliopatria/names.json` for search.

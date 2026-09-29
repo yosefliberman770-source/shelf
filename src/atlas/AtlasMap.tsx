@@ -4,12 +4,22 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, SOURCE_SPECS } from './catalog';
+import { getJSON } from './data';
 import { type HistYear, yearLabel } from './time';
-import { Timeline } from './Timeline';
+import { Timeline, type TimelineMark } from './Timeline';
 
-export interface AtlasFocus { name: string; lat: number; lon: number; approximate?: boolean; note?: string }
-export interface AtlasPin { name: string; lat: number; lon: number }
+export interface AtlasFocus { name: string; lat: number; lon: number; certainty?: 'known' | 'approximate' | 'uncertain' | 'disputed'; note?: string }
+export interface AtlasPin { name: string; lat: number; lon: number; key?: string }
 export interface AtlasView { lat: number; lon: number; zoom: number; bbox?: [number, number, number, number] }
+/** Reader overlays: places from the book (numbered in reading order for a route), nearby results, a search radius. */
+export interface AtlasOverlay {
+  route?: AtlasPin[];
+  /** Draw the connecting line (always labelled as reconstructed from the text). */
+  routeLine?: boolean;
+  markers?: AtlasPin[];
+  circle?: { lat: number; lon: number; km: number };
+}
+export interface AtlasPick { key: string; name: string; lat: number; lon: number }
 
 const LAYERS_KEY = 'shelf.atlas.layers';
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
@@ -42,15 +52,28 @@ function baseStyle(base: string): StyleSpecification {
       'ne-land': { type: 'geojson', data: base + 'ne-land.json', attribution: credit('naturalearth') },
       focus: { type: 'geojson', data: EMPTY },
       pins: { type: 'geojson', data: EMPTY },
+      route: { type: 'geojson', data: EMPTY },
+      radius: { type: 'geojson', data: EMPTY },
     },
     layers: [
       { id: 'sea', type: 'background', paint: { 'background-color': '#cddde4' } },
       { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': '#efe7d4' } },
-      // Uncertain location: a soft circle instead of a sharp point.
-      { id: TOP, type: 'circle', source: 'focus', filter: ['==', ['get', 'approx'], true], paint: { 'circle-radius': 34, 'circle-color': '#d84315', 'circle-opacity': 0.12, 'circle-stroke-color': '#d84315', 'circle-stroke-width': 1, 'circle-stroke-opacity': 0.5 } },
+      // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
+      { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
+      { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
+      // A route read from the book: thin dashed line, labelled as reconstructed.
+      { id: 'route-line', type: 'line', source: 'route', filter: ['==', ['geometry-type'], 'LineString'], paint: { 'line-color': '#6a1b9a', 'line-width': 2, 'line-dasharray': [2, 2], 'line-opacity': 0.8 } },
+      { id: 'route-line-label', type: 'symbol', source: 'route', filter: ['==', ['geometry-type'], 'LineString'], layout: { 'symbol-placement': 'line', 'text-field': ['get', 'label'], 'text-font': ['OpenHistorical Italic'], 'text-size': 11, 'text-offset': [0, -0.8] }, paint: { 'text-color': '#6a1b9a', 'text-halo-color': PALETTE.halo, 'text-halo-width': 1.4 } },
+      { id: 'route-pt', type: 'circle', source: 'route', filter: ['==', ['geometry-type'], 'Point'], paint: { 'circle-radius': 10, 'circle-color': '#ffffff', 'circle-stroke-color': '#6a1b9a', 'circle-stroke-width': 2 } },
+      { id: 'route-num', type: 'symbol', source: 'route', filter: ['==', ['geometry-type'], 'Point'], layout: { 'text-field': ['to-string', ['get', 'ord']], 'text-font': ['OpenHistorical Bold'], 'text-size': 11, 'text-allow-overlap': true }, paint: { 'text-color': '#6a1b9a' } },
+      { id: 'route-label', type: 'symbol', source: 'route', filter: ['==', ['geometry-type'], 'Point'], layout: { 'text-field': ['get', 'name'], 'text-font': ['OpenHistorical Bold'], 'text-size': 12, 'text-offset': [0, 1.2], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#4a126b', 'text-halo-color': PALETTE.halo, 'text-halo-width': 1.6 } },
       { id: 'pins-pt', type: 'circle', source: 'pins', paint: { 'circle-radius': 6, 'circle-color': '#ffffff', 'circle-stroke-color': '#d84315', 'circle-stroke-width': 2.2 } },
-      { id: 'pins-label', type: 'symbol', source: 'pins', layout: { 'text-field': ['get', 'name'], 'text-font': ['OpenHistorical Bold'], 'text-size': 12, 'text-offset': [0, 1], 'text-anchor': 'top' }, paint: { 'text-color': '#8a2c0d', 'text-halo-color': PALETTE.halo, 'text-halo-width': 1.6 } },
-      { id: 'focus-pt', type: 'circle', source: 'focus', paint: { 'circle-radius': 8, 'circle-color': '#d84315', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2.5 } },
+      { id: 'pins-label', type: 'symbol', source: 'pins', layout: { 'text-field': ['get', 'name'], 'text-font': ['OpenHistorical Bold'], 'text-size': 12, 'text-offset': [0, 1], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#8a2c0d', 'text-halo-color': PALETTE.halo, 'text-halo-width': 1.6 } },
+      // The selected place. Known: a solid dot. Approximate: a soft area around it.
+      // Uncertain or disputed: a dashed ring, a hollow centre and "?" after the name.
+      { id: 'focus-area', type: 'circle', source: 'focus', filter: ['==', ['get', 'cert'], 'approximate'], paint: { 'circle-radius': 30, 'circle-color': '#d84315', 'circle-opacity': 0.12, 'circle-stroke-color': '#d84315', 'circle-stroke-width': 1, 'circle-stroke-opacity': 0.5 } },
+      { id: 'focus-ring', type: 'circle', source: 'focus', filter: ['in', ['get', 'cert'], ['literal', ['uncertain', 'disputed']]], paint: { 'circle-radius': 22, 'circle-opacity': 0, 'circle-stroke-color': '#d84315', 'circle-stroke-width': 1.5, 'circle-stroke-opacity': 0.8 } },
+      { id: 'focus-pt', type: 'circle', source: 'focus', paint: { 'circle-radius': 8, 'circle-color': ['case', ['in', ['get', 'cert'], ['literal', ['uncertain', 'disputed']]], '#ffffff', '#d84315'], 'circle-stroke-color': ['case', ['in', ['get', 'cert'], ['literal', ['uncertain', 'disputed']]], '#d84315', '#ffffff'], 'circle-stroke-width': 2.5 } },
       { id: 'focus-label', type: 'symbol', source: 'focus', layout: { 'text-field': ['get', 'name'], 'text-font': ['OpenHistorical Bold'], 'text-size': 15, 'text-offset': [0, 1.1], 'text-anchor': 'top', 'text-allow-overlap': true }, paint: { 'text-color': '#8a2c0d', 'text-halo-color': PALETTE.halo, 'text-halo-width': 2 } },
     ],
   };
@@ -59,20 +82,39 @@ function baseStyle(base: string): StyleSpecification {
 // ── Data used in panels (wars list, war sequence) ─────────────────────────
 interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 type EventFeature = { type: 'Feature'; geometry: { type: 'Point'; coordinates: [number, number] }; properties: { q: string; n: string; k: string; y: HistYear; w?: string; wn?: string; u?: number; yp?: string } };
-const cache = new Map<string, Promise<unknown>>();
-function getJSON<T>(url: string): Promise<T> {
-  if (!cache.has(url)) cache.set(url, fetch(url).then((r) => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); }).catch((e) => { cache.delete(url); throw e; }));
-  return cache.get(url) as Promise<T>;
+
+function circleRing(lat: number, lon: number, radiusKm: number): [number, number][] {
+  const pts: [number, number][] = [];
+  for (let i = 0; i <= 64; i++) {
+    const a = (i / 64) * 2 * Math.PI;
+    pts.push([lon + (radiusKm / (111.32 * Math.cos((lat * Math.PI) / 180))) * Math.cos(a), lat + (radiusKm / 110.57) * Math.sin(a)]);
+  }
+  return pts;
 }
 
-export function AtlasMap({ view, year, onYearChange, focus, pins, marks, className }: {
+export function AtlasMap({ view, year, onYearChange, focus, pins, marks, className, overlay, war: warProp, onWarChange, onReady, onPickPlace, onPickEvent, onPickMarker, layersRequest, onLayersChange, children }: {
   view?: AtlasView;
   year: HistYear;
   onYearChange: (y: HistYear) => void;
   focus?: AtlasFocus;
   pins?: AtlasPin[];
-  marks?: { year: HistYear; label: string }[];
+  marks?: TimelineMark[];
   className?: string;
+  overlay?: AtlasOverlay;
+  /** The selected war (controlled when onWarChange is given). */
+  war?: string;
+  onWarChange?: (q: string | undefined) => void;
+  /** The map, once loaded (for saving bookmarks, reading the view). */
+  onReady?: (map: MLMap) => void;
+  /** A dataset place was tapped and the reader asked for its history. */
+  onPickPlace?: (p: AtlasPick) => void;
+  onPickEvent?: (q: string) => void;
+  onPickMarker?: (key: string) => void;
+  /** Switch to these layers (e.g. from a bookmark); n changes each time. */
+  layersRequest?: { layers: string[]; n: number };
+  onLayersChange?: (layers: string[]) => void;
+  /** Shown over the map (e.g. the "What am I looking at?" chip). */
+  children?: React.ReactNode;
 }) {
   const base = `${import.meta.env.BASE_URL}atlas/`;
   const host = useRef<HTMLDivElement>(null);
@@ -84,7 +126,9 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const [enabled, setEnabled] = useState<string[]>(loadEnabled);
   const [panel, setPanel] = useState(false);
   const [eventWindow, setEventWindow] = useState(0);
-  const [war, setWar] = useState<string | undefined>();
+  const [warOwn, setWarOwn] = useState<string | undefined>();
+  const war = onWarChange ? warProp : warOwn;
+  const setWar = onWarChange ?? setWarOwn;
   const [info, setInfo] = useState<Info | null>(null);
   const ctx: LayerCtx = useMemo(() => ({ year, base, eventWindow, war }), [year, base, eventWindow, war]);
   const ctxRef = useRef(ctx);
@@ -92,7 +136,8 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
 
-  useEffect(() => { try { localStorage.setItem(LAYERS_KEY, JSON.stringify(enabled)); } catch { /* ignore */ } }, [enabled]);
+  useEffect(() => { try { localStorage.setItem(LAYERS_KEY, JSON.stringify(enabled)); } catch { /* ignore */ } onLayersChange?.(enabled); }, [enabled]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (layersRequest) setEnabled(layersRequest.layers.filter((id) => layerById(id) && !layerById(id)!.unavailable)); }, [layersRequest?.n]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Create the map once ──
   useEffect(() => {
@@ -121,6 +166,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
           // Keep the credits folded behind the ⓘ button so they don't cover the map on a phone.
           host.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
           setReady(true);
+          onReadyRef.current?.(map!);
         });
         map.on('error', (e) => { if (!map?.loaded()) console.warn('atlas', e.error?.message); });
         map.on('click', (e) => onClickRef.current(e));
@@ -133,6 +179,9 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     return () => { dead = true; map?.remove(); mapRef.current = null; managed.current.clear(); clioSlice.current = ''; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   // ── Keep layers in step with the toggles and the year ──
   const sync = useCallback(async () => {
@@ -196,9 +245,21 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    (map.getSource('focus') as GeoJSONSource).setData(focus ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [focus.lon, focus.lat] }, properties: { name: focus.name, approx: !!focus.approximate } }] } : EMPTY);
-    (map.getSource('pins') as GeoJSONSource).setData({ type: 'FeatureCollection', features: (pins ?? []).map((p) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lon, p.lat] }, properties: { name: p.name } })) });
-  }, [ready, focus?.name, focus?.lat, focus?.lon, focus?.approximate, pins]);
+    const cert = focus?.certainty ?? 'known';
+    (map.getSource('focus') as GeoJSONSource).setData(focus ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [focus.lon, focus.lat] }, properties: { name: cert === 'uncertain' || cert === 'disputed' ? `${focus.name} ?` : focus.name, approx: cert !== 'known', cert } }] } : EMPTY);
+    const pts = [...(pins ?? []), ...(overlay?.markers ?? [])];
+    (map.getSource('pins') as GeoJSONSource).setData({ type: 'FeatureCollection', features: pts.map((p) => ({ type: 'Feature', geometry: { type: 'Point', coordinates: [p.lon, p.lat] }, properties: { name: p.name, key: p.key ?? '' } })) });
+    const route = overlay?.route ?? [];
+    (map.getSource('route') as GeoJSONSource).setData({
+      type: 'FeatureCollection',
+      features: [
+        ...route.map((p, i) => ({ type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [p.lon, p.lat] }, properties: { name: p.name, ord: i + 1, key: p.key ?? '' } })),
+        ...(overlay?.routeLine && route.length > 1 ? [{ type: 'Feature' as const, geometry: { type: 'LineString' as const, coordinates: route.map((p) => [p.lon, p.lat]) }, properties: { label: 'Route reconstructed from the text' } }] : []),
+      ],
+    });
+    const c = overlay?.circle;
+    (map.getSource('radius') as GeoJSONSource).setData(c ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [circleRing(c.lat, c.lon, c.km)] }, properties: {} } : EMPTY);
+  }, [ready, focus?.name, focus?.lat, focus?.lon, focus?.certainty, pins, overlay]);
 
   // ── Move to a new place ──
   const viewKey = view ? `${view.lat.toFixed(4)},${view.lon.toFixed(4)},${view.zoom}` : '';
@@ -215,8 +276,11 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   onClickRef.current = (e) => {
     const map = mapRef.current;
     if (!map) return;
+    const box: [[number, number], [number, number]] = [[e.point.x - 10, e.point.y - 10], [e.point.x + 10, e.point.y + 10]];
+    const mine = map.queryRenderedFeatures(box, { layers: ['route-pt', 'pins-pt', 'focus-pt'].filter((l) => map.getLayer(l)) });
+    const hitKey = mine.map((f) => f.properties?.key as string | undefined).find(Boolean);
+    if (hitKey && onPickMarker) { onPickMarker(hitKey); return; }
     const ids = [...managed.current.values()].flat().filter((id) => map.getLayer(id) && map.getLayer(id)!.type !== 'hillshade');
-    const box: [[number, number], [number, number]] = [[e.point.x - 8, e.point.y - 8], [e.point.x + 8, e.point.y + 8]];
     const hits = map.queryRenderedFeatures(box, { layers: ids });
     // Points before lines before areas.
     const rank = (f: MapGeoJSONFeature) => (f.layer.type === 'circle' ? 0 : f.layer.type === 'symbol' ? 1 : f.layer.type === 'line' ? 2 : 3);
@@ -233,10 +297,13 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         <div className="atlas-canvas" ref={host} />
         <button className="btn sm atlas-layers-btn" onClick={() => setPanel(!panel)} aria-expanded={panel}>☰ Layers</button>
         {!ready && <div className="atlas-loading">Loading the atlas…</div>}
+        {children}
         {panel && <LayerPanel enabled={enabled} toggle={toggle} year={year} eventWindow={eventWindow} setEventWindow={setEventWindow} war={war} setWar={setWar} base={base} onClose={() => setPanel(false)} />}
       </div>
       <Timeline year={year} onChange={onYearChange} marks={marks} />
-      {info && <FeatureCard info={info} onClose={() => setInfo(null)} />}
+      {info && <FeatureCard info={info} onClose={() => setInfo(null)}
+        onHistory={info.pick && onPickPlace ? () => { onPickPlace(info.pick!); setInfo(null); } : undefined}
+        onEvent={info.event && onPickEvent ? () => { onPickEvent(info.event!); setInfo(null); } : undefined} />}
       <AtlasSources enabled={enabled} />
     </div>
   );
@@ -340,7 +407,7 @@ function WarList({ year, war, setWar, base }: { year: HistYear; war?: string; se
 
 // ── Feature details ───────────────────────────────────────────────────────
 
-interface Info { title: string; lines: string[]; link?: { href: string; label: string }; source: string; caution?: string }
+interface Info { title: string; lines: string[]; link?: { href: string; label: string }; source: string; caution?: string; pick?: AtlasPick; event?: string }
 
 const PERIOD_NAMES: Record<string, string> = { A: 'Archaic', C: 'Classical', H: 'Hellenistic', R: 'Roman', L: 'Late Antique' };
 const periodLabel = (code?: string) => (code ? code.replace('?', '').split('').map((c) => PERIOD_NAMES[c]).filter(Boolean).join(', ') + (code.includes('?') ? ' (uncertain)' : '') : '');
@@ -358,8 +425,10 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '', `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
       if (str('a')) lines.push(`Also: ${str('a')!.split('|').join(' · ')}`);
       if (src === 'pleiades-places') lines.push(num('p') === 1 ? `Precise location${num('r') ? ` (± ${num('r')} m)` : ''}` : 'Rough location');
+      const pt = f.geometry.type === 'Point' ? (f.geometry.coordinates as [number, number]) : undefined;
       return {
         title: str('n') ?? 'Place', lines: lines.filter(Boolean),
+        pick: src === 'pleiades-places' && pt ? { key: `pleiades:${num('i')}`, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
         link: { href: `https://pleiades.stoa.org/places/${num('i')}`, label: 'Pleiades record ↗' }, source: credit('pleiades'),
         caution: num('u') ? 'Pleiades marks this location as less certain.' : num('f') === undefined && num('t') === undefined ? 'The source gives no dates; shown for the ancient period only.' : 'Pleiades dates are broad periods, not founding or abandonment dates.',
       };
@@ -377,7 +446,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       const y = num('y');
       return {
         title: str('n') ?? 'Event', lines: [`${str('k') ?? 'event'}${y !== undefined ? ` · ${yearLabel(y)}${str('yp') ? ` (to the ${str('yp')})` : ''}` : ''}`, ...(str('wn') ? [`Part of: ${str('wn')}`] : [])],
-        link: { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' }, source: credit('wikidata'),
+        link: { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' }, source: credit('wikidata'), event: str('q'),
         caution: num('u') ? 'The date is only known approximately.' : undefined,
       };
     }
@@ -404,7 +473,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
   }
 }
 
-function FeatureCard({ info, onClose }: { info: Info; onClose: () => void }) {
+function FeatureCard({ info, onClose, onHistory, onEvent }: { info: Info; onClose: () => void; onHistory?: () => void; onEvent?: () => void }) {
   return (
     <div className="card tight atlas-card">
       <div className="row between">
@@ -413,6 +482,12 @@ function FeatureCard({ info, onClose }: { info: Info; onClose: () => void }) {
       </div>
       {info.lines.map((l, i) => <div key={i} className="small">{l}</div>)}
       {info.caution && <div className="tiny faint mt-4">{info.caution}</div>}
+      {(onHistory || onEvent) && (
+        <div className="row wrap gap-4 mt-4">
+          {onHistory && <button className="btn xs" onClick={onHistory}>Place history</button>}
+          {onEvent && <button className="btn xs" onClick={onEvent}>Event details</button>}
+        </div>
+      )}
       <div className="tiny faint mt-4">
         {info.link && <><a href={info.link.href} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>{info.link.label}</a> · </>}
         <span dangerouslySetInnerHTML={{ __html: `Source: ${info.source}` }} />

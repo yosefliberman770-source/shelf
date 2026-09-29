@@ -520,6 +520,58 @@ export interface PlaceChoiceRow {
   createdAt: number;
 }
 
+/** A saved map view: where, when, which layers, and what was selected. */
+export interface MapBookmarkRow {
+  id: string;
+  title: string;
+  lat: number;
+  lon: number;
+  zoom: number;
+  /** Historical year (-218 = 218 BCE). */
+  year: number;
+  layers: string[];
+  /** Selected place ("pleiades:314921", "wikidata:Q…") or event ("wd:Q…"). */
+  selected?: { key: string; name: string; kind: 'place' | 'event' };
+  bookId?: string;
+  chapter?: string;
+  /** Reading position in the book when saved (EPUB CFI). */
+  cfi?: string;
+  createdAt: number;
+}
+
+/** A private note on a place or a map spot. Stored only on this device (and in your backups); never sent anywhere. */
+export interface MapNoteRow {
+  id: string;
+  /** The place's key, or "pt:<lat>,<lon>" for a spot on the map. */
+  placeKey: string;
+  placeName: string;
+  lat: number;
+  lon: number;
+  text: string;
+  bookId?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** A historical place the reader met in a book (looked up, tapped, or mapped). */
+export interface PlaceVisitRow {
+  /** bookId|placeKey */
+  id: string;
+  bookId: string;
+  placeKey: string;
+  name: string;
+  /** The name as the book wrote it. */
+  written: string;
+  lat: number;
+  lon: number;
+  chapter?: string;
+  /** Where in the book it was first met (EPUB CFI). */
+  cfi?: string;
+  count: number;
+  firstAt: number;
+  lastAt: number;
+}
+
 /** AI usage per day, provider and model (counts only — never content or keys). */
 export interface AIUsageRow {
   id: string;

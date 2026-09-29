@@ -214,7 +214,7 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
   const inChapter = detectPlaces(chapterText(), knownPlaces, people).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);
   const open = (name: string, text: string) => {
     const i = text.indexOf(name);
-    onOpenMap({ name, passage: i >= 0 ? text.slice(Math.max(0, i - 600), i + 600) : undefined, mentionIndex: i >= 0 ? Math.min(i, 600) : undefined });
+    onOpenMap({ name, passage: i >= 0 ? text.slice(Math.max(0, i - 600), i + 600) : undefined, mentionIndex: i >= 0 ? Math.min(i, 600) : undefined, detection: knownPlaces.includes(name) ? 'known' : 'cue' });
   };
   return (
     <div className="col gap-12">
@@ -233,7 +233,12 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
           <div className="row wrap gap-4 mt-8">{inChapter.map((p) => <button key={p.name} className="chip" onClick={() => open(p.name, chapterText())}>📍 {p.name}</button>)}</div>
         </details>
       )}
-      <button className="btn" onClick={() => onOpenMap({ mode: 'chapter' })}>🗺 Map places in this chapter</button>
+      <div className="row wrap gap-8">
+        <button className="btn" onClick={() => onOpenMap({ mode: 'chapter' })}>🗺 Map this chapter</button>
+        <button className="btn ghost" onClick={() => onOpenMap({ mode: 'search' })}><Icon name="search" />Search the map</button>
+        <button className="btn ghost" onClick={() => onOpenMap({ mode: 'saved' })}>🔖 Saved & places you’ve met</button>
+      </div>
+      <div className="tiny faint">Tip: select a longer passage in the book and tap “🗺 Map this passage” to map just those places. Place names with a blue dotted underline can be tapped.</div>
     </div>
   );
 }

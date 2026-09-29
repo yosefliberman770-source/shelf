@@ -591,6 +591,134 @@ def natural_earth():
     return {'land': len(out), 'rivers': len(rivers)}
 
 
+# ── Gazetteer: every Pleiades place with all its names, for name lookup ──────
+
+# Pleiades connection types that say one place is part of / inside another.
+PART_OF = {'part_of_admin', 'part_of_regional', 'part_of_physical', 'located_in', 'in_territory_of', 'part_of_analytical', 'member'}
+# Other recorded relationships worth showing as "related places" (Pleiades' own wording).
+RELATED = {'succeeds', 'same_as', 'capital', 'port_of', 'founded', 'near', 'at', 'on', 'crosses', 'flows_into', 'route_next', 'abuts', 'bounds', 'communicates', 'related'}
+
+
+def gazetteer():
+    """pleiades-gazetteer.json: compact rows the reader uses to recognise and
+    look up names offline. Every alternative name is one Pleiades itself links
+    to the place — names are never merged across places here."""
+    log('Pleiades gazetteer')
+    z = zipfile.ZipFile(fetch('pleiades_gis', SOURCES['pleiades_gis']))
+    names_in_zip = z.namelist()
+
+    def rows(name):
+        member = next((n for n in names_in_zip if n.endswith('/' + name) or n == name), None)
+        if not member:
+            log('  (no', name, 'in the Pleiades package)')
+            return []
+        return csv.DictReader(io.TextIOWrapper(z.open(member), encoding='utf-8-sig'))
+
+    places = {r['id']: r for r in rows('places.csv')}
+    types = defaultdict(set)
+    for r in rows('places_place_types.csv'):
+        types[r['place_id']].add(r['place_type'])
+    dates = defaultdict(lambda: [None, None])
+    certainty = {}
+    for fname in ('location_points.csv', 'location_linestrings.csv', 'location_polygons.csv'):
+        for r in rows(fname):
+            a, b = year(r['year_after_which']), year(r['year_before_which'])
+            if b is not None and b >= 1700:
+                continue
+            d = dates[r['place_id']]
+            if a is not None:
+                d[0] = a if d[0] is None else min(d[0], a)
+            if b is not None:
+                d[1] = b if d[1] is None else max(d[1], b)
+            rank = {'certain': 0, 'less-certain': 1, 'uncertain': 2}.get(r.get('association_certainty') or 'certain', 0)
+            certainty[r['place_id']] = max(certainty.get(r['place_id'], 0), rank)
+    names = defaultdict(list)
+    for r in rows('names.csv'):
+        pid = r['place_id']
+        a, b = year(r['year_after_which']), year(r['year_before_which'])
+        seen = {n[0] for n in names[pid]}
+        forms = [(r.get(k) or '').strip() for k in ('romanized_form_1', 'romanized_form_2', 'romanized_form_3', 'attested_form')]
+        for v in forms:
+            for part in re.split(r'\s*,\s*', v) if ',' in v else [v]:
+                if part and part not in seen and len(part) < 60 and len(names[pid]) < 12:
+                    seen.add(part)
+                    names[pid].append([part, a, b, (r.get('language_tag') or '')[:8]])
+    parents = defaultdict(list)
+    related = defaultdict(list)
+    for r in rows('connections.csv'):
+        ctype = (r.get('connection_type') or '').strip()
+        src = r.get('place_id') or r.get('source') or ''
+        dst = (r.get('connects_to') or r.get('target') or '').rsplit('/', 1)[-1]
+        if not (src and dst.isdigit()):
+            continue
+        if ctype in PART_OF:
+            if dst not in parents[src]:
+                parents[src].append(dst)
+        elif ctype in RELATED and len(related[src]) < 10:
+            related[src].append([int(dst), ctype])
+
+    out = []
+    titles = {}
+    for pid, p in places.items():
+        t = types.get(pid, set())
+        if not p['representative_latitude'] or (t and not (t - SKIP_TYPES)):
+            continue
+        a, b = dates.get(pid, [None, None])
+        par = [int(x) for x in parents.get(pid, [])[:4] if x.isdigit()]
+        rel = related.get(pid, [])
+        for x in par + [r[0] for r in rel]:
+            if str(x) in places:
+                titles[str(x)] = places[str(x)]['title']
+        out.append([
+            int(pid), p['title'],
+            round(float(p['representative_longitude']), 4), round(float(p['representative_latitude']), 4),
+            1 if p['location_precision'] == 'precise' else 0,
+            ','.join(sorted(t - SKIP_TYPES))[:60],
+            a, b, certainty.get(pid, 0),
+            [n for n in names.get(pid, []) if n[0] != p['title']],
+            par,
+            rel,
+        ])
+    doc = {'v': 1, 'fields': ['id', 'title', 'lon', 'lat', 'precise', 'types', 'from', 'to', 'uncertain', 'names', 'partOf', 'related'], 'titles': titles, 'rows': out}
+    path = os.path.join(OUT, 'pleiades-gazetteer.json')
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
+    log(f'  wrote pleiades-gazetteer.json: {len(out)} places, {os.path.getsize(path)/1e6:.2f} MB')
+    return {'places': len(out), 'withParents': sum(1 for r in out if r[10])}
+
+
+def polity_names():
+    """cliopatria/names.json: every polity name once, with its full date range
+    (from the slices already built), for historical search."""
+    log('Cliopatria names index')
+    folder = os.path.join(OUT, 'cliopatria')
+    by = {}
+    for fn in os.listdir(folder):
+        if not re.match(r'^-?\d+_-?\d+\.json$', fn):
+            continue
+        for f in json.load(open(os.path.join(folder, fn), encoding='utf-8'))['features']:
+            p = f['properties']
+            k = (p['n'], p.get('q', ''))
+            cur = by.get(k)
+            g = shape(f['geometry'])
+            c = g.representative_point()
+            if not cur:
+                by[k] = {'n': p['n'], 'f': p['f'], 't': p['t'], **({'q': p['q']} if p.get('q') else {}), **({'c': p['c']} if p.get('c') else {}),
+                         'x': round(c.x, 2), 'y': round(c.y, 2), 'area': g.area}
+            else:
+                cur['f'] = min(cur['f'], p['f'])
+                cur['t'] = max(cur['t'], p['t'])
+                if g.area > cur['area']:
+                    cur.update(x=round(c.x, 2), y=round(c.y, 2), area=g.area)
+    rows = sorted(by.values(), key=lambda r: (r['f'], r['n']))
+    for r in rows:
+        del r['area']
+    with open(os.path.join(folder, 'names.json'), 'w', encoding='utf-8') as fh:
+        json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
+    log(f'  wrote cliopatria/names.json: {len(rows)} polities')
+    return {'names': len(rows)}
+
+
 def manifest(stats):
     today = date.today().isoformat()
     m = {
@@ -599,7 +727,7 @@ def manifest(stats):
             {'id': 'pleiades', 'name': 'Pleiades', 'url': 'https://pleiades.stoa.org/', 'license': 'CC BY 3.0',
              'licenseUrl': 'https://creativecommons.org/licenses/by/3.0/', 'commercial': True, 'shareAlike': False,
              'attribution': 'Pleiades: A Gazetteer of Past Places, pleiades.stoa.org (CC BY 3.0)',
-             'files': ['pleiades-places.json', 'pleiades-lines.json', 'pleiades-provinces.json'],
+             'files': ['pleiades-places.json', 'pleiades-lines.json', 'pleiades-provinces.json', 'pleiades-gazetteer.json'],
              'notes': 'Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.',
              'retrieved': today, 'counts': stats.get('pleiades')},
             {'id': 'awmc', 'name': 'Ancient World Mapping Center', 'url': 'https://awmc.unc.edu/', 'license': 'ODbL 1.0',
@@ -611,7 +739,7 @@ def manifest(stats):
             {'id': 'cliopatria', 'name': 'Cliopatria (Seshat Global History Databank)', 'url': 'https://github.com/Seshat-Global-History-Databank/cliopatria',
              'license': 'CC BY 4.0', 'licenseUrl': 'https://creativecommons.org/licenses/by/4.0/', 'commercial': True, 'shareAlike': False,
              'attribution': 'Cliopatria, Seshat Global History Databank (CC BY 4.0); simplified by Shelf',
-             'files': ['cliopatria/index.json'],
+             'files': ['cliopatria/index.json', 'cliopatria/names.json'],
              'notes': 'One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.',
              'retrieved': today, 'counts': stats.get('cliopatria')},
             {'id': 'wikidata', 'name': 'Wikidata', 'url': 'https://www.wikidata.org/', 'license': 'CC0',
@@ -637,9 +765,13 @@ def main():
     mpath = os.path.join(OUT, 'manifest.json')
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
-    steps = [('pleiades', pleiades), ('awmc', awmc), ('cliopatria', cliopatria), ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
+    steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names),
+             ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
+    # The manifest keeps counts per dataset; extra steps fold into their dataset.
+    stats['pleiades'] = {**(stats.get('pleiades') or {}), 'gazetteer': stats.pop('gazetteer', None)}
+    stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None)}
     manifest(stats)
 
 

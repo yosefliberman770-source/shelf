@@ -13,13 +13,20 @@ import { DATE_SOURCE_LABEL, type DateContext, dateContextFor, detectPlaces, save
 import { historicalPlaces } from '../../lib/history/placeService';
 import { CONFIDENCE_LABEL, type HistoricalPlace, type PlaceCandidate, type PlaceQuery, type PlaceResolution } from '../../lib/history/types';
 import { Icon } from '../icons';
+import type { Detection } from '../../atlas/resolve';
 
 export interface MapRequest {
   /** Name as written in the book (omit for "map this chapter"). */
   name?: string;
   passage?: string;
   mentionIndex?: number;
-  mode?: 'place' | 'chapter';
+  mode?: 'place' | 'chapter' | 'section' | 'search' | 'saved';
+  /** The selected passage, for "Map this section". */
+  text?: string;
+  /** How the name was found (for "Why is this place here?"). */
+  detection?: Detection;
+  /** A place already identified (from the text popup or the map). */
+  placeKey?: string;
 }
 
 export interface MapBook { bookId: string; title: string; chapter?: string; item?: Pick<Item, 'histStart' | 'histEnd'> }
@@ -147,8 +154,8 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
           animate={animate} onAnimate={(a) => setAnimate(a)} onClearMine={() => { saveBookDate(book.bookId, undefined); setDate(dateContextFor({ bookId: book.bookId, item: book.item, passage: target.passage, chapterText: chapterText() })); }}
           onRemember={() => { if (year !== undefined) saveBookDate(book.bookId, year); }} />
 
-        {target.mode === 'chapter'
-          ? <ChapterPlaces book={book} chapterText={chapterText} year={year} pinned={online && atlas} onView={setChapterView} onPins={setPins} onPick={(name) => setTarget({ name, mode: 'place', passage: undefined })} />
+        {target.mode === 'chapter' || target.mode === 'section'
+          ? <ChapterPlaces book={book} chapterText={target.mode === 'section' && target.text ? () => target.text! : chapterText} year={year} pinned={online && atlas} onView={setChapterView} onPins={setPins} onPick={(name) => setTarget({ name, mode: 'place', passage: undefined })} />
           : <PlaceInfo name={target.name ?? ''} res={res} loading={loading} year={year} query={query} onRetry={() => setRetry((n) => n + 1)} onResolved={setRes} />}
 
         {(src || (atlas && view)) && (
@@ -172,7 +179,7 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
 
 // ── Date controls ─────────────────────────────────────────────────────
 
-function DateControls({ compact, year, approximate, source, onChange, item, animate, onAnimate, onRemember, onClearMine }: {
+export function DateControls({ compact, year, approximate, source, onChange, item, animate, onAnimate, onRemember, onClearMine }: {
   /** The atlas has its own timeline, so only the date's source and "go to a year" are shown. */
   compact?: boolean;
   year?: number; approximate?: boolean; source: DateContext['source']; onChange: (y: number | undefined, approx?: boolean) => void; item?: MapBook['item'];

@@ -67,11 +67,11 @@ export function findInDocument(doc: Document, m: Matcher, limit = 400): Hit[] {
 type HighlightWin = Window & { CSS?: { highlights?: Map<string, unknown> }; Highlight?: new (...r: Range[]) => unknown };
 
 /** Draw subtle underlines under the hits (no-op where unsupported). */
-export function paintHits(win: Window, hits: Hit[]) {
+export function paintHits(win: Window, hits: Hit[], name = 'shelf-entity') {
   const w = win as HighlightWin;
   if (!w.CSS?.highlights || !w.Highlight) return;
-  if (hits.length) w.CSS.highlights.set('shelf-entity', new w.Highlight(...hits.map((h) => h.range)));
-  else w.CSS.highlights.delete('shelf-entity');
+  if (hits.length) w.CSS.highlights.set(name, new w.Highlight(...hits.map((h) => h.range)));
+  else w.CSS.highlights.delete(name);
 }
 
 /** Which hit (if any) is under a tap at viewport point (x, y)? */

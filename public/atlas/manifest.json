@@ -13,14 +13,19 @@
    "files": [
     "pleiades-places.json",
     "pleiades-lines.json",
-    "pleiades-provinces.json"
+    "pleiades-provinces.json",
+    "pleiades-gazetteer.json"
    ],
    "notes": "Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.",
    "retrieved": "2026-09-29",
    "counts": {
     "places": 20340,
     "lines": 612,
-    "provinces": 193
+    "provinces": 193,
+    "gazetteer": {
+     "places": 34458,
+     "withParents": 2434
+    }
    }
   },
   {
@@ -57,13 +62,15 @@
    "shareAlike": false,
    "attribution": "Cliopatria, Seshat Global History Databank (CC BY 4.0); simplified by Shelf",
    "files": [
-    "cliopatria/index.json"
+    "cliopatria/index.json",
+    "cliopatria/names.json"
    ],
    "notes": "One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.",
    "retrieved": "2026-09-29",
    "counts": {
     "polities": 13380,
-    "classified": 2654
+    "classified": 2654,
+    "names": null
    }
   },
   {
