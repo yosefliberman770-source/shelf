@@ -14,7 +14,7 @@ import type { EntityKind } from './mention';
 import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, type HistYear, timeFit, type TimeFit } from './time';
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
-export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya';
+export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh';
 export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
 export interface GazPlace {
   /** "<gazetteer>:<id>", e.g. "pleiades:423025" */
@@ -41,6 +41,12 @@ export interface GazPlace {
   related: Relation[];
   /** Dated roles (Viabundus: town 1250–, toll 1400–1500…). */
   roles?: [string, number | null, number | null][];
+  /** What the start date means ("founded", "first mention", "Germania Sacra" tenure). */
+  dateBasis?: string;
+  /** Estimated inhabitants in thousands per sample year (Buringh), with how each was estimated. */
+  population?: { year: number; thousands: number; estimate?: string }[];
+  /** A correction the build made to the source, stated. */
+  note?: string;
   url: string;
 }
 
@@ -60,6 +66,9 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], core: [-750, 640], box: [-20, 5, 90, 60], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
   { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], core: [1350, 1650], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
   { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], core: [800, 1000], box: [-10, 10, 80, 45], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
+  { id: 'wikidata', name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', coverage: [300, 1900], core: [500, 1650], box: [-32, 24, 62, 72], describe: 'Castles, monasteries, cathedrals, dioceses, fortifications, bridges and settlements with a recorded founding date or first mention, across Europe and the Mediterranean (snapshot).', record: (id) => `https://www.wikidata.org/wiki/${id}` },
+  { id: 'germaniasacra', name: 'Germania Sacra', license: 'CC BY-SA 3.0', url: 'https://klosterdatenbank.germania-sacra.de/', coverage: [400, 1810], core: [700, 1803], box: [2, 43, 20, 56], describe: 'Monasteries and canonries of the Holy Roman Empire with the dated tenure of each religious order.', record: (id) => `https://klosterdatenbank.germania-sacra.de/gsn/${id}` },
+  { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
 /** Gazetteers whose period covers the year (all of them when the year is unknown). */
@@ -89,7 +98,13 @@ const NOT_A_LOCATION = new Set(['people', 'ethnic-group', 'unknown', 'false', 'l
 // ── The tiled index ───────────────────────────────────────────────────────
 
 type Row = [GazetteerId, number | string, string, number, number, 0 | 1, string, number | null, number | null, number,
-  [string, number | null, number | null, string][], string[], [number | string, string, string, 0 | 1][], { roles?: [string, number | null, number | null][]; period?: [number, number]; env?: [number | null, number | null, EnvelopeBasis]; z?: number } | null];
+  [string, number | null, number | null, string][], string[], [number | string, string, string, 0 | 1][], RowExtra | null];
+/** Per-dataset extras: Viabundus roles, dataset periods, envelopes; site kind, date basis, orders, population. */
+interface RowExtra {
+  roles?: [string, number | null, number | null][]; period?: [number, number]; env?: [number | null, number | null, EnvelopeBasis]; z?: number;
+  k?: string; st?: string; fb?: string; nl?: string; o?: string[]; gs?: string; q?: string; fix?: string;
+  pop?: Record<string, number>; est?: Record<string, string>;
+}
 type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
 const CELL = 2;
@@ -122,7 +137,10 @@ function toPlace(r: Row): GazPlace {
     datasetPeriod: from === null && to === null && (!!extra?.period || extra?.env?.[2] === 'dataset'),
     uncertain: unc, names: names.map(([name, a, b, lang]) => ({ name, from: a ?? undefined, to: b ?? undefined, lang: lang || undefined })),
     partOf, related: related.map(([rid, type, t, rev]) => ({ title: t, key: `${src}:${rid}`, type, reverse: rev === 1 })),
-    roles: extra?.roles, url: info.record(id),
+    roles: extra?.roles, url: extra?.q && src !== 'wikidata' ? `https://www.wikidata.org/wiki/${extra.q}` : info.record(id),
+    dateBasis: extra?.fb,
+    population: extra?.pop ? Object.entries(extra.pop).map(([y, v]) => ({ year: Number(y), thousands: v, estimate: extra.est?.[y] })) : undefined,
+    note: extra?.fix,
   };
 }
 
@@ -313,7 +331,9 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   }
   // The record to show from a group: attested at the year first, titled first.
   const fitRank = (p: GazPlace) => ({ within: 0, near: 1, period: 2, 'no-year': 3, undated: 4, earlier: 5, later: 6 })[recordFit(p, year)];
-  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle))[0];
+  // Then a record with dates of its own over one dated only by its dataset's period (a Buringh town).
+  const ownDates = (p: GazPlace) => (p.from !== undefined || p.to !== undefined ? 0 : p.datasetPeriod ? 2 : 1);
+  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
   let why = '';

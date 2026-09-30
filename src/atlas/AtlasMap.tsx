@@ -3,7 +3,7 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -590,6 +590,45 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return {
         title: str('n') ?? 'Place', lines: [roles.join(', '), `Recorded: ${range(num('f'), num('t'))}`, ...(num('tf') !== undefined ? [`Town from ${yearLabel(num('tf')!)}`] : [])],
         pick: pickOf('viabundus'), source: credit('viabundus'), caution: 'Each role (town, toll, fair…) has its own dates in Viabundus — open the place history for them.',
+      };
+    }
+    case 'medieval-sites': {
+      const kind = [str('st'), str('k')].filter(Boolean)[0] ?? 'site';
+      const f0 = num('f');
+      const lines = [kind[0].toUpperCase() + kind.slice(1),
+        f0 === undefined && num('t') === undefined ? 'No founding date or first mention recorded'
+          : `${str('fb') === 'first mention' ? 'First mentioned' : str('fb') === 'Germania Sacra' ? 'Earliest dated tenure (Germania Sacra)' : 'Founded'}: ${f0 !== undefined ? yearLabel(f0) : '?'}${num('t') !== undefined ? ` · dissolved / ended: ${yearLabel(num('t')!)}` : ''}`];
+      if (str('o')) lines.push(`Order: ${str('o')}`);
+      if (str('d')) lines.push(`Diocese: ${str('d')}`);
+      if (str('nl')) lines.push('No English name recorded — shown in its own language');
+      const q = str('i')?.startsWith('Q') ? str('i') : undefined;
+      return {
+        title: str('n') ?? 'Site', lines,
+        pick: pt ? (q ? { key: `wikidata:${q}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : str('gs') ? { key: `germaniasacra:${str('gs')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined) : undefined,
+        link: q ? { href: `https://www.wikidata.org/wiki/${q}`, label: 'Wikidata ↗' } : str('gs') ? { href: `https://klosterdatenbank.germania-sacra.de/gsn/${str('gs')}`, label: 'Germania Sacra ↗' } : undefined,
+        source: str('gs') ? `${credit('wikidata')}; ${credit('germaniasacra')}` : credit('wikidata'),
+        caution: f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
+          : num('t') === undefined ? 'No end is recorded, so it is drawn to the present; many houses and castles ended earlier than their record says.' : undefined,
+      };
+    }
+    case 'urban-population': {
+      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`) ?? 0] as const);
+      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : '—'}`);
+      return {
+        title: str('n') ?? 'Town', lines: [`${str('c') ?? ''}${str('a') ? ` · “${str('a')}” in the dataset` : ''}`, `Estimated inhabitants (thousands) — ${near.join(' · ')}`],
+        pick: pt && str('i') ? { key: `buringh:${str('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
+        link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.17026/dans-xzy-u62q', label: 'Dataset ↗' }, source: credit('buringh'),
+        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “—” = below the dataset’s threshold.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
+      };
+    }
+    case 'gs-dioceses':
+      return { title: `Diocese of ${str('n') ?? '?'}`, lines: ['Holy Roman Empire'], source: credit('germaniasacra'), caution: 'Germania Sacra’s reconstruction for no single stated date; borders changed over the centuries.' };
+    case 'hced-battles': {
+      const y = num('y');
+      return {
+        title: str('n') ?? 'Battle', lines: [`${str('k') ?? 'battle'}${y !== undefined ? ` · ${yearLabel(y)}` : ''}`, ...(str('w') ? [`War: ${str('w')}`] : []), ...(str('win') ? [`Winner: ${str('win')}${str('los') ? ` · loser: ${str('los')}` : ''}`] : [])],
+        link: { href: 'https://doi.org/10.7910/DVN/6ZFC0V', label: 'Dataset ↗' }, source: credit('hced'),
+        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors; Wikidata has no record of it.',
       };
     }
     case 'thurayya-places':

@@ -48,6 +48,8 @@ KINDS = {
     'university': ('wd:Q3918', DATED(1600)),
     'bridge': ('wd:Q12280', DATED(1600)),
     'settlement': ('wd:Q486972', DATED(1600, 400)),    # with a first written mention (P1249) or founding date, 400–1600
+    'city': ('wd:Q515 wd:Q3957', ''),                  # cities and towns of any date: used only to give English names to other sources' towns
+    'town': ('wd:Q486972', '?i wdt:P1082 ?pp . FILTER(?pp >= 5000)'),  # any settlement of 5,000+ today (communes, boroughs…), same use
 }
 NAME_LANGS = 'de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl mul'.split()
 
@@ -60,7 +62,7 @@ PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
 
 
 def inner(cls, extra):
-    return f'''  {{ SELECT DISTINCT ?i ?c WHERE {{ ?i wdt:P31/wdt:P279* {cls} . ?i wdt:P625 ?c .
+    return f'''  {{ SELECT DISTINCT ?i ?c WHERE {{ VALUES ?cls {{ {cls} }} ?i wdt:P31/wdt:P279* ?cls . ?i wdt:P625 ?c .
     BIND(geof:longitude(?c) AS ?lon) BIND(geof:latitude(?c) AS ?lat)
     FILTER({BOX}) {extra} }} }}'''
 

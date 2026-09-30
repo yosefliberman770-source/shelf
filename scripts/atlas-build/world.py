@@ -25,7 +25,7 @@ import re
 import shutil
 import unicodedata
 import zlib
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 
 import tiler
@@ -166,12 +166,15 @@ def places_index(rows):
         k = (zlib.crc32(str(pid).encode()) % 16)
         ids[f'{src}-{k}'][str(pid)] = c
         seen = set()
+        # The title counts as the record's own main name unless the build supplied it from
+        # elsewhere (a Buringh town shown under Wikidata's English name: extra.tn = 0).
+        own_title = not (r[13] and r[13].get('tn') == 0)
         for i, n in enumerate([title] + [x[0] for x in r[10]]):
             nn = norm(n)
             if len(nn) < 2 or nn in seen:
                 continue
             seen.add(nn)
-            names[shard(nn)].append([nn, src, pid, c, 1 if i == 0 else 0])
+            names[shard(nn)].append([nn, src, pid, c, 1 if i == 0 and own_title else 0])
     base = os.path.join(OUT, 'places')
     if os.path.exists(base):
         shutil.rmtree(base)
@@ -372,11 +375,15 @@ def tiles_thurayya():
 
 def build_world(only=None):
     log('World: place index')
+    import sites  # Europe-wide medieval sites and towns (Wikidata, Germania Sacra, Buringh, HCED)
     if only == {'places'}:
-        rows = pleiades_rows() + viabundus_rows() + thurayya_rows()
+        rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + sites.build(rows_only=True)[0]
         return places_index(rows)
-    rows = pleiades_rows() + viabundus_rows() + thurayya_rows()
-    stats = {'places': places_index(rows), 'bySource': {s: sum(1 for r in rows if r[0] == s) for s in ('pleiades', 'viabundus', 'althurayya')}}
+    site_rows, site_stats = sites.build(rows_only=bool(only) and 'sites' not in only)
+    rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows
+    stats = {'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
+    if site_stats:
+        stats['tiles-sites'] = site_stats
     log('  ', stats)
     os.makedirs(os.path.join(OUT, 'tiles'), exist_ok=True)
     for name, fn in (('pleiades', tiles_pleiades), ('itinere', tiles_itinere), ('viabundus', tiles_viabundus), ('thurayya', tiles_thurayya)):
@@ -395,6 +402,10 @@ def build_world(only=None):
         'viabundus': 'Viabundus 2, Zenodo 10.5281/zenodo.16611998 (CC BY 4.0)',
         'althurayya': 'al-Ṯurayyā Gazetteer v1.0, github.com/althurayya (Apache-2.0; after G. Cornu)',
         'itinere': 'Itiner-e route segments download (CC BY 4.0), Zenodo 10.5281/zenodo.17122148',
+        'wikidata': 'Wikidata snapshot of medieval sites via QLever (CC0), data/historical/raw/wikidata-medieval',
+        'germaniasacra': 'Germania Sacra Klosterdatenbank API (CC BY-SA 3.0)',
+        'buringh': 'Buringh, European urban population 700–2000, DANS 10.17026/dans-xzy-u62q (CC0)',
+        'hced': 'Historical Conflict Event Dataset, Harvard Dataverse 10.7910/DVN/6ZFC0V (CC0)',
     }
     write_json(os.path.join(OUT, 'manifest.json'), stats)
     for f in os.listdir(os.path.join(OUT, 'tiles')):
