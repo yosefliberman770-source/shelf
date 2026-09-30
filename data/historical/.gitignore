@@ -17,6 +17,9 @@ raw/*/nightly-export/**
 !raw/al-thurayya/original/master/routes.json
 !raw/al-thurayya/original/master/routes_full.json
 !raw/atlas-rural-settlement/original/atlas-gis-shapefile.zip
+!raw/buringh-urban/original/European urban population, 700 - 2000 - Annex A.pdf
+!raw/buringh-urban/original/European urban population, 700 - 2000 - Annex B.pdf
+!raw/buringh-urban/original/European urban population, 700 - 2000.tab
 !raw/cshapes/original/CShapes-2.0.zip
 !raw/cshapes/original/CShapes-2.0_Codebook.pdf
 !raw/cshapes/original/CShapes-Europe.geojson
@@ -25,10 +28,15 @@ raw/*/nightly-export/**
 !raw/domesday/original/DBinter.zip
 !raw/domesday/original/DBshires.zip
 !raw/domesday/original/LoG_GeneralGuide.pdf
+!raw/germania-sacra/original/diocese-borders.geojson
+!raw/germania-sacra/original/monasteries-list.json
+!raw/germania-sacra/original/monasteries-locations.geojson
 !raw/gough-map/original/Gough_Map_website_intro.pdf
 !raw/gough-map/original/gough_red_lines.zip
 !raw/gough-map/original/gough_routes.zip
 !raw/gough-map/original/gough_way_stations.zip
+!raw/hced/original/HCED Data v3.csv
+!raw/hced/original/HCED explainer.txt
 !raw/historic-england/original/Battlefields.gpkg
 !raw/historic-england/original/Parks_and_Gardens.gpkg
 !raw/historic-england/original/Protected_Wreck_Sites.gpkg
@@ -54,6 +62,7 @@ raw/*/nightly-export/**
 !raw/medieval-bridges/original/General_Guide_bridges.pdf
 !raw/medieval-bridges/original/gis/Bridges1250.csv
 !raw/medieval-bridges/original/gis/Bridges1250.zip
+!raw/periodo/original/periodo-dataset.json
 !raw/pleiades/original/dumps/README.txt
 !raw/pleiades/original/dumps/pleiades-names-20260929.csv.gz
 !raw/pleiades/original/dumps/pleiades-places-20260929.csv.gz
@@ -81,3 +90,24 @@ raw/*/nightly-export/**
 !raw/viabundus/original/population.csv
 !raw/viabundus/original/towns.csv
 !raw/viabundus/original/water-1500.csv
+!raw/wikidata-medieval/original/battle.names.tsv
+!raw/wikidata-medieval/original/battle.tsv
+!raw/wikidata-medieval/original/bridge.names.tsv
+!raw/wikidata-medieval/original/bridge.tsv
+!raw/wikidata-medieval/original/castle.names.tsv
+!raw/wikidata-medieval/original/castle.tsv
+!raw/wikidata-medieval/original/cathedral.names.tsv
+!raw/wikidata-medieval/original/cathedral.tsv
+!raw/wikidata-medieval/original/diocese.names.tsv
+!raw/wikidata-medieval/original/diocese.tsv
+!raw/wikidata-medieval/original/fortification.names.tsv
+!raw/wikidata-medieval/original/fortification.tsv
+!raw/wikidata-medieval/original/labels.tsv
+!raw/wikidata-medieval/original/monastery.names.tsv
+!raw/wikidata-medieval/original/monastery.tsv
+!raw/wikidata-medieval/original/settlement.names.tsv
+!raw/wikidata-medieval/original/settlement.tsv
+!raw/wikidata-medieval/original/siege.names.tsv
+!raw/wikidata-medieval/original/siege.tsv
+!raw/wikidata-medieval/original/university.names.tsv
+!raw/wikidata-medieval/original/university.tsv

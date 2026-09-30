@@ -66,6 +66,24 @@
   "downloaded": "2026-09-30",
   "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/atlas-gis-shapefile.zip.zip). Saved here as atlas-gis-shapefile.zip (the phone added a second \u201c.zip\u201d); contents unchanged."
  },
+ "buringh-urban/original/European urban population, 700 - 2000 - Annex A.pdf": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20414",
+  "bytes": 196426,
+  "sha256": "541f1ecc2342753d83a86ef734aaa220a57d41a6db941699558f4c01f934aa60",
+  "downloaded": "2026-09-30"
+ },
+ "buringh-urban/original/European urban population, 700 - 2000 - Annex B.pdf": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20413",
+  "bytes": 437903,
+  "sha256": "a9563f14abffab4879a3cca1d996c0de97a95a103f232c00ab1a58d57e02a29d",
+  "downloaded": "2026-09-30"
+ },
+ "buringh-urban/original/European urban population, 700 - 2000.tab": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20415",
+  "bytes": 4920667,
+  "sha256": "d799dbeaafe7e00f897696cf828e55146394ae1bdd7618aee3d37d0364291a31",
+  "downloaded": "2026-09-30"
+ },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
   "bytes": 44501172,
@@ -135,6 +153,24 @@
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
   "downloaded": "2026-09-30"
  },
+ "germania-sacra/original/diocese-borders.geojson": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
+  "bytes": 3956104,
+  "sha256": "694971461ecad3798327ed48b015658a969440f89960b770fc955cc25f92a428",
+  "downloaded": "2026-09-30"
+ },
+ "germania-sacra/original/monasteries-list.json": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/list",
+  "bytes": 7095,
+  "sha256": "94b46929af3b7663c6176584a1bcd43432ab379047b81c1bc4ec7eb05ed09d6c",
+  "downloaded": "2026-09-30"
+ },
+ "germania-sacra/original/monasteries-locations.geojson": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/locations/geojson",
+  "bytes": 3625148,
+  "sha256": "b7ddbd4697d094796faffada7cf437367d0038e9fc6006f65f052fa9b53102bd",
+  "downloaded": "2026-09-30"
+ },
  "gough-map/original/Gough_Map_website_intro.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
   "bytes": 116046,
@@ -163,6 +199,18 @@
   "downloaded": "2026-09-30",
   "provenance": "Downloaded from the official URL by fetch.py.",
   "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
+ },
+ "hced/original/HCED Data v3.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
+  "bytes": 2171518,
+  "sha256": "92a22e49c20d02a1d7ecf3fbdbb5e3ca94b7327b7620ee79dd01909857805b79",
+  "downloaded": "2026-09-30"
+ },
+ "hced/original/HCED explainer.txt": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/6909628",
+  "bytes": 2490,
+  "sha256": "7cd17664755fdc2a887df22c8bae8b47f722e1339a62fe3f979adfb25cbabe25",
+  "downloaded": "2026-09-30"
  },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
@@ -398,6 +446,12 @@
   "sha256": "0d9bd6e76da3fe63204aaf9e4068e1f0316c3f7215329c671ae9cc9c9fc449d1",
   "downloaded": "2026-09-29"
  },
+ "periodo/original/periodo-dataset.json": {
+  "url": "https://data.perio.do/d.json",
+  "bytes": 7806282,
+  "sha256": "5482d0dc72e062dfcbd95671b1c2e07f132e30b5b1caff766c172844984432a9",
+  "downloaded": "2026-09-30"
+ },
  "pleiades/original/dumps/README.txt": {
   "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
   "bytes": 2042,
@@ -595,5 +649,131 @@
   "bytes": 19141157,
   "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
   "downloaded": "2026-09-29"
+ },
+ "wikidata-medieval/original/battle.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/battle.names.rq)",
+  "bytes": 393312,
+  "sha256": "36529a100c8b41e26ca9f7c4de54b223c3283d1c2e43a0b387881a9a91bcf8b4",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/battle.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/battle.rq)",
+  "bytes": 407447,
+  "sha256": "bc21e8128cbcc2c0861c31c9b2d4602c3002880305c8bda7407e82a0804d6a8c",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/bridge.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge.names.rq)",
+  "bytes": 35606,
+  "sha256": "b7bc2d18aa43d445c8f01fa7ecfdc83df001c8bf5961e9e3482e784c2e0dc652",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/bridge.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge.rq)",
+  "bytes": 64684,
+  "sha256": "098f7a10ef7800bf28baff20b307cd0272a1c4b8cc3ee6edfa5f8015cb0848ea",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/castle.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/castle.names.rq)",
+  "bytes": 2727959,
+  "sha256": "20c6a3340db1d5a6ec40ac0b309cd900b8499fb45848f50bffc2995fb6f07e83",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/castle.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/castle.rq)",
+  "bytes": 5500441,
+  "sha256": "6596f24db7791acdf7f41907f3d8a31d81303936e7e1e05a5a0a1c06371a75a9",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/cathedral.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/cathedral.names.rq)",
+  "bytes": 488446,
+  "sha256": "ef304f54af55abca773a35d27fba679267af4ff70eca20c979d1106dca05e92a",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/cathedral.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/cathedral.rq)",
+  "bytes": 490145,
+  "sha256": "2edcb632536c8064a7df250bd053e6e9acd383d7e58325cd9e178a3e5cfffa27",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/diocese.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/diocese.names.rq)",
+  "bytes": 215514,
+  "sha256": "e2d99c7d1695202986b9844dafd54a7e31a4b54bb9a2eb9d5855cf5adc620ed6",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/diocese.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/diocese.rq)",
+  "bytes": 150092,
+  "sha256": "e37183083e58187a15eade98cde9d827f88f76ae25cca154630d54bca51a9107",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/fortification.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fortification.names.rq)",
+  "bytes": 564902,
+  "sha256": "9b044a0b7e65366391abeb5456f913da1a4bb6d310854787a279992162250850",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/fortification.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fortification.rq)",
+  "bytes": 1039337,
+  "sha256": "535520379c1c8bd397b2b758996d6cfa728ef121d3b2dc13359eb822490209ad",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/labels.tsv": {
+  "url": "https://qlever.dev/api/wikidata (labels of referenced items)",
+  "bytes": 488149,
+  "sha256": "130ac84c25fdef53db0ea6e61a8d15ad077e0f5b8c703a6b7d3d3bb69b1d28cc",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/monastery.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/monastery.names.rq)",
+  "bytes": 1879551,
+  "sha256": "d45c59f9f7aa67488fbd926ca7acbcbcf4788770450e50b981e20df75a6fa05f",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/monastery.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/monastery.rq)",
+  "bytes": 3977343,
+  "sha256": "83dbdef5bb8a9267352a43c35ee88c872a0f475325e24578c461ca8b54137c16",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/settlement.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement.names.rq)",
+  "bytes": 3824665,
+  "sha256": "9aee76c806cfd0f569cfa97a4374f2fbfaf68cbfae7b15a3decaf9c38bd3e1cc",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/settlement.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement.rq)",
+  "bytes": 5783125,
+  "sha256": "93cdea750dfa508c9d08ff157a892f8b5916be5f8676257855171a47b9d732e9",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/siege.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/siege.names.rq)",
+  "bytes": 194118,
+  "sha256": "1d515ab109526db866fdf19d5c053d0f1418b3559914a89a81563f006a1d5597",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/siege.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/siege.rq)",
+  "bytes": 259403,
+  "sha256": "50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/university.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/university.names.rq)",
+  "bytes": 70098,
+  "sha256": "912f77a97dd4f43bdad7bd8b8cff5d429e5d181b3fc409d2cd5927e16656b637",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/university.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/university.rq)",
+  "bytes": 35094,
+  "sha256": "191ea22ccbeac4dccae30cc919e8d09dde1c73e9747e8470cac4defb2245787c",
+  "downloaded": "2026-09-30"
  }
 }

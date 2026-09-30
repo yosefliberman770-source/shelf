@@ -478,5 +478,61 @@
     "manual": true
    }
   ]
+ },
+ {
+  "id": "germania-sacra",
+  "files": [
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/locations/geojson",
+    "path": "original/monasteries-locations.geojson"
+   },
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/list",
+    "path": "original/monasteries-list.json"
+   },
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
+    "path": "original/diocese-borders.geojson"
+   }
+  ]
+ },
+ {
+  "id": "buringh-urban",
+  "files": [
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20415",
+    "path": "original/European urban population, 700 - 2000.tab"
+   },
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20414",
+    "path": "original/European urban population, 700 - 2000 - Annex A.pdf"
+   },
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20413",
+    "path": "original/European urban population, 700 - 2000 - Annex B.pdf"
+   }
+  ]
+ },
+ {
+  "id": "hced",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
+    "path": "original/HCED Data v3.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/6909628",
+    "path": "original/HCED explainer.txt"
+   }
+  ]
+ },
+ {
+  "id": "periodo",
+  "files": [
+   {
+    "url": "https://data.perio.do/d.json",
+    "path": "original/periodo-dataset.json"
+   }
+  ]
  }
 ]

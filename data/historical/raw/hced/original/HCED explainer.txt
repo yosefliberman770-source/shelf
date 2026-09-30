@@ -1,0 +1,44 @@
+##########################################################################################################################
+
+1. Geolocating the Battles.py is the python file needed to take the first pass at geolocating the battles through Google
+Maps. The battle locations were then rechecked on multiple occasions manually before the analysis in the paper and amended
+if found to be in error.
+
+2. HCED Master Data.csv is the main file for the HCED dataset.
+
+3. Master Data Analysis Final.R is the file in which all of the analysis is contained for the paper until the section 'Dynamic Effects of
+Conflict and Growth' on page 17.
+
+4. Dynamic Models.R is the file in which the analysis is contained for the rest of the paper from page 17 onwards.
+
+5. The files beginning popd are the population density files for the dynamic models from page 17 onwards obtained from the 
+HYDE dataset downloaded from https://www.pbl.nl/en/image/links/hyde
+
+5. Gecon40_post_final is the Nordhaus Gecon data downloaded from https://gecon.yale.edu/
+
+6. Scraping Dincecco.R is the file in which we read in the scanned pages from Dincecco and Onorato's From Warfare to Wealth, 
+Appendix, Data Appendix Table A1 and geolocate the modern day locations for export to Dincecco Coordinates.csv
+
+7. Geachron.py is the file which we used to download the locations of the battle sites on the Geachron website.
+
+8. Merging Geacron and the Master Data.R is the file in which we merged the Geacron and Dincecco Battle site data and 
+compared the sites to our locations. 
+
+9. Locations to Check.csv is the file containing the battle locations on which our locations and Geacron's differed by more than 
+100km
+
+10. Validating the locations.R is the file in which we calculate the distances between our locations, Geacron's and 
+Dincecco and Onorato's for Table 1. 
+
+11. Dincecco to Check.csv is the file containing the battle locations on which our locations and Dincecco and Onorato's 
+differed by more than 100km. 
+
+12. Dincecco Merger.csv is the file containing our locations and Dincecco and Onorato's locations 
+
+13. Geachron Merger.csv is the file containing our locations and Geacron's
+
+14. Plotting the Maps.R is the file to replicate the maps in Figures 2 and 3. 
+
+15. Comparison with Brecke.R is the file to replicate Figure 1
+
+16. TM_WORLD_BORDERS-0.3.shp is the world map shapefile for Figures 2 and 3. Taken from https://thematicmapping.org/downloads/world_borders.php
