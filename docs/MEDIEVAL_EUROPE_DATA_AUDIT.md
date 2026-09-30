@@ -65,7 +65,7 @@ The phone loads the public site, so "local builds only" data never reached it
 | --- | --- | --- | --- | --- |
 | **RAN**, Romania's national archaeological register (CIMEC) | Romania | Migration-period and medieval settlements, churches, monasteries and fortifications, dated by period or stated century. data.gov.ro still refuses connections; taken from the register's own site and map service. | 2,865 | private |
 | **DicoTopo**, Dictionnaire topographique (CTHS / École des chartes) | France (53 départements) | 22,366 communes with their **first dated attestation**, earliest form and dated old forms (median first attestation: 1146). Also 6,774 castles, churches and religious houses located by commune (marked approximate). | 29,140 | private (no-derivatives licence) |
-| **EBIDAT**, castle database of the European Castle Institute | Germany, Austria, Czechia, Slovakia, Hungary, Latvia… | Castles with the start and end of their use, to the half or quarter century (98% dated; Wikidata dates 16% of castles). One castle with an impossible position in the source is left out. The page-by-page snapshot was still running; it resumes and each rebuild adds the rest. | 5,161 so far | private |
+| **EBIDAT**, castle database of the European Castle Institute | Germany, Austria, Czechia, Slovakia, Hungary, Latvia… | 8,264 castles in the snapshot, 87% of them dated by the start and end of their use, to the half or quarter century; Wikidata dates 16% of castles. Mostly Germany, plus Austria (152), Hungary (74), Czechia (57), Slovakia (46) and Latvia (30). One castle with an impossible position in the source is left out. | 8,263 | private |
 | **Fund og Fortidsminder**, Denmark | Denmark | Viking-age and medieval castles, churches, monasteries, farms and pit houses, roads, wrecks, and 3,954 coin finds and hoards (economy), each with the register's date range. | 10,772 | private |
 | **Swedish ancient remains** (Riksantikvarieämbetet) | Sweden | 764,974 remains in the national GeoPackage, which has no dating field. Only the 5,300 whose own description names a period are kept, dated by that period (medieval 2,751, Viking Age 1,094, Migration period 483…). Nothing is dated from its type alone. | 5,300 | private |
 | **Norwegian heritage register** (Riksantikvaren) | Norway | Migration-period, Viking-age and medieval settlements, churches and churchyards, forts, trade sites, burial mounds and house sites, each dated by the register's period. Licence is open (NLOD), so it is public. | 8,941 | **public** |
@@ -85,15 +85,14 @@ All of these now come through the private data pack:
 ### R.4 Measured with and without the private data
 
 The generated matrices below (E.2, F.2, G.2) repeat the coverage measure with
-the private pack counted. These are the raw record counts from the 1 October
-build. EBIDAT is 5,161 castles so far; its snapshot resumes and adds more with
-each rebuild.
+the private pack counted. These are the raw record counts from the final
+build of this pass.
 
 | Region, theme, period | Public only | With your private data | From |
 | --- | --- | --- | --- |
 | France, settlements, 1000–1199 | 291 | **14,618** | DicoTopo first attestations |
 | France, military, 1000–1199 | 671 | 1,470 | DicoTopo castles |
-| Germany, military, 1000–1199 | 490 | 1,826 | EBIDAT |
+| Germany, military, 1000–1199 | 490 | **2,775** | EBIDAT |
 | Scandinavia, settlements, 800–999 | 1,030 | 2,706 | Danish, Swedish registers |
 | Scandinavia, religion, 1000–1199 | 1,485 | 2,877 | Danish, Swedish registers |
 | Scandinavia, economy, 800–999 | 312 | 1,012 | Danish coin finds and hoards |
@@ -506,7 +505,7 @@ checked against its recorded SHA-256.
 | dicotopo | 53/53 | ✓ | ✓ | yes | atlas-build/regional.py → private data pack | 29140 | private-sites.pmtiles | integrated (private data pack) |
 | dk-fund-og-fortidsminder | 1/1 | ✓ | ✓ | yes | atlas-build/regional.py → private data pack | 10772 | private-sites.pmtiles | integrated (private data pack) |
 | domesday | 4/4 | ✓ | ✓ | no | atlas-build/england.py | — | domesday.pmtiles | integrated |
-| ebidat | 0/0 | — | ✓ | yes | atlas-build/regional.py → private data pack | 5161 | private-sites.pmtiles | integrated (private data pack) |
+| ebidat | 12/12 | ✓ | ✓ | yes | atlas-build/regional.py → private data pack | 8263 | private-sites.pmtiles | integrated (private data pack) |
 | engel-hungary | 1/1 | ✓ | ✓ | yes | — | — | — | raw only |
 | finland-heritage | 1/1 | ✓ | ✓ | no | atlas-build/regional.py | 1823 | medieval-sites.pmtiles | integrated |
 | gb1900 | 0/0 | — | ✗ | no | — | — | — | metadata only |
@@ -670,7 +669,7 @@ Records counted per period across all regions (a record spanning several periods
 | Settlements | 9598 | 11381 | 29318 | 50345 | 57391 |
 | Political | 397 | 152 | 196 | 874 | 631 |
 | Religion | 1514 | 1940 | 12985 | 19817 | 22419 |
-| Military | 1742 | 1494 | 5788 | 13802 | 16341 |
+| Military | 1790 | 1635 | 6740 | 16164 | 18869 |
 | Roads | 1712 | 150 | 450 | 22238 | 22688 |
 | Economy | 972 | 1350 | 2841 | 4051 | 3726 |
 | Landscape | 673 | 54 | 53 | 52 | 53 |
@@ -726,7 +725,7 @@ file (see R.4 and E.2).
 
 **Regions** (counts are settlements / religion / military records):
 - **Hungary: 71 / 18 / 10 → 71 / 18 / 73.**
-  - EBIDAT adds castles.
+  - EBIDAT adds 74 Hungarian castles.
   - Settlements and religion stay weak: Engel's atlas is encrypted (R.5).
 - **Bulgaria: 23 / 25 / 23.** TIB adds a few places. No national register
   with a bulk route exists.
@@ -783,7 +782,6 @@ file (see R.4 and E.2).
 
 | Gap (measured) | Source | State | Next step |
 | --- | --- | --- | --- |
-| Castles, central Europe (dating) | EBIDAT | snapshot 5,161 castles so far | Let `ebidat_snapshot.py` finish (it resumes), rebuild, reload the private file |
 | Hungary, settlements and religion | Engel, *Magyarország a középkor végén* | encrypted program (vault) | Ask the HUN-REN institute for a data export; nothing else covers Hungary c. 1500 |
 | Iberia castles and churches | Regional heritage registers (Catalonia, Aragón, Castilla y León) | not downloaded | Acquire; they are the only Iberian source beyond Wikidata |
 | Estonia and the Baltic | Estonian heritage register | refuses automated requests (403) | Download by hand in a browser |
@@ -883,7 +881,7 @@ covers the datasets that are in the vault or next in line.
 | HALC (Low Countries) | yes | ✓ | ✓ | · | ✗ not verified | ✗ | ✗ | Low Countries | medieval | political | Dutch | bot check | owner download |
 | DicoTopo | yes | ✓ | ✓ | ✓ | ✓ NC-ND | ✓ | private file | France (53 dép.) | first attestations 500–1900 | settlements, names, religion, military | French (dated old forms kept) | positions are commune centroids | — |
 | RAN (Romania) | yes | ✓ | ✓ | ✓ | not verified | ✓ | private file | Romania | 400–1600 | settlements, religion, military | Romanian | broad periods where no century is given | — |
-| EBIDAT | yes | ✓ | ✓ | ✓ | not stated | ✓ (partial) | private file | Germany, central Europe | castle use | military | German | snapshot resumes | finish snapshot |
+| EBIDAT | yes | ✓ | ✓ | ✓ | not stated | ✓ | private file | Germany, central Europe | castle use | military | German | 13% undated; few castles outside Germany | — |
 | Fund og Fortidsminder | yes | ✓ | ✓ | ✓ | not verified | ✓ | private file | Denmark | 700–1536 | settlements, religion, military, economy, roads | English category + Danish type | no names in the source | — |
 | Swedish remains | yes | ✓ | ✓ | ✓ | not verified | ✓ | private file | Sweden | periods named in descriptions | settlements, religion, military | Swedish | only 5,300 of 764,974 are dated | — |
 | Norwegian register | yes | ✓ | ✓ | ✓ | ✓ NLOD | ✓ | ✓ public | Norway | 400–1537 | settlements, religion, military, landscape | Norwegian (+ English category) | charcoal pits and stray finds excluded | — |

@@ -426,7 +426,7 @@ DATASETS = {
         'source': 'Europäisches Burgeninstitut (Deutsche Burgenvereinigung). Pages snapshotted by scripts/historical-data/ebidat_snapshot.py.',
         'page': 'https://www.ebidat.de/',
         'doi': '',
-        'version': 'Snapshot started 2026-09-30 (castle overview and main-data page per id).',
+        'version': 'Snapshot 2026-09-30: 8,264 castles (overview and main-data page per id, ids 1–12000).',
         'licence': 'Not stated.',
         'licence_url': 'https://www.ebidat.de/impressum.html',
         'licence_note': 'PRIVATE DATA PACK: used privately in Shelf, not republished.',

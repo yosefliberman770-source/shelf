@@ -153,16 +153,16 @@
   "status": "integrated"
  },
  "ebidat": {
-  "filesRecorded": 0,
-  "filesPresent": 0,
+  "filesRecorded": 12,
+  "filesPresent": 12,
   "checksumMismatch": [],
-  "allHaveUrlDateSha": false,
+  "allHaveUrlDateSha": true,
   "sourceMd": true,
   "licenseMd": true,
   "localOnly": true,
   "localFilesInGit": [],
   "processedBy": "atlas-build/regional.py \u2192 private data pack",
-  "placeIndexRows": 5161,
+  "placeIndexRows": 8263,
   "tiles": [
    "private-sites.pmtiles"
   ],

@@ -567,6 +567,78 @@
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
   "downloaded": "2026-09-30"
  },
+ "ebidat/original/pages-00.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1..1000",
+  "bytes": 729621,
+  "sha256": "223f7a31c1841491d4fb7dadcc5cc0c328742b134ccb34fc8019b35a0758dd90",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-01.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1001..2000",
+  "bytes": 1386912,
+  "sha256": "52711a616c5a376ab98d5b762dbfcd4f5a8e787fa369274fee525ab8a2ac3939",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-02.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=2001..3000",
+  "bytes": 1463664,
+  "sha256": "fa1c53eacf794b8e7388ccac23b9b8cd8fd6992ce5235984931b66bf09cca65d",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-03.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=3001..4000",
+  "bytes": 1479972,
+  "sha256": "2680a7876b9e633fa6149454b7004ad71a2a8c7f9cc3dc6d2ce348771f69e152",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-04.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=4001..5000",
+  "bytes": 1557964,
+  "sha256": "a5a440638f272fb0738fb077e279f35f39dff472c5da3d5ba14862401f08078b",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-05.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=5001..6000",
+  "bytes": 1448972,
+  "sha256": "b18597d18af4efdf0378bddd279673d9511f482241bbccb106a38c8c2bbf34c7",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-06.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=6001..7000",
+  "bytes": 1052188,
+  "sha256": "d7d499b6addd2b78b48b8983bc2008be9ea65128f35acc2649f2fad75abca640",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-07.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=7001..8000",
+  "bytes": 1309113,
+  "sha256": "4af859c4d7cd18a109d41c6c96ea99bfbfe741193b4a4a93951d4c21e0fcd387",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-08.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=8001..9000",
+  "bytes": 1391788,
+  "sha256": "be81b333ea2a2e3e0fdfe7c4422df6b5579eac7f9ea1eb9c24b3597976c7dc93",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-09.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=9001..10000",
+  "bytes": 1178146,
+  "sha256": "a961923796c9201ad19b69e04c06d3022047388306f8ea9e71e3fb0dcdc25d17",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-10.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=10001..11000",
+  "bytes": 1897719,
+  "sha256": "65fdeb9885da6ec11827ea6769026d7bdd1af5d897df2b00a6b849ce9bf0862d",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-11.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=11001..12000",
+  "bytes": 76908,
+  "sha256": "6af6af82e6ca00bb460444a5d3b9909abfec86edaf4a26a860bf0fce19b4cf5b",
+  "downloaded": "2026-09-30"
+ },
  "engel-hungary/original/Engel2020.zip": {
   "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
   "bytes": 51552337,
