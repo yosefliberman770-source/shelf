@@ -129,11 +129,12 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const [enabled, setEnabled] = useState<string[]>(loadEnabled);
   const [panel, setPanel] = useState(false);
   const [eventWindow, setEventWindow] = useState(0);
+  const [showUndated, setShowUndated] = useState(false);
   const [warOwn, setWarOwn] = useState<string | undefined>();
   const war = onWarChange ? warProp : warOwn;
   const setWar = onWarChange ?? setWarOwn;
   const [info, setInfo] = useState<Info | null>(null);
-  const ctx: LayerCtx = useMemo(() => ({ year, base, world: `${import.meta.env.BASE_URL}world/`, eventWindow, war }), [year, base, eventWindow, war]);
+  const ctx: LayerCtx = useMemo(() => ({ year, base, world: `${import.meta.env.BASE_URL}world/`, eventWindow, war, showUndated }), [year, base, eventWindow, war, showUndated]);
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
   const enabledRef = useRef(enabled);
@@ -328,7 +329,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         <button className="btn sm atlas-layers-btn" onClick={() => setPanel(!panel)} aria-expanded={panel}>☰ Layers</button>
         {!ready && <div className="atlas-loading">Loading the atlas…</div>}
         {children}
-        {panel && <LayerPanel enabled={enabled} toggle={toggle} year={year} eventWindow={eventWindow} setEventWindow={setEventWindow} war={war} setWar={setWar} base={base} onClose={() => setPanel(false)} />}
+        {panel && <LayerPanel enabled={enabled} toggle={toggle} year={year} eventWindow={eventWindow} setEventWindow={setEventWindow} war={war} setWar={setWar} base={base} showUndated={showUndated} setShowUndated={setShowUndated} onClose={() => setPanel(false)} />}
       </div>
       <Timeline year={year} onChange={onYearChange} marks={marks} />
       {info && <FeatureCard info={info} onClose={() => setInfo(null)}
@@ -348,9 +349,9 @@ function coverageNote(d: AtlasLayerDef, year: HistYear): string | undefined {
   return undefined;
 }
 
-function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, setWar, base, onClose }: {
+function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, setWar, base, showUndated, setShowUndated, onClose }: {
   enabled: string[]; toggle: (id: string) => void; year: HistYear; eventWindow: number; setEventWindow: (n: number) => void;
-  war?: string; setWar: (q: string | undefined) => void; base: string; onClose: () => void;
+  war?: string; setWar: (q: string | undefined) => void; base: string; showUndated: boolean; setShowUndated: (v: boolean) => void; onClose: () => void;
 }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
@@ -359,6 +360,10 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <b>Layers</b>
         <button className="btn xs ghost" onClick={onClose} aria-label="Close layers">✕</button>
       </div>
+      <label className="row small" style={{ gap: 8, alignItems: 'flex-start' }}>
+        <input type="checkbox" checked={showUndated} onChange={(e) => setShowUndated(e.target.checked)} aria-label="Include undated records" />
+        <span>Include undated records <span className="tiny faint">— records whose source gives no dates, shown faint and only within their dataset’s own period. Off by default: an undated record isn’t evidence that something existed in {yearLabel(year)}.</span></span>
+      </label>
       {GROUPS.map((g) => {
         const defs = LAYERS.filter((l) => l.group === g.id || l.alsoIn?.includes(g.id));
         return (

@@ -75,6 +75,8 @@ export interface PlaceQuery {
   language?: string;
   /** Book id, so a choice made in one book doesn't leak into another. */
   bookId?: string;
+  /** Places already identified in this book (its geography so far), as a prior for ambiguous names. */
+  contextPoints?: { lat: number; lon: number }[];
 }
 
 export interface PlaceResolution {

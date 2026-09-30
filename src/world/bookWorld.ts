@@ -14,10 +14,12 @@ import type { HistYear } from '../atlas/time';
 import { db } from '../db/db';
 import type { BookWorldRow, Item } from '../db/types';
 import { findDatesInText } from '../lib/history/dates';
-import { detectPlaces } from '../lib/history/placeDetect';
+import { detectPlaces, screenMentions } from '../lib/history/placeDetect';
+import type { MentionEvidence } from '../atlas/mention';
 import { type HistDate, UNKNOWN_DATE } from './histdate';
 
-export const BOOK_WORLD_VERSION = 1;
+/** 2: mentions carry their textual evidence and are screened; earlier resolutions were made without it. */
+export const BOOK_WORLD_VERSION = 2;
 
 /** What the reader page can give us for one section of the book (loaded off-screen, then released). */
 export interface SectionText { href: string; label?: string; text: string; cfiOf: (name: string) => string | undefined }
@@ -41,14 +43,14 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
     if (row.chapters.some((c) => c.index === i)) { onProgress?.(i + 1, count); continue; }
     const s = await load(i).catch(() => undefined);
     if (s && s.text.trim().length > 40) {
-      const found = detectPlaces(s.text, names.known.map((k) => k.name), names.people).slice(0, 80);
+      const found = await screenMentions(detectPlaces(s.text, names.known.map((k) => k.name), names.people).slice(0, 80));
       const lower = s.text.toLowerCase();
       row.chapters.push({
         index: i, href: s.href, label: s.label,
         dates: findDatesInText(s.text).map((d) => d.year).slice(0, 200),
         wars: warNames.filter((w) => lower.includes(w.n)).map((w) => w.q).slice(0, 20),
         events: eventNames.filter((e) => lower.includes(e.n)).map((e) => e.q).slice(0, 30),
-        mentions: found.map((m) => ({ name: m.name, count: m.count, cfi: s.cfiOf(m.name), detection: (how.get(m.name.toLowerCase()) as 'known' | 'ai' | undefined) ?? 'cue' })),
+        mentions: found.map((m) => ({ name: m.name, count: m.count, cfi: s.cfiOf(m.name), detection: (how.get(m.name.toLowerCase()) as 'known' | 'ai' | undefined) ?? 'cue', evidence: m.evidence })),
       });
     }
     row.updatedAt = Date.now();
@@ -76,17 +78,25 @@ export function bookPeriod(row: BookWorldRow | undefined, item?: Pick<Item, 'his
 
 /** Identify each distinct place name once: offline for all, online (cached) for the most-mentioned rest. */
 export async function resolveBookWorld(row: BookWorldRow, year: HistYear | undefined, bookId: string, onProgress?: (done: number, total: number) => void, signal?: AbortSignal): Promise<BookWorldRow> {
-  const counts = new Map<string, { n: number; detection: string }>();
-  for (const c of row.chapters) for (const m of c.mentions) counts.set(m.name, { n: (counts.get(m.name)?.n ?? 0) + m.count, detection: m.detection });
+  const counts = new Map<string, { n: number; detection: string; evidence?: MentionEvidence }>();
+  const rank = { strong: 0, weak: 1, none: 2 } as const;
+  for (const c of row.chapters) for (const m of c.mentions) {
+    const prev = counts.get(m.name);
+    // Keep the strongest textual evidence any chapter gave for the name.
+    const evidence = !prev?.evidence || (m.evidence && rank[m.evidence.strength] < rank[prev.evidence.strength]) ? m.evidence ?? prev?.evidence : prev.evidence;
+    counts.set(m.name, { n: (prev?.n ?? 0) + m.count, detection: m.detection, evidence: evidence as MentionEvidence | undefined });
+  }
+  // Where the book is set: every name identified offline without doubt, first.
+  const namesAll = [...counts.keys()];
   const todo = [...counts].filter(([n]) => !(n in row.resolved)).sort((a, b) => b[1].n - a[1].n);
   let done = 0;
   const onlineBudget = { left: 25 };
   for (const [name, info] of todo) {
     if (signal?.aborted) break;
-    let res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', online: false }).catch(() => undefined);
+    let res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', online: false, mention: info.evidence, nearby: namesAll.slice(0, 12) }).catch(() => undefined);
     if (!res?.place && onlineBudget.left > 0 && info.n >= 2) {
       onlineBudget.left--;
-      res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', signal }).catch(() => undefined);
+      res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', mention: info.evidence, nearby: namesAll.slice(0, 12), signal }).catch(() => undefined);
     }
     const p = res?.place && (res.status === 'HIGH' || res.status === 'MEDIUM') ? res.place : undefined;
     row.resolved[name] = p ? { key: p.key, title: p.title, lat: p.lat, lon: p.lon, source: p.sources[0]?.name ?? '', status: res!.status } : null;

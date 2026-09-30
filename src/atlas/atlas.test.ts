@@ -29,8 +29,12 @@ describe('atlas years', () => {
     expect(matches(f, { f: -30, t: 300 })).toBe(false);
     expect(matches(f, { f: -750 })).toBe(true);
     expect(matches(f, {})).toBe(false);
-    expect(matches(existedIn(-218, { undated: { until: 640 } }), {})).toBe(true);
-    expect(matches(existedIn(1200, { undated: { until: 640 } }), {})).toBe(false);
+    // Undated records are only shown where asked, and only inside the dataset's own period.
+    expect(matches(existedIn(-218, { undated: { within: [-750, 640] } }), {})).toBe(true);
+    expect(matches(existedIn(-3000, { undated: { within: [-750, 640] } }), {})).toBe(false);
+    expect(matches(existedIn(1200, { undated: { within: [-750, 640] } }), {})).toBe(false);
+    // An open-ended range is capped by the dataset's window.
+    expect(matches(existedIn(1800, { window: [-3000, 1500] }), { f: -750 })).toBe(false);
   });
   it('finds events in a window', () => {
     expect(matches(eventNear(-218, 0), { y: -218 })).toBe(true);
@@ -91,7 +95,7 @@ describe('atlas data packs', () => {
     const row = pack<unknown[][]>(`../world/places/c/${entry[3]}.json`).find((r) => r[1] === entry[2])!;
     expect(row[2]).toBe('Carthago');
     expect(String(row[6])).toContain('port');
-    expect(matches(existedIn(-218, { undated: { until: 640 } }), { f: row[7], t: row[8] })).toBe(true);
+    expect(matches(existedIn(-218), { f: row[7], t: row[8] })).toBe(true);
   });
   it('ships vector tiles for the heavy layers and no whole-world files', () => {
     const tiles = readdirSync(join(PACK, '../world/tiles'));

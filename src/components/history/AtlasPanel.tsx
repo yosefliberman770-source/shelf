@@ -15,7 +15,8 @@ import { type HistYear, yearLabel } from '../../atlas/time';
 import type { TimelineMark } from '../../atlas/Timeline';
 import type { MapBookmarkRow } from '../../db/types';
 import { unionBBox, zoomForBBox } from '../../lib/history/geometry';
-import { type DateContext, dateContextFor, detectPlaces, saveBookDate } from '../../lib/history/placeDetect';
+import { type DateContext, dateContextFor, detectPlaces, saveBookDate, screenMentions } from '../../lib/history/placeDetect';
+import type { MentionEvidence } from '../../atlas/mention';
 import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
 import { EventCard, LookingAtCard, NearbyPanel, PlaceHistory, SavedPanel, SearchPanel, WarEvents } from './atlasParts';
@@ -387,7 +388,7 @@ function Unresolved({ written, res, onRetry, onChoose, onSearch }: { written: st
 
 // ── Places in this chapter / this section ─────────────────────────────────
 
-interface Row { written: string; index: number; detection: Detection; res?: Resolution }
+interface Row { written: string; index: number; detection: Detection; res?: Resolution; mention?: MentionEvidence }
 
 function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, findMentions, onJump, onOpen, onPins, route, line, setRoute }: {
   text: string; section: boolean; year?: HistYear; bookId: string; bookTitle: string; chapter?: string;
@@ -402,22 +403,25 @@ function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, 
     if (ran.current) return;
     ran.current = true;
     const how = new Map(names.known.map((k) => [k.name.toLowerCase(), k.detection]));
-    const found = detectPlaces(text, names.known.map((k) => k.name), names.people).slice(0, 40);
-    const base: Row[] = found.map((m) => ({ written: m.name, index: m.index, detection: how.get(m.name.toLowerCase()) ?? 'cue' }));
-    setRows(base);
+    const detected = detectPlaces(text, names.known.map((k) => k.name), names.people).slice(0, 40);
     let dead = false;
     (async () => {
+      // Only names the text gives reason to treat as places (not ordinary words after "of"/"at").
+      const found = await screenMentions(detected, year);
+      const base: Row[] = found.map((m) => ({ written: m.name, index: m.index, detection: how.get(m.name.toLowerCase()) ?? 'cue', mention: m.evidence }));
+      if (dead) return;
+      setRows(base);
       const out = [...base];
       // Offline first for every name, then the online service for the rest.
       for (const [i, r] of out.entries()) {
-        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, online: false }).catch(() => undefined);
+        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, online: false, mention: r.mention, nearby: base.map((b) => b.written) }).catch(() => undefined);
         out[i] = { ...r, res };
       }
       if (dead) return;
       setRows([...out]);
       for (const [i, r] of out.entries()) {
         if (r.res?.place) continue;
-        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, nearby: base.map((b) => b.written), chapter, bookTitle, passage: text.slice(Math.max(0, r.index - 500), r.index + 500) }).catch(() => undefined);
+        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, mention: r.mention, nearby: base.map((b) => b.written), chapter, bookTitle, passage: text.slice(Math.max(0, r.index - 500), r.index + 500) }).catch(() => undefined);
         if (dead) return;
         out[i] = { ...r, res };
         setRows([...out]);

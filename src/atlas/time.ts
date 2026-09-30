@@ -23,19 +23,51 @@ export const MIN_YEAR: HistYear = -3400;
 export const MAX_YEAR: HistYear = new Date().getFullYear();
 export const clampYear = (y: HistYear) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, y === 0 ? 1 : y));
 
+// ── Temporal validity ──────────────────────────────────────────────────────
+//
+// A record's dates say when its source attests it. Missing dates are NOT
+// "valid at all times": an undated record is `undated` — it can still identify
+// a place, but it never counts as existing in a given year. A missing start or
+// end means "open on that side *within the dataset's own period*": a source
+// only speaks for the period it covers, so the window caps open ranges.
+
+/** within = attested at the year; near = within the slack; earlier = its dates end before the year; later = they start after it. */
+export type TimeFit = 'within' | 'near' | 'earlier' | 'later' | 'undated';
+
+export function timeFit(span: { from?: HistYear; to?: HistYear }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
+  if (span.from === undefined && span.to === undefined) return 'undated';
+  const lo = span.from ?? opts.window?.[0] ?? -Infinity;
+  const hi = span.to ?? opts.window?.[1] ?? Infinity;
+  if (lo <= year && year <= hi) return 'within';
+  const slack = opts.slack ?? 0;
+  if (lo - slack <= year && year <= hi + slack) return 'near';
+  return year > hi ? 'earlier' : 'later';
+}
+
+/** Attested at (or near) the year. Undated records are never "existing" at a date. */
+export const attestedAt = (span: { from?: HistYear; to?: HistYear }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
+  const f = timeFit(span, year, opts);
+  return f === 'within' || f === 'near';
+};
+
 /**
  * Filter for features that existed in year y, from their own from/to fields.
  * `undated` decides what happens to features that carry no dates at all.
  */
-export function existedIn(y: HistYear, opts: { from?: string; to?: string; undated?: 'show' | 'hide' | { until: HistYear } } = {}): ExpressionSpecification {
+export function existedIn(y: HistYear, opts: { from?: string; to?: string; undated?: 'show' | 'hide' | { within: [HistYear, HistYear] }; window?: [HistYear, HistYear] } = {}): ExpressionSpecification {
   const f = opts.from ?? 'f';
   const t = opts.to ?? 't';
   const dated: ExpressionSpecification = ['any', ['has', f], ['has', t]];
+  // An open side is capped by the dataset's own window, never unbounded.
+  const w = opts.window;
   const inRange: ExpressionSpecification = ['all',
     ['any', ['!', ['has', f]], ['<=', ['get', f], y]],
-    ['any', ['!', ['has', t]], ['>=', ['get', t], y]]];
+    ['any', ['!', ['has', t]], ['>=', ['get', t], y]],
+    ...(w ? [['boolean', y >= w[0] && y <= w[1]] as ExpressionSpecification] : [])];
   const undated = opts.undated ?? 'hide';
-  const show = undated === 'show' || (typeof undated === 'object' && y <= undated.until);
+  // Undated records only where the source's documented semantics say they apply ('show'),
+  // or — when the reader asks to see undated records — inside the dataset's own period.
+  const show = undated === 'show' || (typeof undated === 'object' && y >= undated.within[0] && y <= undated.within[1]);
   return show ? ['any', ['!', dated], inRange] : ['all', dated, inRange];
 }
 

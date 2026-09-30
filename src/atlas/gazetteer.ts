@@ -9,7 +9,9 @@
 // for it; places from different datasets are treated as the same place only
 // when they carry the name *and* lie within a few kilometres of each other.
 import { getJSON, km, type Pos } from './data';
-import type { HistYear } from './time';
+import { contextDistance, type GeoContext } from './geocontext';
+import type { EntityKind } from './mention';
+import { attestedAt, type HistYear, timeFit, type TimeFit } from './time';
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
 export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya';
@@ -188,8 +190,8 @@ export async function searchPlaces(q: string, limit = 20): Promise<{ place: GazP
   return out;
 }
 
-/** Places within `radiusKm`, nearest first; with a year, only those recorded around then (or undated). Loads only the cells it needs. */
-export async function nearbyPlaces(at: Pos, radiusKm: number, opts: { year?: HistYear; slack?: number; exclude?: string; filter?: (p: GazPlace) => boolean } = {}): Promise<{ place: GazPlace; km: number }[]> {
+/** Places within `radiusKm`, nearest first; with a year, only those attested around then (undated ones only when asked for). Loads only the cells it needs. */
+export async function nearbyPlaces(at: Pos, radiusKm: number, opts: { year?: HistYear; slack?: number; exclude?: string; filter?: (p: GazPlace) => boolean; undated?: boolean } = {}): Promise<{ place: GazPlace; km: number }[]> {
   const dLat = radiusKm / 110.57;
   const dLon = radiusKm / (111.32 * Math.max(0.1, Math.cos((at[1] * Math.PI) / 180)));
   const x0 = Math.floor((at[0] - dLon + 180) / CELL);
@@ -202,7 +204,7 @@ export async function nearbyPlaces(at: Pos, radiusKm: number, opts: { year?: His
   const out: { place: GazPlace; km: number }[] = [];
   for (const p of all) {
     if (p.key === opts.exclude || Math.abs(p.lat - at[1]) > dLat || Math.abs(p.lon - at[0]) > dLon) continue;
-    if (opts.year !== undefined && !existedAround(p, opts.year, opts.slack ?? (p.datasetPeriod ? 150 : 0))) continue;
+    if (opts.year !== undefined && !existedAround(p, opts.year, opts.slack ?? (p.datasetPeriod ? 150 : 0)) && !(opts.undated && p.from === undefined && p.to === undefined)) continue;
     if (opts.filter && !opts.filter(p)) continue;
     const d = km(at, [p.lon, p.lat]);
     if (d <= radiusKm) out.push({ place: p, km: d });
@@ -210,16 +212,19 @@ export async function nearbyPlaces(at: Pos, radiusKm: number, opts: { year?: His
   return out.sort((a, b) => a.km - b.km);
 }
 
-/** Was the place recorded around this year? Undated places count as "maybe". */
-export function existedAround(p: { from?: HistYear; to?: HistYear }, year: HistYear, slack = 0): boolean {
-  if (p.from === undefined && p.to === undefined) return true;
-  return (p.from === undefined || p.from - slack <= year) && (p.to === undefined || p.to + slack >= year);
+/**
+ * Was the place attested around this year? Undated records are NOT counted as
+ * existing (they are "undated", see timeFit). An open start or end is capped by
+ * the gazetteer's own period.
+ */
+export function existedAround(p: { from?: HistYear; to?: HistYear; gazetteer?: GazetteerId }, year: HistYear, slack = 0): boolean {
+  return attestedAt(p, year, { slack, window: p.gazetteer ? gazetteerInfo(p.gazetteer).coverage : undefined });
 }
 
-/** Names the place had around a year, according to the dataset's own name dates. */
+/** Names the place had around a year, according to the dataset's own name dates (undated names aren't tied to a period, so they're kept). */
 export function namesAround(p: GazPlace, year?: HistYear): GazName[] {
   if (year === undefined) return p.names;
-  return p.names.filter((n) => existedAround(n, year, 50));
+  return p.names.filter((n) => (n.from === undefined && n.to === undefined) || attestedAt(n, year, { slack: 50 }));
 }
 
 // ── Matching a name from the book ─────────────────────────────────────────
@@ -231,6 +236,8 @@ export interface NameMatch {
   candidates: GazPlace[];
   /** Records of the same place in other datasets (same name, within a few km). */
   corroborating: GazPlace[];
+  /** How the chosen record's dates relate to the year. */
+  fit?: TimeFit | 'no-year';
   /** Which recorded name matched ("Carthage" → recorded name of Carthago). */
   matchedName?: GazName & { isTitle: boolean };
   reason: string;
@@ -239,44 +246,90 @@ export interface NameMatch {
 const SAME_PLACE_KM = 8;
 const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).join(' and ');
 
+/** What kind of entity a gazetteer record is, from its dataset's own type words. */
+export function kindOf(p: GazPlace): EntityKind {
+  const t = p.types.join(' ').toLowerCase();
+  if (/\b(province|region|regions|people|ethnic|territory|area|district|diocese|kingdom|state)\b/.test(t)) return 'region';
+  if (/\b(settlement|urban|polis|town|towns|city|capitals?|village|villages|vicus|waystations?|port|harbou?r)\b/.test(t)) return 'settlement';
+  if (/\briver\b/.test(t)) return 'river';
+  if (/\bisland\b/.test(t)) return 'island';
+  if (/\b(mountain|hill|volcano|pass)\b/.test(t)) return 'mountain';
+  if (/\b(lake|lagoon|marsh)\b/.test(t)) return 'lake';
+  return p.types.length ? 'site' : 'unknown';
+}
+const COMPATIBLE: Record<EntityKind, EntityKind[]> = {
+  settlement: ['settlement', 'site', 'unknown'], polity: ['region', 'polity'], region: ['region', 'polity'], continent: ['region'], sea: [],
+  river: ['river'], island: ['island', 'region'], mountain: ['mountain'], lake: ['lake'], site: ['site', 'settlement', 'unknown'], unknown: [],
+};
+
+/** How a record's own dates relate to the year being read about. */
+export function recordFit(p: GazPlace, year?: HistYear): TimeFit | 'no-year' {
+  if (year === undefined) return 'no-year';
+  return timeFit(p, year, { slack: p.datasetPeriod ? 150 : 50, window: gazetteerInfo(p.gazetteer).coverage });
+}
+
+export interface MatchOptions {
+  /** Where the book is set, so far (points of already identified places). */
+  context?: GeoContext;
+  /** The entity type the wording implies ("the city of X" → settlement). */
+  expected?: EntityKind;
+}
+
 /**
- * Match a name as written in the book. A place is chosen only when every
- * record carrying that name (in the gazetteers covering the year, recorded
- * around the year when it's known) is one place — records from different
- * datasets count as one place only when they lie within a few kilometres.
- * Otherwise it's ambiguous and the reader decides.
+ * Match a name as written in the book against the offline gazetteers.
+ *
+ * Records are *scored*, not dropped for lack of dates: an undated record, or a
+ * place a dataset records only for an earlier period (towns persist), can still
+ * be the place meant — only records attested exclusively *after* the year are
+ * excluded, as are records of the wrong kind of entity for the wording. Records
+ * from different datasets within a few km are one place. A place is chosen only
+ * when one candidate remains, or when the book's own geography clearly favours
+ * one; otherwise the result is ambiguous and the reader decides.
  */
-export async function matchName(written: string, year?: HistYear): Promise<NameMatch> {
-  const sources = gazetteersFor(year).map((g) => g.id);
-  const hits = (await placesByName(written)).filter((h) => sources.includes(h.place.gazetteer));
-  if (!hits.length) return { status: 'none', candidates: [], corroborating: [], reason: `No place called “${written}” in ${srcList(sources) || 'the gazetteers for this period'}.` };
-  const inTime = year === undefined ? hits : hits.filter((h) => existedAround(h.place, year, h.place.datasetPeriod ? 150 : 150));
-  const pool = inTime.length ? inTime : hits;
-  // Group records that are the same place: same dataset id, or different datasets within a few km.
+export async function matchName(written: string, year?: HistYear, opts: MatchOptions = {}): Promise<NameMatch> {
+  const all = await placesByName(written);
+  const names = srcList(GAZETTEERS.map((g) => g.id));
+  if (!all.length) return { status: 'none', candidates: [], corroborating: [], reason: `No place called “${written}” in ${names}.` };
+  const notLater = all.filter((h) => recordFit(h.place, year) !== 'later');
+  if (!notLater.length) return { status: 'none', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
+  const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
+  const pool = typed.length ? typed : notLater;
+  // Group records that are the same place: different datasets within a few km.
   const groups: { place: GazPlace; isTitle: boolean }[][] = [];
   for (const h of pool) {
     const g = groups.find((gr) => gr.some((x) => x.place.gazetteer !== h.place.gazetteer && km([x.place.lon, x.place.lat], [h.place.lon, h.place.lat]) <= SAME_PLACE_KM));
     if (g) g.push(h); else groups.push([h]);
   }
-  // Pick the record to show from a group: the dataset whose period fits best (listed first in GAZETTEERS for the year), titled first.
-  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => Number(b.isTitle) - Number(a.isTitle) || sources.indexOf(a.place.gazetteer) - sources.indexOf(b.place.gazetteer))[0];
+  // The record to show from a group: attested at the year first, titled first.
+  const fitRank = (p: GazPlace) => ({ within: 0, near: 1, 'no-year': 2, undated: 3, earlier: 4, later: 5 })[recordFit(p, year)];
+  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
+  let why = '';
   if (groups.length === 1) chosen = groups[0];
   else {
-    // A single group where the name is the main title, against at most one other place listing it as an alternative.
-    const titled = groups.filter((gr) => gr.some((x) => x.isTitle));
-    if (titled.length === 1 && groups.length - 1 <= 1 && lead(titled[0]).place.precise) chosen = titled[0];
+    // The book's geography: one candidate clearly nearer the places already identified.
+    const ctx = opts.context;
+    if (ctx?.points.length) {
+      const dist = groups.map((g) => Math.min(...g.map((x) => contextDistance(ctx, [x.place.lon, x.place.lat]))));
+      const order = dist.map((d, i) => ({ d, i })).sort((a, b) => a.d - b.d);
+      if (order[0].d < 1500 && order[1].d > 3 * order[0].d + 300) { chosen = groups[order[0].i]; why = `It is the one near the other places in this book (${Math.round(order[0].d)} km from one of them; the next is ${Math.round(order[1].d)} km away).`; }
+    }
+    if (!chosen) {
+      // A single group where the name is the main title, against at most one other place listing it as an alternative.
+      const titled = groups.filter((gr) => gr.some((x) => x.isTitle));
+      if (titled.length === 1 && groups.length - 1 <= 1 && lead(titled[0]).place.precise) { chosen = titled[0]; why = `The only place in ${srcList(pool.map((h) => h.place.gazetteer))} whose main name is “${written}”.`; }
+    }
   }
   const where = srcList(pool.map((h) => h.place.gazetteer));
-  if (!chosen) return { status: 'ambiguous', candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: [], reason: `${groups.length} different places in ${where} are recorded with the name “${written}”${year !== undefined && inTime.length ? ' around this date' : ''}.` };
+  if (!chosen) return { status: 'ambiguous', candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: [], reason: `${groups.length} different places in ${where} are recorded with the name “${written}”, and nothing in the book yet says which is meant.` };
   const main = lead(chosen);
   const nm = main.isTitle ? { name: main.place.title, isTitle: true } : { ...(main.place.names.find((n) => normName(n.name) === k) ?? { name: written }), isTitle: false };
   const others = chosen.filter((x) => x !== main).map((x) => x.place);
+  const fit = recordFit(main.place, year);
+  const when = fit === 'earlier' ? ` ${gazetteerInfo(main.place.gazetteer).name} records it for an earlier period only (to ${main.place.to !== undefined ? (main.place.to < 0 ? `${-main.place.to} BCE` : `${main.place.to} CE`) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.` : fit === 'undated' ? ' The record has no dates.' : '';
   return {
-    status: 'unique', place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm,
-    reason: groups.length === 1
-      ? `The only place in ${where} recorded with the name “${written}”${year !== undefined && inTime.length < hits.length ? ' around this date' : ''}.${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}`
-      : `The only place in ${where} whose main name is “${written}”.`,
+    status: 'unique', place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm, fit,
+    reason: `${why || `The only place in ${where} recorded with the name “${written}”.`}${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}${when}`,
   };
 }

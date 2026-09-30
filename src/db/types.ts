@@ -581,7 +581,7 @@ export interface BookWorldRow {
   id: string;
   version: number;
   /** One entry per book section (spine item), in reading order. */
-  chapters: { index: number; href: string; label?: string; dates: number[]; wars: string[]; events: string[]; mentions: { name: string; count: number; cfi?: string; detection: 'cue' | 'known' | 'ai' }[] }[];
+  chapters: { index: number; href: string; label?: string; dates: number[]; wars: string[]; events: string[]; mentions: { name: string; count: number; cfi?: string; detection: 'cue' | 'known' | 'ai'; evidence?: { cue?: string; strength: 'strong' | 'weak' | 'none'; expected?: string; multiword: boolean; demonym?: boolean } }[] }[];
   /** Name as written → the place it was identified as (null = not identified with confidence). */
   resolved: Record<string, { key: string; title: string; lat: number; lon: number; source: string; status: string } | null>;
   sectionCount: number;

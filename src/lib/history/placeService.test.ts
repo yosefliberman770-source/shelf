@@ -66,7 +66,8 @@ describe('HistoricalPlaceService', () => {
     const { p } = fakeProvider();
     const s = new HistoricalPlaceService([p]);
     const r = await s.resolvePlaceName({ name: 'Constantinople', date: 1204 });
-    expect(r.status).toBe('HIGH');
+    // One exact online record, with nothing else supporting it, is "likely" — not certain.
+    expect(r.status).toBe('MEDIUM');
     expect(r.place?.canonicalName).toBe('İstanbul');
   });
 
@@ -127,7 +128,8 @@ describe('HistoricalPlaceService', () => {
     const s = new HistoricalPlaceService([p]);
     await s.resolvePlaceName({ name: 'Capua' });
     const rs = await s.resolveMany([{ name: 'Capua' }, { name: 'Constantinople' }, { name: 'Nowhere' }]);
-    expect(rs.map((r) => r.status)).toEqual(['HIGH', 'HIGH', 'UNRESOLVED']);
+    // Exact single online matches are "likely" unless the date or the book's geography also supports them.
+    expect(rs.map((r) => r.status)).toEqual(['MEDIUM', 'MEDIUM', 'UNRESOLVED']);
     expect(calls).toEqual(['Capua', 'Constantinople', 'Nowhere']);
   });
 
