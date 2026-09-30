@@ -16,6 +16,16 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('./index.html', { ignoreSearch: true }).then((r) => r || caches.match('./'))));
     return;
   }
+  // Map tiles are read in pieces (range requests); let the browser handle those directly.
+  if (req.headers.has('range')) return;
+  // Atlas and World data change when rebuilt: network first, the cached copy offline.
+  if (url.pathname.includes('/atlas/') || url.pathname.includes('/world/')) {
+    e.respondWith(fetch(req).then((res) => {
+      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+      return res;
+    }).catch(() => caches.match(req).then((r) => r || Response.error())));
+    return;
+  }
   // Cache first for hashed assets and icons.
   e.respondWith(
     caches.match(req).then((hit) => hit || fetch(req).then((res) => {

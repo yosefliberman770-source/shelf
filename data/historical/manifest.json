@@ -1,0 +1,599 @@
+{
+ "al-thurayya/original/DATA-LICENSE.md": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/DATA-LICENSE.md",
+  "bytes": 1071,
+  "sha256": "f99d3f9f9bee98aaabf99bedd8200c4ee7c9e90ae1d32e696b19540163271837",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/LICENSE": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/LICENSE",
+  "bytes": 11371,
+  "sha256": "f844745981081fa53332541f9370ce9d13471c4e4e1eed6a63cbdeb50383f058",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/README.md": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/README.md",
+  "bytes": 3936,
+  "sha256": "93a012ac3ebab6b82271d4fe8fadecdee70f090489b4e78de5e4ae5d110edb4d",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/places.geojson": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places.geojson",
+  "bytes": 3350965,
+  "sha256": "9ceef49582106441fc63fc230a17045fdb6f5ef778f77d8c63eebbea2e2137d3",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/places.json": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places.json",
+  "bytes": 3350965,
+  "sha256": "9ceef49582106441fc63fc230a17045fdb6f5ef778f77d8c63eebbea2e2137d3",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/places_full.geojson": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places_full.geojson",
+  "bytes": 3350965,
+  "sha256": "9ceef49582106441fc63fc230a17045fdb6f5ef778f77d8c63eebbea2e2137d3",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/places_new_structure.geojson": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/places_new_structure.geojson",
+  "bytes": 4331105,
+  "sha256": "f55abaeab8c67a111bffe8a3d7b5f8d1321b059cbbc279503dea8d1ad9a278eb",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/regions.json": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/regions.json",
+  "bytes": 4433,
+  "sha256": "da705f7d280b82633da78b076a5f13fca07aedc2acd77b55d352bca65861d000",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/routes.json": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/routes.json",
+  "bytes": 6689410,
+  "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
+  "downloaded": "2026-09-29"
+ },
+ "al-thurayya/original/master/routes_full.json": {
+  "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/master/routes_full.json",
+  "bytes": 6689410,
+  "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
+  "downloaded": "2026-09-29"
+ },
+ "atlas-rural-settlement/original/atlas-gis-shapefile.zip": {
+  "url": "https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm",
+  "bytes": 13213011,
+  "sha256": "be6fdf6e49084763d83fbf35e0d8c172294553e76fb193878423ed3c1d06f42e",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/atlas-gis-shapefile.zip.zip). Saved here as atlas-gis-shapefile.zip (the phone added a second \u201c.zip\u201d); contents unchanged."
+ },
+ "cshapes/original/CShapes-2.0.csv": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
+  "bytes": 44501172,
+  "sha256": "e78d0b3a40605631f5a136c6155e0dd5290996c59765999e159385fdeaf7b157",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.geojson": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson",
+  "bytes": 26344671,
+  "sha256": "384b1ea90b9419f30a858d7ec237c85a22c60d1b35b5f85f215a1204f9989d42",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.txt": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.txt",
+  "bytes": 44501140,
+  "sha256": "5e5e5d328666b74270944dd41ee40b4196bf3e5152ede8353a84d1282eb19533",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0.zip": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.zip",
+  "bytes": 13009920,
+  "sha256": "7048e08742648c8ed5a99454bba17de845746e90035c23d5efcf6d1751f3deb6",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-2.0_Codebook.pdf": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0_Codebook.pdf",
+  "bytes": 120346,
+  "sha256": "e132b84d6df02b58eef3c10845ca2b87b1816fa18c5b4a64104cc124afa3ebbd",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/CShapes-Europe.geojson": {
+  "url": "https://icr.ethz.ch/data/cshapes/CShapes-Europe.geojson",
+  "bytes": 4574391,
+  "sha256": "9831764d2ad17e37bc009031829265621534de097f7b3e8d6928d1a828436279",
+  "downloaded": "2026-09-29"
+ },
+ "cshapes/original/ChangeLog.txt": {
+  "url": "https://icr.ethz.ch/data/cshapes/ChangeLog.txt",
+  "bytes": 3722,
+  "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
+  "downloaded": "2026-09-29"
+ },
+ "domesday/original/DBhundreds.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",
+  "bytes": 4191467,
+  "sha256": "7c5752a72580958f7a2f46aacee22f74570834fa06845a03a73b0bea17c2fc52",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBhundreds.zip)."
+ },
+ "domesday/original/DBinter.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBinter.zip",
+  "bytes": 309648,
+  "sha256": "a2ff8aa137429c3041d04c542904cbc09566e51ec51b51a5ea7aaf8a47d2e072",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBinter.zip)."
+ },
+ "domesday/original/DBshires.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBshires.zip",
+  "bytes": 1199179,
+  "sha256": "20ef0dea52b91f9c91e1dfdb27ab147bec37a17e5aced69b4541a6130c1ac06c",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBshires.zip)."
+ },
+ "domesday/original/LoG_GeneralGuide.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
+  "bytes": 220483,
+  "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
+  "downloaded": "2026-09-30"
+ },
+ "gough-map/original/Gough_Map_website_intro.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
+  "bytes": 116046,
+  "sha256": "7cad8ed9bd9101d9ebbacc006d2a9cb3384418f6c34598be0f2e7649243b30a0",
+  "downloaded": "2026-09-30"
+ },
+ "gough-map/original/gough_red_lines.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip",
+  "bytes": 9469,
+  "sha256": "0f31837dd1cbd87487380063802de9db3d303d870003eaef874a825bcc02a397",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_red_lines.zip). The uploaded copy is byte-identical."
+ },
+ "gough-map/original/gough_routes.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_routes.zip",
+  "bytes": 317606,
+  "sha256": "2ae0ccd9507ff4ce150ddd035488911add71d7b1a6fc66f512a7038f8e5697be",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_routes.zip)."
+ },
+ "gough-map/original/gough_way_stations.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip",
+  "bytes": 7439,
+  "sha256": "0dca818e95c7f860d7a87b5832afd8f4c4b2b7d9dd4f11b879f6c477491848dc",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
+ },
+ "historic-england/original/Battlefields.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
+  "bytes": 630784,
+  "sha256": "f816265133937bafabaafa6cda154e8ae06834c100bf750155639af3dd9e99e8",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/Listed_Building_points.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=0",
+  "bytes": 102944768,
+  "sha256": "1197b966654a328aad288da8ae31e1de5e6c5dfc2bc85098dd203c94a67ffa2d",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/Listed_Building_polygons.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=3",
+  "bytes": 149590016,
+  "sha256": "5c8d5bcb47fb1b6d85c2947a4eb823e285f556740a976c2f0023afd8f2855c11",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/Parks_and_Gardens.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=7",
+  "bytes": 14184448,
+  "sha256": "e39875d7101c3e161cbc55fdfb1277b31d950609409d8e122cac3112dad207b4",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/Protected_Wreck_Sites.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=9",
+  "bytes": 315392,
+  "sha256": "9b7cd267ea3e6ae2327f5acec97f1b91131168c6fb692cbaa446b018f1a3a939",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/Scheduled_Monuments.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=6",
+  "bytes": 45191168,
+  "sha256": "fb8554874537483e2e5b61053141367821615757edfd235ed12e09317330d060",
+  "downloaded": "2026-09-29"
+ },
+ "historic-england/original/World_Heritage_Sites.gpkg": {
+  "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=10",
+  "bytes": 3452928,
+  "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
+  "downloaded": "2026-09-29"
+ },
+ "inland-navigation/original/gis/direct_evidence.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
+  "bytes": 1115556,
+  "sha256": "4b61c3ced1656996c30dcf3adc72bcc946e207e3969985e35d3eab88f537bf06",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/direct_evidence.zip)."
+ },
+ "inland-navigation/original/gis/heads_of_navigation.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip",
+  "bytes": 61822,
+  "sha256": "16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303",
+  "downloaded": "2026-09-29",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/heads_of_navigation.zip). The uploaded copy is byte-identical."
+ },
+ "inland-navigation/original/gis/indirect_evidence.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/indirect_evidence.zip",
+  "bytes": 434660,
+  "sha256": "bee51b7b9740aeef429fdf9551ee3b0d68c5949a5d7de2696776147b61fbcbf1",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/indirect_evidence.zip)."
+ },
+ "inland-navigation/original/gis/pn_river_traffic.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
+  "bytes": 22841,
+  "sha256": "66b01e2db6b37a8e03370158868e6a01a0567ee4a765fc60e16e919cba16797a",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/pn_river_traffic.zip). The uploaded copy is byte-identical."
+ },
+ "inland-navigation/original/pdf/general_guide.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf",
+  "bytes": 250611,
+  "sha256": "a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327",
+  "downloaded": "2026-09-30"
+ },
+ "itinere/nightly-export/route-segments.ndjson": {
+  "url": "https://itiner-e.org/route-segments/download",
+  "bytes": 39094440,
+  "sha256": "1bdcd1f13e99caecacae31aa0e3c49797889406473a0ddb0ffb0fcee03d9932b",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/Data field description.docx": {
+  "url": "https://zenodo.org/api/records/17122148/files/Data%20field%20description.docx/content",
+  "bytes": 18004,
+  "sha256": "0f486847ab54e2675bbd9b0087998c0833f0e22876459a6d82b6c4c30485359a",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/Itiner-e bibliography.bib": {
+  "url": "https://zenodo.org/api/records/17122148/files/Itiner-e%20bibliography.bib/content",
+  "bytes": 248702,
+  "sha256": "8c819a8238664666042b1f538dc319f364f13358715322b40d29bac21ec3b0a7",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.cpg": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.cpg/content",
+  "bytes": 5,
+  "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.dbf": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.dbf/content",
+  "bytes": 13780023,
+  "sha256": "e0cc5cf8c67c6b40782d5f7fea023d6c09470adbb412b100baa7badb4a417a60",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.geojson": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.geojson/content",
+  "bytes": 78054413,
+  "sha256": "4f8f5cf99f387bab2c509b1bf50143e9a3117691e316f2f46a9bb1d3d4b1cc34",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.gpkg": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.gpkg/content",
+  "bytes": 33619968,
+  "sha256": "1b9470aaec696b0827e7aecad20badc74df2652ae8a62464baea4f07ae4855e7",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.prj": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.prj/content",
+  "bytes": 354,
+  "sha256": "cff1c1763dd47707d0f59447c952f2c850b2cf31446d81b3bacd06f76574f794",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.sbn": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.sbn/content",
+  "bytes": 139932,
+  "sha256": "ec4c5ff1aad2c155e48433441ec914d970025b0d5daee3c223538f9122f773fd",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.sbx": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.sbx/content",
+  "bytes": 5956,
+  "sha256": "d72846126e8a80e5b0193e001a63e714f6ee3e006dc46b39be918f60ad141f60",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.shp": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.shp/content",
+  "bytes": 137954940,
+  "sha256": "4d564c58a04c637fd8080375a1e87c35cf712e2d11a0480278db44549a1abf10",
+  "downloaded": "2026-09-29"
+ },
+ "itinere/original/itinere_roads.shx": {
+  "url": "https://zenodo.org/api/records/17122148/files/itinere_roads.shx/content",
+  "bytes": 118252,
+  "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/README.md": {
+  "url": "https://zenodo.org/api/records/11241371/files/README.md/content",
+  "bytes": 11073,
+  "sha256": "98882deb69aeb111e5755ad42edb61ee5eb63e295e351e1e5c4e2b711a7af710",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_all.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_all.csv/content",
+  "bytes": 7650080,
+  "sha256": "9550cb8f4710fa36642a841d6cc6c6816d561cb121c3f2b3b615af5d82e91213",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_all_georeferenced.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_all_georeferenced.csv/content",
+  "bytes": 38842793,
+  "sha256": "af45149656fe0afb465c2b046b70fec0e6aa31707a49d322d6bc0a3f8dd103f2",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_building.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_building.csv/content",
+  "bytes": 7863788,
+  "sha256": "d625ed7cf2f21c8c50dc287635d8b3a9cbddda94a524490729b55031c32a333b",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_building_georeferenced.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_building_georeferenced.csv/content",
+  "bytes": 42529621,
+  "sha256": "add9efc59b38fb2f0a7f5a4962212c2b3516a9cb014bc5af3352570e5747be25",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_railspace_all.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_railspace_all.csv/content",
+  "bytes": 7850244,
+  "sha256": "438aac9e17ad29dfcb42a1332d9fdfaa696ccc2320c55253a7ed3da7cd9c6730",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/annotations-2024_zenodo-11241371/annots_railspace_all_georeferenced.csv": {
+  "url": "https://zenodo.org/api/records/11241371/files/annots_railspace_all_georeferenced.csv/content",
+  "bytes": 39042957,
+  "sha256": "53d4ff2d354b639c9782cc373edd58e96491f3b17d0fe588501c7d435f063ef8",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/railspace-v2_zenodo-14522926/post_processed_railspace_predictions_patch_df.csv": {
+  "url": "https://zenodo.org/api/records/14522926/files/post_processed_railspace_predictions_patch_df.csv/content",
+  "bytes": 360897240,
+  "sha256": "26a075bc08ba51c0024c214b5a27a85b289e17c8ce786cd7daf53bd3dd4c51bf",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/railspace-v2_zenodo-14522926/railspace_predictions_patch_df.csv": {
+  "url": "https://zenodo.org/api/records/14522926/files/railspace_predictions_patch_df.csv/content",
+  "bytes": 345393130,
+  "sha256": "9727e5d6423d256b76ca7c5cf83f9e1998bcdd7bac0c3814341435630bd17329",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/sigspatial-2022_zenodo-7147906/MapReader_Data_SIGSPATIAL_2022.zip": {
+  "url": "https://zenodo.org/api/records/7147906/files/MapReader_Data_SIGSPATIAL_2022.zip/content",
+  "bytes": 4605817680,
+  "sha256": "9aa4682f949064b73326d1663ba266136c932060321037da6a465059d2ea4b15",
+  "downloaded": "2026-09-29"
+ },
+ "living-with-machines/original/sigspatial-2022_zenodo-7147906/README": {
+  "url": "https://zenodo.org/api/records/7147906/files/README/content",
+  "bytes": 143,
+  "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/General_Guide_bridges.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/General_Guide_bridges.pdf",
+  "bytes": 1108662,
+  "sha256": "cc5ac095dceaa5decbab34f9f559bbcec16bae8a01e3555efa14ebc998d94f4b",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/gis/Bridges1250.csv": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.csv",
+  "bytes": 44528,
+  "sha256": "c973522f71fd0776a1ef604ec91e506b4aab9ec523556df31bc9c2b9e0bfd138",
+  "downloaded": "2026-09-29"
+ },
+ "medieval-bridges/original/gis/Bridges1250.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/gis/Bridges1250.zip",
+  "bytes": 66959,
+  "sha256": "0d9bd6e76da3fe63204aaf9e4068e1f0316c3f7215329c671ae9cc9c9fc449d1",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/README.txt": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
+  "bytes": 2042,
+  "sha256": "17f99a59f8d53417ff6fb0c3ff8ebc5184c2ae8a7a466971cf656af24e98c492",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-locations-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-locations-20260929.csv.gz",
+  "bytes": 39551537,
+  "sha256": "92d4dd7cbf1c2a86c025a99334939f836d182730485f5ac1d89a1b972bc5fb3b",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-names-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-names-20260929.csv.gz",
+  "bytes": 3806872,
+  "sha256": "9dded1fa1603a305ac2632022263c45a170c2e1cce7a164dfaf28ed49377a981",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/dumps/pleiades-places-20260929.csv.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/dumps/pleiades-places-20260929.csv.gz",
+  "bytes": 6806706,
+  "sha256": "5c9703bfed29de46a54c4a7310fc7fb9459339a5cc537028c073240e5aac84ec",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/gis/pleiades_gis_data.zip": {
+  "url": "https://atlantides.org/downloads/pleiades/gis/pleiades_gis_data.zip",
+  "bytes": 35593577,
+  "sha256": "7c0ef2f1483cec0618e0a7c41cfbb15a66307fac46ec5a839fb3672e7eecaf28",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/json/pleiades-errata-20260929.json.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/json/pleiades-errata-20260929.json.gz",
+  "bytes": 84175,
+  "sha256": "25c5648847a034e88c3273e232aefd7ec81c5fb018108f38c89b16afc3a4b001",
+  "downloaded": "2026-09-29"
+ },
+ "pleiades/original/json/pleiades-places-20260929.json.gz": {
+  "url": "https://atlantides.org/downloads/pleiades/json/pleiades-places-20260929.json.gz",
+  "bytes": 136020531,
+  "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
+  "downloaded": "2026-09-29"
+ },
+ "tribal-hidage/original/Individuals_Data.csv": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
+  "bytes": 534736,
+  "sha256": "cc99e9c5fbbe8d9fcb492ca5e6a7958d8ee32b462ee8701a9d526197825177aa",
+  "downloaded": "2026-09-29"
+ },
+ "tribal-hidage/original/Objects_Data.csv": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Objects_Data.csv",
+  "bytes": 1364281,
+  "sha256": "976c8bb3150d94b45434957e1dfd3b8a35be9190297b1337b39f341526f2ff00",
+  "downloaded": "2026-09-29"
+ },
+ "tribal-hidage/original/Sites_data.csv": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Sites_data.csv",
+  "bytes": 81131,
+  "sha256": "b773f3bb0ebd105128914843af38e2de950bcbad1218e1e631b3f1750e09c5f4",
+  "downloaded": "2026-09-29"
+ },
+ "tribal-hidage/original/TribalHidage_website_image.jpg": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/TribalHidage_website_image.jpg",
+  "bytes": 2057772,
+  "sha256": "905e21e8b6303337b5581e90771f22f982cb3fa1f5f873c65ca14d626af42d05",
+  "downloaded": "2026-09-29"
+ },
+ "tribal-hidage/original/TribalHidgae_GeneralGuide.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/TribalHidgae_GeneralGuide.pdf",
+  "bytes": 218696,
+  "sha256": "c1be803803f71ae91acaf6a54e573ed8ab50625b78165a274d3cf2e8be46fd4b",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-edges.geojson": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.geojson/content",
+  "bytes": 53953432,
+  "sha256": "1f8c6eef835462c77124eb685c27267aa2d8e9acfb6a18ffeaf140ceb6ca9ca6",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-edges.gml": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.gml/content",
+  "bytes": 59340541,
+  "sha256": "11ddb8f865eefea1490ddaa3bfe77f09d4ac5d28804c333819dd95bd01374ad0",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-town-outlines.geojson": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-town-outlines.geojson/content",
+  "bytes": 2528955,
+  "sha256": "e27e2a57464dfcef0931adc545868d6cedd5103ff1777816504d6794fa15173e",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-town-outlines.gml": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-town-outlines.gml/content",
+  "bytes": 2735361,
+  "sha256": "b8d479b94667821ba2263de71f64f4ecea0210ecfaf5ccb5a67f95910058bea7",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-water-1500.geojson": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-water-1500.geojson/content",
+  "bytes": 24785213,
+  "sha256": "07e921e91f871ad4c191c6076ef210974d111e2278abded13f5f80c12bcddea7",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus-2-water-1500.gml": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-water-1500.gml/content",
+  "bytes": 21850389,
+  "sha256": "76de3af99571a570a77617c0880d7ce124d5900abfffd3a53c47d4dae74972fd",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/Viabundus_Documentation_v2.pdf": {
+  "url": "https://zenodo.org/api/records/16611998/files/Viabundus_Documentation_v2.pdf/content",
+  "bytes": 664943,
+  "sha256": "7a49c7ac248128d204e21d32a54933da3cae0d54c68df9a59d60188573473750",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/alternativenames.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/alternativenames.csv/content",
+  "bytes": 1465491,
+  "sha256": "0745984599abe7b5ab2d97e62d522f91c94079ef40417dd18b5916378cd229ab",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/database structure 2.pdf": {
+  "url": "https://zenodo.org/api/records/16611998/files/database%20structure%202.pdf/content",
+  "bytes": 229615,
+  "sha256": "077afd099d1f1df57ce89fe1962eba68a45d413177ebf421a77f0731dd9486f5",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/descriptions.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/descriptions.csv/content",
+  "bytes": 2329996,
+  "sha256": "5139a454c3b80618fd60a77da48700fcbce633b45e19176e71d8e0a9b4b7ccc9",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/edges.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/edges.csv/content",
+  "bytes": 39554937,
+  "sha256": "2965162bb888ea4be6b778834120d399187e2b8f0b672fc9ffb5c56efecb1559",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/edgesdescription.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/edgesdescription.csv/content",
+  "bytes": 114215,
+  "sha256": "7e6c2da7c7c1c3fb8fed644614bf9cc3fa55a9f14145a9c8f8671d4327b77146",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/edgesdescriptionlang.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/edgesdescriptionlang.csv/content",
+  "bytes": 120531,
+  "sha256": "7c1663846f49e8af7be2032458924f81cbac57458ff170cea62a6bfc392ad432",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/fairs.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/fairs.csv/content",
+  "bytes": 217376,
+  "sha256": "ab9ad6906294dfba705d3b57630ce97405613f18fc058954a00a58b9b8248242",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/fairsdescription.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/fairsdescription.csv/content",
+  "bytes": 106644,
+  "sha256": "d447cefb78cee3a9ddd4001720c518cc3adb963e0fe3d40cf174cf7e8a54449c",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/literature.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/literature.csv/content",
+  "bytes": 443841,
+  "sha256": "93f3232c9541c2debb551456bcf5ceddb4efd68a621c7e3bb97f590ad0578945",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/literaturelink.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/literaturelink.csv/content",
+  "bytes": 967825,
+  "sha256": "1f982fe939afddf708f47989e629fbd7174edfa100e1f353dd05041728ae2679",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/nodes.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/nodes.csv/content",
+  "bytes": 7449826,
+  "sha256": "de42bd5293ae7873f15dc5a922ddccdeacaf2907f34c5dac739ae9d4862b725d",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/population.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/population.csv/content",
+  "bytes": 64820,
+  "sha256": "8631c5c78b5ce24b37db0dd76556a930215f1be4c599e542e1ccfa07e77597e6",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/towns.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/towns.csv/content",
+  "bytes": 1883060,
+  "sha256": "1bfe64569d3eb6331860b579c8f6dcea8abb4664ebb59ea5a38f5959a6fc3898",
+  "downloaded": "2026-09-29"
+ },
+ "viabundus/original/water-1500.csv": {
+  "url": "https://zenodo.org/api/records/16611998/files/water-1500.csv/content",
+  "bytes": 19141157,
+  "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
+  "downloaded": "2026-09-29"
+ }
+}

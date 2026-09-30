@@ -27,6 +27,11 @@ import type {
   AILogRow,
   AICacheRow,
   PlaceChoiceRow,
+  MapBookmarkRow,
+  MapNoteRow,
+  PlaceVisitRow,
+  WorldCacheRow,
+  BookWorldRow,
 } from './types';
 import type { BookChunkRow, BookGraphRow, BookJobRow, BookTextRow, BookXRayRow, XRayHiddenRow } from '../lib/book/types';
 
@@ -64,6 +69,11 @@ export class ShelfDB extends Dexie {
   bookGraph!: Table<BookGraphRow, string>;
   bookXray!: Table<BookXRayRow, string>;
   xrayHidden!: Table<XRayHiddenRow, string>;
+  mapBookmarks!: Table<MapBookmarkRow, string>;
+  mapNotes!: Table<MapNoteRow, string>;
+  placeVisits!: Table<PlaceVisitRow, string>;
+  worldCache!: Table<WorldCacheRow, string>;
+  bookWorld!: Table<BookWorldRow, string>;
 
   constructor(name = 'shelf') {
     super(name);
@@ -97,6 +107,10 @@ export class ShelfDB extends Dexie {
     this.version(5).stores({ aiUsage: 'id, day, month, provider', aiLog: '++id, at, provider', aiCache: 'id, createdAt' });
     // v6: whole-book analysis — the book's text, chunk results, jobs, the resolved graph, X-Ray summaries and removed entries.
     this.version(6).stores({ bookText: 'id, bookId', bookChunks: 'id, bookId, [bookId+status]', bookJobs: 'id, status', bookGraph: 'id', bookXray: 'id, bookId', xrayHidden: 'id, bookId' });
+    // v7: the historical atlas — saved map views, private place notes, and places met in each book.
+    this.version(7).stores({ mapBookmarks: 'id, bookId, createdAt', mapNotes: 'id, placeKey, bookId, updatedAt', placeVisits: 'id, bookId, placeKey, lastAt' });
+    // v8: the Historical World — cached answers from live sources, and each book's historical geography.
+    this.version(8).stores({ worldCache: 'id, at', bookWorld: 'id, updatedAt' });
   }
 }
 
@@ -125,6 +139,9 @@ export const ALL_TABLES = [
   'media',
   'placeChoices',
   'xrayHidden',
+  'mapBookmarks',
+  'mapNotes',
+  'placeVisits',
 ] as const;
 export type TableName = (typeof ALL_TABLES)[number];
 

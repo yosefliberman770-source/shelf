@@ -1,8 +1,10 @@
-// The historical map panel: OpenHistoricalMap centred on a place from the
-// book, at the year being read about. Full screen on phones, a side panel on
+// The historical map panel: the layered Historical Atlas (or, on phones
+// without WebGL, OpenHistoricalMap) centred on a place from the book, at the
+// year being read about. Full screen on phones, a side panel on
 // larger screens. Everything here fails gently — if a lookup or the map is
 // unavailable, the reader is untouched.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AtlasMap, type AtlasPin, webglAvailable } from '../../atlas/AtlasMap';
 import type { Item } from '../../db/types';
 import { addYears, formatHistoricalDate, parseHistoricalDate, toOhmYear } from '../../lib/history/dates';
 import { formatCoords, mapViewFor, type MapView, unionBBox, zoomForBBox } from '../../lib/history/geometry';
@@ -11,13 +13,20 @@ import { DATE_SOURCE_LABEL, type DateContext, dateContextFor, detectPlaces, save
 import { historicalPlaces } from '../../lib/history/placeService';
 import { CONFIDENCE_LABEL, type HistoricalPlace, type PlaceCandidate, type PlaceQuery, type PlaceResolution } from '../../lib/history/types';
 import { Icon } from '../icons';
+import type { Detection } from '../../atlas/resolve';
 
 export interface MapRequest {
   /** Name as written in the book (omit for "map this chapter"). */
   name?: string;
   passage?: string;
   mentionIndex?: number;
-  mode?: 'place' | 'chapter';
+  mode?: 'place' | 'chapter' | 'section' | 'search' | 'saved' | 'world' | 'maps';
+  /** The selected passage, for "Map this section". */
+  text?: string;
+  /** How the name was found (for "Why is this place here?"). */
+  detection?: Detection;
+  /** A place already identified (from the text popup or the map). */
+  placeKey?: string;
 }
 
 export interface MapBook { bookId: string; title: string; chapter?: string; item?: Pick<Item, 'histStart' | 'histEnd'> }
@@ -104,6 +113,16 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
     try { frameRef.current?.contentWindow?.location.replace(next); } catch { /* map not loaded yet */ }
   }, [fullSrc]);
   const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+  // The layered atlas needs WebGL; without it the OpenHistoricalMap view is used.
+  const [atlas] = useState(webglAvailable);
+  const [pins, setPins] = useState<AtlasPin[]>([]);
+  const focus = place?.latitude !== undefined && target.mode !== 'chapter'
+    ? { name: place.canonicalName, lat: place.latitude, lon: place.longitude!, approximate: place.locationPrecision !== 'exact' }
+    : undefined;
+  const marks = useMemo(() => [
+    ...(book.item?.histStart !== undefined ? [{ year: book.item.histStart, label: 'Book’s period begins' }] : []),
+    ...(book.item?.histEnd !== undefined ? [{ year: book.item.histEnd, label: 'Book’s period ends' }] : []),
+  ], [book.item?.histStart, book.item?.histEnd]);
 
   const setYear = (y: number | undefined, approximate?: boolean) => {
     setAnimate(null);
@@ -120,27 +139,31 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
       </div>
       <div className="hmap-body">
         {/* The map */}
-        <div className="hmap-frame">
+        {online && atlas && (
+          <AtlasMap view={view} year={year ?? book.item?.histStart ?? 1} onYearChange={(y) => setYear(y)} focus={focus} pins={target.mode === 'chapter' ? pins : undefined} marks={marks} />
+        )}
+        {!(online && atlas) && <div className="hmap-frame">
           {!online ? <div className="hmap-empty">You’re offline, so the historical map can’t load. The book still works normally.</div>
+            : atlas ? null
             : src ? <iframe ref={frameRef} key={viewKey} src={src} title={`OpenHistoricalMap: ${place?.canonicalName ?? 'map'}${year ? `, ${formatHistoricalDate(year)}` : ''}`} referrerPolicy="no-referrer-when-downgrade" allow="fullscreen" />
             : <div className="hmap-empty">{loading ? 'Finding the place…' : target.mode === 'chapter' ? 'Mapping this chapter…' : res?.status === 'AMBIGUOUS' ? 'Choose a location below.' : res ? 'No map location for this place.' : ''}</div>}
-        </div>
+        </div>}
 
         {/* Date controls */}
-        <DateControls year={year} approximate={date?.approximate} source={date?.source ?? 'none'} onChange={setYear} item={book.item}
+        <DateControls compact={online && atlas} year={year} approximate={date?.approximate} source={date?.source ?? 'none'} onChange={setYear} item={book.item}
           animate={animate} onAnimate={(a) => setAnimate(a)} onClearMine={() => { saveBookDate(book.bookId, undefined); setDate(dateContextFor({ bookId: book.bookId, item: book.item, passage: target.passage, chapterText: chapterText() })); }}
           onRemember={() => { if (year !== undefined) saveBookDate(book.bookId, year); }} />
 
-        {target.mode === 'chapter'
-          ? <ChapterPlaces book={book} chapterText={chapterText} year={year} onView={setChapterView} onPick={(name) => setTarget({ name, mode: 'place', passage: undefined })} />
+        {target.mode === 'chapter' || target.mode === 'section'
+          ? <ChapterPlaces book={book} chapterText={target.mode === 'section' && target.text ? () => target.text! : chapterText} year={year} pinned={online && atlas} onView={setChapterView} onPins={setPins} onPick={(name) => setTarget({ name, mode: 'place', passage: undefined })} />
           : <PlaceInfo name={target.name ?? ''} res={res} loading={loading} year={year} query={query} onRetry={() => setRetry((n) => n + 1)} onResolved={setRes} />}
 
-        {src && (
+        {(src || (atlas && view)) && (
           <div className="row wrap gap-8">
-            {view && <a className="btn sm" href={openHistoricalMap.fullMapUrl(view, year)} target="_blank" rel="noreferrer"><Icon name="map" />Open full map ↗</a>}
-            <select className="select sm" style={{ width: 'auto' }} value={layer} onChange={(e) => setLayer(e.target.value)} aria-label="Map style">
+            {view && <a className="btn sm" href={openHistoricalMap.fullMapUrl(view, year)} target="_blank" rel="noreferrer"><Icon name="map" />{atlas ? 'OpenHistoricalMap ↗' : 'Open full map ↗'}</a>}
+            {!atlas && <select className="select sm" style={{ width: 'auto' }} value={layer} onChange={(e) => setLayer(e.target.value)} aria-label="Map style">
               {openHistoricalMap.layers.map((l) => <option key={l.id} value={l.id}>{l.label} style</option>)}
-            </select>
+            </select>}
             {target.mode !== 'chapter' && <button className="btn sm" onClick={() => setTarget({ mode: 'chapter' })}>🗺 Map places in this chapter</button>}
           </div>
         )}
@@ -148,7 +171,7 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
           <span><b>Follow the book</b><br /><span className="tiny faint">Move the map to places on each new page as you read.</span></span>
           <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked)} />
         </label>
-        <Sources place={place} />
+        <Sources place={place} atlas={online && atlas} />
       </div>
     </div>
   );
@@ -156,7 +179,9 @@ export function HistoricalMapPanel({ request, book, chapterText, pagePlaces, dat
 
 // ── Date controls ─────────────────────────────────────────────────────
 
-function DateControls({ year, approximate, source, onChange, item, animate, onAnimate, onRemember, onClearMine }: {
+export function DateControls({ compact, year, approximate, source, onChange, item, animate, onAnimate, onRemember, onClearMine }: {
+  /** The atlas has its own timeline, so only the date's source and "go to a year" are shown. */
+  compact?: boolean;
   year?: number; approximate?: boolean; source: DateContext['source']; onChange: (y: number | undefined, approx?: boolean) => void; item?: MapBook['item'];
   animate: { to: number; step: number } | null; onAnimate: (a: { to: number; step: number } | null) => void; onRemember: () => void; onClearMine: () => void;
 }) {
@@ -188,6 +213,16 @@ function DateControls({ year, approximate, source, onChange, item, animate, onAn
       </div>
     );
   }
+  if (compact) return (
+    <div className="card tight hmap-date">
+      <div className="tiny faint">{formatHistoricalDate(year, { approximate })} · {DATE_SOURCE_LABEL[source]}{source === 'yours' ? <> · <button className="why-link" onClick={onClearMine}>use the book’s dates</button></> : <> · <button className="why-link" onClick={onRemember}>keep for this book</button></>}</div>
+      <form className="row mt-8" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+        <input className="input sm" value={text} onChange={(e) => setText(e.target.value)} placeholder="Go to a year, e.g. 216 BC" aria-label="Go to year" />
+        <button className="btn sm" disabled={!text.trim()}>Go</button>
+      </form>
+      {err && <div className="tiny" style={{ color: 'var(--bad)' }}>{err}</div>}
+    </div>
+  );
   return (
     <div className="card tight hmap-date">
       <div className="row between">
@@ -318,7 +353,7 @@ function SearchBox({ q, setQ, onResults }: { q: string; setQ: (s: string) => voi
 
 // ── Map this chapter ──────────────────────────────────────────────────
 
-function ChapterPlaces({ book, chapterText, year, onView, onPick }: { book: MapBook; chapterText: () => string; year?: number; onView: (v: MapView | undefined) => void; onPick: (name: string) => void }) {
+function ChapterPlaces({ book, chapterText, year, pinned, onView, onPins, onPick }: { book: MapBook; chapterText: () => string; year?: number; pinned: boolean; onView: (v: MapView | undefined) => void; onPins: (p: AtlasPin[]) => void; onPick: (name: string) => void }) {
   const [rows, setRows] = useState<{ name: string; res?: PlaceResolution }[] | null>(null);
   const [err, setErr] = useState('');
   const ran = useRef(false);
@@ -336,6 +371,7 @@ function ChapterPlaces({ book, chapterText, year, onView, onPick }: { book: MapB
         setRows(out);
         if (rs.every((r) => r.error)) setErr('Historical place lookup unavailable. Try again.');
         const boxes = out.flatMap((r) => (r.res?.place && (r.res.status === 'HIGH' || r.res.status === 'MEDIUM') && r.res.place.latitude !== undefined ? [[r.res.place.longitude!, r.res.place.latitude!, r.res.place.longitude!, r.res.place.latitude!] as [number, number, number, number]] : []));
+        onPins(out.flatMap((r) => (r.res?.place && (r.res.status === 'HIGH' || r.res.status === 'MEDIUM') && r.res.place.latitude !== undefined ? [{ name: r.res.place.canonicalName, lat: r.res.place.latitude, lon: r.res.place.longitude! }] : [])));
         const box = unionBBox(boxes);
         if (box) onView({ lat: (box[1] + box[3]) / 2, lon: (box[0] + box[2]) / 2, zoom: Math.min(zoomForBBox([box[0] - 0.5, box[1] - 0.5, box[2] + 0.5, box[3] + 0.5]), 9), bbox: [box[0] - 0.5, box[1] - 0.5, box[2] + 0.5, box[3] + 0.5] });
         else onView(undefined);
@@ -351,7 +387,7 @@ function ChapterPlaces({ book, chapterText, year, onView, onPick }: { book: MapB
   return (
     <div className="card tight">
       <b>Places in this chapter</b>
-      <div className="tiny faint mb-8">The map above is framed around every place below. The historical map can’t show pins, so tap a place to go to it.</div>
+      <div className="tiny faint mb-8">{pinned ? 'Each place below is pinned on the map where its source locates it. Tap one to look at it closely.' : 'The map above is framed around every place below. The historical map can’t show pins, so tap a place to go to it.'}</div>
       {err && <div className="small muted">{err}</div>}
       <div className="col" style={{ gap: 4 }}>
         {good.map((r, i) => (
@@ -376,12 +412,12 @@ function ChapterPlaces({ book, chapterText, year, onView, onPick }: { book: MapB
 
 // ── Sources & attribution ─────────────────────────────────────────────
 
-function Sources({ place }: { place?: HistoricalPlace }) {
+function Sources({ place, atlas }: { place?: HistoricalPlace; atlas: boolean }) {
   return (
     <details className="hmap-sources">
-      <summary>Sources & attribution</summary>
+      <summary>{atlas ? 'Place-name sources' : 'Sources & attribution'}</summary>
       <ul>
-        <li>Map: <a href="https://www.openhistoricalmap.org/" target="_blank" rel="noreferrer">OpenHistoricalMap</a> — © <a href="https://www.openhistoricalmap.org/copyright" target="_blank" rel="noreferrer">OpenHistoricalMap contributors</a>. Historical borders are approximate.</li>
+        {!atlas && <li>Map: <a href="https://www.openhistoricalmap.org/" target="_blank" rel="noreferrer">OpenHistoricalMap</a> — © <a href="https://www.openhistoricalmap.org/copyright" target="_blank" rel="noreferrer">OpenHistoricalMap contributors</a>. Historical borders are approximate.</li>}
         <li>Place names: <a href="https://whgazetteer.org/" target="_blank" rel="noreferrer">World Historical Gazetteer</a> (when available on your Shelf server), otherwise <a href="https://www.wikidata.org/" target="_blank" rel="noreferrer">Wikidata</a> (CC0).</li>
         {place?.attribution.map((a, i) => (
           <li key={i}>{place.canonicalName}: {a.url ? <a href={a.url} target="_blank" rel="noreferrer">{a.source}</a> : a.source}{a.dataset ? ` — ${a.dataset}` : ''}{a.license ? ` · ${a.licenseUrl ? '' : 'licence: '}` : ''}{a.license ? (a.licenseUrl ? <a href={a.licenseUrl} target="_blank" rel="noreferrer">{a.license}</a> : a.license) : ''}{a.redistributable === false ? ' · not redistributable — shown by reference only' : ''}</li>

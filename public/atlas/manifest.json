@@ -1,0 +1,114 @@
+{
+ "version": "2026-09-29",
+ "datasets": [
+  {
+   "id": "pleiades",
+   "name": "Pleiades",
+   "url": "https://pleiades.stoa.org/",
+   "license": "CC BY 3.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "Pleiades: A Gazetteer of Past Places, pleiades.stoa.org (CC BY 3.0)",
+   "files": [
+    "pleiades-lines.json",
+    "pleiades-provinces.json",
+    "../world/places/",
+    "../world/tiles/pleiades.pmtiles"
+   ],
+   "notes": "Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.",
+   "retrieved": "2026-09-29",
+   "counts": {
+    "places": 20340,
+    "lines": 612,
+    "provinces": 193,
+    "gazetteer": null
+   }
+  },
+  {
+   "id": "awmc",
+   "name": "Ancient World Mapping Center",
+   "url": "https://awmc.unc.edu/",
+   "license": "ODbL 1.0",
+   "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+   "commercial": true,
+   "shareAlike": true,
+   "attribution": "Ancient World Mapping Center, UNC Chapel Hill — geodata derived from the Barrington Atlas (ODbL)",
+   "files": [
+    "awmc-roads.json",
+    "awmc-shoreline.json",
+    "awmc-inland-water.json",
+    "awmc-snapshots.json"
+   ],
+   "notes": "Road and shoreline dates are Barrington periods. Inland water is modern-based (OSM). Dates for non-Roman snapshots are the conventional dates of the extents their titles name.",
+   "retrieved": "2026-09-29",
+   "counts": {
+    "roads": 3165,
+    "shoreline": 9901,
+    "inland": 6393,
+    "snapshots": 183
+   }
+  },
+  {
+   "id": "cliopatria",
+   "name": "Cliopatria (Seshat Global History Databank)",
+   "url": "https://github.com/Seshat-Global-History-Databank/cliopatria",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "Cliopatria, Seshat Global History Databank (CC BY 4.0); simplified by Shelf",
+   "files": [
+    "cliopatria/index.json",
+    "cliopatria/names.json"
+   ],
+   "notes": "One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.",
+   "retrieved": "2026-09-29",
+   "counts": {
+    "polities": 13380,
+    "classified": 2654,
+    "names": null
+   }
+  },
+  {
+   "id": "wikidata",
+   "name": "Wikidata",
+   "url": "https://www.wikidata.org/",
+   "license": "CC0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "Wikidata (CC0)",
+   "files": [
+    "wikidata-events.json",
+    "wikidata-wars.json"
+   ],
+   "notes": "Battles, sieges and campaigns with a location and a date. Crowd-sourced; check important facts.",
+   "retrieved": "2026-09-29",
+   "counts": {
+    "events": 11670,
+    "wars": 888
+   }
+  },
+  {
+   "id": "naturalearth",
+   "name": "Natural Earth",
+   "url": "https://www.naturalearthdata.com/",
+   "license": "Public domain",
+   "licenseUrl": "https://www.naturalearthdata.com/about/terms-of-use/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "Made with Natural Earth",
+   "files": [
+    "ne-land.json",
+    "ne-rivers.json"
+   ],
+   "notes": "Modern coastline and modern river courses. Rivers and coasts have moved since antiquity; ancient coastlines come from AWMC.",
+   "retrieved": "2026-09-29",
+   "counts": {
+    "land": 1420,
+    "rivers": 1201
+   }
+  }
+ ]
+}

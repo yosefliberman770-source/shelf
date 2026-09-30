@@ -73,7 +73,7 @@ export class ProviderUnavailable extends Error {}
 
 const WHG_ATTR: Attribution = { source: 'World Historical Gazetteer', url: 'https://whgazetteer.org/' };
 
-function whgPlace(c: WireCandidate, name: string): HistoricalPlace {
+function whgPlace(c: WireCandidate, name: string, spans: [number, number][] = []): HistoricalPlace {
   const underlying: Attribution | undefined = c.attribution?.source ? { source: c.attribution.source, license: c.attribution.license, licenseUrl: c.attribution.licenseUrl, url: c.attribution.url, redistributable: c.attribution.redistributable } : undefined;
   return {
     id: `whg:${c.id}`,
@@ -86,6 +86,8 @@ function whgPlace(c: WireCandidate, name: string): HistoricalPlace {
     placeType: c.placeTypes?.[0],
     description: c.description,
     countryCodes: c.ccodes ?? [],
+    historicalStartYear: spans.length ? Math.min(...spans.map((x) => x[0])) : undefined,
+    historicalEndYear: spans.length ? Math.max(...spans.map((x) => x[1])) : undefined,
     source: 'World Historical Gazetteer',
     sourceId: c.id,
     confidence: 'UNRESOLVED',
@@ -99,30 +101,20 @@ export const whgProvider: PlaceProvider = {
   name: 'World Historical Gazetteer',
   async available() { return (await historyServerStatus()).whg; },
   async search(queries, signal) {
-    const out: PlaceCandidate[][] = [];
-    // WHG takes up to 50 queries per request; our server enforces the same.
-    for (let i = 0; i < queries.length; i += 50) {
-      const batch = queries.slice(i, i + 50);
-      let r: Response;
-      try {
-        r = await fetch(`${historyApiBase()}/api/historical/place-search`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ queries: batch.map((q) => ({ name: q.name, limit: 8 })) }),
-          signal,
-        });
-      } catch (e) {
-        if ((e as Error).name === 'AbortError') throw e;
-        throw new ProviderUnavailable('Historical place lookup unavailable. Try again.');
-      }
-      if (!r.ok) throw new ProviderUnavailable(r.status === 503 || r.status === 502 || r.status === 429 ? 'Historical place lookup unavailable. Try again.' : `Historical place lookup failed (${r.status}).`);
-      const j = (await r.json()) as { results: ({ candidates: WireCandidate[] } | { error: string })[] };
-      j.results.forEach((res, k) => {
-        if ('error' in res) throw new ProviderUnavailable('Historical place lookup unavailable. Try again.');
-        out.push(res.candidates.map((c) => ({ place: whgPlace(c, batch[k].name), score: c.score, nameConfidence: c.confidence, exactName: c.match })));
-      });
-    }
-    return out;
+    // One WHG client for the whole app (src/world/whg.ts): batched up to 50 names per request,
+    // cached on the device, with each record's source and licence kept. Loaded lazily.
+    const { whgLookupMany } = await import('../../world/whg');
+    const found = await whgLookupMany(queries.map((q) => q.name), { route: 'reconcile', signal });
+    return queries.map((q) => {
+      const l = found.get(q.name.trim());
+      if (!l || l.status !== 'ok') throw new ProviderUnavailable(l?.error ?? 'Historical place lookup unavailable. Try again.');
+      // Records whose source forbids redistribution have no location or names here; they can't be a map answer.
+      return l.attestations.filter((a) => !a.restricted).map((a) => ({
+        place: whgPlace({ id: a.whgId, name: a.title, altNames: a.names.filter((n) => n !== a.title), point: a.point, placeTypes: a.types, ccodes: a.ccodes, namespace: a.namespace, hasGeom: false,
+          attribution: { source: a.source, license: a.licence?.spdx, licenseUrl: a.licence?.url, url: a.links.original, redistributable: a.redistributable } }, q.name, a.timespans),
+        score: a.score, nameConfidence: a.confidence, exactName: a.exactMatch,
+      }));
+    });
   },
   async get(sourceId, signal) {
     const r = await fetch(`${historyApiBase()}/api/historical/place?id=${encodeURIComponent(sourceId)}`, { signal }).catch(() => undefined);

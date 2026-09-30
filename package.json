@@ -24,11 +24,14 @@
     "dexie-react-hooks": "^4.4.0",
     "epubjs": "^0.3.93",
     "leaflet": "^1.9.4",
+    "maplibre-gl": "^5.24.0",
+    "pmtiles": "^4.5.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@maplibre/maplibre-gl-style-spec": "^24.10.0",
     "@types/d3-force": "^3.0.10",
     "@types/node": "^26.6.3",
     "@types/react": "^19.3.0",

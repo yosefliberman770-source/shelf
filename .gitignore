@@ -5,3 +5,9 @@ dist
 !.env.example
 server/.data
 *.log
+
+# Atlas build downloads
+scripts/atlas-build/.cache/
+public/world/tiles/rural-settlement.pmtiles
+__pycache__/
+*.pyc

@@ -1,0 +1,250 @@
+// Resolving a place name read in the book into one record the whole reader
+// uses — the text popup, the map, notes and "places you've met".
+//
+// Order: the reader's own pick for this book → the period gazetteers
+// (offline; only a name the dataset records, only when exactly one place has
+// it) → the online place service (World Historical Gazetteer / Wikidata).
+// Every result carries its sources and a plain account of why it was chosen.
+// Coordinates, names and dates come only from those datasets — never from AI.
+import { db } from '../db/db';
+import { norm } from '../lib/history/assess';
+import { historicalPlaces } from '../lib/history/placeService';
+import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
+import { km } from './data';
+import { type GazName, type GazPlace, gazetteerInfo, getPlace, matchName, normName, type Relation } from './gazetteer';
+import type { HistYear } from './time';
+import { type HistDate, mergeDates, period, yearRange } from '../world/histdate';
+import type { EvidenceKind } from '../world/evidence';
+import { assessPlace, type Claim, type PlaceEvidence } from '../world/placeEvidence';
+
+/** How the name was found in the book (shown in "Why is this place here?"). */
+export type Detection = 'cue' | 'known' | 'ai' | 'selection' | 'search' | 'map';
+export const DETECTION_LABEL: Record<Detection, string> = {
+  cue: 'Found in the text after a place word (e.g. “to”, “at”, “siege of”)',
+  known: 'A place already in your Knowledge Atlas or X-Ray for this book',
+  ai: 'Picked out of the text by the AI book analysis (the AI only found the name — the location comes from the dataset)',
+  selection: 'You selected it in the text',
+  search: 'You searched for it',
+  map: 'You chose it on the map',
+};
+
+/** Known / approximate / uncertain / disputed — each only when the source says so. */
+export type Certainty = 'known' | 'approximate' | 'uncertain' | 'disputed';
+export const CERTAINTY_LABEL: Record<Certainty, string> = {
+  known: 'Location known',
+  approximate: 'Approximate location',
+  uncertain: 'Uncertain — the source marks this identification as less certain',
+  disputed: 'Disputed location',
+};
+
+export interface Source { name: string; url?: string; license?: string; record?: string; note?: string; id?: string; tier?: string; accessed?: string }
+/** Two or more sources saying different things about the same place — kept side by side, never averaged. */
+export interface Disagreement { field: 'location' | 'date' | 'name' | 'affiliation'; claims: { source: string; value: string }[]; note?: string }
+
+export interface ReaderPlace {
+  key: string;
+  title: string;
+  /** As written in the book. */
+  written: string;
+  lat: number;
+  lon: number;
+  certainty: Certainty;
+  from?: HistYear;
+  to?: HistYear;
+  /** The record's dates with their kind and uncertainty (and other sources' dates as conflicts). */
+  when?: HistDate;
+  /** Dated roles (Viabundus: town, toll, fair…). */
+  roles?: [string, number | null, number | null][];
+  evidence?: EvidenceKind;
+  disagreements?: Disagreement[];
+  names: GazName[];
+  partOf: string[];
+  related: Relation[];
+  types: string[];
+  description?: string;
+  sources: Source[];
+  status: Confidence;
+  why: { detection: Detection; matchedName?: string; matchedIsTitle?: boolean; reason: string; method: string; userChosen?: boolean };
+  gaz?: GazPlace;
+  /** Evidence from all sources, weighed together (placeEvidence.ts), when it was gathered. */
+  assessment?: PlaceEvidence;
+}
+
+export interface Resolution {
+  place?: ReaderPlace;
+  status: Confidence;
+  /** Alternatives when the name fits several places. */
+  candidates: ReaderPlace[];
+  reason: string;
+  error?: string;
+  /** The combined evidence behind this result, when online sources were consulted. */
+  evidence?: PlaceEvidence;
+}
+
+const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
+
+/** A gazetteer record's dates, keeping what kind of date they are. */
+export function gazDate(p: GazPlace): HistDate {
+  const name = gazetteerInfo(p.gazetteer).name;
+  if (p.datasetPeriod) return period(p.from, p.to, 'Period of the whole dataset, not of this place', name);
+  if (p.gazetteer === 'pleiades') return period(p.from, p.to, 'Pleiades periods', name);
+  return yearRange(p.from, p.to, { source: name, qualifier: p.to === undefined && p.from !== undefined ? 'after' : 'between' });
+}
+
+export function fromGaz(p: GazPlace, written: string, why: ReaderPlace['why'], status: Confidence = 'HIGH', corroborating: GazPlace[] = []): ReaderPlace {
+  const src = (g: GazPlace): Source => { const info = gazetteerInfo(g.gazetteer); return { name: info.name, url: info.url, license: info.license, record: g.url, id: String(g.id) }; };
+  const all = [p, ...corroborating];
+  // Other datasets placing the same name at the same spot: note any gap in distance or dates rather than hiding it.
+  const disagreements: Disagreement[] = [];
+  for (const c of corroborating) {
+    const d = km([p.lon, p.lat], [c.lon, c.lat]);
+    if (d >= 2) disagreements.push({ field: 'location', claims: [{ source: gazetteerInfo(p.gazetteer).name, value: `${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}` }, { source: gazetteerInfo(c.gazetteer).name, value: `${c.lat.toFixed(3)}, ${c.lon.toFixed(3)}` }], note: `The two records are ${d.toFixed(1)} km apart — datasets often mark different points of the same town.` });
+  }
+  return {
+    key: p.key, title: p.title, written, lat: p.lat, lon: p.lon,
+    certainty: p.uncertain >= 1 ? 'uncertain' : p.precise ? 'known' : 'approximate',
+    from: p.from, to: p.to, when: mergeDates(all.map(gazDate)), names: p.names, partOf: p.partOf, related: p.related, types: [...new Set(all.flatMap((x) => x.types))],
+    roles: p.roles ?? corroborating.find((c) => c.roles)?.roles,
+    sources: all.map(src),
+    evidence: p.uncertain >= 1 ? 'historical-uncertainty' : corroborating.length ? 'confirmed' : 'single-source',
+    disagreements,
+    status, why, gaz: p,
+  };
+}
+
+function fromOnline(h: HistoricalPlace, written: string, why: ReaderPlace['why'], status: Confidence): ReaderPlace | undefined {
+  if (h.latitude === undefined || h.longitude === undefined) return undefined;
+  return {
+    key: h.id, title: h.canonicalName, written, lat: h.latitude, lon: h.longitude,
+    certainty: h.locationPrecision === 'exact' ? 'known' : h.locationPrecision === 'uncertain' ? 'uncertain' : 'approximate',
+    from: h.historicalStartYear, to: h.historicalEndYear,
+    names: h.alternativeNames.map((name) => ({ name })), partOf: [], related: [], types: h.placeType ? [h.placeType] : [], description: h.description,
+    sources: h.attribution.map((a) => ({ name: a.dataset ? `${a.source} — ${a.dataset}` : a.source, url: a.url, license: a.license, record: h.url })),
+    status, why,
+  };
+}
+
+/** A WHG attestation as a source line, keeping its provenance. */
+export function whgSource(c: Claim, accessed?: string): Source {
+  return { name: c.source.replace(/^WHG · /, 'World Historical Gazetteer — '), url: c.url, license: c.licence, record: c.whg?.links.original, id: c.id, tier: 'C', accessed: accessed?.slice(0, 10) };
+}
+
+/** Attach the combined evidence to a place: its statements, disagreements, and the other sources that agree. */
+function withEvidence(p: ReaderPlace, ev: PlaceEvidence | undefined): ReaderPlace {
+  if (!ev) return p;
+  const top = ev.clusters.find((c) => km([c.lon, c.lat], [p.lon, p.lat]) < 25);
+  const extra = (top?.claims ?? []).filter((c) => c.kind === 'whg' && !c.restricted).map((c) => whgSource(c, ev.whg?.accessed));
+  return {
+    ...p, assessment: ev,
+    sources: [...p.sources, ...extra.filter((x) => !p.sources.some((y) => y.id === x.id))],
+    disagreements: [...(p.disagreements ?? []), ...ev.disagreements],
+  };
+}
+
+/** A place built from the evidence alone (no offline record, no place-service answer). */
+function fromEvidence(ev: PlaceEvidence, written: string, why: ReaderPlace['why'], status: Confidence): ReaderPlace | undefined {
+  const top = ev.clusters[0];
+  const c = top?.claims.find((x) => x.nameMatch !== 'none') ?? top?.claims[0];
+  if (!top || !c || c.lat === undefined || c.lon === undefined) return undefined;
+  const spans = top.claims.flatMap((x) => x.spans);
+  return withEvidence({
+    key: `whg:${c.id}`, title: c.title, written, lat: c.lat, lon: c.lon, certainty: 'approximate',
+    from: spans.length ? Math.min(...spans.map((x) => x[0])) : undefined, to: spans.length ? Math.max(...spans.map((x) => x[1])) : undefined,
+    when: spans.length ? yearRange(Math.min(...spans.map((x) => x[0])), Math.max(...spans.map((x) => x[1])), { source: 'World Historical Gazetteer', qualifier: 'between' }) : undefined,
+    names: [...new Set(top.claims.flatMap((x) => x.names))].slice(0, 20).map((name) => ({ name })), partOf: [], related: [], types: [...new Set(top.claims.flatMap((x) => x.types))].slice(0, 6),
+    sources: [], evidence: top.families.length >= 2 ? 'confirmed' : 'single-source', status, why,
+  }, ev);
+}
+
+/** A gazetteer place as the online service's record type, so a reader's pick can be remembered per book. */
+function toHistorical(p: ReaderPlace): HistoricalPlace {
+  return {
+    id: p.key, canonicalName: p.title, matchedName: p.written, alternativeNames: p.names.map((n) => n.name), latitude: p.lat, longitude: p.lon,
+    locationPrecision: p.certainty === 'known' ? 'exact' : p.certainty === 'uncertain' ? 'uncertain' : 'approximate', placeType: p.types[0], countryCodes: [],
+    historicalStartYear: p.from, historicalEndYear: p.to, source: p.sources[0]?.name ?? '', sourceId: p.key.split(':').slice(1).join(':'), confidence: 'HIGH',
+    attribution: p.sources.map((s) => ({ source: s.name, license: s.license, url: s.url })), url: p.sources[0]?.record,
+  };
+}
+
+export async function choosePlace(bookId: string | undefined, written: string, p: ReaderPlace): Promise<ReaderPlace> {
+  const chosen = { ...p, written, status: 'HIGH' as Confidence, why: { ...p.why, userChosen: true, reason: 'You chose this place for this name in this book.' } };
+  if (bookId) await historicalPlaces.choosePlace({ name: written, bookId }, toHistorical(chosen));
+  return chosen;
+}
+
+export async function resolvePlace(written: string, opts: { year?: HistYear; bookId?: string; detection: Detection; passage?: string; nearby?: string[]; chapter?: string; bookTitle?: string; online?: boolean; signal?: AbortSignal }): Promise<Resolution> {
+  const why = (reason: string, method: string, extra: Partial<ReaderPlace['why']> = {}): ReaderPlace['why'] => ({ detection: opts.detection, reason, method, ...extra });
+  // 1. The reader's own pick for this name in this book.
+  if (opts.bookId) {
+    const c = await db.placeChoices.get(choiceKey(opts.bookId, written)).catch(() => undefined);
+    const h = c?.place as HistoricalPlace | undefined;
+    if (h) {
+      const g = await getPlace(h.id).catch(() => undefined);
+      const p = g ? fromGaz(g, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true })) : fromOnline(h, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true }), 'HIGH');
+      if (p) return { place: p, status: 'HIGH', candidates: [], reason: p.why.reason };
+    }
+  }
+  // 2. Period gazetteers, offline.
+  let local: Resolution | undefined;
+  const m = await matchName(written, opts.year).catch(() => undefined);
+  if (m?.status === 'unique' && m.place) {
+    const status: Confidence = m.candidates.length === 1 ? 'HIGH' : 'MEDIUM';
+    const method = `${[m.place, ...m.corroborating].map((p) => gazetteerInfo(p.gazetteer).name).join(' + ')} name match`;
+    const place = fromGaz(m.place, written, why(m.reason, method, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status, m.corroborating);
+    return { place, status, candidates: m.candidates.filter((c) => c.key !== m.place!.key).map((c) => fromGaz(c, written, place.why, 'LOW')), reason: m.reason };
+  }
+  if (m?.status === 'ambiguous') local = { status: 'AMBIGUOUS', candidates: m.candidates.map((c) => fromGaz(c, written, why(m.reason, `${gazetteerInfo(c.gazetteer).name} name match`), 'AMBIGUOUS')), reason: m.reason };
+  if (opts.online === false) return local ?? { status: 'UNRESOLVED', candidates: [], reason: `“${written}” isn’t in the offline gazetteer for this period.` };
+  // Weigh every source together (offline gazetteers + World Historical Gazetteer). WHG only adds evidence; it never decides alone.
+  const ev = await assessPlace(written, { year: opts.year, local: m?.candidates ?? [], signal: opts.signal }).catch((e) => { if ((e as Error).name === 'AbortError') throw e; return undefined; });
+  if (local && ev?.status === 'identified' && ev.confidence !== 'weak') {
+    // The offline records disagree among themselves; the combined evidence may favour one of them.
+    const keys = new Set(ev.clusters[0].claims.filter((c) => c.gaz && local!.candidates.some((x) => x.key === c.gaz!.key)).map((c) => c.gaz!.key));
+    if (keys.size === 1) {
+      const chosen = local.candidates.find((x) => x.key === [...keys][0])!;
+      const reason = `${m!.reason} Weighing all sources: ${ev.statements.filter((x) => /independent sources|fits the date|Confidence/.test(x)).join(' ')}`.trim();
+      const place = withEvidence({ ...chosen, status: 'MEDIUM', why: { ...chosen.why, reason, method: `${chosen.sources[0].name} + World Historical Gazetteer evidence` } }, ev);
+      return { place, status: 'MEDIUM', candidates: local.candidates.filter((x) => x.key !== chosen.key).map((x) => ({ ...x, status: 'LOW' as Confidence })), reason, evidence: ev };
+    }
+  }
+  if (local) local = { ...local, candidates: local.candidates.map((x) => withEvidence(x, ev)), evidence: ev };
+  // 3. The online place service (WHG via Shelf's server, else Wikidata).
+  const q: PlaceQuery = { name: written, date: opts.year, surroundingText: opts.passage?.slice(0, 1200), nearbyPlaceNames: opts.nearby?.slice(0, 10), chapterTitle: opts.chapter, bookTitle: opts.bookTitle, bookId: opts.bookId, language: 'en' };
+  const res = await historicalPlaces.resolvePlaceName(q, { signal: opts.signal }).catch((e) => { if ((e as Error).name === 'AbortError') throw e; return undefined; });
+  if (!res || res.error || (!res.place && !res.candidates.length)) {
+    if (local) return local;
+    // Nothing from the place service: the combined evidence may still point to one place (never above "likely").
+    if (ev && ev.status === 'identified' && ev.confidence !== 'weak') {
+      const status: Confidence = ev.confidence === 'strong' ? 'MEDIUM' : 'LOW';
+      const place = fromEvidence(ev, written, why(ev.statements.slice(0, 3).join(' '), 'World Historical Gazetteer attestations, weighed together'), status);
+      if (place) return { place, status, candidates: [], reason: place.why.reason, evidence: ev };
+    }
+    if (ev && ev.status === 'ambiguous') {
+      const cands = ev.clusters.slice(0, 8).map((c) => fromEvidence({ ...ev, clusters: [c] }, written, why(ev.statements.find((x) => x.includes('doesn’t settle')) ?? '', 'World Historical Gazetteer attestation'), 'AMBIGUOUS')).filter((x): x is ReaderPlace => !!x);
+      if (cands.length) return { status: 'AMBIGUOUS', candidates: cands, reason: `“${written}” could be ${cands.length} different places.`, evidence: ev };
+    }
+    return { status: 'UNRESOLVED', candidates: [], reason: ev?.statements.find((x) => x.startsWith('No record')) ?? '', error: res?.error ?? (res ? undefined : 'Historical place lookup unavailable. Try again.'), evidence: ev };
+  }
+  const onlineWhy = (h: HistoricalPlace) => why(res.reason ?? '', `${h.source} search`);
+  let place = res.place && (res.status === 'HIGH' || res.status === 'MEDIUM' || res.userChosen) ? fromOnline(res.place, written, onlineWhy(res.place), res.status) : undefined;
+  // The offline candidates can settle it when the online match agrees with one of them (same name, within 25 km).
+  if (place && local) {
+    const same = local.candidates.find((c) => km([c.lon, c.lat], [place!.lon, place!.lat]) < 25);
+    if (same) place = { ...same, status: res.status, why: { ...same.why, reason: `${res.reason ?? ''} ${same.sources[0].name} records a place with this name at the same spot.`.trim(), method: `${res.place!.source} search, confirmed by ${same.sources[0].name}` }, sources: [...same.sources, ...place.sources] };
+  }
+  if (place) return { place: withEvidence(place, ev), status: res.status, candidates: res.candidates.map((c) => fromOnline(c.place, written, onlineWhy(c.place), 'LOW')).filter((x): x is ReaderPlace => !!x), reason: res.reason ?? '', evidence: ev };
+  const cands = [...(local?.candidates ?? []), ...res.candidates.map((c) => fromOnline(c.place, written, onlineWhy(c.place), 'AMBIGUOUS')).filter((x): x is ReaderPlace => !!x)];
+  return { status: cands.length > 1 ? 'AMBIGUOUS' : res.status, candidates: cands.slice(0, 12), reason: local?.reason ?? res.reason ?? '', evidence: ev };
+}
+
+/** Quick offline check used while reading: is this name one unique place in the period's gazetteer? */
+export async function offlineUnique(names: string[], year: HistYear): Promise<Map<string, GazPlace>> {
+  const out = new Map<string, GazPlace>();
+  for (const n of [...new Set(names)]) {
+    if (out.has(normName(n))) continue;
+    const m = await matchName(n, year).catch(() => undefined);
+    // Underline only clear cases: one place, located on the map with confidence.
+    if (m?.status === 'unique' && m.place && m.candidates.length === 1 && m.place.uncertain === 0) out.set(normName(n), m.place);
+  }
+  return out;
+}
