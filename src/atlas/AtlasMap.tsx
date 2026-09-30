@@ -3,7 +3,8 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
@@ -26,6 +27,8 @@ let pmtilesReady = false;
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
+/** Detailed water from OpenStreetMap, kept just above the political layers. */
+const WATER = 'water-detail';
 
 /** WebGL is needed for the atlas; without it the reader falls back to the simple map. */
 export function webglAvailable(): boolean {
@@ -51,6 +54,9 @@ function baseStyle(base: string): StyleSpecification {
     glyphs: GLYPHS,
     sources: {
       'ne-land': { type: 'geojson', data: base + 'ne-land.json', attribution: credit('naturalearth') },
+      // Detailed coastlines and water (OpenStreetMap via OpenFreeMap: free, no key). Only the water shapes are
+      // used — no modern roads, places or labels. Offline, the coarse Natural Earth coast underneath remains.
+      ofm: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' },
       focus: { type: 'geojson', data: EMPTY },
       pins: { type: 'geojson', data: EMPTY },
       route: { type: 'geojson', data: EMPTY },
@@ -59,6 +65,9 @@ function baseStyle(base: string): StyleSpecification {
     layers: [
       { id: 'sea', type: 'background', paint: { 'background-color': '#cddde4' } },
       { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': '#efe7d4' } },
+      // Drawn above the reconstructed borders (moved into place in sync), so their simplified outlines don't
+      // spill into the sea and coastal places sit on the true coast.
+      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': '#cddde4' } },
       // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
       { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
       { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
@@ -228,6 +237,13 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
       const labelAfter = map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined && labelKey(managedDef(l.id)!) > rank)?.id ?? TOP;
       for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, spec.type === 'symbol' ? labelAfter : geomAfter);
       managed.current.set(def.id, specs.map((s) => s.id));
+    }
+    // Keep the detailed water just above the political layers (fills, outlines, shires) and below
+    // everything else — coasts, rivers, roads, places and all labels.
+    if (map.getLayer(WATER)) {
+      const isLabel = (id: string) => map.getLayer(id)?.type === 'symbol';
+      const firstAfterPolitics = DRAW_ORDER.slice(DRAW_ORDER.indexOf('rural-settlement') + 1).map((id) => managed.current.get(id)?.find((l) => !isLabel(l))).find(Boolean);
+      map.moveLayer(WATER, firstAfterPolitics ?? labelBandStart(map) ?? TOP);
     }
     // Borders come in time slices; load the slice that covers the year.
     if (map.getSource('cliopatria')) {
@@ -502,12 +518,13 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       if (str('m')) lines.push(`Part of: ${str('m')!.split(';').map((x) => x.replace(/^\(|\)$/g, '')).join(', ')}`);
       if (grouping && str('cm')) lines.push(`Made up of: ${str('cm')!.split(';').join(', ')}`);
       if (num('a')) lines.push(`Area in this outline: about ${num('a')!.toLocaleString()} km²`);
+      if (str('cn')) lines.unshift(`Formal name in the source: ${str('n')}`);
       const cautions = ['One scholarly reconstruction of the territory; borders were rarely this precise.'];
       if (p.op !== undefined) cautions.unshift('A small detached piece of this polity’s outline, far from its main territory. Cliopatria includes it in the outline but doesn’t say whether it was held, briefly occupied, or is an artefact of the reconstruction.');
       if (str('x')) cautions.unshift(`Overlapping outlines: the source’s outline for this polity overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria records territory per period and records no claims or disputes, so this may be shared or changing control within the period, or imprecision in the reconstruction — the source doesn’t say which.`);
       if (str('xr')) cautions.unshift(`Overlap explained by a relationship Cliopatria records: ${str('xr')!.split(';').join('; ')}.`);
       return {
-        title: grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity', lines,
+        title: str('cn') ?? (grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity'), lines,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : undefined, source: credit('cliopatria'),
         caution: cautions.join(' '),
       };
@@ -592,7 +609,13 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'ohm': {
       const s = str('start_date');
       const e = str('end_date');
-      return { title: str('name') ?? 'Feature', lines: [str('type') ?? '', s || e ? `Mapped for ${s ?? '?'} – ${e ?? 'present'}` : ''].filter(Boolean), source: credit('ohm') };
+      // A readable name first (English, else a Latin-script one); the local-language name kept as a second line.
+      const local = str('name');
+      const latin = str('name_en') ?? (local && isLatinScript(local) ? local : undefined) ?? OHM_LATIN_LANGS.map((l) => str(`name_${l}`)).find(Boolean);
+      const lines = [str('type') ?? '', s || e ? `Mapped for ${s ?? '?'} – ${e ?? 'present'}` : ''];
+      if (local && latin && local !== latin) lines.push(`Local name: ${isolate(local)}`);
+      if (local && !latin) lines.push('No English or Latin-script name is recorded for it in OpenHistoricalMap, so the map shows no label.');
+      return { title: latin ?? (local ? isolate(local) : 'Feature'), lines: lines.filter(Boolean), source: credit('ohm') };
     }
     default:
       return { title: str('n') ?? str('name') ?? 'Feature', lines: [], source: '' };

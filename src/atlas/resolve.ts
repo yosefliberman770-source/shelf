@@ -190,7 +190,8 @@ export function fromPolity(pm: PolityMatch, written: string, why: ReaderPlace['w
   if (p.x === undefined || p.y === undefined) return undefined;
   const name = p.n.replace(/^\(|\)$/g, '');
   return {
-    key: `polity:${p.q ?? normName(p.n)}:${p.f}`, title: name, kind: 'polity', written, lat: p.y, lon: p.x, certainty: 'approximate',
+    // Shown by its everyday name ("Greece"); the source's formal title stays as the record title.
+    key: `polity:${p.q ?? normName(p.n)}:${p.f}`, title: p.cn ?? name, recordTitle: p.cn ? name : undefined, kind: 'polity', written, lat: p.y, lon: p.x, certainty: 'approximate',
     polity: { n: name, f: p.f, t: p.t, q: p.q }, from: p.f, to: p.t, when: yearRange(p.f, p.t, { source: 'Cliopatria', qualifier: 'between' }),
     names: [], partOf: [], related: [], types: ['polity'],
     sources: [{ name: 'Cliopatria (Seshat Global History Databank)', url: 'https://github.com/Seshat-Global-History-Databank/cliopatria', license: 'CC BY 4.0', record: p.q ? `https://www.wikidata.org/wiki/${p.q}` : undefined, note: 'Territory reconstructed by Cliopatria; the point is only where its label sits.' }],

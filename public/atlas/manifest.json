@@ -68,9 +68,9 @@
     "polities": 43252,
     "classified": 12211,
     "names": null,
-    "aliases": {
-     "aliases": 1053,
-     "demonyms": 260
+    "aliases": null,
+    "commonNames": {
+     "commonNames": 201
     }
    }
   },

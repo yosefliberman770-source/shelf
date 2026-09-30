@@ -19,11 +19,12 @@ export interface Polity {
   /** Recorded relationships (allegiance, vassalage, personal union…) that explain an overlap. */ xr?: string;
   /** A small outlying piece of the polity's outline. */ op?: 1;
   /** Area of the outline, km². */ a?: number;
+  /** The everyday English name when `n` is a formal title ("Third Hellenic Republic" → Greece). */ cn?: string;
   /** Groupings containing this point that the polity belongs to, without parentheses. */ partOf?: string[];
 }
 
 /** A polity's name for display: Cliopatria's parentheses removed from groupings. */
-export const polityDisplayName = (p: Pick<Polity, 'n'>) => p.n.replace(/^\(|\)$/g, '');
+export const polityDisplayName = (p: Pick<Polity, 'n' | 'cn'>) => p.cn ?? p.n.replace(/^\(|\)$/g, '');
 export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
 export interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 

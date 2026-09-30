@@ -198,11 +198,29 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
   ];
 }
 
+/**
+ * OpenHistoricalMap's `name` is the local-language name (Arabic, Hebrew, Chinese, Greek…). Labels use a
+ * readable name instead: the English name if recorded, else `name` when it is already in Latin script,
+ * else a Latin-script name recorded in another language. When none is recorded, no label is drawn
+ * (the dot stays; tapping it shows the original name) — local script is never shown as the map label.
+ */
+export const OHM_LATIN_LANGS = ['la', 'fr', 'de', 'it', 'es', 'pt', 'nl', 'ca', 'pl', 'sv', 'nb', 'da', 'fi', 'cs', 'hu', 'ro', 'tr', 'id', 'vi', 'eu', 'hr', 'sk', 'sl'];
+/**
+ * True when the text starts in Latin script: below U+0370 (Latin, Latin-1, Latin Extended A/B, IPA and the
+ * modifier letters transliterations use, like ʿ), or Latin Extended Additional (Ḥ, Ṣ, Ạ…, U+1E00–U+1EFF).
+ */
+const latinStart = (e: ExpressionSpecification): ExpressionSpecification => ['all', ['>', ['length', e], 0],
+  ['any', ['<', e, 'Ͱ'], ['all', ['>=', e, 'Ḁ'], ['<', e, 'ἀ']]]];
+export const ohmLabel: ExpressionSpecification = ['case',
+  ['has', 'name_en'], ['get', 'name_en'],
+  latinStart(['to-string', ['coalesce', ['get', 'name'], ''] ]), ['get', 'name'],
+  ['coalesce', ...OHM_LATIN_LANGS.map((l) => ['get', `name_${l}`] as ExpressionSpecification), '']] as ExpressionSpecification;
+
 function ohmPlaces(id: string, types: string[], color: string, minzoom: number, size: number, ctx: LayerCtx): LayerSpecification[] {
   const filter = ['all', ['in', ['get', 'type'], ['literal', types]], ohmExisted(ctx.year)] as FilterSpecification;
   return [
     { id: `${id}-pt`, type: 'circle', source: 'ohm', 'source-layer': 'place_points_centroids', filter, minzoom, paint: { 'circle-radius': size, 'circle-color': color, 'circle-stroke-color': C.halo, 'circle-stroke-width': 1 } },
-    { id: `${id}-label`, type: 'symbol', source: 'ohm', 'source-layer': 'place_points_centroids', filter, minzoom, layout: { 'text-field': ['get', 'name'], 'text-font': FONT, 'text-size': size * 3.2, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
+    { id: `${id}-label`, type: 'symbol', source: 'ohm', 'source-layer': 'place_points_centroids', filter, minzoom, layout: { 'text-field': ohmLabel, 'text-font': FONT, 'text-size': size * 3.2, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
   ];
 }
 
@@ -246,7 +264,9 @@ function polityClass(id: string, match: ExpressionSpecification, _color: string,
     { id: `${id}-group`, type: 'line', source: 'cliopatria', filter: grouping, paint: { 'line-color': polityColour(POLITY_TEXT), 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 1, 7, 2.2], 'line-dasharray': [4, 2], 'line-opacity': 0.55 } },
     { id: `${id}-label`, type: 'symbol', source: 'cliopatria', filter: labels, layout: {
       // Groupings are named without Cliopatria's parentheses, in italic, so they read as "a grouping", not a state.
-      'text-field': ['case', ['has', 'g'], ['slice', ['get', 'n'], 1, ['-', ['length', ['get', 'n']], 1]], ['get', 'n']],
+      // The everyday name when the source's is a formal title ("Third Hellenic Republic" → Greece; see the build),
+      // groupings without Cliopatria's parentheses.
+      'text-field': ['case', ['has', 'cn'], ['get', 'cn'], ['has', 'g'], ['slice', ['get', 'n'], 1, ['-', ['length', ['get', 'n']], 1]], ['get', 'n']],
       'text-font': ['case', ['has', 'g'], ['literal', FONT_ITALIC], ['literal', FONT_BOLD]],
       'text-size': areaLabelSize, 'text-transform': 'uppercase', 'text-letter-spacing': 0.08, 'text-max-width': 8,
       'symbol-placement': 'point', 'symbol-sort-key': ['-', 0, ['get', 'a']], 'text-padding': 6, 'text-optional': true,

@@ -164,6 +164,7 @@ export interface PolityName {
   n: string; f: HistYear; t: HistYear; q?: string; x?: number; y?: number; m?: string; g?: 1;
   /** English aliases Wikidata records for the polity ("Venetian Republic", "Byzantium"). */ al?: string[];
   /** Demonyms Wikidata records for it (P1549: "Venetian", "English"). */ dm?: string[];
+  /** Its everyday English name when `n` is a formal title. */ cn?: string;
 }
 /** Words that name a political form, not a polity ("Kingdom of Aragon" → Aragon). */
 const FORM = '(?:grand |great |holy |united |old |new |late |early |second |first |third )?(?:kingdom|kingdoms|crown|county|duchy|grand duchy|empire|republic|principality|emirate|caliphate|sultanate|khanate|khaganate|tsardom|despotate|margraviate|march|lordship|earldom|electorate|state|states|city-states|confederation|confederacy|league|dominion|colony|protectorate|viceroyalty|governorate|bishopric|archbishopric|prince-bishopric|theme|satrapy|province|dynasty|realm|commonwealth|territory|federation)';
@@ -226,6 +227,7 @@ export async function matchPolity(written: string, year?: HistYear, opts: { cont
   if (k.length < 3) return [];
   const via = (p: PolityName & { core: string }): PolityVia | undefined => {
     if (p.core === k || normName(p.n.replace(/^\(|\)$/g, '')) === w) return 'name';
+    if (p.cn && normName(p.cn) === w) return 'alias';
     if (p.al?.some((a) => normName(a) === w || polityCore(a) === k)) return 'alias';
     if (p.dm?.some((d) => normName(d) === w)) return 'demonym';
     return undefined;
