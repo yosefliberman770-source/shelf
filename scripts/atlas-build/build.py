@@ -12,9 +12,13 @@ Sources (see docs/HISTORICAL_ATLAS.md for what each provides and why):
   Cliopatria      CC BY 4.0   polity borders 3400 BCE - 2024 CE
   Wikidata        CC0         battles, sieges, wars; polity classification (empire/kingdom/republic)
   Natural Earth   public dom. modern land outline for the base map
+  Early Medieval Atlas (ADS)  CC BY 4.0  Domesday shires & hundreds, Gough Map routes, inland navigation (england.py,
+                  read from the original ZIPs in data/historical/raw/)
+  Atlas of Rural Settlement   © English Heritage, personal/business use — local builds only, never deployed
 
 Usage:  python3 scripts/atlas-build/build.py            (downloads into scripts/atlas-build/.cache)
-Needs:  pip install shapely pyshp
+        python3 scripts/atlas-build/england.py          (England layers only)
+Needs:  pip install shapely pyshp pyproj pmtiles mapbox-vector-tile
 """
 from __future__ import annotations
 

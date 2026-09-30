@@ -62,6 +62,10 @@ def main():
                     manifest[rel] = record(f['url'], dest, None)
                     save(manifest)
                 continue
+            if f.get('manual'):
+                # Only obtainable by hand (the site refuses automated downloads): never fetched here.
+                print('MANUAL  ', rel, '— download it in a browser from', f['url'])
+                continue
             if verify:
                 print('MISSING ', rel)
                 bad += 1
@@ -90,12 +94,16 @@ def main():
 
 def record(url, dest, rec):
     digest = sha256(dest)
-    return {
+    out = {
         'url': url,
         'bytes': os.path.getsize(dest),
         'sha256': digest,
         'downloaded': rec['downloaded'] if rec and rec['sha256'] == digest else datetime.date.today().isoformat(),
     }
+    # Keep notes on where a file came from (e.g. uploaded by hand) while it is unchanged.
+    if rec and rec['sha256'] == digest:
+        out.update({k: v for k, v in rec.items() if k not in out})
+    return out
 
 
 def save(manifest):

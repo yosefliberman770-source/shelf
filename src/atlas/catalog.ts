@@ -15,7 +15,8 @@ export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'economic', label: 'Economic & cultural' },
 ];
 
-export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya';
+export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
+  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -29,7 +30,17 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   itinere: { name: 'Itiner-e (Brughmans et al. 2024)', url: 'https://itiner-e.org/', license: 'CC BY 4.0' },
   viabundus: { name: 'Viabundus 2', url: 'https://www.viabundus.eu/', license: 'CC BY 4.0' },
   althurayya: { name: 'al-Ṯurayyā Gazetteer (after G. Cornu)', url: 'https://althurayya.github.io/', license: 'Apache-2.0' },
+  domesday: { name: 'Domesday Shires and Hundreds (Brookes 2020, ADS)', url: 'https://doi.org/10.5284/1058999', license: 'CC BY 4.0' },
+  gough: { name: 'Routes and Roads of the Gough Map (Oksanen & Brookes 2024, ADS)', url: 'https://doi.org/10.5284/1124312', license: 'CC BY 4.0' },
+  navigation: { name: 'Inland Navigation before 1348 (Oksanen 2019, ADS)', url: 'https://doi.org/10.5284/1057497', license: 'CC BY 4.0' },
+  ruralsettlement: { name: 'Atlas of Rural Settlement in England GIS (Roberts & Wrathmell, English Heritage)', url: 'https://doi.org/10.5284/1031493', license: '© English Heritage — personal use' },
 };
+
+/**
+ * Datasets whose terms don't allow republishing: their tiles exist only in
+ * local builds (VITE_SHELF_LOCAL_DATA=1) and are never deployed.
+ */
+const LOCAL_DATA = (import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SHELF_LOCAL_DATA === '1';
 
 export interface LayerCtx {
   year: HistYear;
@@ -104,6 +115,10 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'viabundus-nodes': (c) => pmtiles(c, 'viabundus-nodes.pmtiles', 'viabundus', 11),
   'thurayya-places': (c) => pmtiles(c, 'thurayya-places.pmtiles', 'althurayya', 10),
   'thurayya-routes': (c) => pmtiles(c, 'thurayya-routes.pmtiles', 'althurayya', 10),
+  domesday: (c) => pmtiles(c, 'domesday.pmtiles', 'domesday', 10),
+  gough: (c) => pmtiles(c, 'gough.pmtiles', 'gough', 11),
+  navigation: (c) => pmtiles(c, 'navigation.pmtiles', 'navigation', 11),
+  'rural-settlement': (c) => pmtiles(c, 'rural-settlement.pmtiles', 'ruralsettlement', 10),
   'pleiades-lines': (c) => ({ type: 'geojson', data: c.base + 'pleiades-lines.json', attribution: credit('pleiades') }),
   'pleiades-provinces': (c) => ({ type: 'geojson', data: c.base + 'pleiades-provinces.json', attribution: credit('pleiades') }),
   'awmc-roads': (c) => ({ type: 'geojson', data: c.base + 'awmc-roads.json', attribution: credit('awmc') }),
@@ -185,6 +200,12 @@ function events(id: string, kind: string | string[], color: string, ctx: LayerCt
 const VIABUNDUS: [HistYear, HistYear] = [1250, 1700];
 /** al-Ṯurayyā follows Cornu's atlas of the 9th–10th centuries. */
 const THURAYYA: [HistYear, HistYear] = [700, 1100];
+/** Domesday Book records 1086; its units are shown twenty years either side, and labelled as 1086. */
+const DOMESDAY: [HistYear, HistYear] = [1066, 1106];
+/** The Gough Map is dated c. 1400 (ADS introduction); shown for the later fourteenth and fifteenth centuries. */
+const GOUGH: [HistYear, HistYear] = [1350, 1450];
+/** Navigation evidence from the eleventh century to 1348. */
+const NAVIGATION: [HistYear, HistYear] = [1000, 1348];
 const inWindow = (y: HistYear, w: [HistYear, HistYear]): FilterSpecification => (y >= w[0] && y <= w[1] ? ['boolean', true] : ['boolean', false]) as FilterSpecification;
 
 /** Itiner-e segments: shown when the year falls within the segment's dates widened by the dataset's own error margins. */
@@ -440,6 +461,65 @@ export const LAYERS: AtlasLayerDef[] = [
 
   // ECONOMIC & CULTURAL
   {
+    id: 'domesday', group: 'political', label: 'Domesday shires & hundreds (1086)', datasets: ['domesday'], defaultOn: true, coverage: DOMESDAY,
+    hint: 'The shires, intermediate districts (Ridings, lathes, rapes…) and hundreds/wapentakes of England as they are believed to have existed in 1086, reconstructed from Domesday Book and later parish boundaries. Shown 1066–1106 and always as the 1086 arrangement — boundaries changed before and after. Coverage is thin in the far north (divided into wards) and in Wales.', sources: ['domesday'],
+    specs: (c) => {
+      const w = inWindow(c.year, DOMESDAY);
+      const k = (v: string): FilterSpecification => ['all', w, ['==', ['get', 'k'], v]] as FilterSpecification;
+      return [
+        { id: 'domesday-hundreds', type: 'line', source: 'domesday', 'source-layer': 'units', filter: k('hundred'), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-opacity': 0.55 } },
+        { id: 'domesday-inter', type: 'line', source: 'domesday', 'source-layer': 'units', filter: k('inter'), minzoom: 5, paint: { 'line-color': C.province, 'line-width': 1.1, 'line-opacity': 0.7, 'line-dasharray': [3, 1.5] } },
+        { id: 'domesday-shires-fill', type: 'fill', source: 'domesday', 'source-layer': 'units', filter: k('shire'), paint: { 'fill-color': C.province, 'fill-opacity': 0.04 } },
+        { id: 'domesday-shires', type: 'line', source: 'domesday', 'source-layer': 'units', filter: k('shire'), paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 1, 9, 2.4], 'line-opacity': 0.85 } },
+        { id: 'domesday-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('shire'), layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 13, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
+        { id: 'domesday-hundred-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('hundred'), minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ];
+    },
+  },
+  {
+    id: 'rural-settlement', group: 'places', alsoIn: ['physical'], label: 'Rural settlement provinces (England)', datasets: ['ruralsettlement'], defaultOn: false,
+    unavailable: LOCAL_DATA ? undefined : 'Not published: the Atlas of Rural Settlement terms allow personal and business use, not republishing on a public site. Available in local builds of Shelf.',
+    hint: 'Roberts & Wrathmell’s settlement provinces, sub-provinces and local regions, and the nucleated settlements (villages and hamlets) they mapped from nineteenth-century Ordnance Survey maps. A characterisation of settlement patterns used to study medieval England — not a dated map of any one year.', sources: ['rural-settlement'],
+    specs: () => {
+      const k = (v: string): FilterSpecification => ['==', ['get', 'k'], v] as FilterSpecification;
+      return [
+        { id: 'rural-local', type: 'line', source: 'rural-settlement', 'source-layer': 'rural', filter: k('local'), minzoom: 7, paint: { 'line-color': '#6d8b74', 'line-width': 0.7, 'line-opacity': 0.6 } },
+        { id: 'rural-subprovince', type: 'line', source: 'rural-settlement', 'source-layer': 'rural', filter: k('subprovince'), paint: { 'line-color': '#4a6b52', 'line-width': 1.2, 'line-opacity': 0.7, 'line-dasharray': [3, 1.5] } },
+        { id: 'rural-province', type: 'line', source: 'rural-settlement', 'source-layer': 'rural', filter: k('province'), paint: { 'line-color': '#2f4a36', 'line-width': 2.2, 'line-opacity': 0.8 } },
+        { id: 'rural-nucleations', type: 'circle', source: 'rural-settlement', 'source-layer': 'rural', filter: k('nucleation'), minzoom: 7, paint: { 'circle-radius': 1.8, 'circle-color': '#4a6b52', 'circle-opacity': 0.7 } },
+      ];
+    },
+  },
+  {
+    id: 'gough-map', group: 'infrastructure', label: 'Gough Map routes (c. 1400)', datasets: ['gough'], defaultOn: true, coverage: GOUGH,
+    hint: 'England and Wales c. 1400 as the Gough Map shows it: the settlements its red lines connect, the red lines themselves (schematic, dashed red, with the distance numeral the map gives), and the historical roads the lines have been matched to (brown). Only a selection of the medieval network — the map was never complete.', sources: ['gough'],
+    specs: (c) => {
+      const w = inWindow(c.year, GOUGH);
+      const k = (v: string): FilterSpecification => ['all', w, ['==', ['get', 'k'], v]] as FilterSpecification;
+      return [
+        { id: 'gough-routes', type: 'line', source: 'gough', 'source-layer': 'gough', filter: k('route'), paint: { 'line-color': '#8d5524', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 10, 2.4], 'line-opacity': 0.8 } },
+        { id: 'gough-red', type: 'line', source: 'gough', 'source-layer': 'gough', filter: k('red'), maxzoom: 9, paint: { 'line-color': '#c62828', 'line-width': 1.2, 'line-opacity': 0.7, 'line-dasharray': [3, 2] } },
+        { id: 'gough-stations', type: 'circle', source: 'gough', 'source-layer': 'gough', filter: k('station'), paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2.5, 10, 5], 'circle-color': '#c62828', 'circle-stroke-color': C.halo, 'circle-stroke-width': 1, 'circle-opacity': ['case', ['==', ['get', 'lg'], 0], 0.5, 1] } },
+        { id: 'gough-stations-label', type: 'symbol', source: 'gough', 'source-layer': 'gough', filter: k('station'), minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 11, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#8b1a1a', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ];
+    },
+  },
+  {
+    id: 'inland-navigation', group: 'infrastructure', alsoIn: ['economic', 'physical'], label: 'Navigable rivers before 1348 (England & Wales)', datasets: ['navigation'], defaultOn: true, coverage: NAVIGATION,
+    hint: 'Rivers and canals known to have carried boats between the eleventh century and 1348 (Early Medieval Atlas): solid blue = direct documentary or archaeological evidence; dashed = inferred mainly from place-names; points = heads of navigation (with the latest recorded date) and place-names that refer to river traffic. The courses follow modern or parish-boundary lines where the old course isn’t known.', sources: ['navigation'],
+    specs: (c) => {
+      const w = inWindow(c.year, NAVIGATION);
+      const k = (v: string): FilterSpecification => ['all', w, ['==', ['get', 'k'], v]] as FilterSpecification;
+      return [
+        { id: 'navigation-direct', type: 'line', source: 'navigation', 'source-layer': 'nav', filter: k('direct'), paint: { 'line-color': '#1f6f8b', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 3], 'line-opacity': 0.85 } },
+        { id: 'navigation-indirect', type: 'line', source: 'navigation', 'source-layer': 'nav', filter: k('indirect'), paint: { 'line-color': '#5e9ab4', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 10, 2.2], 'line-opacity': 0.75, 'line-dasharray': [2, 2] } },
+        { id: 'navigation-heads', type: 'circle', source: 'navigation', 'source-layer': 'nav', filter: k('head'), paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 2.5, 10, 5], 'circle-color': '#0d4f66', 'circle-stroke-color': C.halo, 'circle-stroke-width': 1 } },
+        { id: 'navigation-pn', type: 'circle', source: 'navigation', 'source-layer': 'nav', filter: k('pn'), paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 2, 10, 4], 'circle-color': C.halo, 'circle-stroke-color': '#0d4f66', 'circle-stroke-width': 1.5 } },
+        { id: 'navigation-label', type: 'symbol', source: 'navigation', 'source-layer': 'nav', filter: ['all', w, ['in', ['get', 'k'], ['literal', ['head', 'pn']]]] as FilterSpecification, minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#0d4f66', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ];
+    },
+  },
+  {
     id: 'trade-routes', group: 'economic', alsoIn: ['infrastructure'], label: 'Early Islamic routes', datasets: ['althurayya'], defaultOn: true, coverage: THURAYYA,
     hint: 'Route sections between towns and way-stations of the 9th–10th-century Islamic world, from Cornu’s atlas (al-Ṯurayyā). For northern Europe 1350–1650 see “Medieval roads & waterways”. No open dataset covers trade routes elsewhere, so none are drawn there.', sources: ['thurayya-routes'],
     specs: (c) => [{ id: 'trade-routes-line', type: 'line', source: 'thurayya-routes', 'source-layer': 'routes', filter: inWindow(c.year, THURAYYA), paint: { 'line-color': '#2e7d32', 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.8], 'line-opacity': 0.7, 'line-dasharray': [3, 1.5] } }],
@@ -470,7 +550,7 @@ export const layerById = (id: string) => LAYERS.find((l) => l.id === id);
 export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable).map((l) => l.id);
 
 /** Order in which layers are drawn, bottom to top (areas under lines under points). */
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'coast-modern', 'coast-ancient', 'rivers', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'trade-routes',
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'rivers', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

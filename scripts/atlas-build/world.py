@@ -275,6 +275,10 @@ def build_world(only=None):
         log('World: tiles', name)
         stats[f'tiles-{name}'] = fn()
         log('  ', stats[f'tiles-{name}'])
+    if not only or 'england' in only:
+        # Medieval England & Wales layers, read from data/historical/raw (see england.py).
+        import england
+        stats['england'] = england.build()
     stats['built'] = date.today().isoformat()
     stats['sources'] = {
         'pleiades': 'Pleiades daily GIS export (CC BY 3.0)',

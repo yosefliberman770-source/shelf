@@ -29,15 +29,18 @@
   "files": [
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",
-    "path": "original/DBhundreds.zip"
+    "path": "original/DBhundreds.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBinter.zip",
-    "path": "original/DBinter.zip"
+    "path": "original/DBinter.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBshires.zip",
-    "path": "original/DBshires.zip"
+    "path": "original/DBshires.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
@@ -67,19 +70,23 @@
   "files": [
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
-    "path": "original/gis/direct_evidence.zip"
+    "path": "original/gis/direct_evidence.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip",
-    "path": "original/gis/heads_of_navigation.zip"
+    "path": "original/gis/heads_of_navigation.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/indirect_evidence.zip",
-    "path": "original/gis/indirect_evidence.zip"
+    "path": "original/gis/indirect_evidence.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
-    "path": "original/gis/pn_river_traffic.zip"
+    "path": "original/gis/pn_river_traffic.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf",
@@ -112,15 +119,18 @@
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip",
-    "path": "original/gough_red_lines.zip"
+    "path": "original/gough_red_lines.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_routes.zip",
-    "path": "original/gough_routes.zip"
+    "path": "original/gough_routes.zip",
+    "manual_copy": true
    },
    {
     "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip",
-    "path": "original/gough_way_stations.zip"
+    "path": "original/gough_way_stations.zip",
+    "manual_copy": true
    }
   ]
  },
@@ -456,6 +466,16 @@
    {
     "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=10",
     "path": "original/World_Heritage_Sites.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "atlas-rural-settlement",
+  "files": [
+   {
+    "url": "https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm",
+    "path": "original/atlas-gis-shapefile.zip",
+    "manual": true
    }
   ]
  }

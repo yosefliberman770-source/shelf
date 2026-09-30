@@ -16,19 +16,26 @@ raw/*/nightly-export/**
 !raw/al-thurayya/original/master/regions.json
 !raw/al-thurayya/original/master/routes.json
 !raw/al-thurayya/original/master/routes_full.json
+!raw/atlas-rural-settlement/original/atlas-gis-shapefile.zip
 !raw/cshapes/original/CShapes-2.0.zip
 !raw/cshapes/original/CShapes-2.0_Codebook.pdf
 !raw/cshapes/original/CShapes-Europe.geojson
 !raw/cshapes/original/ChangeLog.txt
+!raw/domesday/original/DBhundreds.zip
+!raw/domesday/original/DBinter.zip
+!raw/domesday/original/DBshires.zip
 !raw/domesday/original/LoG_GeneralGuide.pdf
 !raw/gough-map/original/Gough_Map_website_intro.pdf
 !raw/gough-map/original/gough_red_lines.zip
+!raw/gough-map/original/gough_routes.zip
 !raw/gough-map/original/gough_way_stations.zip
 !raw/historic-england/original/Battlefields.gpkg
 !raw/historic-england/original/Parks_and_Gardens.gpkg
 !raw/historic-england/original/Protected_Wreck_Sites.gpkg
 !raw/historic-england/original/World_Heritage_Sites.gpkg
+!raw/inland-navigation/original/gis/direct_evidence.zip
 !raw/inland-navigation/original/gis/heads_of_navigation.zip
+!raw/inland-navigation/original/gis/indirect_evidence.zip
 !raw/inland-navigation/original/gis/pn_river_traffic.zip
 !raw/inland-navigation/original/pdf/general_guide.pdf
 !raw/itinere/original/Data field description.docx

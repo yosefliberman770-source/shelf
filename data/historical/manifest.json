@@ -59,6 +59,13 @@
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
  },
+ "atlas-rural-settlement/original/atlas-gis-shapefile.zip": {
+  "url": "https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm",
+  "bytes": 13213011,
+  "sha256": "be6fdf6e49084763d83fbf35e0d8c172294553e76fb193878423ed3c1d06f42e",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/atlas-gis-shapefile.zip.zip). Saved here as atlas-gis-shapefile.zip (the phone added a second \u201c.zip\u201d); contents unchanged."
+ },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
   "bytes": 44501172,
@@ -101,6 +108,27 @@
   "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
   "downloaded": "2026-09-29"
  },
+ "domesday/original/DBhundreds.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",
+  "bytes": 4191467,
+  "sha256": "7c5752a72580958f7a2f46aacee22f74570834fa06845a03a73b0bea17c2fc52",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBhundreds.zip)."
+ },
+ "domesday/original/DBinter.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBinter.zip",
+  "bytes": 309648,
+  "sha256": "a2ff8aa137429c3041d04c542904cbc09566e51ec51b51a5ea7aaf8a47d2e072",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBinter.zip)."
+ },
+ "domesday/original/DBshires.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBshires.zip",
+  "bytes": 1199179,
+  "sha256": "20ef0dea52b91f9c91e1dfdb27ab147bec37a17e5aced69b4541a6130c1ac06c",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/DBshires.zip)."
+ },
  "domesday/original/LoG_GeneralGuide.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
   "bytes": 220483,
@@ -117,13 +145,24 @@
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip",
   "bytes": 9469,
   "sha256": "0f31837dd1cbd87487380063802de9db3d303d870003eaef874a825bcc02a397",
-  "downloaded": "2026-09-30"
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_red_lines.zip). The uploaded copy is byte-identical."
+ },
+ "gough-map/original/gough_routes.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_routes.zip",
+  "bytes": 317606,
+  "sha256": "2ae0ccd9507ff4ce150ddd035488911add71d7b1a6fc66f512a7038f8e5697be",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_routes.zip)."
  },
  "gough-map/original/gough_way_stations.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip",
   "bytes": 7439,
   "sha256": "0dca818e95c7f860d7a87b5832afd8f4c4b2b7d9dd4f11b879f6c477491848dc",
-  "downloaded": "2026-09-30"
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
  },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
@@ -167,17 +206,35 @@
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
  },
+ "inland-navigation/original/gis/direct_evidence.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
+  "bytes": 1115556,
+  "sha256": "4b61c3ced1656996c30dcf3adc72bcc946e207e3969985e35d3eab88f537bf06",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/direct_evidence.zip)."
+ },
  "inland-navigation/original/gis/heads_of_navigation.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip",
   "bytes": 61822,
   "sha256": "16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303",
-  "downloaded": "2026-09-29"
+  "downloaded": "2026-09-29",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/heads_of_navigation.zip). The uploaded copy is byte-identical."
+ },
+ "inland-navigation/original/gis/indirect_evidence.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/indirect_evidence.zip",
+  "bytes": 434660,
+  "sha256": "bee51b7b9740aeef429fdf9551ee3b0d68c5949a5d7de2696776147b61fbcbf1",
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/indirect_evidence.zip)."
  },
  "inland-navigation/original/gis/pn_river_traffic.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
   "bytes": 22841,
   "sha256": "66b01e2db6b37a8e03370158868e6a01a0567ee4a765fc60e16e919cba16797a",
-  "downloaded": "2026-09-30"
+  "downloaded": "2026-09-30",
+  "provenance": "Downloaded from the official URL by fetch.py.",
+  "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/pn_river_traffic.zip). The uploaded copy is byte-identical."
  },
  "inland-navigation/original/pdf/general_guide.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf",

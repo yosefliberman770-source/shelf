@@ -525,6 +525,30 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return { title: str('n') ?? 'Place', lines: [`${str('k') ?? ''}${str('rg') ? ` · ${str('rg')}` : ''}`, 'Period: 9th–10th c. (the atlas it comes from)'], pick: pickOf('althurayya'), source: credit('althurayya'), caution: 'Georeferenced from G. Cornu’s atlas; the date is the atlas’s period, not this place’s.' };
     case 'thurayya-routes':
       return { title: 'Route section', lines: [num('m') ? `${Math.round(num('m')! / 1000)} km` : '', 'Period: 9th–10th c. (Cornu’s atlas)'].filter(Boolean), source: credit('althurayya') };
+    case 'domesday': {
+      const k = str('k');
+      return {
+        title: str('n') ?? 'Domesday unit', lines: [k === 'shire' ? 'Shire' : k === 'inter' ? `Intermediate district${str('c') ? ` · ${str('c')}` : ''}` : `Hundred / wapentake${str('c') ? ` · ${str('c')}` : ''}${str('i') ? ` (${str('i')})` : ''}`, 'As recorded in Domesday Book, 1086'],
+        link: { href: 'https://doi.org/10.5284/1058999', label: 'Dataset (ADS) ↗' }, source: credit('domesday'),
+        caution: 'A modern reconstruction of the 1086 units; boundaries were different before and after.',
+      };
+    }
+    case 'gough': {
+      const k = str('k');
+      if (k === 'station') return { title: str('n') ?? 'Settlement', lines: [`Settlement on the Gough Map (c. 1400)${str('c') ? ` · ${str('c')}` : ''}`], link: { href: 'https://doi.org/10.5284/1124312', label: 'Dataset (ADS) ↗' }, source: credit('gough'), caution: num('lg') === 0 ? 'The name is illegible or missing on the map; the identification follows the map’s editors.' : 'Identified by the map’s editors.' };
+      if (k === 'red') return { title: 'Red line on the Gough Map', lines: [num('v') !== undefined ? `Distance numeral: ${num('v')} (unit uncertain)` : 'No distance numeral', ...(str('no') ? [str('no')!] : [])], source: credit('gough'), caution: 'Drawn schematically between the settlements, as on the map — not the road’s real course.' };
+      return { title: 'Route matched to a Gough Map line', lines: [`Evidence: ${str('ca') ?? 'not recorded'}${str('mg') ? ` · Margary ${str('mg')}` : ''}`, ...(str('ev') ? [str('ev')!] : []), ...(str('no') ? [str('no')!] : []), ...(num('pd') !== undefined ? [`Period code in the dataset: ${num('pd')}`] : [])], source: credit('gough'), caution: 'A reconstruction of the road the red line most likely stands for, from later and earlier evidence.' };
+    }
+    case 'navigation': {
+      const k = str('k');
+      if (k === 'head') return { title: str('n') ?? 'Head of navigation', lines: [`Head of navigation on the ${str('w') ?? 'river'}`, `Latest date: ${str('ld') ?? 'not recorded'}`, `Evidence class: ${str('cl') ?? 'not recorded'}`, ...(str('ob') ? [`Obstruction: ${str('ob')}`] : []), ...(str('no') ? [str('no')!] : []), ...(str('rf') ? [`References: ${str('rf')}`] : [])], source: credit('navigation'), caution: 'Codes are shown as the dataset records them.' };
+      if (k === 'pn') return { title: str('n') ?? 'Place-name', lines: [`Place-name referring to river traffic${str('c') ? ` · ${str('c')}` : ''}`, `${str('ge') ?? ''}${str('tr') ? ` — ${str('tr')}` : ''}`, `First recorded: ${str('ce') ?? '?'} century${str('cd') ? ` (charter date ${str('cd')})` : ''}`, ...(str('rf') ? [`References: ${str('rf')}`] : [])], source: credit('navigation'), caution: 'A place-name suggests river traffic; it does not date it precisely.' };
+      return { title: str('n') ?? 'Waterway', lines: [k === 'direct' ? 'Navigable before 1348 — direct evidence' : 'Possibly navigable — mainly place-name evidence', ...(str('h') ? [`Head of navigation: ${str('h')}`] : []), ...(str('co') ? [`Course drawn from: ${str('co')}`] : []), ...(str('no') ? [str('no')!] : [])], source: credit('navigation'), caution: k === 'direct' ? 'The drawn course follows modern or boundary lines where the medieval course is unknown.' : 'Inferred mostly from place-names; the period of use can’t be dated directly.' };
+    }
+    case 'rural-settlement': {
+      const k = str('k');
+      return { title: str('n') ?? (k === 'nucleation' ? str('d') ?? 'Nucleated settlement' : 'Settlement region'), lines: [k === 'province' ? 'Settlement province' : k === 'subprovince' ? `Sub-province of the ${str('p')}` : k === 'local' ? `Local region · ${str('s')}${str('ds') ? ` · dispersion: ${str('ds')}` : ''}` : `Category ${str('ca') ?? '?'}`], source: credit('ruralsettlement'), caution: 'Mapped from nineteenth-century Ordnance Survey maps; a characterisation, not a dated record.' };
+    }
     case 'ohm': {
       const s = str('start_date');
       const e = str('end_date');

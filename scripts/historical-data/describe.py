@@ -40,7 +40,9 @@ DATASETS = {
         'cite': 'Brookes, S. (2020) Domesday Shires and Hundreds of England [data-set]. York: Archaeology Data Service [distributor] https://doi.org/10.5284/1058999',
         'area': 'England and parts of Wales.',
         'period': 'AD 1086 (as recorded in Domesday Book).',
-        'contents': 'All three ESRI shapefiles offered: DBshires (shires), DBinter (intermediate districts, where they existed) and DBhundreds (hundreds and wapentakes); plus the general guide (PDF).',
+        'contents': 'All three ESRI shapefiles offered: DBshires (shires, 35), DBinter (intermediate districts such as lathes and rapes, 21) and DBhundreds (hundreds and wapentakes, 810); plus the general guide (PDF). British National Grid.',
+        'processed': 'public/world/tiles/domesday.pmtiles (layer `units`; `k` = shire / inter / hundred), built by scripts/atlas-build/england.py. Map layer “Domesday shires & hundreds (1086)”, shown 1066–1106 and always labelled as the 1086 arrangement.',
+        'limitations': 'From the guide: the boundaries are a retrogressive reconstruction — mostly following the Alecto Domesday county maps (1986–92) and re-aggregated from parish boundaries mapped in 1851 — of units "as they are believed to have existed in 1086", not earlier or later arrangements. Domesday coverage is thinner in Durham, Northumberland, Westmorland and Cumberland, where land was divided into wards rather than hundreds; parts of Wales and the far north are absent — a gap in the record, not an absence of places. The guide counts 812 hundreds; the file holds 810 polygons. DBinter groups very different units (Ridings, lathes, rapes, Lincolnshire hundreds) together.',
     },
     'medieval-bridges': {
         'name': 'Bridges of Medieval England to c.1250',
@@ -68,7 +70,9 @@ DATASETS = {
         'cite': 'Oksanen, E. (2019) Inland Navigation in England and Wales before 1348: GIS Database [data-set]. York: Archaeology Data Service [distributor] https://doi.org/10.5284/1057497',
         'area': 'England and Wales.',
         'period': '11th century to 1348.',
-        'contents': 'Navigable rivers and canals: direct evidence (documents, finds, canal building), indirect evidence (mainly place-names), heads of navigation, and place-names relating to river traffic — each a shapefile in a ZIP; plus the general guide (PDF) and an overview map (PNG).',
+        'contents': 'Navigable rivers and canals: direct evidence (documents, finds, canal building; 542 segments), indirect evidence (mainly place-names; 110), heads of navigation (249, with latest dates and references), and place-names relating to river traffic (65) — each a shapefile in a ZIP; plus the general guide (PDF). British National Grid.',
+        'processed': 'public/world/tiles/navigation.pmtiles (layer `nav`; `k` = direct / indirect / head / pn), built by scripts/atlas-build/england.py. Map layer “Navigable rivers before 1348”, shown 1000–1348.',
+        'limitations': 'Courses follow modern Ordnance Survey rivers, parish or county boundaries where the medieval course is unknown (the `Course` field says which). Indirect evidence rests mostly on place-names and cannot be dated precisely. Evidence-class codes (DE, IE, KB) and dates like “PN” or “post-1348” are kept exactly as recorded. Rivers not listed may simply lack surviving evidence.',
     },
     'gough-map': {
         'name': 'The Routes and Roads of the Gough Map: GIS Database',
@@ -82,7 +86,9 @@ DATASETS = {
         'cite': 'Oksanen, E., Brookes, S. (2024) The Routes and Roads of the Gough Map: GIS Database [data-set]. York: Archaeology Data Service [distributor] https://doi.org/10.5284/1124312',
         'area': 'England and Wales (Great Britain as drawn on the Gough Map).',
         'period': 'The Gough Map (c. 14th–15th century), with routes matched to Roman, medieval and post-medieval evidence.',
-        'contents': 'Complete GIS set: the red lines drawn on the map (gough_red_lines), the settlements they connect (gough_way_stations, 179 points) and the reconstructed routeways (gough_routes), as zipped shapefiles; plus the general guide, the map image and introduction (PDFs) and a website image (PNG).',
+        'contents': 'Complete GIS set: the red lines drawn on the map (gough_red_lines, 188), the settlements they connect (gough_way_stations, 179) and the reconstructed routeways matched to the lines (gough_routes, 455), as zipped shapefiles; plus the introduction (PDF). British National Grid.',
+        'processed': 'public/world/tiles/gough.pmtiles (layer `gough`; `k` = station / red / route), built by scripts/atlas-build/england.py. Map layer “Gough Map routes (c. 1400)”, shown 1350–1450.',
+        'limitations': 'The Gough Map (c. 1400) shows a selection of routes, not the whole medieval network. Red lines are schematic. Routes are reconstructions matched to the lines from Roman, medieval, 17th–18th-century (Cary, Ogilby) and modern evidence. The routes’ numeric `period` code and some fields are not explained in the files held here, so they are shown as recorded, never interpreted. Way stations with legibility 0 are identifications by the map’s editors where the map’s name is illegible.',
     },
     'viabundus': {
         'name': 'Viabundus map of premodern European transport and mobility (Viabundus 2)',
@@ -182,26 +188,33 @@ DATASETS = {
         'period': '1886–2019 (Europe from 1816).',
         'contents': 'State borders and capitals with validity dates: shapefile (ZIP), GeoJSON, CSV, the Europe-from-1816 GeoJSON, the codebook (PDF), the readme text and the changelog. The SQL, XLSX and R-package formats were skipped as duplicates.',
     },
+    'atlas-rural-settlement': {
+        'name': 'Atlas of Rural Settlement in England GIS (Roberts & Wrathmell)',
+        'source': 'English Heritage (now Historic England), data by Andrew Lowerre, Eddie Lyons, Brian K. Roberts and Stuart Wrathmell; distributed by ADS and Historic England.',
+        'page': 'https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm',
+        'doi': 'https://doi.org/10.5284/1031493',
+        'version': 'Shapefile dissemination package, README dated January 2011 (English Heritage); ADS collection 2015. Based on Roberts & Wrathmell, An Atlas of Rural Settlement in England (2000; corrected reprint 2003).',
+        'licence': 'Atlas of Rural Settlement in England GIS terms and conditions (© English Heritage) — download for personal and business use',
+        'licence_url': 'https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/',
+        'licence_note': 'From AtlasRuralSettlementEnglandGIS_TermsConditions.pdf inside the ZIP: title, copyright and all other rights remain with English Heritage, Brian Roberts and Stuart Wrathmell; the data may be downloaded "for personal and business use"; it must not be used in ways that may damage archaeological sites, historic buildings or landscapes; no warranty. The terms do NOT grant permission to republish the data. Because this repository and the Shelf website are public, the processed tiles are kept out of git and out of the deployed site (local builds only). The raw ZIP was uploaded to this public repository by its owner; consider removing it, or ask Historic England for permission to republish.',
+        'cite': 'Lowerre, A., Lyons, E., Roberts, B. K., Wrathmell, S. (2015) Atlas of Rural Settlement in England GIS [data-set]. York: Archaeology Data Service [distributor] https://doi.org/10.5284/1031493',
+        'area': 'England (with a background outline of England and Wales).',
+        'period': 'Settlement patterns mapped mainly from mid-nineteenth-century Ordnance Survey maps, used to study medieval and earlier rural settlement. Not a dated snapshot of any one year.',
+        'contents': 'The complete Shapefile package: settlement provinces (31 polygons), sub-provinces (60), local regions (276, with dispersion descriptions), nucleations (10,513 villages and hamlets by category), dispersion/hamlet scores (4,004 sample points), terrain types, terrain zones and escarpments, an England–Wales background, UK GEMINI metadata, ArcGIS project and layer files, the province descriptions (PDF), documentation and data dictionary (PDFs), terms and conditions (PDF) and READ_ME.txt.',
+        'processed': 'public/world/tiles/rural-settlement.pmtiles (layer `rural`; `k` = province / subprovince / local / nucleation), built by scripts/atlas-build/england.py — git-ignored and not deployed. The map layer “Rural settlement provinces (England)” is disabled unless Shelf is built locally with VITE_SHELF_LOCAL_DATA=1.',
+        'limitations': 'A characterisation of settlement patterns, not a record of when places existed. Terrain layers were not processed (not needed yet). English Heritage says the data should be checked against other sources before relying on it.',
+    },
 }
 
 MANUAL = {
     'gb1900': {
         'name': 'GB1900 Complete Gazetteer',
-        'status': 'NOT DOWNLOADED — needs a manual download.',
-        'why': 'The only download is on the Vision of Britain site (https://www.visionofbritain.org.uk/data/), which did not respond from the build environment (connection timed out). The NLS Data Foundry page for GB1900 only links back to Vision of Britain.',
-        'action': 'Open https://www.visionofbritain.org.uk/data/#tabgb1900 in a browser, download the COMPLETE gazetteer (about 2.55 million rows, CSV), and place the unchanged file in original/ here.',
+        'status': 'SKIPPED FOR NOW — the repository owner chose not to add GB1900 (30 September 2026). Do not download it until asked.',
+        'why': 'Skipped by choice. For reference: the only download is on the Vision of Britain site (https://www.visionofbritain.org.uk/data/), which did not respond from the build environment (connection timed out). The NLS Data Foundry page for GB1900 only links back to Vision of Britain.',
+        'action': 'None for now. If it is wanted later: open https://www.visionofbritain.org.uk/data/#tabgb1900 in a browser, download the COMPLETE gazetteer (about 2.55 million rows, CSV), and place the unchanged file in original/ here.',
         'licence': 'Conflicting statements: search summaries of the Vision of Britain page say CC BY-SA 4.0; the NLS Data Foundry page says CC0. Record whatever the downloaded file and its page say.',
         'area': 'England, Wales and Scotland.',
         'period': 'Ordnance Survey six-inch 2nd edition maps, 1888–1914.',
-    },
-    'atlas-rural-settlement': {
-        'name': 'Atlas of Rural Settlement in England GIS (Roberts & Wrathmell)',
-        'status': 'NOT DOWNLOADED — needs a manual download.',
-        'why': 'Both official copies are behind a Cloudflare bot check ("Just a moment…"): Historic England (https://historicengland.org.uk/research/current/heritage-science/atlas-of-rural-settlement-in-england/) and ADS (https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm, DOI https://doi.org/10.5284/1031493). It is not on the Historic England Open Data Hub.',
-        'action': 'Open the ADS downloads page in a browser, accept the terms if asked, and download the Shapefile data (and the province descriptions and data dictionary). Place the unchanged files in original/ here.',
-        'licence': 'DataCite record: "ADS Terms and Conditions apply to reuse". Check the collection metadata page for the exact licence.',
-        'area': 'England.',
-        'period': 'Settlement patterns mapped from 19th-century maps, used to study medieval and earlier settlement.',
     },
     'kepn': {
         'name': 'Key to English Place-Names (KEPN)',
@@ -265,12 +278,19 @@ def main():
             f"- **Download date:** {', '.join(dates) if dates else 'not yet downloaded'}",
             f"- **Total size:** {human(total)} in {len(rows)} files",
             '', '## What it contains', '', d['contents'], '',
+            *(['## Processed into Shelf', '', d['processed'], ''] if d.get('processed') else []),
+            *(['## Known limitations', '', d['limitations'], ''] if d.get('limitations') else []),
             '## Files', '',
             'Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not stored in git; run `python3 scripts/historical-data/fetch.py ' + ds + '` to download them again and check them against these SHA-256 checksums.',
             '', '| File | Size | In git | Download URL | SHA-256 |', '| --- | --- | --- | --- | --- |',
         ]
         for path, v in rows:
             lines.append(f"| `{path}` | {human(v['bytes'])} | {'yes' if v['bytes'] <= LARGE else 'no'} | {v['url']} | `{v['sha256']}` |")
+        notes = [(path, v) for path, v in rows if v.get('provenance') or v.get('corroborated_by')]
+        if notes:
+            lines += ['', '### Provenance', '']
+            for path, v in notes:
+                lines.append(f"- `{path}`: {' '.join(x for x in (v.get('provenance'), v.get('corroborated_by')) if x)}")
         missing = [f['path'] for s in json.load(open(os.path.join(ROOT, 'sources.json'))) if s['id'] == ds for f in s['files'] if f"{ds}/{f['path']}" not in manifest]
         if missing:
             lines += ['', '**Not yet downloaded:** ' + ', '.join(f'`{m}`' for m in missing)]
@@ -291,7 +311,7 @@ def main():
             f"- **Licence:** {d['licence']}",
             f"- **Geographic coverage:** {d['area']}",
             f"- **Historical date range:** {d['period']}",
-            '- **Checked on:** 2026-09-29', '',
+            '- **Checked on:** 2026-09-29 (GB1900 status updated 2026-09-30)' if ds == 'gb1900' else '- **Checked on:** 2026-09-29', '',
         ]
         open(os.path.join(folder, 'SOURCE.md'), 'w').write('\n'.join(lines))
 

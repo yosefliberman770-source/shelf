@@ -63,7 +63,7 @@ describe('atlas layer catalog', () => {
     }
   });
   it('builds valid MapLibre layers in every era', () => {
-    for (const year of [-3000, -218, 43, 1066, 1815, 2000]) {
+    for (const year of [-3000, -218, 43, 1066, 1086, 1300, 1400, 1815, 2000]) {
       for (const eventWindow of [0, 25]) {
         const c = { ...ctx, year, eventWindow, war: 'Q6271' };
         const sources = { 'ne-land': { type: 'geojson', data: '/atlas/ne-land.json' }, ...Object.fromEntries(Object.keys(SOURCE_SPECS).map((k) => [k, SOURCE_SPECS[k](c)])) };
@@ -95,9 +95,24 @@ describe('atlas data packs', () => {
   });
   it('ships vector tiles for the heavy layers and no whole-world files', () => {
     const tiles = readdirSync(join(PACK, '../world/tiles'));
-    for (const t of ['pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles']) expect(tiles).toContain(t);
+    for (const t of ['pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles', 'domesday.pmtiles', 'gough.pmtiles', 'navigation.pmtiles']) expect(tiles).toContain(t);
     expect(readdirSync(PACK)).not.toContain('pleiades-places.json');
     expect(readdirSync(PACK)).not.toContain('pleiades-gazetteer.json');
+  });
+  it('shows the medieval England layers only in their own periods, and keeps the Atlas of Rural Settlement unpublished', () => {
+    const on = (id: string, year: number) => {
+      const l = LAYERS.find((x) => x.id === id)!;
+      const spec = l.specs({ year, base: '/atlas/', eventWindow: 0 })[0] as { filter?: unknown };
+      return matches(spec.filter as never, { k: id === 'domesday' ? 'hundred' : id === 'gough-map' ? 'route' : 'direct' });
+    };
+    expect(on('domesday', 1086)).toBe(true);
+    expect(on('domesday', 1300)).toBe(false);
+    expect(on('gough-map', 1400)).toBe(true);
+    expect(on('gough-map', 1086)).toBe(false);
+    expect(on('inland-navigation', 1300)).toBe(true);
+    expect(on('inland-navigation', 1500)).toBe(false);
+    // Its terms allow personal use only: the layer is disabled in the public build.
+    expect(LAYERS.find((l) => l.id === 'rural-settlement')!.unavailable).toMatch(/personal/);
   });
   it('dates the battles of the Second Punic War as Wikidata does', () => {
     const ev = pack<FC>('wikidata-events.json');
