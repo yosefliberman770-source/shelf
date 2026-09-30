@@ -8,7 +8,7 @@ import react from '@vitejs/plugin-react';
  * "personal and business use") is never shipped in a build unless it is
  * explicitly a local build (VITE_SHELF_LOCAL_DATA=1).
  */
-const LOCAL_ONLY = ['world/tiles/rural-settlement.pmtiles'];
+const LOCAL_ONLY = ['world/tiles/rural-settlement.pmtiles', 'world/tiles/local-sites.pmtiles'];
 const keepLocalDataLocal = (): Plugin => ({
   name: 'shelf-local-only-data',
   apply: 'build',

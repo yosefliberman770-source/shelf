@@ -1,0 +1,17 @@
+﻿Variable;Description;Data Type;Allowed Values / Format;Example;Required
+ID;Unique record identifier;Integer;Positive integer;1;Yes
+Modern_place_name;Current official place name;Text;UTF-8;Plzeň;Yes
+Second_name;Alternative/historical name;Text;Free text;;No
+Settlement_type;Settlement category;Categorical;Village, Town, City, etc.;Village;Yes
+Administrative_unit;Current administrative affiliation;Text;Region/District;Plzeň Region;Yes
+First_attestation_year;Earliest attestation;Integer;Year;1186;Yes
+Second_attestation_year;Additional attestation;Integer;Year;1234;No
+Reconstructed_form;Reconstructed historical form;Text;Free text;;No
+Lexical_base;Underlying lexeme;Text;Free text;;No
+Etymology;Etymological interpretation;Text;Free text;;No
+Morphological_class;Word-formation class;Categorical;See project coding;;No
+Analogy_Bavaria;Analogous Bavarian toponym;Text;Free text;;No
+Analogy_assessment;Assessment of analogy;Categorical;Accepted/Rejected/Uncertain;Accepted;No
+Latitude;Latitude WGS84;Decimal;EPSG:4326;49.747;Yes
+Longitude;Longitude WGS84;Decimal;EPSG:4326;13.377;Yes
+Notes;Comments;Text;Free text;;No

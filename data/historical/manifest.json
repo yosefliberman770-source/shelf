@@ -59,12 +59,96 @@
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
  },
+ "atlas-fontium-poland/original/akweny.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:akweny&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 14577201,
+  "sha256": "c4218374d1df3109065707b9c2ff396687fcc146f45032dc98258d75850c6ee1",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/archidiakonaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:archidiakonaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1315490,
+  "sha256": "3e6c2c93a5a7ffb9d3cb16f8e167c10a6f7f0db58fdd1cd455030e1a9ffbef5d",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/dekanaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:dekanaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 2698642,
+  "sha256": "4761e7b97d13f7750b23664e5dd4e73c243a88783c81f12464276ec54957645e",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/diecezje.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:diecezje&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 854612,
+  "sha256": "a1bb56aa875645b9560dd12f8353cab05c098d321effb61d8add3bf8347d1265",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/drogi.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:drogi&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1971085,
+  "sha256": "48e10d833f747077038b77c4fe9a510dc90c6984c225773a75e70ee32abf4683",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/lasy.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:lasy&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 121695830,
+  "sha256": "42c94259bba49728a99fd094ff41bfa9f4a5ad2a9b1c0f37857c215cbca99196",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/miejscowosci.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:miejscowosci&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 11780465,
+  "sha256": "1cf385db4ff369ea5e61c44851676c7552ceb54a77a29063b25934164985ab04",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/parafie.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:parafie&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 8394353,
+  "sha256": "ed76b4586a18450768c240f55b8d3a07d185b6c882a35b099a0c12902391cf11",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/powiaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:powiaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 2322995,
+  "sha256": "7878514fc917123181d5b3b5425428a78193b02f7a6d760b83691a4d6dbc7172",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/rzeki.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:rzeki&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 19693629,
+  "sha256": "c5d2b569f894e9649c690117f777840b493301feb9403da1b6b3f7dcaca241d1",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/wojewodztwa.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:wojewodztwa&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1218099,
+  "sha256": "87cedd39f4560ff0c570ce6bea63c08d3959f60d0684180389ca7db861de1475",
+  "downloaded": "2026-09-30"
+ },
  "atlas-rural-settlement/original/atlas-gis-shapefile.zip": {
   "url": "https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm",
   "bytes": 13213011,
   "sha256": "be6fdf6e49084763d83fbf35e0d8c172294553e76fb193878423ed3c1d06f42e",
   "downloaded": "2026-09-30",
   "provenance": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/atlas-gis-shapefile.zip.zip). Saved here as atlas-gis-shapefile.zip (the phone added a second \u201c.zip\u201d); contents unchanged."
+ },
+ "buringh-urban/original/European urban population, 700 - 2000 - Annex A.pdf": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20414",
+  "bytes": 196426,
+  "sha256": "541f1ecc2342753d83a86ef734aaa220a57d41a6db941699558f4c01f934aa60",
+  "downloaded": "2026-09-30"
+ },
+ "buringh-urban/original/European urban population, 700 - 2000 - Annex B.pdf": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20413",
+  "bytes": 437903,
+  "sha256": "a9563f14abffab4879a3cca1d996c0de97a95a103f232c00ab1a58d57e02a29d",
+  "downloaded": "2026-09-30"
+ },
+ "buringh-urban/original/European urban population, 700 - 2000.tab": {
+  "url": "https://ssh.datastations.nl/api/access/datafile/20415",
+  "bytes": 4920667,
+  "sha256": "d799dbeaafe7e00f897696cf828e55146394ae1bdd7618aee3d37d0364291a31",
+  "downloaded": "2026-09-30"
  },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
@@ -108,6 +192,354 @@
   "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
   "downloaded": "2026-09-29"
  },
+ "darmc/original/ancient-ports-harbours.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2453917",
+  "bytes": 530837,
+  "sha256": "f8d12481854686277b3a741c4ebacb25c11074696cc98250d79d83f0de585d24",
+  "downloaded": "2026-09-30"
+ },
+ "darmc/original/anglo-saxon-rural-settlements.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2457775",
+  "bytes": 45218,
+  "sha256": "2ea7db96fa29034783171833667fa520fc6202b3e7d522add4528136326d617c",
+  "downloaded": "2026-09-30"
+ },
+ "darmc/original/carolingian-hoards-751-987.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2452979",
+  "bytes": 124342,
+  "sha256": "46644483cfd398bb19bc5d9459f2b23fec7707b1e47f54a85e0d122d911fa4b1",
+  "downloaded": "2026-09-30"
+ },
+ "darmc/original/shipwrecks-1-1500.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2446023",
+  "bytes": 230734,
+  "sha256": "99ec4adfb9de4ca2a37212aab82117903e72bed0dc00da438fcf7cde4a6f02ed",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT01.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT01",
+  "bytes": 6388460,
+  "sha256": "ab17315ebfacf62b69e889e5419e4edd860b0ab1f51dca58d9e261d24f241a5d",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT02.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT02",
+  "bytes": 4290864,
+  "sha256": "e57eee63ac6c22249f5515de7378e23e46e3feb9e75cfea2c84b643de09e2b75",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT03.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT03",
+  "bytes": 3110935,
+  "sha256": "2e08eddc27d8c0c1ea162469b2ec74da98219cdeb6639c01299aaedaaca3e127",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT05.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT05",
+  "bytes": 3673757,
+  "sha256": "4d691c4c98c15d63ca56c50076d2bc7d646bfae8e631ba3301c578cc62d8b02b",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT07.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT07",
+  "bytes": 6082013,
+  "sha256": "8a8ba77efc21a7d6fcd2eb23331b2931a81b661886766fbe2fa1a23eefc89e60",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT10.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT10",
+  "bytes": 2704818,
+  "sha256": "b6056a456aaa06c4e3dfebbd3a71ef1744765561db769644a3eb436574a5fa61",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT11.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT11",
+  "bytes": 7862385,
+  "sha256": "95dc82be92e30f00376f68a18de4fd5581f3ca1ac84fadaab6f626693258017e",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT14.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT14",
+  "bytes": 5668200,
+  "sha256": "ff07830be562b7c9646dfea3919474cdb5b49663ab50b6fdee7d974b0a6dec83",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT15.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT15",
+  "bytes": 8967712,
+  "sha256": "536300946efbe0a02491b00a6e71d6080fd6dc8d304e16b37999ef198ad956ac",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT18.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT18",
+  "bytes": 7063275,
+  "sha256": "54786a0dbfe4bde55796dca47a9167f62a5beddebd16ab032abd81d129c683c4",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT21.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT21",
+  "bytes": 6042399,
+  "sha256": "e619d2569a7f267f72b117fe9073dd16c73877413b2ee7dc006b865cd483c58e",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT22.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT22",
+  "bytes": 937693,
+  "sha256": "9f0dac57e267731749dd426b3d4dc2409f089f9bb81326903520000b0d46883e",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT23.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT23",
+  "bytes": 13663963,
+  "sha256": "f2da7fcb82ef16f23f8e93ca30ae434958de2b8b62e832e5af73cb067bc91037",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT24.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT24",
+  "bytes": 6903249,
+  "sha256": "fa4fefa472fc31a80d487408e461fc750ab850e368877ab8b80eee2564323f31",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT26.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT26",
+  "bytes": 6382618,
+  "sha256": "08dab8fa4203817c8695b7475eba5876503a6d1d395aacc2b3f8fb107d16ee02",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT27.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT27",
+  "bytes": 4587507,
+  "sha256": "07d764812ae04313843161a7cf68eadeb19d6178de5cb6d9034faad469d10177",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT28.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT28",
+  "bytes": 3417108,
+  "sha256": "51d3f6d7331a55e5ea53cd3b379f7bb8b9ac90c18698233555328f28153ac347",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT29.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT29",
+  "bytes": 18715006,
+  "sha256": "8325ef14de4d4cf7770f838dbcde286e0bae4d15ba3bd7c2c2ef3be6ab5374ee",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT30.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT30",
+  "bytes": 3990421,
+  "sha256": "f8884cdea78cf7dd526f3505fca655a47eae897060ca8488475b4cee153230d4",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT33.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT33",
+  "bytes": 551384,
+  "sha256": "6acada602988d2194a02a20363ab35e46ee775b1f2e9ef05692b3becd039dcfc",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT34.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT34",
+  "bytes": 3506903,
+  "sha256": "96b7563e780720571d68a1f0a9f148734a4c9e71b3365f2ee4541137bfe1d9b1",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT36.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT36",
+  "bytes": 3057785,
+  "sha256": "1021e30b6649bc14e681184f90fbb8ad2120a9fe751e05ab33ddf8881e62cb01",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT37.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT37",
+  "bytes": 10512502,
+  "sha256": "4fe4b9bd8a8618603bae9ca6216dc2c7dc98f090bd73a5a6e1894f5e6260a2dd",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT41.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT41",
+  "bytes": 300684,
+  "sha256": "5caec317ec21a22130f289c9a9fe2552559a1cf076714d0cc68fa3b74d88b3d3",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT42.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT42",
+  "bytes": 8892966,
+  "sha256": "fce67985700b3841ab06b1c4b0dce67be13da9388159c6929af2787bbf5ad61d",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT43.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT43",
+  "bytes": 5174561,
+  "sha256": "e8e59238bdde69a8d91bea69aad20c067d262e6e6ad43ea41a1c72742ab54783",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT44.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT44",
+  "bytes": 6324578,
+  "sha256": "df189c5be4db380074cfd1adda9a64b0466288a1ec08929379eca7568dab5836",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT47.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT47",
+  "bytes": 299161,
+  "sha256": "a218f0ce29dfe13180b7ad27e4348414e3b3b5cfa06bbbb42a8c7a57c229f756",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT51.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT51",
+  "bytes": 4489959,
+  "sha256": "8f72ab0296b466ba57945b46e39ccc0791b14c1c196c0fdc392c9ae884868812",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT52.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT52",
+  "bytes": 2597402,
+  "sha256": "be7f3ac732df22621f03eddf5dc9572f29706f68f2aaca4d03664f46e4cfabd7",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT53.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT53",
+  "bytes": 6215610,
+  "sha256": "1d5e249a12ad2393d1815edbf0412383d6d24840c44c36cd736a45211f499897",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT54.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT54",
+  "bytes": 2375098,
+  "sha256": "e47361fb16346828e6776612d87b6d8272d4b80747e7e2cdc43127ccd2ffa3bd",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT55.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT55",
+  "bytes": 3602627,
+  "sha256": "1cf0b41d0b33420fb2f281162b090bfd74b3d73dda37126bebfdfbf77da4242f",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT56.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT56",
+  "bytes": 6881657,
+  "sha256": "f1397983f97e5a2b32df389a516d81d346cd7e9ed697555bfe9f39d107bfd89e",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT57.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT57",
+  "bytes": 3283668,
+  "sha256": "df97e0261ddd83a546b9c3f0a2011b087881092463f3556f5895d6360fe5c6cc",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT58.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT58",
+  "bytes": 3781919,
+  "sha256": "bb43de30bf7e7311d40f4bcf586463e10f841b983d46064bac862d56ad66ef5d",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT60.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT60",
+  "bytes": 5899114,
+  "sha256": "d04fde7f55c7090058856c4754666f71f4c71c60e75a2eca5d42346b70c1f8e8",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT62.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT62",
+  "bytes": 6359189,
+  "sha256": "c0425812c72ff946f4979723034d6ea56b48aecb433420d42a2f035af5211109",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT64.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT64",
+  "bytes": 2912930,
+  "sha256": "2c3577fc61e7dfa6efbf466de1a0ca2ffe27549505c9c64c05a806b26db7652c",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT65.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT65",
+  "bytes": 3281472,
+  "sha256": "290fca85a9df9a664e38c17ff39de39020bfb17cb8de90bb08b5b95d7945d6bc",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT66.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT66",
+  "bytes": 1014291,
+  "sha256": "0976048b5d0bc8047d87dbf892c656e8ff8d8f0ebfa15cbc813eddfea08887e2",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT68.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT68",
+  "bytes": 4428945,
+  "sha256": "b8dd5ac71592df86380f57d2c26e0faa1899bfdf901b95ec1fef3e6da56268f7",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT71.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT71",
+  "bytes": 16189237,
+  "sha256": "8f74fc46c99f782f2b5f899b9fe024d9e57d99464be47f155cf4610e9903110e",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT72.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT72",
+  "bytes": 19195043,
+  "sha256": "2a9cb762660e2f4daa4b0ce584ef8ff9c9ac918afbc7460c5d95eb78193cbdd9",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT73.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT73",
+  "bytes": 2934438,
+  "sha256": "797cc863e97bc29ac874564cbba733e88441f3ffff2e30f219d03c68dd814739",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT76.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT76",
+  "bytes": 22069729,
+  "sha256": "5f3928e9dba2e1e054b396cfe03090d82933856ef64cec8c59a88ac61358b8ea",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT77.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT77",
+  "bytes": 9468378,
+  "sha256": "588fd2b87c9de281d178805b1089658a47f86cba3456e6b55847a4923b762dbe",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT79.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT79",
+  "bytes": 5327615,
+  "sha256": "5d6a20c9355175c0b75b7bfdf4c61626417b128c2eb9ab707c0a8da87060b4c9",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT80.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT80",
+  "bytes": 5695972,
+  "sha256": "b3bc838cd174bf24140bb50a9080adb0276e4f4a8284a20d39e92d75dd526c36",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT86.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT86",
+  "bytes": 7161064,
+  "sha256": "4c14d6bdc4828bd5ab6fa96952dd6f1e7ed9cf09128a8159bac379a5e10be075",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT88.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT88",
+  "bytes": 7954246,
+  "sha256": "a6f32515d3a6881c1fd8e4a0ad568ea4ecdc6e395575155eafdc88db91c11d7b",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/DT89.xml": {
+  "url": "https://github.com/chartes/dico-topo/tree/master/data/DT89",
+  "bytes": 2645535,
+  "sha256": "cec95018ebf1a848069e398abad16f964150c027c8c8982f824e7b95ad14bcd7",
+  "downloaded": "2026-09-30"
+ },
+ "dicotopo/original/insee-coords.tsv": {
+  "url": "https://qlever.dev/api/wikidata (query in insee-coords.rq)",
+  "bytes": 3041740,
+  "sha256": "e33f1823350650fb8369abb38ce46585ddc60b442daada0e7cd41e9465364dd4",
+  "downloaded": "2026-09-30"
+ },
+ "dk-fund-og-fortidsminder/original/FF.zip": {
+  "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
+  "bytes": 109119092,
+  "sha256": "a4686a62d9b576e08e1846aad6413bda8f38e267e871552ee5f939e48bdc25a2",
+  "downloaded": "2026-09-30"
+ },
  "domesday/original/DBhundreds.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",
   "bytes": 4191467,
@@ -133,6 +565,108 @@
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
   "bytes": 220483,
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-00.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1..1000",
+  "bytes": 729621,
+  "sha256": "223f7a31c1841491d4fb7dadcc5cc0c328742b134ccb34fc8019b35a0758dd90",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-01.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1001..2000",
+  "bytes": 1386912,
+  "sha256": "52711a616c5a376ab98d5b762dbfcd4f5a8e787fa369274fee525ab8a2ac3939",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-02.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=2001..3000",
+  "bytes": 1463664,
+  "sha256": "fa1c53eacf794b8e7388ccac23b9b8cd8fd6992ce5235984931b66bf09cca65d",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-03.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=3001..4000",
+  "bytes": 1479972,
+  "sha256": "2680a7876b9e633fa6149454b7004ad71a2a8c7f9cc3dc6d2ce348771f69e152",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-04.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=4001..5000",
+  "bytes": 1557964,
+  "sha256": "a5a440638f272fb0738fb077e279f35f39dff472c5da3d5ba14862401f08078b",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-05.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=5001..6000",
+  "bytes": 1448972,
+  "sha256": "b18597d18af4efdf0378bddd279673d9511f482241bbccb106a38c8c2bbf34c7",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-06.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=6001..7000",
+  "bytes": 1052188,
+  "sha256": "d7d499b6addd2b78b48b8983bc2008be9ea65128f35acc2649f2fad75abca640",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-07.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=7001..8000",
+  "bytes": 1309113,
+  "sha256": "4af859c4d7cd18a109d41c6c96ea99bfbfe741193b4a4a93951d4c21e0fcd387",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-08.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=8001..9000",
+  "bytes": 1391788,
+  "sha256": "be81b333ea2a2e3e0fdfe7c4422df6b5579eac7f9ea1eb9c24b3597976c7dc93",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-09.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=9001..10000",
+  "bytes": 1178146,
+  "sha256": "a961923796c9201ad19b69e04c06d3022047388306f8ea9e71e3fb0dcdc25d17",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-10.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=10001..11000",
+  "bytes": 1897719,
+  "sha256": "65fdeb9885da6ec11827ea6769026d7bdd1af5d897df2b00a6b849ce9bf0862d",
+  "downloaded": "2026-09-30"
+ },
+ "ebidat/original/pages-11.jsonl.gz": {
+  "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=11001..12000",
+  "bytes": 76908,
+  "sha256": "6af6af82e6ca00bb460444a5d3b9909abfec86edaf4a26a860bf0fce19b4cf5b",
+  "downloaded": "2026-09-30"
+ },
+ "engel-hungary/original/Engel2020.zip": {
+  "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
+  "bytes": 51552337,
+  "sha256": "27bf997c6a1f0d61409e536d806552fec525c8b7870ecb5f5201ef9f4b50e057",
+  "downloaded": "2026-09-30"
+ },
+ "finland-heritage/original/tutkija.zip": {
+  "url": "https://mverkkodatashare.blob.core.windows.net/share/tutkija.zip",
+  "bytes": 38319125,
+  "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
+  "downloaded": "2026-09-30"
+ },
+ "germania-sacra/original/diocese-borders.geojson": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
+  "bytes": 3956104,
+  "sha256": "694971461ecad3798327ed48b015658a969440f89960b770fc955cc25f92a428",
+  "downloaded": "2026-09-30"
+ },
+ "germania-sacra/original/monasteries-list.json": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/list",
+  "bytes": 7095,
+  "sha256": "94b46929af3b7663c6176584a1bcd43432ab379047b81c1bc4ec7eb05ed09d6c",
+  "downloaded": "2026-09-30"
+ },
+ "germania-sacra/original/monasteries-locations.geojson": {
+  "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/locations/geojson",
+  "bytes": 3625148,
+  "sha256": "b7ddbd4697d094796faffada7cf437367d0038e9fc6006f65f052fa9b53102bd",
   "downloaded": "2026-09-30"
  },
  "gough-map/original/Gough_Map_website_intro.pdf": {
@@ -163,6 +697,18 @@
   "downloaded": "2026-09-30",
   "provenance": "Downloaded from the official URL by fetch.py.",
   "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
+ },
+ "hced/original/HCED Data v3.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
+  "bytes": 2171518,
+  "sha256": "92a22e49c20d02a1d7ecf3fbdbb5e3ca94b7327b7620ee79dd01909857805b79",
+  "downloaded": "2026-09-30"
+ },
+ "hced/original/HCED explainer.txt": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/6909628",
+  "bytes": 2490,
+  "sha256": "7cd17664755fdc2a887df22c8bae8b47f722e1339a62fe3f979adfb25cbabe25",
+  "downloaded": "2026-09-30"
  },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
@@ -380,6 +926,24 @@
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
   "downloaded": "2026-09-29"
  },
+ "markets-fairs/original/MFEngland.txt": {
+  "url": "https://sas-space.sas.ac.uk/106/3/MFEngland.txt",
+  "bytes": 650667,
+  "sha256": "1f7d6a88f26083ed0e2856f4c6d0074095ba2db355c3cc941e11296cb51f281a",
+  "downloaded": "2026-09-30"
+ },
+ "markets-fairs/original/MFWales.txt": {
+  "url": "https://sas-space.sas.ac.uk/106/4/MFWales.txt",
+  "bytes": 38073,
+  "sha256": "ce680123f34dbce113441c6aa85f3b57bb97258b8a91a23ff1a1a17d0dd1f8cd",
+  "downloaded": "2026-09-30"
+ },
+ "markets-fairs/original/Markets and Fairs 13C guide.DOC": {
+  "url": "https://sas-space.sas.ac.uk/106/2/Markets%20and%20Fairs%2013C%20guide.DOC",
+  "bytes": 648704,
+  "sha256": "84afa972c77a9e93c7b7173a1d7d82ee48188ceafbb82c0da1b355c0fbb418ef",
+  "downloaded": "2026-09-30"
+ },
  "medieval-bridges/original/General_Guide_bridges.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/General_Guide_bridges.pdf",
   "bytes": 1108662,
@@ -397,6 +961,54 @@
   "bytes": 66959,
   "sha256": "0d9bd6e76da3fe63204aaf9e4068e1f0316c3f7215329c671ae9cc9c9fc449d1",
   "downloaded": "2026-09-29"
+ },
+ "merimee/original/merimee.csv": {
+  "url": "https://ministere-culture.s3.sbg.io.cloud.ovh.net/POP/merimee.csv",
+  "bytes": 100102040,
+  "sha256": "1866e937c412e61b462a265de88cd1ab4d525b2667e6c5352e1685a0a6637422",
+  "downloaded": "2026-09-30"
+ },
+ "nordic-spatial-humanities/original/source-data.zip": {
+  "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
+  "bytes": 14943058,
+  "sha256": "b48d2f8f63a3ee2d4d9cefb69b29953b628bc29bb43255ad3492de7528b9bb0f",
+  "downloaded": "2026-09-30"
+ },
+ "norway-kulturminner/original/Kulturminner_0000_Norge_4258_Kulturminner_GML.zip": {
+  "url": "https://nedlasting.geonorge.no/api/order (dataset c72906a0-2bc2-41d7-bea2-c92d368e3c49, whole country, GML)",
+  "bytes": 311284659,
+  "sha256": "daaf645d654eb13ea2cf8c7f4bb8849089d22f495d28a872e2ec7f43400bdb0f",
+  "downloaded": "2026-09-30"
+ },
+ "norway-kulturminner/original/cl-kulturminnedatering.json": {
+  "url": "https://register.geonorge.no/sosi-kodelister/kulturminner/kulturminnedatering.json",
+  "bytes": 30852,
+  "sha256": "ffc115eaf01697765fbddf304633c899d9815cab88e0f4e40057ccc650846cbb",
+  "downloaded": "2026-09-30"
+ },
+ "norway-kulturminner/original/cl-kulturminneenkeltminneart.json": {
+  "url": "https://register.geonorge.no/sosi-kodelister/kulturminner/kulturminneenkeltminneart.json",
+  "bytes": 344613,
+  "sha256": "2c01f521d378d0b86d5c0e10faa1cf6bb5ba487cfecf1d162713c49e24d0c2c8",
+  "downloaded": "2026-09-30"
+ },
+ "norway-kulturminner/original/cl-kulturminnefunksjon.json": {
+  "url": "https://register.geonorge.no/sosi-kodelister/kulturminner/kulturminnefunksjon.json",
+  "bytes": 13056,
+  "sha256": "f65dee9885b36c3ba20a2f3d4eb3b6ce258f5a7e12982a63c7cbbb0002e3841f",
+  "downloaded": "2026-09-30"
+ },
+ "norway-kulturminner/original/cl-kulturminnekategori.json": {
+  "url": "https://register.geonorge.no/sosi-kodelister/kulturminner/kulturminnekategori.json",
+  "bytes": 7483,
+  "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
+  "downloaded": "2026-09-30"
+ },
+ "periodo/original/periodo-dataset.json": {
+  "url": "https://data.perio.do/d.json",
+  "bytes": 7806282,
+  "sha256": "5482d0dc72e062dfcbd95671b1c2e07f132e30b5b1caff766c172844984432a9",
+  "downloaded": "2026-09-30"
  },
  "pleiades/original/dumps/README.txt": {
   "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
@@ -439,6 +1051,990 @@
   "bytes": 136020531,
   "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
   "downloaded": "2026-09-29"
+ },
+ "princes-townspeople/original/cities_dynasties.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047015",
+  "bytes": 24907909,
+  "sha256": "7d1d71e5cfce0df1327bc95b0e5a70ead23201f0d49a5a588c8c47d8e2c505d5",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/cities_polities.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047016",
+  "bytes": 45399973,
+  "sha256": "a7385a1c6f217c810d147f898a1cab14774f2c61c1aed791dfd616de58480c8f",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_borders_2019.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/4099960",
+  "bytes": 564648,
+  "sha256": "4f12e1861523428bba464da1a573f9ff71613efd4fe9c6ac5db156681e392a4f",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588457",
+  "bytes": 1931538,
+  "sha256": "e5df2f74971d6730828ade8712c67ca805d4ec5bbab0e2dc209ed51304d7da63",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_locations.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588458",
+  "bytes": 370892,
+  "sha256": "1c9a5f736f4f623e81fe4d308498dede36c2cb932200637f427c66fdd2661114",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/conflict_incidents.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588455",
+  "bytes": 662950,
+  "sha256": "a5d8da46316160328bd040e24fbe4afaa1880a06673e9f743924051b5af01621",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/conflict_incidents_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588456",
+  "bytes": 409510,
+  "sha256": "fed280a7493bdbdb9f1872ed9bf3909085c063fca95441e511496db204d1e7c2",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/construction.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047022",
+  "bytes": 3018305,
+  "sha256": "1be481534c3ffcf3bd9b6573b99331647e7d41b14f341bca4744d38e582b45e9",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/construction_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047032",
+  "bytes": 128931,
+  "sha256": "1a864910914cee8c61d6941df107152f897f7b625131c9fb20366c9943b7beaf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/legal_families.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806259",
+  "bytes": 3073,
+  "sha256": "53fbb1e7d4bb6c868c90fd8945bc883f45260c2457af1b33eed3d9895f7cf7cf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/markets.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806263",
+  "bytes": 1062284,
+  "sha256": "7e7927d1130d224139dd4a0c3affe94d5ccfeea714d9c729bb693bec7b045ed8",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/markets_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806264",
+  "bytes": 80727,
+  "sha256": "0939645bd896ca9eab91fed3988e0d432b3e636be2ce79f031836359182c33e5",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territories_all.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047017",
+  "bytes": 5037241,
+  "sha256": "8da0a9fc9c32aa01cea7c2e6c2a0c460b16411bedcb0b46883756365f7c0f3fc",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_blueprints.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806256",
+  "bytes": 418969,
+  "sha256": "11c577dc9bccf447e34bad20a90918bbca868dc1662b15b60842afb83da740bf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_codes.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/4099956",
+  "bytes": 211954,
+  "sha256": "903f546da18efc50aedce4e906e9ca2cbded7ec2584ee2b94d99b65dafde128c",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047031",
+  "bytes": 350604,
+  "sha256": "c94b237254549e9e37b2f3bc62962838e4d38ae48108bead7a6dee2dddfe8520",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/towncharter.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806261",
+  "bytes": 682015,
+  "sha256": "ad069820fcfa0a5e36e79c6c781ecee74f9e16a5ef1bb1bd4150e716ed0fed98",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/towncharter_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806260",
+  "bytes": 78926,
+  "sha256": "f9e9a457422c73a3c22b0f354e4cb5f864d3ed97b300ac9baf4133767e6bfead",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-001.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=1",
+  "bytes": 1775295,
+  "sha256": "ecfd4615cb4d472286f2446d2ec977c2ccf28623c4cb6f0dc7864b0a419c7a31",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-002.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=2",
+  "bytes": 1766949,
+  "sha256": "1d25dcd7eb183f34aa385f917f5b50027e8a71318d397e5c1bdaaba227384e6e",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-003.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=3",
+  "bytes": 1757112,
+  "sha256": "a066909f2408b8f31b70814374f9a4796de8b64d0dc3986ecf9f755605654701",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-004.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=4",
+  "bytes": 1754912,
+  "sha256": "0b7ac8e18768646ef1e6622733d8fb7c44664715ae50bb1aaee5e64bcd69528e",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-005.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=5",
+  "bytes": 1825884,
+  "sha256": "8966da14f062723c8cc69965ebcfff2f261df54b0b46fee4a1753d2604ea95a4",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-006.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=6",
+  "bytes": 1750653,
+  "sha256": "38a95d312d0d1c3c24a122bc1b7ec184395b9ad5fb6024d6dfd74e150f08c2c1",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-007.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=7",
+  "bytes": 1733890,
+  "sha256": "633db538458c95f3b11354652f3015a9c2e187aec8e77c292f28bd30beb3e67f",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-008.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=8",
+  "bytes": 1740473,
+  "sha256": "1fb9c0d1b3fbe442d785798389803fd6861374f46cbf4938dc6773798b542df4",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-009.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=9",
+  "bytes": 1733112,
+  "sha256": "35bc6d0888895b18887e73c9743bbd81691b83a904ca1ba81714552b7dec9261",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-010.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=10",
+  "bytes": 1756522,
+  "sha256": "412ed3815f2fbe246982432f65a3a6560351048ef8aacffaf9c69ea74deadafb",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-011.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=11",
+  "bytes": 1744340,
+  "sha256": "a647a859ebc3930415539883f860f8bcb5b98aba566b6dc70eb95f184cf44ffa",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-012.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=12",
+  "bytes": 1728314,
+  "sha256": "883541d5d06c518dc16aa383606b707b27f5a4652952e2d63600cb2f89363ea5",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-013.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=13",
+  "bytes": 1738354,
+  "sha256": "66e5e0475fa358c6264a432e26aaab98b446471b9d096c2983f6c41517d7d4fe",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-014.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=14",
+  "bytes": 1749737,
+  "sha256": "01eac02758dedc7ab1537fa76331391711a1d604c4c553f91a3ca592a67ca817",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-015.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=15",
+  "bytes": 1747531,
+  "sha256": "1b70e81e930ab687727879f1efe45989ea6ac0d90bedccf78f26d0632fe095e6",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-016.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=16",
+  "bytes": 1732248,
+  "sha256": "2ab4e1318efe5ed346768a5cdacbe8b657a141666dfcb903421cade90339dca2",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-017.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=17",
+  "bytes": 1759040,
+  "sha256": "0724c3a92109d53c372ec4c99adca75d92cfeb403d3efe4e3515f86e2d87de6b",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-018.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=18",
+  "bytes": 1754345,
+  "sha256": "b02750abe074277ae88c5f8fdfd78de22d192367ee66ac8833ddb28b3586850b",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-019.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=19",
+  "bytes": 1786263,
+  "sha256": "dc97413e75bef8feab3531ba7fcd3ddb14f4eb64c6198efe31263ee4c924d6bf",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-020.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=20",
+  "bytes": 1733937,
+  "sha256": "f172dee838d9576890984b8a06c0f88fea7cf7a63dff1c15f59b3fe1880a4537",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-021.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=21",
+  "bytes": 1736377,
+  "sha256": "d93ba830a9fe8271fc3a09bc849d6d7f0b636e83674170b068b1ac471388d8ce",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-022.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=22",
+  "bytes": 1730397,
+  "sha256": "18ee76fe7554f7d528de16b3435e431dac4126add7590dba9281dff4bea42d44",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-023.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=23",
+  "bytes": 1752702,
+  "sha256": "482517a6ce976324d793d85fb9728e7697178dd3c7371192cb9ff2764aff1f51",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-024.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=24",
+  "bytes": 1742257,
+  "sha256": "f6a791dc3375fa4e9edb6fce5c2ec54b061b43a61f1da600b58445880093c06a",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-025.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=25",
+  "bytes": 1755594,
+  "sha256": "28e0ba6a518c0d62aa9e22e67b1eb7d201aaa4b1a40c47c435a77a6340423cf5",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-026.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=26",
+  "bytes": 1763091,
+  "sha256": "4598025163edd0a659be4de9be405050a815153385b49c5d05c0f7bb8955f613",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-027.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=27",
+  "bytes": 1741750,
+  "sha256": "9d9fb1334997b02313606b74354e72333412ba549f67c35c3b8493ef6de08b89",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-028.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=28",
+  "bytes": 1773351,
+  "sha256": "298d3c0746e90699dd3f9966d3f3dfa244d749d256d5a3c5a93fc7101139b058",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-029.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=29",
+  "bytes": 1766385,
+  "sha256": "70b93aa51d6255eba6c3a3fd1e0ab3f08c528a3e7bd2f3ab5ca985838d9ca743",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-030.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=30",
+  "bytes": 1764994,
+  "sha256": "38457e75ff0874a40e6154a70842ea15301bd393505e01ae31f68c4c9e440ca5",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-031.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=31",
+  "bytes": 1730864,
+  "sha256": "ea0132b6e85437195c8618fb55370d53a6357f69c2257b29518ef5c319137aac",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-032.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=32",
+  "bytes": 1717743,
+  "sha256": "05a1c6a1882ea9f2b35c74c9dddedc05c7f9e33c2c0acc3ed0df5afc84e6a73c",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-033.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=33",
+  "bytes": 1733724,
+  "sha256": "ed471534b0e646cae00da2b88ecd0dfb03dd34665947b6dbf97d1a09f708bf29",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-034.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=34",
+  "bytes": 1754410,
+  "sha256": "72271ac391ac8c25a99df31a3a661f932f922acc663aed2072c8b475a9cc558c",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-035.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=35",
+  "bytes": 1781932,
+  "sha256": "48abdeb492eea0bc9cf7aec70c611aacb6ee38596aa6d5ba9e68789405d732b9",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-036.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=36",
+  "bytes": 1780044,
+  "sha256": "2858f4bca2c726c85aa88596ca6a561986f08ce86c6277c23632a3802e1984a2",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-037.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=37",
+  "bytes": 1759063,
+  "sha256": "0e1068bc16fdf579f5acb80aff1a7727154122b0c919ad55b4008ccab73516ee",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-038.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=38",
+  "bytes": 1717577,
+  "sha256": "89b96d3d6cbba441030d337bfe9fe2a31f507128f9fce21cce88a7f5814a0caf",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-039.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=39",
+  "bytes": 1729458,
+  "sha256": "bec39778886d629005dde41722798a90ee7bbece075567e2194a0ce48dde4674",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-040.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=40",
+  "bytes": 1736558,
+  "sha256": "e7952ba4b7d353dd4accfb51ee0dd21df8067f1944215e39b46a15dd4c91f5c5",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-041.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=41",
+  "bytes": 1720310,
+  "sha256": "e68750825aca1d40bbaf4648f76b6191f0009aeb56a2cb1741b9f6496989b5c0",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-042.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=42",
+  "bytes": 1722333,
+  "sha256": "d45ba46f9b8ab32eb68fbc1d8cdc38744460a934ba718b6c974e9ee916c13e05",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-043.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=43",
+  "bytes": 1747833,
+  "sha256": "37c310a4baeb2ec77fbc82453c5cd640d3fc4703c044aba1ddf2b20ac5ae7b86",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-044.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=44",
+  "bytes": 1743188,
+  "sha256": "c0e90534977c5e361a5daa86ea4ca2da0acc568dcb211fe6048622f83715d312",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-045.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=45",
+  "bytes": 1719003,
+  "sha256": "e7940d779e663e1d4a39d12bb2d80e79b4268fd1c2297879e40403c36acabaef",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-046.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=46",
+  "bytes": 1682523,
+  "sha256": "ebb5b588b54f253bac2281946c54cbc1892931a1da0b05aeb190571c58e3768e",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-047.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=47",
+  "bytes": 1730785,
+  "sha256": "fa0ce54dc049e3e2fa1d1c20ebbb5d65dbfe1da11a396554f906ab18f105c79c",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-048.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=48",
+  "bytes": 1700529,
+  "sha256": "121074d8f4b13ff4907972f83e3ae3fe678f6ea843099ff5237e4672c57f0db8",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-049.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=49",
+  "bytes": 1716999,
+  "sha256": "aa40b4b79879f5a569a1550c152e16312d54f2972a71a8f6f6ef8b86ff1409db",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-050.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=50",
+  "bytes": 1718632,
+  "sha256": "ba2abc350fabc5baf9939dff38e86ab2f9beb894f870b2f2051dabeba20a2012",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-051.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=51",
+  "bytes": 1710432,
+  "sha256": "8558dc1926a5dbd5684f91712dac6987a2be82c1d874199c1282c7c6f2e78e4f",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-052.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=52",
+  "bytes": 1700108,
+  "sha256": "296ccdfce55bd87d4f5126e9cfe62c5f72377fea0fd71be30a1f26052fa39884",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-053.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=53",
+  "bytes": 1675475,
+  "sha256": "e1c66683a33bc6a5e4921610c20ac1ff83c3e60c36bf6952cc914ec13849956e",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-054.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=54",
+  "bytes": 1669910,
+  "sha256": "1a86d011c36a5bc3b400f2c5526e7764273b7c3280f669e6e1d00ec240f87617",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-055.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=55",
+  "bytes": 1696191,
+  "sha256": "18b818c9af13d93ac68f6b119221209dff8814dc52ffd9075b8d6c378aa19304",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-056.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=56",
+  "bytes": 1678797,
+  "sha256": "672bc6a0b935e4edd48944802c500feef7bad2b1ca8d79135fe8bf4281653355",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-057.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=57",
+  "bytes": 1715306,
+  "sha256": "fb041bc5234a5da60c89a6b447465d2ddb71e78c13aed925fb188b7c13f7c54d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-058.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=58",
+  "bytes": 1684620,
+  "sha256": "4de297bf824ecea52fa5af89f0c8b4a5d59d1537fa26920963e0b7279f7c783d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/list-page-059.html": {
+  "url": "https://ran.cimec.ro/sel.asp?Oepo=1&lpag=500&nr=59",
+  "bytes": 239126,
+  "sha256": "afdf1494f7913767e9ff6198bf269b2ca24f4443cd08a8f914de391e19319cb5",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-000.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4394841+AND+OBJECTID%3C4395841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 191339,
+  "sha256": "c191af41674ec1c709521b6dcbffd0f8e39da1163fb8f64bfbaaac50fa3d8244",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-001.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4395841+AND+OBJECTID%3C4396841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 188758,
+  "sha256": "c14e9e6350b6beef56a54e3f1911fd4100f266329daf8302a74f68c88259c7b1",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-002.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4396841+AND+OBJECTID%3C4397841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 189912,
+  "sha256": "106c11f781b1c87fdb6353ca46c6b25341ed85105f121bb212651d94593f7f95",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-003.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4397841+AND+OBJECTID%3C4398841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 192137,
+  "sha256": "990903c4e591c00afb206e605d2175a66c499e3064646aa7b0eb65a54818549f",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-004.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4398841+AND+OBJECTID%3C4399841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 190141,
+  "sha256": "c8390c0e0a6fb398a09234059d511854c87173f30ef66b6c39a2b12bc002dd51",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-005.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4399841+AND+OBJECTID%3C4400841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 187576,
+  "sha256": "ca12a00c538c73bcadd6ec28906968c6471a110df18a248c8fe9ba118ff73351",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-006.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4400841+AND+OBJECTID%3C4401841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 187329,
+  "sha256": "94df6b93135590ea9efaa28fff21fe275d53a40940b9129aa1f71e3d5c31a312",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-007.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4401841+AND+OBJECTID%3C4402841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 193354,
+  "sha256": "5c7798a0518754566f1b7031d2f25d831404f0ee08efce1a9cbe060a8fdc812f",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-008.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4402841+AND+OBJECTID%3C4403841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 194968,
+  "sha256": "7d5f920162c838f010bb9c2ab024f10fb0587758d2fa3062918bcc4c0fa8e0ad",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-009.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4403841+AND+OBJECTID%3C4404841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 188687,
+  "sha256": "3a0273e620208bc75ad22e1d0d398dfba1ec2f13ce4271d06a3bc166432d37ea",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-010.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4404841+AND+OBJECTID%3C4405841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 186748,
+  "sha256": "5020d2b6ea230352dcaa35cae70e9a91ba61668ec8d9267157d3cfaf9a229ba3",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-011.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4405841+AND+OBJECTID%3C4406841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 188479,
+  "sha256": "fc0d4bc050efd7aef99bc851ef1560afab7f678968cfe0274345c8aea382708d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-012.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4406841+AND+OBJECTID%3C4407841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 189772,
+  "sha256": "f2583c2c55ee5062f6cbe2ac7c2d1df90c4b1b4b795fac2b4157b1f9fcbdd0e9",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-013.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4407841+AND+OBJECTID%3C4408841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 190041,
+  "sha256": "db1d28d7fe3f552c925e18e9546685c84d0cd9835cbf39a60f59ab25a48432ab",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-014.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4408841+AND+OBJECTID%3C4409841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 193218,
+  "sha256": "78d3fbcfe7d7fbf1a1f2bceaa5f08c5c7de09cca0d9235fdbaff3ad51aabcab7",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-015.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4409841+AND+OBJECTID%3C4410841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 190961,
+  "sha256": "2dfdf326f147a8cda413b103ea0221c60bdbcf73229e8adae7e5f8161dbcbd53",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-016.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4410841+AND+OBJECTID%3C4411841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 192203,
+  "sha256": "79576ca9edf3fb868c2aa788d26df6346d4d718b52be8b8c19b1cbfa3cf56d58",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-017.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4411841+AND+OBJECTID%3C4412841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 187511,
+  "sha256": "90ce62657eaa00045914e44ecbb8cf67a9b7a044283d8554f1af3af6ab44395d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-018.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4412841+AND+OBJECTID%3C4413841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 190499,
+  "sha256": "08ed6652d13fe6ffed05c24f67a3a4ae175e4ed368e377c4c4cc77d29477c77e",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-019.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4413841+AND+OBJECTID%3C4414841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 180165,
+  "sha256": "4fbdb50d7713cbb200c79c38f0129c9ce5d03690628763ef7029fd669e8233cc",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-020.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4414841+AND+OBJECTID%3C4415841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 183410,
+  "sha256": "2bada5a9a8b1c326fe38a32b5d41565e69ba8b03112e5ebf212ad9d961a1cf29",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-021.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4415841+AND+OBJECTID%3C4416841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 183704,
+  "sha256": "8f4f33870d07fc8c04a82cda7b9d36308a870366b08c610949cf89d4ee71f3b4",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-022.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4416841+AND+OBJECTID%3C4417841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 193468,
+  "sha256": "2ebcd83747aa1ff005895ed869c1b92787638fff4b3d3ca37cfa710d78bb10b7",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-023.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4417841+AND+OBJECTID%3C4418841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 186075,
+  "sha256": "bc19b27dfe1ea1f382276c19c7175435a030b2e630deba9fd754b539fa6e117d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-024.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4418841+AND+OBJECTID%3C4419841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 187778,
+  "sha256": "06df0dc7b55c2aeb1523115c05c7519903cbce4e0d7246c76628ad708f2b247d",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-025.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4419841+AND+OBJECTID%3C4420841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 190905,
+  "sha256": "3e8713a1769a7904e7be1cbe8437ef3bac0b6f2b2f64c0d732e05b603a60e2bf",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-026.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4420841+AND+OBJECTID%3C4421841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 187661,
+  "sha256": "39054c39e132a9c462978b65acdd56f843180cba0e55a6a7da2735ee9c60b847",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-027.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4421841+AND+OBJECTID%3C4422841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 186197,
+  "sha256": "cc5a02f19909f84a79e17f6857d2c77bf1ecb6fa9755450df1d14561a0d431a9",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-028.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4422841+AND+OBJECTID%3C4423841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 188580,
+  "sha256": "4cae9a88f4dd08b1aef90c45afe3f75fdc90030c976988c89150551e1e171c33",
+  "downloaded": "2026-09-30"
+ },
+ "ran-romania/original/points-029.json": {
+  "url": "https://eism.geo-spatial.ro/eismgeo/rest/services/Patrimoniu/PatrimoniuWM/MapServer/0/query?where=OBJECTID%3E%3D4423841+AND+OBJECTID%3C4424841&outFields=OBJECTID,CODSIT,NUMESIT,SIRUTA&returnGeometry=true&outSR=4326&f=json",
+  "bytes": 10471,
+  "sha256": "8480146fa43519579403a54f9d3fbedb2a8827d2a23ca9536c9d2c0107620c3a",
+  "downloaded": "2026-09-30"
+ },
+ "sweden-lamningar/original/lamningar_sverige.gpkg": {
+  "url": "https://pub.raa.se/nedladdning/datauttag/lamningar_v1/l%c3%a4mningar_sverige.gpkg",
+  "bytes": 2292899840,
+  "sha256": "3c6e50b685d803b6f8cf4c8bf9ead4eb1a6ede189d5fa4157d07a2252401335e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-001.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=1",
+  "bytes": 475768,
+  "sha256": "196f0719900ea9cdb24f5fe9b18910680c59477758211bd3ee743ce3c54ca25f",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-002.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=2",
+  "bytes": 467002,
+  "sha256": "752ea9598206b9f4f7a9e04c7b25021ed92715f628013b2da8f6bde429d12c38",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-003.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=3",
+  "bytes": 617491,
+  "sha256": "5efa52f1fe335c4a7480d65144c7976bf1001a780a6d761a524e827f32df58c7",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-004.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=4",
+  "bytes": 507197,
+  "sha256": "919809cda8fb2552ae67b2076aca6daeb0915a1a8f0c452a177829068be74748",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-005.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=5",
+  "bytes": 718215,
+  "sha256": "c6ea833f18f0543fa5a8784f0a7d152cef28837fb9027cabf4690e7f1e198d0c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-006.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=6",
+  "bytes": 556137,
+  "sha256": "12033be95844301a422d2ead5ae3d5fb5692ead55839bbeba762691c7e5018fc",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-007.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=7",
+  "bytes": 659569,
+  "sha256": "cb1e045121bd67532ad786af9723af2efd7f04c02d37831d901b4c1576efec9a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-008.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=8",
+  "bytes": 851135,
+  "sha256": "936de897ffa8d73a6bd45213df38c0f094871d5daf9dd6aa2c623710963c47a2",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-009.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=9",
+  "bytes": 533630,
+  "sha256": "b5c6ccb2acd825211ee455d7614c077025a2bc99e15530f0bf7c19bb47bfc5b5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-010.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=10",
+  "bytes": 506224,
+  "sha256": "c2040873a70c3ecf9a07a2c6f458ec7834f16c531f8ff40b2bd43329724aaa37",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-011.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=11",
+  "bytes": 639102,
+  "sha256": "3a00b03b31d5002ed7002fb8d0b0fe219af78aedda735ebc5b5ee7770bbd1cb0",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-012.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=12",
+  "bytes": 812068,
+  "sha256": "350cd7e56308a4973d2e1c30fd56684f4766143b08cebdd2d2d24229fe6fe4e3",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-013.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=13",
+  "bytes": 484080,
+  "sha256": "080f93a8fade4cacc3cff6e5311d6bda978644040b2cebf7eb8a8fc43d5df649",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-014.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=14",
+  "bytes": 543131,
+  "sha256": "add4aea3dd06e6481d9806f432bdcc2fa0aefbccf50c858136f71c2b077e947c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-015.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=15",
+  "bytes": 632053,
+  "sha256": "513d66f6e6192f2412705a59cabee3cc85a30ce6a83ce35a159166d6ae64ff94",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-016.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=16",
+  "bytes": 388411,
+  "sha256": "3dccf0de6b6961708503062005d6f6fb5ef99e118548848c8a58f055e5e77dc5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-017.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=17",
+  "bytes": 473347,
+  "sha256": "cb08b8dae993af9ab49deca79a1bcaa65b3afbbb56353a2d9af014fe60d88e23",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-018.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=18",
+  "bytes": 706402,
+  "sha256": "c8d7799df9817a0a6e52221b2e467c7f52741ae7eb0497223284fd54442a3372",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-019.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=19",
+  "bytes": 716289,
+  "sha256": "8e4e92ad6dd8f217b86b6760f8a92eb18314c86fe36af4f99a136cbea3dd9184",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-020.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=20",
+  "bytes": 528496,
+  "sha256": "a51115959aab822ee9450eab6b12bb676fd231d39d456b0506d9d02c01af9313",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-021.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=21",
+  "bytes": 514822,
+  "sha256": "a726def9dc5bd822ed8a28a7791017b098086a9c8c04ee7c7494552a7a67818a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-022.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=22",
+  "bytes": 498144,
+  "sha256": "a34cedcdfc8a86c4bf564c4205c02727def1838b6dd49c7e06a578b7d6396003",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-023.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=23",
+  "bytes": 770729,
+  "sha256": "cc099e20595aebd1714894c3ca6f7d3f90995f5f8d6827b0a7d0f712db81f598",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-024.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=24",
+  "bytes": 641847,
+  "sha256": "667e29ff3b44965f6998912d88cedecd4911630e89aa67715785e4c534a608b5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-025.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=25",
+  "bytes": 628728,
+  "sha256": "8f420ae7e4bef32a9f6ec5c0e322e529b5f4bbbc28b1b314abc75a5ca3fa4ecd",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-026.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=26",
+  "bytes": 488632,
+  "sha256": "84d1eaf5ab8d3bc5e8fe7a345e4ac2f95c14a6e858e36de1a0cc03994094425c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-027.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=27",
+  "bytes": 507847,
+  "sha256": "ce0bd050bcf7d6ba76c434a4eb2ca96ff7cbb09bbd8152a1b4314026c22f9e9b",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-028.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=28",
+  "bytes": 814687,
+  "sha256": "512278b33adfc42f94589ba70509449d40c8efb03db3db1e1ea29f2af85c47b4",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-029.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=29",
+  "bytes": 658657,
+  "sha256": "e03f72e2e4cee1685ea521abf68794be81861900cf6806a34fc2053fa20ff57a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-030.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=30",
+  "bytes": 525181,
+  "sha256": "be3d321e515ea3f6571b0933791275a5beca12b608c6723d0f6a01f16c6bda61",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-031.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=31",
+  "bytes": 584411,
+  "sha256": "5d48f1cd7e5369f35a0a3bb3e074d426d2e86f6b64f2a9451afe97fdf637bb8e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-032.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=32",
+  "bytes": 696114,
+  "sha256": "ba2176cb0842070c3e5cda94f199bd9a67a643589288b2ceac113fbb90f0982e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-033.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=33",
+  "bytes": 777642,
+  "sha256": "d124615c8c0dc815039fc46edc2b4fc37118cb164fcee322ddeffd96e6f2bca6",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-034.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=34",
+  "bytes": 616154,
+  "sha256": "19cce9a5ad063b38526593a061c5cce25f44d2a182ce01dd58bd48a0de193c31",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-035.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=35",
+  "bytes": 414177,
+  "sha256": "67d576dad5563281075a011c485cedec5041385119f38e21a527fb237b3ea538",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-036.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=36",
+  "bytes": 521077,
+  "sha256": "c7e8bb03981fd58a82483c1f46c60aff223272cf45941d5a44111c934028d21c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-037.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=37",
+  "bytes": 476368,
+  "sha256": "b64fec499905bffad90f9c775b590baee6464e3d922068420a195a857aee0a1b",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-038.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=38",
+  "bytes": 658588,
+  "sha256": "f98846d8a370d9efea3bcbca2776ce09fead3a7fe5722e71ae8b5ac2a94b0c54",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-039.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=39",
+  "bytes": 966719,
+  "sha256": "11c1e35d15400b295ca595e4c121daa00e422b6f31d7769f6813bc5621c39219",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-040.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=40",
+  "bytes": 654158,
+  "sha256": "7945341f55d989f8064e4f8bb907d95d72d609c8cd29a2c53c498a834a64f566",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-041.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=41",
+  "bytes": 842057,
+  "sha256": "a7c29fb46695cd013075ce3b77bdfdf28d1062d939e14181f3722a0714872c55",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-042.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=42",
+  "bytes": 597517,
+  "sha256": "91f9601dedfd667eb3b8b1ba9e67c3e362c050148932e158c19d0f520d69cc70",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-043.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=43",
+  "bytes": 498104,
+  "sha256": "66b9b546300fd5e99e69b5c9f23b5379034b80b515f16c34777c0f7e4fc1e067",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-044.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=44",
+  "bytes": 723212,
+  "sha256": "b8ca5d1736cc9e1a2cde746f0dd9e8ae7c10f37e3b9de96ec1491ac1685b19b3",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-045.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=45",
+  "bytes": 634672,
+  "sha256": "620d3e9d9dbfec24ea18a3bc474e4559944880036519bf1e4b472f8504d8c73d",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-046.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=46",
+  "bytes": 712149,
+  "sha256": "bfd76b645c1006ac502bbed75984d222500732b089d5627d5ba4cbb590847e6a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-047.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=47",
+  "bytes": 882072,
+  "sha256": "17dae6a59730deadebb0a5795408d261ba94441eeef1c06c23c78d44ef7762e8",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-048.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=48",
+  "bytes": 553105,
+  "sha256": "b416e8a3fdd0dd977454b9dd8145b003b8834f82aff211fba3a8bb0c021cc033",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-049.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=49",
+  "bytes": 542494,
+  "sha256": "e4ff3e828515d9e344883d5fbbbcb154aba680265c602bcf033382d1706165fd",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-050.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=50",
+  "bytes": 629452,
+  "sha256": "833bc925bbb9a43dd248d063f1b7e6a27a2c82cfd70c0695e480e9f34c4a1925",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-051.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=51",
+  "bytes": 712323,
+  "sha256": "34337a1958ebbe19b0140f72cc411891a6b27e9c49a7d0c3d4e06975ed6fa837",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-052.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=52",
+  "bytes": 628704,
+  "sha256": "4dd6e264a3914a456d66cbcb8a2a9892aeea17fc070610c2949431ace07af103",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-053.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=53",
+  "bytes": 592707,
+  "sha256": "d2c3da5a4845676d46e779412d24480857d6a953d9a0d7e6331f0497f4aa78c7",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-054.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=54",
+  "bytes": 680391,
+  "sha256": "ece50c1c0b295a6548830b2a42554d4cc1cea242db14d273c5f3004c12b7eb3c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-055.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=55",
+  "bytes": 581475,
+  "sha256": "ec98ef912fd93af7de114cc370f22e363e88eba9a4f4a885cfcbe3d13f4cd52e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-056.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=56",
+  "bytes": 75055,
+  "sha256": "ebd6ac3540b9c316928d522fcec78d3f70c156d9d9056d17269f469f754f3de0",
+  "downloaded": "2026-09-30"
  },
  "tribal-hidage/original/Individuals_Data.csv": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
@@ -595,5 +2191,191 @@
   "bytes": 19141157,
   "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
   "downloaded": "2026-09-29"
+ },
+ "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {
+  "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",
+  "bytes": 458894,
+  "sha256": "9431669a8159e2ede82836e85c997b8d81a465d82adb542afa744e2a9b704c5c",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/Data_Dictionary.csv": {
+  "url": "https://zenodo.org/records/21479034/files/Data_Dictionary.csv?download=1",
+  "bytes": 1140,
+  "sha256": "1f4d00c9f01ffe224b771136c64fd83b439805036a594ed3ad52a140dbdc54d3",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/License for Dataset.txt": {
+  "url": "https://zenodo.org/records/21479034/files/License%20for%20Dataset.txt?download=1",
+  "bytes": 1881,
+  "sha256": "74cb0a1e60ade2167384fd9f3c9416ada1d1fe7144618fc729076c1faf5822cb",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/README.md": {
+  "url": "https://zenodo.org/records/21479034/files/README.md?download=1",
+  "bytes": 7134,
+  "sha256": "6e25c0dabea2f518bff643320dbdb77007a81543da52e1360d6cb90781cbb70e",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/Western_Bohemia_place_names_key.csv": {
+  "url": "https://zenodo.org/records/21479034/files/Western_Bohemia_place_names_key.csv?download=1",
+  "bytes": 1563,
+  "sha256": "7aa90ccec4078249e5f255e18539902749aedc6f2db5e0c6f9694fc9a09f2cbe",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/battle.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/battle.names.rq)",
+  "bytes": 593671,
+  "sha256": "2420394e182814442c84f3b5b819030bef8876c076c1203cb951c077bf4ca911",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/battle.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/battle.rq)",
+  "bytes": 407447,
+  "sha256": "bc21e8128cbcc2c0861c31c9b2d4602c3002880305c8bda7407e82a0804d6a8c",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/bridge.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge.names.rq)",
+  "bytes": 46242,
+  "sha256": "0df8ec5617b450c3b78c3121bc96e26b1d5e3c4b10967b5c091e809c021df940",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/bridge.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge.rq)",
+  "bytes": 64684,
+  "sha256": "098f7a10ef7800bf28baff20b307cd0272a1c4b8cc3ee6edfa5f8015cb0848ea",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/castle.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/castle.names.rq)",
+  "bytes": 3286357,
+  "sha256": "755e5b77f1216718e9f24be0e727f94e9152c6fafde374f36b22edb49a4e74c7",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/castle.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/castle.rq)",
+  "bytes": 5500441,
+  "sha256": "6596f24db7791acdf7f41907f3d8a31d81303936e7e1e05a5a0a1c06371a75a9",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/cathedral.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/cathedral.names.rq)",
+  "bytes": 736964,
+  "sha256": "02b315752955c2fdeb91248f1c09cbd8da9c0035fc235f6538384fe3f6bc4fab",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/cathedral.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/cathedral.rq)",
+  "bytes": 490145,
+  "sha256": "2edcb632536c8064a7df250bd053e6e9acd383d7e58325cd9e178a3e5cfffa27",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/city.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/city.names.rq)",
+  "bytes": 6837534,
+  "sha256": "9a290bcabd002aecf250cbb3e0073574ffbe5d114819241fcbefe6348e220522",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/city.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/city.rq)",
+  "bytes": 4054530,
+  "sha256": "60ec1c60a4abd06b787147492cc856a56e9ee1e6c286adac43bf6fdd81e3c259",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/diocese.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/diocese.names.rq)",
+  "bytes": 277746,
+  "sha256": "5941170caaf9d3e9ff7ab739e0e3fb14b8a6ddc8498cd40481c78ba48516bea2",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/diocese.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/diocese.rq)",
+  "bytes": 150092,
+  "sha256": "e37183083e58187a15eade98cde9d827f88f76ae25cca154630d54bca51a9107",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/fallback.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fallback.names.rq)",
+  "bytes": 8758,
+  "sha256": "d324ca3d2c56845eac3f7122a1373d1d8d6fb3e28a9c585dbd3593287728bb8c",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/fortification.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fortification.names.rq)",
+  "bytes": 724948,
+  "sha256": "33407df310a66851751a8d800c6fb800411541f78a9b88f9af9728a2692a90e6",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/fortification.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fortification.rq)",
+  "bytes": 1039337,
+  "sha256": "535520379c1c8bd397b2b758996d6cfa728ef121d3b2dc13359eb822490209ad",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/labels.tsv": {
+  "url": "https://qlever.dev/api/wikidata (labels of referenced items)",
+  "bytes": 618688,
+  "sha256": "06a24abcd9c66797176c9793936b0e78fc3554eae4e05094bc8382c752aec53b",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/monastery.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/monastery.names.rq)",
+  "bytes": 2473992,
+  "sha256": "57f0ad964c303bc12a88c9c0eb2b2556f13ba49274868f35bfa9ed9581c6893b",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/monastery.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/monastery.rq)",
+  "bytes": 3977343,
+  "sha256": "83dbdef5bb8a9267352a43c35ee88c872a0f475325e24578c461ca8b54137c16",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/settlement.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement.names.rq)",
+  "bytes": 5461892,
+  "sha256": "4d4833b64de7dfb810feedfdf20130d0e42b4a5caaee0930fd0c24dfc171aabe",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/settlement.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement.rq)",
+  "bytes": 5783125,
+  "sha256": "93cdea750dfa508c9d08ff157a892f8b5916be5f8676257855171a47b9d732e9",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/siege.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/siege.names.rq)",
+  "bytes": 276962,
+  "sha256": "805a5f9d0b189b681fdcbd07179fd2fdebacda2626eef62b2e24b491c0ab4413",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/siege.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/siege.rq)",
+  "bytes": 259403,
+  "sha256": "50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/town.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/town.names.rq)",
+  "bytes": 7625491,
+  "sha256": "553ffc1b15ae30e5f0061aca7b275f32e8fe9bf25584b22178f53c638002d6ad",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/town.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/town.rq)",
+  "bytes": 4456050,
+  "sha256": "a72801bc1853ad35b880c46d4a5fe59f288b845357016442fbd404b460c9697c",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/university.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/university.names.rq)",
+  "bytes": 121655,
+  "sha256": "493b09bddbc3930e7008f366cd31abb29033c4dcf52d1e7e4e4106c1d1ab0008",
+  "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/university.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/university.rq)",
+  "bytes": 35094,
+  "sha256": "191ea22ccbeac4dccae30cc919e8d09dde1c73e9747e8470cac4defb2245787c",
+  "downloaded": "2026-09-30"
  }
 }

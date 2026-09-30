@@ -3,7 +3,8 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { installPrivateData, loadPrivateData, privateHeader, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -27,6 +28,8 @@ let pmtilesReady = false;
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
+const SEA = '#cddde4';
+const LAND = '#efe7d4';
 /** Detailed water from OpenStreetMap, kept just above the political layers. */
 const WATER = 'water-detail';
 
@@ -63,11 +66,11 @@ function baseStyle(base: string): StyleSpecification {
       radius: { type: 'geojson', data: EMPTY },
     },
     layers: [
-      { id: 'sea', type: 'background', paint: { 'background-color': '#cddde4' } },
-      { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': '#efe7d4' } },
+      { id: 'sea', type: 'background', paint: { 'background-color': SEA } },
+      { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': LAND } },
       // Drawn above the reconstructed borders (moved into place in sync), so their simplified outlines don't
       // spill into the sea and coastal places sit on the true coast.
-      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': '#cddde4' } },
+      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': SEA } },
       // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
       { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
       { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
@@ -132,6 +135,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const host = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const managed = useRef(new Map<string, string[]>()); // layer def id → maplibre layer ids
+  const paintSeen = useRef(new Map<string, string>());
   const clioSlice = useRef<string>('');
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState('');
@@ -161,8 +165,12 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         const ml = await import('maplibre-gl');
         // Vector tiles are read from PMTiles archives by range request: only what's on screen is fetched.
         if (!pmtilesReady) {
-          const { Protocol } = await import('pmtiles');
-          ml.addProtocol('pmtiles', new Protocol().tile);
+          const { Protocol, PMTiles } = await import('pmtiles');
+          const protocol = new Protocol();
+          // Tiles from the owner's private data pack, if one was loaded on this device, are read from it by range.
+          await loadPrivateData();
+          for (const f of privateTiles()) protocol.add(new PMTiles(privateTileSource(f)));
+          ml.addProtocol('pmtiles', protocol.tile);
           pmtilesReady = true;
         }
         await import('maplibre-gl/dist/maplibre-gl.css');
@@ -187,7 +195,19 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
           setReady(true);
           onReadyRef.current?.(map!);
         });
-        map.on('error', (e) => { if (!map?.loaded()) console.warn('atlas', e.error?.message); });
+        // Base map: once the detailed water tiles arrive, land is the background and only real water is
+        // painted, so coastal places (Portsmouth on Portsea Island) sit on land. If they can't load
+        // (offline, service down), fall back to the coarse Natural Earth land shape on a sea background.
+        const detailedBase = (on: boolean) => {
+          if (!map?.getLayer('sea')) return;
+          map.setPaintProperty('sea', 'background-color', on ? LAND : SEA);
+          map.setLayoutProperty('land', 'visibility', on ? 'none' : 'visible');
+        };
+        map.on('sourcedata', (e) => { if (e.sourceId === 'ofm' && e.tile && e.isSourceLoaded) detailedBase(true); });
+        map.on('error', (e) => {
+          if ((e as { sourceId?: string }).sourceId === 'ofm') detailedBase(false);
+          else if (!map?.loaded()) console.warn('atlas', e.error?.message);
+        });
         map.on('click', (e) => onClickRef.current(e));
         mapRef.current = map;
         (window as unknown as { __shelfAtlas?: MLMap }).__shelfAtlas = map;
@@ -224,7 +244,16 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
       const specs = def.specs(c);
       const existing = managed.current.get(def.id);
       if (existing) {
-        for (const spec of specs) if ('filter' in spec && spec.filter && map.getLayer(spec.id)) map.setFilter(spec.id, spec.filter);
+        for (const spec of specs) {
+          if (!map.getLayer(spec.id)) continue;
+          if ('filter' in spec && spec.filter) map.setFilter(spec.id, spec.filter);
+          // Paint can depend on the year too (dated vs. only-evidenced styling): re-apply what changed.
+          for (const [k, v] of Object.entries(('paint' in spec && spec.paint) || {})) {
+            const key = `${spec.id}|${k}`;
+            const json = JSON.stringify(v);
+            if (paintSeen.current.get(key) !== json) { map.setPaintProperty(spec.id, k, v); paintSeen.current.set(key, json); }
+          }
+        }
         continue;
       }
       // Geometry goes below the next layer in draw order that's already on
@@ -363,6 +392,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         onHistory={info.pick && onPickPlace ? () => { onPickPlace(info.pick!); setInfo(null); } : undefined}
         onEvent={info.event && onPickEvent ? () => { onPickEvent(info.event!); setInfo(null); } : undefined} />}
       <AtlasSources enabled={enabled} />
+      <PrivateDataControl />
     </div>
   );
 }
@@ -578,6 +608,94 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         pick: pickOf('viabundus'), source: credit('viabundus'), caution: 'Each role (town, toll, fair…) has its own dates in Viabundus — open the place history for them.',
       };
     }
+    case 'medieval-sites': {
+      const kind = [str('st'), str('k')].filter(Boolean)[0] ?? 'site';
+      const f0 = num('f');
+      const fb = str('fb');
+      const startLabel = fb === 'first mention' ? 'First mentioned' : fb === 'Germania Sacra' ? 'Earliest dated tenure (Germania Sacra)'
+        : fb === 'founded' ? 'Founded / built' : 'Start recorded in Wikidata (may be a first mention)';
+      const lines = [kind[0].toUpperCase() + kind.slice(1),
+        f0 === undefined && num('t') === undefined ? 'No founding date or first mention recorded'
+          : `${startLabel}: ${f0 !== undefined ? yearLabel(f0) : '?'}${num('t') !== undefined ? ` · dissolved / ended: ${yearLabel(num('t')!)}` : ''}`];
+      if (str('o')) lines.push(`Order: ${str('o')}`);
+      if (str('d')) lines.push(`Diocese: ${str('d')}`);
+      const nb = str('nb');
+      if (nb) lines.push(nb.startsWith('romanized') ? `No English name recorded — romanized from ${str('nl')} (${nb.replace('romanized: ', '')})` : nb === 'original script' ? 'No English or Latin-script name recorded — shown in its own script' : 'No English name recorded — shown in its own language');
+      const notYet = f0 !== undefined && f0 > year && fb !== 'founded';
+      const q = str('i')?.startsWith('Q') ? str('i') : undefined;
+      const src = str('src') as DatasetId | undefined;
+      const ownId = src && src !== 'merimee' ? str('i')!.slice(2) : str('i');
+      if (str('bc')) lines.push(`Main building campaign: ${str('bc')}${str('mr') ? ' (Mérimée)' : ''}`);
+      if (str('per')) lines.push(`Register period class: ${str('per')}`);
+      if (str('riv')) lines.push(`River: ${str('riv')}`);
+      const byPeriod = f0 === undefined && num('t') === undefined && (num('ef') !== undefined || num('et') !== undefined);
+      if (byPeriod) lines[1] = `Dated only by ${src === 'merimee' ? 'the century of its main building campaign' : 'the register’s period class'}: ${range(num('ef'), num('et'))}`;
+      const merimeeRef = src === 'merimee' ? str('i') : str('mr');
+      return {
+        title: str('n') ?? 'Site', lines,
+        pick: pt ? (q ? { key: `wikidata:${q}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : src ? { key: `${src}:${ownId}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : str('gs') ? { key: `germaniasacra:${str('gs')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined) : undefined,
+        link: q ? { href: `https://www.wikidata.org/wiki/${q}`, label: 'Wikidata ↗' } : merimeeRef ? { href: `https://www.pop.culture.gouv.fr/notice/merimee/${merimeeRef}`, label: 'Mérimée record ↗' } : str('gs') ? { href: `https://klosterdatenbank.germania-sacra.de/gsn/${str('gs')}`, label: 'Germania Sacra ↗' } : src ? { href: DATASET_CREDIT[src].url, label: 'Dataset ↗' } : undefined,
+        source: [q ? credit('wikidata') : '', str('gs') ? credit('germaniasacra') : '', merimeeRef ? credit('merimee') : '', src && src !== 'merimee' ? credit(src) : ''].filter(Boolean).join('; '),
+        caution: byPeriod ? (src === 'merimee' ? 'The date is when the present building was mainly built; the site may be older, and the building is shown from the start of that century.' : 'Dated only by the register’s broad period class, so it is shown for the whole period.')
+          : num('u') ? 'The identification of this location is uncertain in the source.'
+          : f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
+          : notYet ? `Not yet recorded in ${yearLabel(year)}: the first record is from ${yearLabel(f0!)}. It may be older, but nothing places it at this date — shown because “Include undated records” is on.`
+          : num('t') === undefined ? 'No end is recorded, so it is drawn to the present; many houses and castles ended earlier than their record says.' : undefined,
+      };
+    }
+    case 'urban-population': {
+      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`) ?? 0] as const);
+      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : '—'}`);
+      return {
+        title: str('n') ?? 'Town', lines: [`${str('c') ?? ''}${str('a') ? ` · “${str('a')}” in the dataset` : ''}`, `Estimated inhabitants (thousands) — ${near.join(' · ')}`],
+        pick: pt && str('i') ? { key: `buringh:${str('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
+        link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.17026/dans-xzy-u62q', label: 'Dataset ↗' }, source: credit('buringh'),
+        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “—” = below the dataset’s threshold.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
+      };
+    }
+    case 'hre-towns': {
+      const rule = (str('rl') ?? '').split(';').map((x) => x.split('|')).filter((x) => x.length === 3).map(([n, a, b]) => ({ n, a: +a, b: +b }));
+      const now = rule.find((r) => r.a <= year && year <= r.b);
+      const lines = [
+        num('f') !== undefined ? `${str('fb') === 'founded' ? 'Founded' : 'First written mention'}: ${yearLabel(num('f')!)}` : 'No first mention recorded',
+        num('ch') !== undefined ? `Town charter: ${yearLabel(num('ch')!)}${str('lf') ? ` (legal family ${str('lf')})` : ''}` : 'No formal town charter recorded',
+        ...(num('m') !== undefined ? [`First market grant: ${yearLabel(num('m')!)}${str('mt') ? ` — ${str('mt')}` : ''}`] : []),
+        now ? `Ruled in ${yearLabel(year)} by: ${now.n} (${now.a}–${now.b})` : rule.length ? `Ruling territory recorded from ${rule[0].a}` : 'No ruling territory recorded',
+      ];
+      if (str('a')) lines.push(`Called “${str('a')}” in the Deutsches Städtebuch`);
+      return {
+        title: str('n') ?? 'Town', lines,
+        pick: pt ? { key: `hre:${str('i') ?? num('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
+        link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.7910/DVN/ZGSJED', label: 'Dataset ↗' },
+        source: credit('hre'),
+        caution: year < 1300 ? 'Rulers are recorded year by year from 1300; the dataset’s authors consider earlier records less complete.' : 'Territories are recorded as ruling lineages, as the dataset does (e.g. a Wittelsbach line rather than “Bavaria”).',
+      };
+    }
+    case 'private-sites': {
+      const f = num('f');
+      const ef = num('ef'), et = num('et');
+      const when = f !== undefined ? `${str('fb') === 'founded' ? 'Built' : 'First recorded'}: ${yearLabel(f)}${num('t') !== undefined ? ` · end: ${yearLabel(num('t')!)}` : ''}`
+        : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}`
+        : ef !== undefined || et !== undefined ? `Dated only by ${str('per') ?? 'an evidence period'}: ${ef !== undefined ? yearLabel(ef) : '…'}–${et !== undefined ? yearLabel(et) : '…'}`
+        : 'No date recorded';
+      const key = str('i');
+      return {
+        title: str('n') ?? 'Place', lines: [str('k') ?? '', when, ...(str('dt') ? [`Dating in the source: ${str('dt')}`] : []), ...(str('ty') ? [str('ty')!] : []), ...(num('u') ? ['Location approximate (placed at its commune or parish)'] : [])].filter(Boolean),
+        pick: pt && key?.includes(':') ? { key, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
+        source: privateHeader()?.datasets.find((d) => d.id === str('src'))?.name ?? credit('localonly'),
+        caution: 'From your private data file: used privately in Shelf, not published.' + (ef !== undefined && f === undefined ? ' Shown for the whole period the record is dated to — that is when evidence places it, not its founding or end.' : ''),
+      };
+    }
+    case 'gs-dioceses':
+      return { title: `Diocese of ${str('n') ?? '?'}`, lines: ['Holy Roman Empire'], source: credit('germaniasacra'), caution: 'Germania Sacra’s reconstruction for no single stated date; borders changed over the centuries.' };
+    case 'hced-battles': {
+      const y = num('y');
+      return {
+        title: str('n') ?? 'Battle', lines: [`${str('k') ?? 'battle'}${y !== undefined ? ` · ${yearLabel(y)}` : ''}`, ...(str('w') ? [`War: ${str('w')}`] : []), ...(str('win') ? [`Winner: ${str('win')}${str('los') ? ` · loser: ${str('los')}` : ''}`] : [])],
+        link: { href: 'https://doi.org/10.7910/DVN/6ZFC0V', label: 'Dataset ↗' }, source: credit('hced'),
+        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors; Wikidata has no record of it.',
+      };
+    }
     case 'thurayya-places':
       return { title: str('n') ?? 'Place', lines: [`${str('k') ?? ''}${str('rg') ? ` · ${str('rg')}` : ''}`, 'Period: 9th–10th c. (the atlas it comes from)'], pick: pickOf('althurayya'), source: credit('althurayya'), caution: 'Georeferenced from G. Cornu’s atlas; the date is the atlas’s period, not this place’s.' };
     case 'thurayya-routes':
@@ -642,6 +760,48 @@ function FeatureCard({ info, onClose, onHistory, onEvent }: { info: Info; onClos
         <span dangerouslySetInnerHTML={{ __html: `Source: ${info.source}` }} />
       </div>
     </div>
+  );
+}
+
+/**
+ * The owner's private data file: datasets used privately in Shelf but not published (see privateData.ts).
+ * Loading it stores it on this device; the page then reloads so every layer and lookup picks it up.
+ */
+function PrivateDataControl() {
+  const [header, setHeader] = useState(privateHeader());
+  const [busy, setBusy] = useState<string>();
+  useEffect(() => { loadPrivateData().then(setHeader); }, []);
+  const load = async (list: FileList | null) => {
+    if (!list?.length) return;
+    setBusy('Loading…');
+    try {
+      // The file may come in parts (…part1.pack, …part2.pack): they are joined in name order.
+      const files = [...list].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+      await installPrivateData(files.length === 1 ? files[0] : new Blob(files));
+      location.reload();
+    } catch (e) {
+      setBusy(e instanceof Error ? e.message : 'Could not read that file.');
+    }
+  };
+  return (
+    <details className="hmap-sources">
+      <summary>Your private data {header ? `· ${header.datasets.length} datasets on this device` : '· not loaded'}</summary>
+      <p className="tiny">
+        Some historical datasets can be used privately but not republished on a public website. They come in a separate
+        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Load the file “shelf-private-data.pack” — or, if it came in parts, select all the parts together.'}
+      </p>
+      {header && (
+        <ul>
+          {header.datasets.map((d) => <li key={d.id}>{d.name}: {d.records.toLocaleString()} records ({d.licence})</li>)}
+        </ul>
+      )}
+      <label className="btn xs">
+        {header ? 'Replace with a newer file' : 'Load private data file'}
+        <input type="file" accept=".pack,application/octet-stream" multiple hidden onChange={(e) => load(e.target.files)} />
+      </label>
+      {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
+      {busy && <p className="tiny">{busy}</p>}
+    </details>
   );
 }
 

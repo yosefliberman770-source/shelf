@@ -196,3 +196,37 @@ in a Byzantine-set book —
 
 - **Final test count**: 230 passed across the suite (69 passed in `geography.test.ts`), 0 failing.
 - **Production build** (`SHELF_BASE=/shelf/ npx vite build`, with `tsc -b`): succeeds.
+
+## 5. Medieval Europe beyond England (2026-09-30)
+
+| # | Problem | How it showed | Fix |
+| --- | --- | --- | --- |
+| R22 | **Medieval data only for England and the Hanseatic north.** Outside Viabundus's area (1350–1650) and the England-only layers, the map had no dated medieval settlements, no castles, no religious houses and no town sizes; Pleiades's late-antique tail was the only settlement evidence for France, Italy, Iberia and the Balkans. | Empty medieval maps of France, Italy, Iberia, Hungary, the Balkans | Europe-wide layers from Wikidata (CC0), Germania Sacra (CC BY-SA), Buringh towns (CC0) and HCED battles (CC0) — see MEDIEVAL_EUROPE_DATA_AUDIT.md |
+| R23 | **No importance signal for medieval towns except documentation.** | Small and large towns drawn alike | Buringh's estimated population per century sizes towns; sitelinks are never used as importance |
+| R24 | **Source errors passed through.** Some Buringh coordinates lost their decimal point or are hundreds of km off. | Riga in the Baltic Sea, Minsk in Russia | Repaired only when an independent record (a same-named Wikidata town) confirms it; otherwise the town is left off and listed |
+| R25 | **Borrowed titles counted as a dataset's own name.** Once Buringh towns carried Wikidata's English name, "Rome" became the only *titled* match and hid the Mecklenburg village. | Rome chosen without asking when the book's date and place were unknown | A title the build borrowed is indexed as an alternative name; a record with its own dates leads its group |
+
+Verification: 268 tests pass (38 in `src/atlas/medieval-europe.test.ts`, across eight European regions); map
+checks at 3000 BCE, 430 BCE Greece, 117 Rome, 883 Europe, 1100 France and Rus', 1300 central Europe, Balkans,
+Scandinavia, Wales and the Rhine, 1450 Iberia and Italy, 1850 Europe. Production build succeeds.
+
+
+### Second pass (2026-10-01): errors in the first pass's own imports
+
+| # | Problem | How it showed | Fix |
+| --- | --- | --- | --- |
+| R26 | **A first mention read as a start.** A place first recorded in 1100 was "later" (did not exist yet) at any earlier date, exactly like a founding. | Towns and villages missing, or ranked below rivals, before their first charter | A start has a kind: only an explicit founding or construction date says "did not exist before". Before a first mention, attestation or evidence period, a place is *unattested*: hidden by default and hollow when the reader asks for unevidenced records. In lookups it ranks below attested rivals but is never called absent. |
+| R27 | **Names outside Latin script dropped.** The first pass kept only English or Latin-script labels. 1,252 sites with only Cyrillic, Greek or Georgian labels were discarded. | Balkan, Ukrainian, Greek and Georgian sites missing | The hierarchy is English → Latin-script label → romanization by a named standard → the original script. No label is ever discarded, and the popup names the scheme. |
+| R28 | **Wikidata class matches taken at face value.** Titular sees and post-1650 dioceses counted as medieval. Czech cadastral units counted as settlements. Châteaux counted as castles. | Dioceses at ancient sites that were never medieval sees; Czechia looking better covered than France | Starts after 1650 dropped (3,791). Measured and documented per kind (`import-audit.json`). Settlement inceptions are never treated as foundings. The documentation bias is stated in the coverage matrices. |
+| R29 | **A source error treated as isolated.** Buringh positions were repaired case by case. | Minsk, Riga, Coutances | Measured across all towns: about 7% had a bad position. Every town is checked against Wikidata by rule; each change is stated with its distance; unconfirmable towns are dropped and listed. |
+| R30 | **A licence claim without evidence.** The first pass recorded Denmark's register as "CC0 as stated on the download page". The page states no licence. | — | Licences are recorded as confirmed, not verified, explicit restriction, or per source. A missing licence is "not verified", never "private use only", and the data stays local-only. |
+| R31 | **An end date read as "existed since always".** 583 Wikidata sites record only an end (a dissolution or a destruction). The map treated the open start as unbounded. | Castel Paterno ("ended 1600") drawn at 3000 BCE | Before its end, such a record is unevidenced, like an undated one. The map and the place lookup share the rule. |
+| R32 | **The latest of several start dates used.** The Empire's town data sometimes dates a charter or foundation before the "first mention"; "Middle Ages" is coded as 1500 at the latest. | Eisenach drawn only from 1500 though chartered by 1080 | A town starts at its earliest dated evidence of any kind, with that evidence named. Tested for all 2,390 towns. |
+
+| R33 | **"Local builds only" meant "never on the owner's phone".** Data kept out of the public repository was switched on by a build flag (`VITE_SHELF_LOCAL_DATA=1`), but the phone loads the public GitHub Pages build — so TIB Byzantium, the English markets, Poland c. 1580 and the Atlas of Rural Settlement never reached the app that is actually used. The first two passes also treated "no licence to republish" as a reason not to acquire data at all, as if Shelf were a data-distribution project. | Private datasets invisible in the app; Hungary, Romania, Scandinavia and France left thinner than the obtainable data allowed | A private data pack: one file (`shelf-private-data.pack`, built by `scripts/atlas-build/private_pack.py`, git-ignored) that the owner loads on the device ("Your private data" under the map). It is stored in the browser and read in slices — tiles by byte range, place records per map cell and name shard, merged with the public ones. Layers switch on when the pack holds their tiles; nothing depends on a build flag. Recovery pass: RAN (Romania), DicoTopo (France), EBIDAT (castles), Danish, Swedish and Norwegian registers, DARMC, Nordic Spatial Humanities. |
+| R34 | **Year-dependent paint frozen at the first year.** When the year changed, the map updated each layer's filter but not its paint, so the "dated here vs. only by an evidence period / not yet recorded" styling kept the year the layer was created with. | Dated castles and monasteries drawn hollow (as if undated) after moving the timeline | The layer sync re-applies every paint property whose value changed, alongside the filter. |
+
+Verification: 286 tests pass. Map checks at 3000 BCE, 117, 500, 700, 883, 1000, 1100, 1200, 1300, 1400, 1500
+and 1850 across eleven regions at zoom 6, plus zoom 9 at Nuremberg, Lyon, Sofia and Buda, each view read
+twice (the first reading after a jump can show the previous view). Production build succeeds, and local-only
+tiles are absent from it.

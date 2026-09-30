@@ -1,0 +1,666 @@
+[
+{
+"section": null,
+"candidate": "World Historical Gazetteer (WHG)"
+},
+{
+"section": null,
+"candidate": "Cliopatria"
+},
+{
+"section": null,
+"candidate": "Pelagios / Linked Places"
+},
+{
+"section": null,
+"candidate": "DARE"
+},
+{
+"section": null,
+"candidate": "DARMC"
+},
+{
+"section": null,
+"candidate": "PastPlace"
+},
+{
+"section": null,
+"candidate": "GeoNames"
+},
+{
+"section": null,
+"candidate": "Wikidata"
+},
+{
+"section": null,
+"candidate": "Getty Thesaurus of Geographic Names (TGN)"
+},
+{
+"section": null,
+"candidate": "OpenHistoricalMap"
+},
+{
+"section": null,
+"candidate": "PeriodO"
+},
+{
+"section": null,
+"candidate": "Europeana"
+},
+{
+"section": null,
+"candidate": "ARIADNEplus"
+},
+{
+"section": null,
+"candidate": "ADS"
+},
+{
+"section": null,
+"candidate": "iDAI.gazetteer"
+},
+{
+"section": null,
+"candidate": "iDAI.objects"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Pleiades"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Itiner-e"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "al-Ṯurayyā"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Nomisma"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "ToposText"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Trismegistos Places"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Trismegistos Texts"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Vici.org"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "EDH"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "EDCS"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "EDR"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "EAGLE"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "ORBIS"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "AWMC"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "AWMC/Pleiades GIS resources"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Pelagios Digital Map of the Roman Empire"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Roman Roads Research Association resources"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Roman Roads in Britain"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Tabula Peutingeriana digital projects"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "ancient itinerary datasets / OmnesViae"
+},
+{
+"section": "Ancient / Roman / Late Antique",
+"candidate": "Barrington Atlas-derived digital resources where legally and technically usable"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Viabundus"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "GB1900"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Key to English Place-Names"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "PASE"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Domesday geographical resources"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Domesday shires/hundreds"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Beyond the Tribal Hidage"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Mapping Medieval Countryside / IPM"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Mapping Medieval Townscapes"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Whittlewood"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Atlas of Rural Settlement"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Where Power Lies"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Medieval Settlement Research Group resources"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "English Medieval Towns resources"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Historic Towns Atlas resources"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Gough Map GIS"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Inland Navigation in England/Wales before 1348"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Bridges of Medieval England to c.1250"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Historic England datasets"
+},
+{
+"section": "Medieval England / Britain",
+"candidate": "Living with Machines datasets"
+},
+{
+"section": "France",
+"candidate": "French historical gazetteers"
+},
+{
+"section": "France",
+"candidate": "medieval French settlement datasets"
+},
+{
+"section": "France",
+"candidate": "Cassini-derived historical geography where appropriate"
+},
+{
+"section": "France",
+"candidate": "medieval French administrative boundaries"
+},
+{
+"section": "France",
+"candidate": "French historical town/city datasets"
+},
+{
+"section": "France",
+"candidate": "diocesan and ecclesiastical geography"
+},
+{
+"section": "France",
+"candidate": "castles and fortifications"
+},
+{
+"section": "France",
+"candidate": "medieval roads and routes"
+},
+{
+"section": "France",
+"candidate": "French archaeological gazetteers"
+},
+{
+"section": "France",
+"candidate": "French historic maps with usable GIS/georeferencing"
+},
+{
+"section": "France",
+"candidate": "regional medieval settlement datasets"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "German historical gazetteers"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "medieval German settlement datasets"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "historical Ortsnamen/place-name datasets"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "medieval HRE political boundaries"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "duchies, counties, bishoprics, prince-bishoprics"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "German medieval town datasets"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "castles and fortifications"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "medieval roads"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "monasteries and ecclesiastical institutions"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "German historical atlases"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "Austrian historical GIS"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "Swiss historical GIS"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "Bohemian/Czech historical geography"
+},
+{
+"section": "Holy Roman Empire / Germany / Central Europe",
+"candidate": "medieval imperial cities and territories"
+},
+{
+"section": "Italy",
+"candidate": "medieval Italian city datasets"
+},
+{
+"section": "Italy",
+"candidate": "comuni/communes"
+},
+{
+"section": "Italy",
+"candidate": "city-state geography"
+},
+{
+"section": "Italy",
+"candidate": "Papal States"
+},
+{
+"section": "Italy",
+"candidate": "Lombard/Frankish/Norman/Sicilian political geography"
+},
+{
+"section": "Italy",
+"candidate": "medieval Italian roads"
+},
+{
+"section": "Italy",
+"candidate": "castles"
+},
+{
+"section": "Italy",
+"candidate": "monasteries"
+},
+{
+"section": "Italy",
+"candidate": "dioceses"
+},
+{
+"section": "Italy",
+"candidate": "ports"
+},
+{
+"section": "Italy",
+"candidate": "historic towns"
+},
+{
+"section": "Italy",
+"candidate": "archaeological gazetteers"
+},
+{
+"section": "Italy",
+"candidate": "Italian historical atlases"
+},
+{
+"section": "Italy",
+"candidate": "regional historical GIS"
+},
+{
+"section": "Iberia",
+"candidate": "Castile"
+},
+{
+"section": "Iberia",
+"candidate": "León"
+},
+{
+"section": "Iberia",
+"candidate": "Aragón"
+},
+{
+"section": "Iberia",
+"candidate": "Navarre"
+},
+{
+"section": "Iberia",
+"candidate": "Catalonia"
+},
+{
+"section": "Iberia",
+"candidate": "Portugal"
+},
+{
+"section": "Iberia",
+"candidate": "Galicia"
+},
+{
+"section": "Iberia",
+"candidate": "Andalusia"
+},
+{
+"section": "Iberia",
+"candidate": "medieval Islamic Iberia"
+},
+{
+"section": "Iberia",
+"candidate": "taifa geography"
+},
+{
+"section": "Iberia",
+"candidate": "Christian kingdoms"
+},
+{
+"section": "Iberia",
+"candidate": "counties"
+},
+{
+"section": "Iberia",
+"candidate": "marches"
+},
+{
+"section": "Iberia",
+"candidate": "medieval cities"
+},
+{
+"section": "Iberia",
+"candidate": "castles"
+},
+{
+"section": "Iberia",
+"candidate": "fortifications"
+},
+{
+"section": "Iberia",
+"candidate": "roads"
+},
+{
+"section": "Iberia",
+"candidate": "pilgrimage routes"
+},
+{
+"section": "Iberia",
+"candidate": "monasteries"
+},
+{
+"section": "Iberia",
+"candidate": "dioceses"
+},
+{
+"section": "Iberia",
+"candidate": "historical gazetteers"
+},
+{
+"section": "Iberia",
+"candidate": "archaeological datasets"
+},
+{
+"section": "Iberia",
+"candidate": "Spanish and Portuguese historical GIS"
+},
+{
+"section": "Scandinavia",
+"candidate": "Denmark"
+},
+{
+"section": "Scandinavia",
+"candidate": "Norway"
+},
+{
+"section": "Scandinavia",
+"candidate": "Sweden"
+},
+{
+"section": "Scandinavia",
+"candidate": "Finland"
+},
+{
+"section": "Scandinavia",
+"candidate": "Iceland"
+},
+{
+"section": "Scandinavia",
+"candidate": "medieval settlements"
+},
+{
+"section": "Scandinavia",
+"candidate": "medieval administrative divisions"
+},
+{
+"section": "Scandinavia",
+"candidate": "Scandinavian historical gazetteers"
+},
+{
+"section": "Scandinavia",
+"candidate": "Old Norse place-name resources"
+},
+{
+"section": "Scandinavia",
+"candidate": "medieval churches"
+},
+{
+"section": "Scandinavia",
+"candidate": "monasteries"
+},
+{
+"section": "Scandinavia",
+"candidate": "royal sites"
+},
+{
+"section": "Scandinavia",
+"candidate": "Viking/medieval routes"
+},
+{
+"section": "Scandinavia",
+"candidate": "ports"
+},
+{
+"section": "Scandinavia",
+"candidate": "archaeological settlement datasets"
+},
+{
+"section": "Scandinavia",
+"candidate": "historical maps"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Poland"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Czechia/Bohemia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Hungary"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Slovakia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Croatia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Serbia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Bosnia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Bulgaria"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Romania"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Wallachia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Moldavia"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Byzantine territories"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Greece"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Ukraine"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Belarus"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "Baltic regions"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "historical Rus' territories"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "medieval settlements"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "historical gazetteers"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "political boundaries"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "administrative divisions"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "castles"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "fortifications"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "monasteries"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "churches"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "roads"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "trade routes"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "archaeological sites"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "historical maps"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "medieval towns"
+},
+{
+"section": "Eastern Europe / Balkans",
+"candidate": "historical place-name datasets"
+}
+]

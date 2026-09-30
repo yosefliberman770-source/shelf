@@ -1,0 +1,41 @@
+LICENSE
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+Dataset
+Toponymic Data for Western Bohemia up to AD 1500
+Version
+1.0.0
+Copyright
+© 2026 Viktorie Janovská
+
+Licence
+This dataset is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+You are free to:
+* Share — copy and redistribute the material in any medium or format.
+* Adapt — remix, transform, and build upon the material for any purpose, including commercial use.
+The licensor cannot revoke these freedoms provided that you comply with the licence terms.
+
+Attribution
+When using this dataset, users must:
+* give appropriate credit to the creator;
+* provide a link to the licence;
+* indicate whether changes were made;
+* not imply endorsement by the original author.
+A recommended citation is provided in CITATION.cff and in the Zenodo metadata.
+
+Third-Party Sources
+The dataset incorporates information derived from published scholarly literature, including historical place-name lexica and related academic works.
+The published dataset represents a scholarly enriched derivative dataset. Original bibliographic sources remain subject to their respective copyrights and should be cited where appropriate.
+Users are responsible for ensuring that reuse of any cited primary sources complies with applicable copyright legislation.
+
+Disclaimer
+The dataset is provided “as is”, without warranty of any kind, either express or implied.
+The author makes no representations regarding the completeness, accuracy or fitness of the dataset for any particular purpose and accepts no liability for damages resulting from its use.
+
+Licence URI
+https://creativecommons.org/licenses/by/4.0/
+
+Contact
+Author: Viktorie Janovská
+Affiliation: Department of Archaeology, Charles University
+ORCID: 0000-0002-0454-4684
+E-mail: viktorie.janovska@ff.cuni.cz

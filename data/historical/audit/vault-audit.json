@@ -1,0 +1,632 @@
+{
+ "al-thurayya": {
+  "filesRecorded": 10,
+  "filesPresent": 10,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/world.py",
+  "placeIndexRows": 2518,
+  "tiles": [
+   "thurayya-places.pmtiles",
+   "thurayya-routes.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "atlas-fontium-poland": {
+  "filesRecorded": 11,
+  "filesPresent": 11,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py, sites.py \u2192 private data pack",
+  "placeIndexRows": 26204,
+  "tiles": [
+   "private-sites.pmtiles",
+   "private-lines.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "atlas-rural-settlement": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/england.py \u2192 private data pack",
+  "placeIndexRows": 0,
+  "tiles": [
+   "rural-settlement.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "buringh-urban": {
+  "filesRecorded": 3,
+  "filesPresent": 3,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/sites.py",
+  "placeIndexRows": 2237,
+  "tiles": [
+   "towns.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "cshapes": {
+  "filesRecorded": 7,
+  "filesPresent": 7,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "darmc": {
+  "filesRecorded": 4,
+  "filesPresent": 4,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 843,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "dicotopo": {
+  "filesRecorded": 53,
+  "filesPresent": 53,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 29140,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "dk-fund-og-fortidsminder": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 10772,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "domesday": {
+  "filesRecorded": 4,
+  "filesPresent": 4,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/england.py",
+  "placeIndexRows": 0,
+  "tiles": [
+   "domesday.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "ebidat": {
+  "filesRecorded": 12,
+  "filesPresent": 12,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 8263,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "engel-hungary": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "finland-heritage": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 1823,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "gb1900": {
+  "filesRecorded": 0,
+  "filesPresent": 0,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": false,
+  "sourceMd": true,
+  "licenseMd": false,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "metadata only"
+ },
+ "germania-sacra": {
+  "filesRecorded": 3,
+  "filesPresent": 3,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/sites.py",
+  "placeIndexRows": 2502,
+  "tiles": [
+   "medieval-sites.pmtiles",
+   "gs-dioceses.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "gough-map": {
+  "filesRecorded": 4,
+  "filesPresent": 4,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/england.py",
+  "placeIndexRows": 0,
+  "tiles": [
+   "gough.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "hced": {
+  "filesRecorded": 2,
+  "filesPresent": 2,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/sites.py \u2192 public/atlas/hced-battles.json",
+  "placeIndexRows": 0,
+  "tiles": [
+   "atlas/hced-battles.json"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "historic-england": {
+  "filesRecorded": 7,
+  "filesPresent": 7,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "inland-navigation": {
+  "filesRecorded": 5,
+  "filesPresent": 5,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/england.py",
+  "placeIndexRows": 0,
+  "tiles": [
+   "navigation.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "itinere": {
+  "filesRecorded": 12,
+  "filesPresent": 12,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/world.py",
+  "placeIndexRows": 0,
+  "tiles": [
+   "itinere.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "kepn": {
+  "filesRecorded": 0,
+  "filesPresent": 0,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": false,
+  "sourceMd": true,
+  "licenseMd": false,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "metadata only"
+ },
+ "living-with-machines": {
+  "filesRecorded": 11,
+  "filesPresent": 11,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "markets-fairs": {
+  "filesRecorded": 3,
+  "filesPresent": 3,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 2371,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "medieval-bridges": {
+  "filesRecorded": 3,
+  "filesPresent": 3,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 258,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "merimee": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 9875,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "nordic-spatial-humanities": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 764,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "norway-kulturminner": {
+  "filesRecorded": 5,
+  "filesPresent": 5,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 8941,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "pase": {
+  "filesRecorded": 0,
+  "filesPresent": 0,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": false,
+  "sourceMd": true,
+  "licenseMd": false,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "metadata only"
+ },
+ "periodo": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "pleiades": {
+  "filesRecorded": 7,
+  "filesPresent": 7,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/build.py, world.py",
+  "placeIndexRows": 34458,
+  "tiles": [
+   "pleiades.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "princes-townspeople": {
+  "filesRecorded": 18,
+  "filesPresent": 18,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 2390,
+  "tiles": [
+   "hre-towns.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "ran-romania": {
+  "filesRecorded": 89,
+  "filesPresent": 89,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 2865,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "scowl": {
+  "filesRecorded": 0,
+  "filesPresent": 0,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": false,
+  "sourceMd": false,
+  "licenseMd": false,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "metadata only"
+ },
+ "sweden-lamningar": {
+  "filesRecorded": 1,
+  "filesPresent": 1,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 5300,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "tib-maps-of-power": {
+  "filesRecorded": 56,
+  "filesPresent": 56,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": true,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py \u2192 private data pack",
+  "placeIndexRows": 2809,
+  "tiles": [
+   "private-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated (private data pack)"
+ },
+ "tribal-hidage": {
+  "filesRecorded": 5,
+  "filesPresent": 5,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": null,
+  "placeIndexRows": 0,
+  "tiles": [],
+  "layerInCatalog": false,
+  "status": "raw only"
+ },
+ "viabundus": {
+  "filesRecorded": 21,
+  "filesPresent": 21,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/world.py",
+  "placeIndexRows": 7488,
+  "tiles": [
+   "viabundus-nodes.pmtiles",
+   "viabundus-edges.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "western-bohemia-toponyms": {
+  "filesRecorded": 5,
+  "filesPresent": 5,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/regional.py",
+  "placeIndexRows": 839,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ },
+ "wikidata-medieval": {
+  "filesRecorded": 26,
+  "filesPresent": 26,
+  "checksumMismatch": [],
+  "allHaveUrlDateSha": true,
+  "sourceMd": true,
+  "licenseMd": true,
+  "localOnly": false,
+  "localFilesInGit": [],
+  "processedBy": "atlas-build/sites.py",
+  "placeIndexRows": 77836,
+  "tiles": [
+   "medieval-sites.pmtiles"
+  ],
+  "layerInCatalog": true,
+  "status": "integrated"
+ }
+}

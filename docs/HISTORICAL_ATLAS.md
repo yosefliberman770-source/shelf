@@ -56,13 +56,45 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Ancient World Mapping Center](https://awmc.unc.edu/) geodata | ODbL |
 | [Cliopatria](https://github.com/Seshat-Global-History-Databank/cliopatria) (Seshat) | CC BY 4.0 |
 | Coastlines and water: [OpenStreetMap](https://www.openstreetmap.org/copyright) via [OpenFreeMap](https://openfreemap.org) / OpenMapTiles (live tiles, water shapes only; no key) | ODbL |
-| [Wikidata](https://www.wikidata.org/) | CC0 |
+| [Wikidata](https://www.wikidata.org/) (events; medieval sites snapshot) | CC0 |
+| [Germania Sacra](https://klosterdatenbank.germania-sacra.de/), Klöster und Stifte des Alten Reiches (monastery and diocese tiles are shared under the same licence) | CC BY-SA 3.0 |
+| [Buringh, European urban population 700–2000](https://doi.org/10.17026/dans-xzy-u62q) (DANS) | CC0 |
+| [Historical Conflict Event Dataset](https://doi.org/10.7910/DVN/6ZFC0V) (Miller et al. 2022) | CC0 |
 | [Natural Earth](https://www.naturalearthdata.com/) | Public domain |
 | [OpenHistoricalMap](https://www.openhistoricalmap.org/) (tiles and fonts) | CC0 |
 | [Terrain Tiles](https://github.com/tilezen/joerd/blob/master/docs/attribution.md) | Various; see the linked page |
 | [Domesday Shires and Hundreds](https://doi.org/10.5284/1058999), [Gough Map GIS](https://doi.org/10.5284/1124312), [Inland Navigation GIS](https://doi.org/10.5284/1057497) (ADS) | CC BY 4.0 |
 | [Atlas of Rural Settlement in England GIS](https://doi.org/10.5284/1031493) | © English Heritage; personal and business use — not republished |
+| [Princes and Townspeople](https://doi.org/10.7910/DVN/ZGSJED) (towns of the Empire: charters, first mentions, markets, ruling territories) | CC0 |
+| [Mérimée](https://www.data.gouv.fr/) (French protected medieval monuments) | Licence Ouverte 2.0 |
+| Museovirasto spatial data (Finnish register, medieval classes) | CC BY 4.0 |
+| [Toponymic Data for Western Bohemia up to AD 1500](https://doi.org/10.5281/zenodo.21479034) | CC BY 4.0 |
+| [Bridges of Medieval England to c.1250](https://doi.org/10.5284/1053676) (ADS) | CC BY 4.0 |
 | [World Historical Gazetteer](https://whgazetteer.org/) (queried, not downloaded) | Index CC BY-NC 4.0; each source its own licence |
+
+| [Norwegian heritage register](https://kulturminnesok.no/) (Riksantikvaren, via Geonorge) | NLOD |
+| [Nordic Spatial Humanities](https://doi.org/10.5281/zenodo.14871254) (Nordic saints' cult places, Icelandic Saga Map) | CC BY 4.0 |
+
+**Your private data file.** Some datasets may be used privately but not
+republished: either no licence to republish is stated, or the terms forbid it.
+They are built into one file, `shelf-private-data.pack`
+(`scripts/atlas-build/private_pack.py`). The owner loads it under the map
+("Your private data"). It stays on that device, and it is never in this
+repository or on the website.
+
+It holds:
+- TIB *Maps of Power* (ÖAW)
+- Letters, *Markets and Fairs to 1516*
+- Atlas Fontium, Poland c. 1580 (IH PAN)
+- RAN, Romania's archaeological register (CIMEC)
+- DicoTopo (CTHS, CC BY-NC-ND)
+- EBIDAT castles
+- Denmark's Fund og Fortidsminder
+- Sweden's register of ancient remains
+- DARMC (shipwrecks, Carolingian hoards)
+- the Atlas of Rural Settlement (personal and business use only)
+
+Layers that need it say so, and switch on once it is loaded.
 
 Attribution for datasets appears in three places:
 

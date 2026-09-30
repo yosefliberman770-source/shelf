@@ -478,5 +478,295 @@
     "manual": true
    }
   ]
+ },
+ {
+  "id": "germania-sacra",
+  "files": [
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/locations/geojson",
+    "path": "original/monasteries-locations.geojson"
+   },
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/list",
+    "path": "original/monasteries-list.json"
+   },
+   {
+    "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
+    "path": "original/diocese-borders.geojson"
+   }
+  ]
+ },
+ {
+  "id": "buringh-urban",
+  "files": [
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20415",
+    "path": "original/European urban population, 700 - 2000.tab"
+   },
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20414",
+    "path": "original/European urban population, 700 - 2000 - Annex A.pdf"
+   },
+   {
+    "url": "https://ssh.datastations.nl/api/access/datafile/20413",
+    "path": "original/European urban population, 700 - 2000 - Annex B.pdf"
+   }
+  ]
+ },
+ {
+  "id": "hced",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
+    "path": "original/HCED Data v3.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/6909628",
+    "path": "original/HCED explainer.txt"
+   }
+  ]
+ },
+ {
+  "id": "periodo",
+  "files": [
+   {
+    "url": "https://data.perio.do/d.json",
+    "path": "original/periodo-dataset.json"
+   }
+  ]
+ },
+ {
+  "id": "princes-townspeople",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/5588458",
+    "path": "original/city_locations.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/4099960",
+    "path": "original/city_borders_2019.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/5588457",
+    "path": "original/city_documentation.pdf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047016",
+    "path": "original/cities_polities.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047015",
+    "path": "original/cities_dynasties.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047017",
+    "path": "original/territories_all.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/4099956",
+    "path": "original/territory_codes.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806256",
+    "path": "original/territory_blueprints.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047031",
+    "path": "original/territory_documentation.pdf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806261",
+    "path": "original/towncharter.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806259",
+    "path": "original/legal_families.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806260",
+    "path": "original/towncharter_documentation.pdf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806263",
+    "path": "original/markets.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3806264",
+    "path": "original/markets_documentation.pdf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047022",
+    "path": "original/construction.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10047032",
+    "path": "original/construction_documentation.pdf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/5588455",
+    "path": "original/conflict_incidents.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/5588456",
+    "path": "original/conflict_incidents_documentation.pdf"
+   }
+  ]
+ },
+ {
+  "id": "merimee",
+  "files": [
+   {
+    "url": "https://ministere-culture.s3.sbg.io.cloud.ovh.net/POP/merimee.csv",
+    "path": "original/merimee.csv"
+   }
+  ]
+ },
+ {
+  "id": "finland-heritage",
+  "files": [
+   {
+    "url": "https://mverkkodatashare.blob.core.windows.net/share/tutkija.zip",
+    "path": "original/tutkija.zip"
+   }
+  ]
+ },
+ {
+  "id": "markets-fairs",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://sas-space.sas.ac.uk/106/3/MFEngland.txt",
+    "path": "original/MFEngland.txt"
+   },
+   {
+    "url": "https://sas-space.sas.ac.uk/106/4/MFWales.txt",
+    "path": "original/MFWales.txt"
+   },
+   {
+    "url": "https://sas-space.sas.ac.uk/106/2/Markets%20and%20Fairs%2013C%20guide.DOC",
+    "path": "original/Markets and Fairs 13C guide.DOC"
+   }
+  ]
+ },
+ {
+  "id": "western-bohemia-toponyms",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",
+    "path": "original/DATASET_Western_Bohemia_place_names.csv"
+   },
+   {
+    "url": "https://zenodo.org/records/21479034/files/Western_Bohemia_place_names_key.csv?download=1",
+    "path": "original/Western_Bohemia_place_names_key.csv"
+   },
+   {
+    "url": "https://zenodo.org/records/21479034/files/README.md?download=1",
+    "path": "original/README.md"
+   },
+   {
+    "url": "https://zenodo.org/records/21479034/files/Data_Dictionary.csv?download=1",
+    "path": "original/Data_Dictionary.csv"
+   },
+   {
+    "url": "https://zenodo.org/records/21479034/files/License%20for%20Dataset.txt?download=1",
+    "path": "original/License for Dataset.txt"
+   }
+  ]
+ },
+ {
+  "id": "tib-maps-of-power",
+  "local_only": true,
+  "files": [],
+  "note": "Fetched page by page by scripts/historical-data/openatlas_snapshot.py"
+ },
+ {
+  "id": "dk-fund-og-fortidsminder",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
+    "path": "original/FF.zip"
+   }
+  ]
+ },
+ {
+  "id": "atlas-fontium-poland",
+  "local_only": true,
+  "files": [],
+  "note": "WFS GetFeature (GeoJSON, EPSG:4326) of the 16th-century layers of geonode.ontohgis.pl, 2026-09-30"
+ },
+ {
+  "id": "ran-romania",
+  "local_only": true,
+  "files": [],
+  "note": "Fetched by scripts/historical-data/ran_snapshot.py (register list pages + ArcGIS positions)"
+ },
+ {
+  "id": "dicotopo",
+  "local_only": true,
+  "files": [],
+  "note": "XML volumes copied from github.com/chartes/dico-topo (commit in original/COMMIT); INSEE positions from Wikidata via QLever (original/insee-coords.rq)"
+ },
+ {
+  "id": "darmc",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2446023",
+    "path": "original/shipwrecks-1-1500.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2452979",
+    "path": "original/carolingian-hoards-751-987.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2453917",
+    "path": "original/ancient-ports-harbours.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2457775",
+    "path": "original/anglo-saxon-rural-settlements.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "ebidat",
+  "local_only": true,
+  "files": [],
+  "note": "Fetched by scripts/historical-data/ebidat_snapshot.py"
+ },
+ {
+  "id": "sweden-lamningar",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://pub.raa.se/nedladdning/datauttag/lamningar_v1/l%c3%a4mningar_sverige.gpkg",
+    "path": "original/lamningar_sverige.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "engel-hungary",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
+    "path": "original/Engel2020.zip"
+   }
+  ]
+ },
+ {
+  "id": "norway-kulturminner",
+  "files": [],
+  "note": "Geonorge download order (whole country, GML, EPSG:4258) of dataset c72906a0-2bc2-41d7-bea2-c92d368e3c49; code lists from register.geonorge.no"
+ },
+ {
+  "id": "nordic-spatial-humanities",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
+    "path": "original/source-data.zip"
+   }
+  ]
  }
 ]
