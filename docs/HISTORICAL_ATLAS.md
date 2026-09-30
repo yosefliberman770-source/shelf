@@ -55,6 +55,7 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Pleiades](https://pleiades.stoa.org/) | CC BY 3.0 |
 | [Ancient World Mapping Center](https://awmc.unc.edu/) geodata | ODbL |
 | [Cliopatria](https://github.com/Seshat-Global-History-Databank/cliopatria) (Seshat) | CC BY 4.0 |
+| Coastlines and water: [OpenStreetMap](https://www.openstreetmap.org/copyright) via [OpenFreeMap](https://openfreemap.org) / OpenMapTiles (live tiles, water shapes only; no key) | ODbL |
 | [Wikidata](https://www.wikidata.org/) | CC0 |
 | [Natural Earth](https://www.naturalearthdata.com/) | Public domain |
 | [OpenHistoricalMap](https://www.openhistoricalmap.org/) (tiles and fonts) | CC0 |

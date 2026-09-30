@@ -27,6 +27,8 @@ let pmtilesReady = false;
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
+/** Detailed water from OpenStreetMap, kept just above the political layers. */
+const WATER = 'water-detail';
 
 /** WebGL is needed for the atlas; without it the reader falls back to the simple map. */
 export function webglAvailable(): boolean {
@@ -52,6 +54,9 @@ function baseStyle(base: string): StyleSpecification {
     glyphs: GLYPHS,
     sources: {
       'ne-land': { type: 'geojson', data: base + 'ne-land.json', attribution: credit('naturalearth') },
+      // Detailed coastlines and water (OpenStreetMap via OpenFreeMap: free, no key). Only the water shapes are
+      // used — no modern roads, places or labels. Offline, the coarse Natural Earth coast underneath remains.
+      ofm: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' },
       focus: { type: 'geojson', data: EMPTY },
       pins: { type: 'geojson', data: EMPTY },
       route: { type: 'geojson', data: EMPTY },
@@ -60,6 +65,9 @@ function baseStyle(base: string): StyleSpecification {
     layers: [
       { id: 'sea', type: 'background', paint: { 'background-color': '#cddde4' } },
       { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': '#efe7d4' } },
+      // Drawn above the reconstructed borders (moved into place in sync), so their simplified outlines don't
+      // spill into the sea and coastal places sit on the true coast.
+      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': '#cddde4' } },
       // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
       { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
       { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
@@ -229,6 +237,13 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
       const labelAfter = map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined && labelKey(managedDef(l.id)!) > rank)?.id ?? TOP;
       for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, spec.type === 'symbol' ? labelAfter : geomAfter);
       managed.current.set(def.id, specs.map((s) => s.id));
+    }
+    // Keep the detailed water just above the political layers (fills, outlines, shires) and below
+    // everything else — coasts, rivers, roads, places and all labels.
+    if (map.getLayer(WATER)) {
+      const isLabel = (id: string) => map.getLayer(id)?.type === 'symbol';
+      const firstAfterPolitics = DRAW_ORDER.slice(DRAW_ORDER.indexOf('rural-settlement') + 1).map((id) => managed.current.get(id)?.find((l) => !isLabel(l))).find(Boolean);
+      map.moveLayer(WATER, firstAfterPolitics ?? labelBandStart(map) ?? TOP);
     }
     // Borders come in time slices; load the slice that covers the year.
     if (map.getSource('cliopatria')) {
