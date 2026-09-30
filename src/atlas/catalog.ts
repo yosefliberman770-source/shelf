@@ -185,12 +185,51 @@ function ohmPlaces(id: string, types: string[], color: string, minzoom: number, 
   ];
 }
 
-function polityClass(id: string, match: ExpressionSpecification, color: string, ctx: LayerCtx): LayerSpecification[] {
-  const filter = ['all', match, existedIn(ctx.year)] as FilterSpecification;
+/**
+ * Political colours. Each polity has a fixed palette index from the build
+ * (by its Seshat/Wikidata identity, so a state keeps its colour through time),
+ * chosen so neighbours and overlapping polities differ. Colour identifies the
+ * polity; it does not encode its type (empire/kingdom/… are separate layers
+ * and are named in the legend and the details).
+ */
+export const POLITY_PALETTE = ['#c0392b', '#2e86c1', '#27ae60', '#8e44ad', '#d68910', '#16a085', '#a04000', '#2c3e50', '#c2185b', '#7d8c1f', '#5d6d7e', '#1f618d'];
+/** Darker text versions of the same colours, readable on the parchment base. */
+const POLITY_TEXT = ['#8e2419', '#1b5e89', '#1b7a43', '#5f2d77', '#8f5a05', '#0e6b59', '#6e2c00', '#1a252f', '#880e4f', '#556113', '#3d4955', '#123f5f'];
+const polityColour = (pal: string[]): ExpressionSpecification => ['match', ['%', ['coalesce', ['get', 'ci'], 0], pal.length], ...pal.slice(1).flatMap((c, i) => [i + 1, c]), pal[0]] as unknown as ExpressionSpecification;
+const isOutline: ExpressionSpecification = ['!=', ['geometry-type'], 'Point'];
+/** Label size by the polity's area: only large polities are named at world scale; small ones appear as you zoom in. */
+const areaLabelSize: ExpressionSpecification = ['step', ['zoom'],
+  ['case', ['>=', ['get', 'a'], 400000], 11, 0],
+  3, ['case', ['>=', ['get', 'a'], 120000], 12, 0],
+  4, ['case', ['>=', ['get', 'a'], 30000], 12, 0],
+  5, ['case', ['>=', ['get', 'a'], 8000], 13, 0],
+  6, ['case', ['>=', ['get', 'a'], 2000], 13, 0],
+  7, 13];
+
+function polityClass(id: string, match: ExpressionSpecification, _color: string, ctx: LayerCtx): LayerSpecification[] {
+  const alive = existedIn(ctx.year);
+  const area = ['all', match, alive, isOutline, ['!', ['has', 'lbl']]] as ExpressionSpecification;
+  // Members and independent polities are filled. A grouping (Cliopatria's
+  // parenthesised collections: an empire's provinces, a heptarchy, a
+  // personal union) is only outlined around its members — it isn't a rival.
+  const filled = ['all', area, ['!', ['has', 'g']]] as FilterSpecification;
+  const grouping = ['all', area, ['has', 'g']] as FilterSpecification;
+  const labels = ['all', match, alive, ['has', 'lbl']] as FilterSpecification;
+  // Contested outlines (overlapping another polity in the source) and small
+  // outlying pieces far from the main territory are drawn fainter and dashed.
+  const doubtful: ExpressionSpecification = ['any', ['has', 'x'], ['has', 'op']];
   return [
-    { id: `${id}-fill`, type: 'fill', source: 'cliopatria', filter, paint: { 'fill-color': color, 'fill-opacity': 0.13 } },
-    { id: `${id}-edge`, type: 'line', source: 'cliopatria', filter, paint: { 'line-color': color, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.6, 7, 1.6], 'line-opacity': 0.65, 'line-blur': 0.6 } },
-    { id: `${id}-label`, type: 'symbol', source: 'cliopatria', filter, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['interpolate', ['linear'], ['zoom'], 2, 10, 6, 14], 'text-transform': 'uppercase', 'text-letter-spacing': 0.08, 'text-max-width': 8, 'symbol-placement': 'point', 'text-optional': true }, paint: { 'text-color': color, 'text-opacity': 0.8, 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+    { id: `${id}-fill`, type: 'fill', source: 'cliopatria', filter: filled, paint: { 'fill-color': polityColour(POLITY_PALETTE), 'fill-opacity': ['case', ['has', 'op'], 0.07, ['has', 'x'], 0.1, 0.16] } },
+    { id: `${id}-edge`, type: 'line', source: 'cliopatria', filter: filled, paint: { 'line-color': polityColour(POLITY_PALETTE), 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.6, 7, 1.6], 'line-opacity': ['case', doubtful, 0.5, 0.7], 'line-blur': 0.6 } },
+    { id: `${id}-edge-doubt`, type: 'line', source: 'cliopatria', filter: ['all', filled, doubtful] as FilterSpecification, paint: { 'line-color': polityColour(POLITY_TEXT), 'line-width': 1, 'line-dasharray': [2, 2], 'line-opacity': 0.6 } },
+    { id: `${id}-group`, type: 'line', source: 'cliopatria', filter: grouping, paint: { 'line-color': polityColour(POLITY_TEXT), 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 1, 7, 2.2], 'line-dasharray': [4, 2], 'line-opacity': 0.55 } },
+    { id: `${id}-label`, type: 'symbol', source: 'cliopatria', filter: labels, layout: {
+      // Groupings are named without Cliopatria's parentheses, in italic, so they read as "a grouping", not a state.
+      'text-field': ['case', ['has', 'g'], ['slice', ['get', 'n'], 1, ['-', ['length', ['get', 'n']], 1]], ['get', 'n']],
+      'text-font': ['case', ['has', 'g'], ['literal', FONT_ITALIC], ['literal', FONT_BOLD]],
+      'text-size': areaLabelSize, 'text-transform': 'uppercase', 'text-letter-spacing': 0.08, 'text-max-width': 8,
+      'symbol-placement': 'point', 'symbol-sort-key': ['-', 0, ['get', 'a']], 'text-padding': 6, 'text-optional': true,
+    }, paint: { 'text-color': polityColour(POLITY_TEXT), 'text-opacity': ['case', ['has', 'x'], 0.6, 0.85], 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
   ];
 }
 
@@ -426,7 +465,7 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'borders', group: 'political', label: 'Historical borders', datasets: ['cliopatria', 'ohm'], defaultOn: true,
     hint: 'Outlines of every polity in the chosen year (Cliopatria), plus country borders mapped in OpenHistoricalMap (dated features, mainly after 1500).', sources: ['cliopatria', 'ohm'],
     specs: (c) => [
-      { id: 'borders-clio', type: 'line', source: 'cliopatria', filter: existedIn(c.year) as FilterSpecification, paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 7, 1.2], 'line-opacity': 0.55 } },
+      { id: 'borders-clio', type: 'line', source: 'cliopatria', filter: ['all', existedIn(c.year), isOutline, ['!', ['has', 'g']], ['!', ['has', 'lbl']]] as FilterSpecification, paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 7, 1.2], 'line-opacity': 0.55 } },
       { id: 'borders-ohm', type: 'line', source: 'ohm', 'source-layer': 'land_ohm_lines', filter: ['all', ['==', ['get', 'admin_level'], 2], ohmExisted(c.year)] as FilterSpecification, paint: { 'line-color': C.border, 'line-width': 1.2, 'line-dasharray': [3, 1.5], 'line-opacity': 0.7 } },
     ],
   },
@@ -558,6 +597,19 @@ export const layerById = (id: string) => LAYERS.find((l) => l.id === id);
 export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable).map((l) => l.id);
 
 /** Order in which layers are drawn, bottom to top (areas under lines under points). */
+/**
+ * Label hierarchy: where several labels compete for the same space, higher
+ * wins (MapLibre places the top-most layer's labels first). Polity names are
+ * gated by area and zoom, so they never crowd out towns when zoomed in.
+ */
+const LABEL_PRIORITY: Record<string, number> = {
+  empires: 100, kingdoms: 99, republics: 98, 'other-states': 97, territories: 90, provinces: 85,
+  cities: 80, ports: 75, settlements: 72, towns: 70, 'islamic-places': 68, 'medieval-places': 66,
+  domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
+};
+/** Sort key for a layer's labels (priority, then draw order). */
+export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
+
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'rivers', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 

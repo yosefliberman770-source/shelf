@@ -7,7 +7,7 @@ import { type GazPlace, GAZETTEERS, matchName, namesAround, normName } from '../
 import { CERTAINTY_LABEL, type Detection, DETECTION_LABEL } from '../../atlas/resolve';
 import { yearLabel } from '../../atlas/time';
 import { DATE_SOURCE_LABEL, type DateContext } from '../../lib/history/placeDetect';
-import { span } from './atlasParts';
+import { politiesLine, span } from './atlasParts';
 
 export function PlacePopup({ written, place, date, detection, colors, onMap, onClose }: {
   written: string;
@@ -47,7 +47,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
         <dd>{year !== undefined ? <>{yearLabel(year)}{date.approximate ? ' (approx.)' : ''} <span className="tiny" style={{ color: colors.muted }}>· {DATE_SOURCE_LABEL[date.source]}</span></> : <span style={{ color: colors.muted }}>Not given by the book — set it on the map</span>}</dd>
         <dt>Recorded</dt><dd>{span(place.from, place.to)}</dd>
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && (
-          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${pol.map((p) => `${p.edge ? 'at the edge of ' : ''}${p.n}`).join(' / ')} (${yearLabel(year!)})` : '', place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
+          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${politiesLine(pol)} (${yearLabel(year!)})` : '', place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
         )}
       </dl>
       <div className="row wrap" style={{ gap: 6 }}>

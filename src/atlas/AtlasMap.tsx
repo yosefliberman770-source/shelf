@@ -3,7 +3,7 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, SOURCE_SPECS } from './catalog';
+import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, SOURCE_SPECS } from './catalog';
 import { getJSON } from './data';
 import { type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
@@ -193,6 +193,11 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
 
+  /** Which layer definition added a map layer. */
+  const managedDef = (layerId: string) => [...managed.current].find(([, ids]) => ids.includes(layerId))?.[0];
+  /** The lowest label layer we manage (the start of the label band). */
+  const labelBandStart = (map: MLMap) => map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined)?.id;
+
   // ── Keep layers in step with the toggles and the year ──
   const sync = useCallback(async () => {
     const map = mapRef.current;
@@ -213,9 +218,15 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         for (const spec of specs) if ('filter' in spec && spec.filter && map.getLayer(spec.id)) map.setFilter(spec.id, spec.filter);
         continue;
       }
-      // Insert below the next layer in draw order that's already on the map.
-      const after = DRAW_ORDER.slice(DRAW_ORDER.indexOf(def.id) + 1).map((id) => managed.current.get(id)?.[0]).find(Boolean) ?? TOP;
-      for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, after);
+      // Geometry goes below the next layer in draw order that's already on
+      // the map. Labels go in one band above all geometry, ordered by the
+      // label hierarchy, so a polity's name isn't hidden by a shire's.
+      const isLabel = (id: string) => map.getLayer(id)?.type === 'symbol';
+      const geomAfter = DRAW_ORDER.slice(DRAW_ORDER.indexOf(def.id) + 1).map((id) => managed.current.get(id)?.find((l) => !isLabel(l))).find(Boolean)
+        ?? labelBandStart(map) ?? TOP;
+      const rank = labelKey(def.id);
+      const labelAfter = map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined && labelKey(managedDef(l.id)!) > rank)?.id ?? TOP;
+      for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, spec.type === 'symbol' ? labelAfter : geomAfter);
       managed.current.set(def.id, specs.map((s) => s.id));
     }
     // Borders come in time slices; load the slice that covers the year.
@@ -471,10 +482,21 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     }
     case 'cliopatria': {
       const c = str('c');
+      const grouping = p.g !== undefined;
+      const lines = [
+        grouping ? 'A grouping of polities in Cliopatria (outlined, not a separate state)' : `${c ? c[0].toUpperCase() + c.slice(1) : 'Type not recorded'}${c ? ' (type from Wikidata)' : ''}`,
+        `This outline: ${range(num('f'), num('t'))}`,
+      ];
+      if (str('m')) lines.push(`Part of: ${str('m')!.split(';').map((x) => x.replace(/^\(|\)$/g, '')).join(', ')}`);
+      if (grouping && str('cm')) lines.push(`Made up of: ${str('cm')!.split(';').join(', ')}`);
+      if (num('a')) lines.push(`Area in this outline: about ${num('a')!.toLocaleString()} km²`);
+      const cautions = ['One scholarly reconstruction of the territory; borders were rarely this precise.'];
+      if (p.op !== undefined) cautions.unshift('A small outlying piece of this polity’s outline, far from its main territory — a holding or claim as the source records it.');
+      if (str('x')) cautions.unshift(`Contested: this outline overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria draws each polity’s extent for a period, so overlaps are rival claims or control that changed within it.`);
       return {
-        title: str('n') ?? 'Polity', lines: [`${c ? c[0].toUpperCase() + c.slice(1) : 'Type not recorded'}${c ? ' (type from Wikidata)' : ''}`, `This outline: ${range(num('f'), num('t'))}`],
+        title: grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity', lines,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : undefined, source: credit('cliopatria'),
-        caution: 'One scholarly reconstruction of the territory; borders were rarely this precise.',
+        caution: cautions.join(' '),
       };
     }
     case 'wikidata-events':

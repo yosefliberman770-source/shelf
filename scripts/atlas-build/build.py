@@ -510,24 +510,128 @@ POLITY_CLASSES = [
 ]
 
 
+def label_point(f):
+    g = shape(f['geometry'])
+    parts = list(getattr(g, 'geoms', [g]))
+    big = max(parts, key=lambda x: x.area)
+    try:
+        from shapely.ops import polylabel
+        pt = polylabel(big, tolerance=0.05)
+    except Exception:
+        pt = big.representative_point()
+    return {'type': 'Point', 'coordinates': [round(pt.x, 2), round(pt.y, 2)]}
+
+
+def same_as_member(p):
+    """A grouping whose only member has its own name ("(Kingdom of England)" of "Kingdom of England") needs no second label."""
+    if not p.get('g'):
+        return False
+    comps = [c.strip() for c in p.get('cm', '').split(';') if c.strip()]
+    return not comps or p['n'].strip('()') in comps
+
+
+PALETTE_SIZE = 12
+
+
+def polity_relations(out, geoms):
+    """Contested overlaps and colours, computed once from the outlines.
+
+    Contested: two polities (neither a grouping, neither a member of the
+    other) whose outlines overlap substantially at the same time. Cliopatria
+    draws each polity's maximal claimed extent, so such overlaps are claims or
+    shifting control within the period — they are flagged, not shown as fact.
+
+    Colour: every polity gets a fixed palette index (by its Seshat/Wikidata
+    identity, so the same state keeps its colour through time), chosen so
+    polities that border or overlap each other at any time differ.
+    """
+    from shapely.strtree import STRtree
+    tree = STRtree(geoms)
+    ents = sorted({f['properties']['k'] for f in out})
+    nbrs = defaultdict(set)
+    contested = 0
+    for i, f in enumerate(out):
+        p = f['properties']
+        gi = geoms[i]
+        for j in tree.query(gi.buffer(0.1)):
+            j = int(j)
+            if j <= i:
+                continue
+            o = out[j]['properties']
+            if o['f'] > p['t'] or o['t'] < p['f'] or o['k'] == p['k']:
+                continue
+            nbrs[p['k']].add(o['k'])
+            nbrs[o['k']].add(p['k'])
+            if p.get('g') or o.get('g'):
+                continue
+            gj = geoms[j]
+            if not gi.intersects(gj):
+                continue
+            inter = gi.intersection(gj).area
+            small = min(gi.area, gj.area)
+            # Either a large share of one outline, or a separate piece of one
+            # lying mostly inside the other (e.g. an overseas holding claimed
+            # inside a neighbour) — but not the thin slivers simplification
+            # leaves along a shared border.
+            enclave = inter > 0.05 and any(x.area > 0.05 and x.intersection(other).area > 0.5 * x.area
+                                           for a, other in ((gi, gj), (gj, gi)) for x in getattr(a, 'geoms', [a]) if x.area < 0.5 * a.area)
+            if small > 0 and ((inter / small > 0.08 and inter > 0.05) or enclave):
+                p.setdefault('x', [])
+                o.setdefault('x', [])
+                if o['n'] not in p['x']:
+                    p['x'].append(o['n'])
+                if p['n'] not in o['x']:
+                    o['x'].append(p['n'])
+                contested += 1
+    # Greedy colouring, largest-degree first; deterministic order.
+    colour = {}
+    for k in sorted(ents, key=lambda k: (-len(nbrs[k]), k)):
+        used = {colour[n] for n in nbrs[k] if n in colour}
+        free = [c for c in range(PALETTE_SIZE) if c not in used]
+        if free:
+            # Spread choices by identity so unrelated polities don't all get colour 0.
+            colour[k] = free[sum(map(ord, k)) % len(free)]
+        else:
+            counts = defaultdict(int)
+            for n in nbrs[k]:
+                if n in colour:
+                    counts[colour[n]] += 1
+            colour[k] = min(range(PALETTE_SIZE), key=lambda c: (counts[c], c))
+    for f in out:
+        p = f['properties']
+        p['ci'] = colour[p['k']]
+        if 'x' in p:
+            p['x'] = ';'.join(sorted(p['x'])[:6])
+        if not p.get('op'):
+            p['_lp'] = label_point(f)['coordinates']
+    log(f'  cliopatria: {contested} contested overlaps flagged; {len(ents)} polities coloured with {PALETTE_SIZE} colours')
+
+
 def cliopatria():
     log('Cliopatria + Wikidata classification')
     z = zipfile.ZipFile(fetch('cliopatria', SOURCES['cliopatria']))
     member = next(n for n in z.namelist() if n.endswith('.geojson'))
     d = json.load(z.open(member))
     qids = sorted({f['properties'].get('Wikidata') for f in d['features'] if f['properties'].get('Wikidata')})
-    cls = {}
-    for i in range(0, len(qids), 300):
-        chunk = ' '.join('wd:' + q for q in qids[i:i + 300])
-        for c, items in POLITY_CLASSES:
-            vals = ' '.join('wd:' + x for x in items)
-            rows = sparql(f'SELECT DISTINCT ?p WHERE {{ VALUES ?p {{ {chunk} }} VALUES ?c {{ {vals} }} ?p wdt:P31/wdt:P279* ?c . }}')
-            for r in rows:
-                q = r['p']['value'].rsplit('/', 1)[1]
-                cls.setdefault(q, c)  # first (highest precedence) class wins
-            time.sleep(2)  # be polite to the public endpoints
-        time.sleep(3)
+    # The Wikidata classes change rarely; they are cached so a rebuild doesn't re-query the endpoint.
+    cls_path = os.path.join(CACHE, 'cliopatria-classes.json')
+    if os.path.exists(cls_path):
+        cls = json.load(open(cls_path))
+    else:
+        cls = {}
+        for i in range(0, len(qids), 300):
+            chunk = ' '.join('wd:' + q for q in qids[i:i + 300])
+            for c, items in POLITY_CLASSES:
+                vals = ' '.join('wd:' + x for x in items)
+                rows = sparql(f'SELECT DISTINCT ?p WHERE {{ VALUES ?p {{ {chunk} }} VALUES ?c {{ {vals} }} ?p wdt:P31/wdt:P279* ?c . }}')
+                for r in rows:
+                    q = r['p']['value'].rsplit('/', 1)[1]
+                    cls.setdefault(q, c)  # first (highest precedence) class wins
+                time.sleep(2)  # be polite to the public endpoints
+            time.sleep(3)
+        json.dump(cls, open(cls_path, 'w'))
     out = []
+    geoms = []
     for f in d['features']:
         p = f['properties']
         if p.get('Type') != 'POLITY' or not f.get('geometry'):
@@ -545,7 +649,34 @@ def cliopatria():
             props['q'] = q
             if q in cls:
                 props['c'] = cls[q]
+        # Hierarchy, as Cliopatria records it. A name in parentheses is a
+        # grouping of other polities (an empire's provinces, a heptarchy, a
+        # personal union) — drawn as an outline around its members, never as a
+        # rival state. Members record which grouping(s) they belong to.
+        if p['Name'].startswith('('):
+            props['g'] = 1
+            if p.get('Components'):
+                props['cm'] = p['Components']
+        if p.get('MemberOf'):
+            props['m'] = p['MemberOf']
+        props['a'] = int(round(float(p.get('Area') or 0)))  # km², from Cliopatria
+        props['k'] = (p.get('SeshatID') or '').split(';')[0] or q or p['Name'].strip('()')
+        # Small pieces far from the polity's main territory (a coastal
+        # foothold, a raid remembered as a holding) are kept as separate
+        # "outlying" features, so the map can show them as the source's
+        # claim rather than as solid territory, and they get no label.
+        parts = list(getattr(g, 'geoms', [g]))
+        main = max(parts, key=lambda x: x.area)
+        outlying = [x for x in parts if x is not main and x.area < 0.05 * g.area and x.distance(main) > 2]
+        if outlying and not props.get('g'):
+            rest = [x for x in parts if not any(x is o for o in outlying)]
+            g = unary_union(rest) if len(rest) > 1 else rest[0]
+            for o in outlying:
+                out.append({'type': 'Feature', 'geometry': rnd(o, 2), 'properties': {**props, 'op': 1}})
+                geoms.append(o)
         out.append({'type': 'Feature', 'geometry': rnd(g, 2), 'properties': props})
+        geoms.append(g)
+    polity_relations(out, geoms)
     # Split by time so the app downloads only the era on screen. Borders change
     # almost yearly in recent centuries, so those slices are shorter.
     def slice_len(y):
@@ -566,6 +697,11 @@ def cliopatria():
         fs = [f for f in out if f['properties']['f'] <= b and f['properties']['t'] >= a]
         if not fs:
             continue
+        # One label point per polity version: inside its largest part, so a
+        # polity split into many pieces (Denmark with Greenland) is named once.
+        fs = [{**f, 'properties': {k: v for k, v in f['properties'].items() if k != '_lp'}} for f in fs] + [
+            {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': f['properties']['_lp']},
+             'properties': {**{k: v for k, v in f['properties'].items() if k in ('n', 'f', 't', 'q', 'c', 'g', 'a', 'k', 'ci', 'x')}, 'lbl': 1}} for f in fs if not f['properties'].get('op') and not same_as_member(f['properties'])]
         name = f'{a}_{b}.json'
         total += write(f'cliopatria/{name}', fc(fs))
         index.append({'from': a, 'to': b, 'file': f'cliopatria/{name}', 'count': len(fs)})
@@ -712,12 +848,14 @@ def polity_names():
             continue
         for f in json.load(open(os.path.join(folder, fn), encoding='utf-8'))['features']:
             p = f['properties']
+            if p.get('lbl') or p.get('op'):
+                continue
             k = (p['n'], p.get('q', ''))
             cur = by.get(k)
             g = shape(f['geometry'])
             c = g.representative_point()
             if not cur:
-                by[k] = {'n': p['n'], 'f': p['f'], 't': p['t'], **({'q': p['q']} if p.get('q') else {}), **({'c': p['c']} if p.get('c') else {}),
+                by[k] = {'n': p['n'], 'f': p['f'], 't': p['t'], **({'q': p['q']} if p.get('q') else {}), **({'c': p['c']} if p.get('c') else {}), **({'g': 1} if p.get('g') else {}), **({'m': p['m']} if p.get('m') else {}),
                          'x': round(c.x, 2), 'y': round(c.y, 2), 'area': g.area}
             else:
                 cur['f'] = min(cur['f'], p['f'])

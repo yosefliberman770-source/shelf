@@ -3,7 +3,7 @@
 // "no longer recorded" (the datasets record evidence, not foundations or
 // abandonments), a polity boundary that differs between reconstructions, a
 // name recorded for one date and not the other.
-import { type AtlasEvent, eventsNear, type Polity, politiesAt } from '../atlas/context';
+import { type AtlasEvent, eventsNear, type Polity, politiesAt, polityDisplayName } from '../atlas/context';
 import type { Pos } from '../atlas/data';
 import { existedAround, type GazPlace, gazetteerInfo, namesAround, nearbyPlaces } from '../atlas/gazetteer';
 import { type HistYear, yearLabel } from '../atlas/time';
@@ -13,7 +13,7 @@ import { histogisWhereWas, type HistogisUnit } from './live';
 export interface Change { kind: 'political' | 'administrative' | 'settlement' | 'name' | 'event'; text: string; source: string }
 export interface WhatChanged { a: HistYear; b: HistYear; changes: Change[]; unchanged: string[]; notes: string[] }
 
-const names = (ps: Polity[]) => ps.map((p) => p.n);
+const names = (ps: Polity[]) => ps.map(polityDisplayName);
 
 export async function whatChanged(at: Pos, a: HistYear, b: HistYear, radiusKm = 40): Promise<WhatChanged> {
   const [lo, hi] = a <= b ? [a, b] : [b, a];
