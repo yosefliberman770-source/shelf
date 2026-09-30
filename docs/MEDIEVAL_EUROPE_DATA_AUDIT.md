@@ -796,7 +796,7 @@ file (see R.4 and E.2).
 
 ## J. Tests and validation
 
-`npx vitest run`: **292 tests pass, 0 fail** (17 files).
+`npx vitest run`: **293 tests pass, 0 fail** (17 files).
 - The second pass added tests for end-only records, and made the HRE start
   rule strict for every town.
 - The recovery pass added `src/atlas/private-data.test.ts`:
