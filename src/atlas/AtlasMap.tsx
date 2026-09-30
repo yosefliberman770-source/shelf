@@ -4,7 +4,7 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
-import { assembleParts, installPrivateData, loadPrivateData, privateHeader, privateTileSource, privateTiles, removePrivateData } from './privateData';
+import { assembleParts, installPrivateData, loadPrivateData, privateHeader, privateLoadError, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -771,7 +771,8 @@ function PrivateDataControl() {
   const [header, setHeader] = useState(privateHeader());
   const [picked, setPicked] = useState<File[]>([]);
   const [msg, setMsg] = useState<string>();
-  useEffect(() => { loadPrivateData().then(setHeader); }, []);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  useEffect(() => { loadPrivateData().then((h) => { setHeader(h); setLoadError(privateLoadError()); }); }, []);
   const mb = (n: number) => `${(n / 1e6).toFixed(1)} MB`;
   // Parts can be picked all at once or one at a time; each pick is added to what is already chosen.
   const add = async (list: FileList | null) => {
@@ -787,8 +788,8 @@ function PrivateDataControl() {
       if (r.state === 'error') { setMsg(r.message); return; }
       setMsg('Saving on this device…');
       await installPrivateData(r.blob);
-      setMsg('Loaded. Restarting the map…');
-      location.reload();
+      setMsg('Saved and checked. Restarting the map…');
+      setTimeout(() => location.reload(), 800);
     } catch (e) {
       setMsg(`Could not load: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -812,6 +813,7 @@ function PrivateDataControl() {
       {picked.length > 0 && <button className="btn xs" onClick={() => { setPicked([]); setMsg(undefined); }}>Start over</button>}
       {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
       {picked.length > 0 && <ul className="tiny">{picked.map((f) => <li key={f.name + f.size}>{f.name} — {mb(f.size)}</li>)}</ul>}
+      {loadError && !msg && <p className="tiny" role="status">A saved file is on this device but could not be opened: {loadError}</p>}
       {msg && <p className="tiny" role="status">{msg}</p>}
     </details>
   );
