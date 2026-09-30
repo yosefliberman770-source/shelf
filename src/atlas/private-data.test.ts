@@ -5,7 +5,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { LAYERS, SOURCE_SPECS, type LayerCtx } from './catalog';
-import { closePrivateData, openPrivateData, privateHas, privateJSON, privateTileSource, readHeader } from './privateData';
+import { assembleParts, closePrivateData, openPrivateData, privateHas, privateJSON, privateTileSource, readHeader } from './privateData';
 
 const ROOT = join(__dirname, '../..');
 const enc = new TextEncoder();
@@ -43,6 +43,24 @@ describe('private data pack', () => {
     const parts = cut.slice(1).map((end, i) => new Blob([bytes.slice(cut[i], end)]));
     await openPrivateData(new Blob(parts));
     expect((await privateJSON<unknown[][]>('places/c/5_46.json'))?.[0]?.[2]).toBe('Aisne');
+  });
+  it('parts picked in any order, with names the phone changed, are put back together; a missing part is reported', async () => {
+    const files: Record<string, string> = {};
+    for (let i = 0; i < 40; i++) files[`places/c/${i}_0.json`] = JSON.stringify([['dicotopo', `P${i}`, `Place ${i}`, i, 0, 1, 'settlement', 900 + i, null, 0, [], [], [], {}]]);
+    const bytes = new Uint8Array(await pack(files).arrayBuffer());
+    const size = Math.ceil(bytes.length / 3);
+    const named = (i: number, name: string) => Object.assign(new Blob([bytes.slice(i * size, (i + 1) * size)]), { name });
+    const [a, b, c] = [named(0, 'IMG_0003.bin'), named(1, 'download (1)'), named(2, 'download')];
+    const whole = await assembleParts([c, b, a]);
+    expect(whole.state).toBe('complete');
+    if (whole.state === 'complete') {
+      await openPrivateData(whole.blob);
+      expect((await privateJSON<unknown[][]>('places/c/39_0.json'))?.[0]?.[2]).toBe('Place 39');
+    }
+    const part = await assembleParts([b, a]);
+    expect(part.state).toBe('incomplete');
+    expect((await assembleParts([b, c])).state).toBe('needFirst');  // first part not added yet
+    expect((await assembleParts([a, b, c, b])).state).toBe('error');  // a part twice
   });
   it('refuses a file that is not a Shelf pack', async () => {
     await expect(readHeader(new Blob(['PK\u0003\u0004 not a pack at all']))).rejects.toThrow(/not a Shelf private data file/);

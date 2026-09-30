@@ -4,7 +4,7 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
-import { installPrivateData, loadPrivateData, privateHeader, privateTileSource, privateTiles, removePrivateData } from './privateData';
+import { assembleParts, installPrivateData, loadPrivateData, privateHeader, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -769,26 +769,36 @@ function FeatureCard({ info, onClose, onHistory, onEvent }: { info: Info; onClos
  */
 function PrivateDataControl() {
   const [header, setHeader] = useState(privateHeader());
-  const [busy, setBusy] = useState<string>();
+  const [picked, setPicked] = useState<File[]>([]);
+  const [msg, setMsg] = useState<string>();
   useEffect(() => { loadPrivateData().then(setHeader); }, []);
-  const load = async (list: FileList | null) => {
+  const mb = (n: number) => `${(n / 1e6).toFixed(1)} MB`;
+  // Parts can be picked all at once or one at a time; each pick is added to what is already chosen.
+  const add = async (list: FileList | null) => {
     if (!list?.length) return;
-    setBusy('Loading…');
+    const all = [...picked];
+    for (const f of list) if (!all.some((x) => x.name === f.name && x.size === f.size)) all.push(f);
+    setPicked(all);
+    setMsg('Checking…');
     try {
-      // The file may come in parts (…part1.pack, …part2.pack): they are joined in name order.
-      const files = [...list].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-      await installPrivateData(files.length === 1 ? files[0] : new Blob(files));
+      const r = await assembleParts(all);
+      if (r.state === 'incomplete') { setMsg(`Got ${all.length} file${all.length > 1 ? 's' : ''} (${mb(r.have)} of ${mb(r.need)}). Add the remaining part${r.need - r.have > 26e6 ? 's' : ''}.`); return; }
+      if (r.state === 'needFirst') { setMsg(`Got ${all.length} file${all.length > 1 ? 's' : ''} (${mb(r.have)}). Now add the first part (…part1.pack).`); return; }
+      if (r.state === 'error') { setMsg(r.message); return; }
+      setMsg('Saving on this device…');
+      await installPrivateData(r.blob);
+      setMsg('Loaded. Restarting the map…');
       location.reload();
     } catch (e) {
-      setBusy(e instanceof Error ? e.message : 'Could not read that file.');
+      setMsg(`Could not load: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
   return (
-    <details className="hmap-sources">
+    <details className="hmap-sources" open={!!picked.length || undefined}>
       <summary>Your private data {header ? `· ${header.datasets.length} datasets on this device` : '· not loaded'}</summary>
       <p className="tiny">
         Some historical datasets can be used privately but not republished on a public website. They come in a separate
-        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Load the file “shelf-private-data.pack” — or, if it came in parts, select all the parts together.'}
+        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Choose the three parts (…part1.pack, …part2.pack, …part3.pack) — all at once, or one after another.'}
       </p>
       {header && (
         <ul>
@@ -796,11 +806,13 @@ function PrivateDataControl() {
         </ul>
       )}
       <label className="btn xs">
-        {header ? 'Replace with a newer file' : 'Load private data file'}
-        <input type="file" accept=".pack,application/octet-stream" multiple hidden onChange={(e) => load(e.target.files)} />
+        {header ? 'Replace with a newer file' : picked.length ? 'Add another part' : 'Load private data file'}
+        <input type="file" multiple hidden onChange={(e) => { add(e.target.files); e.target.value = ''; }} />
       </label>
+      {picked.length > 0 && <button className="btn xs" onClick={() => { setPicked([]); setMsg(undefined); }}>Start over</button>}
       {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
-      {busy && <p className="tiny">{busy}</p>}
+      {picked.length > 0 && <ul className="tiny">{picked.map((f) => <li key={f.name + f.size}>{f.name} — {mb(f.size)}</li>)}</ul>}
+      {msg && <p className="tiny" role="status">{msg}</p>}
     </details>
   );
 }
