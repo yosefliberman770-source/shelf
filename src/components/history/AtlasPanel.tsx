@@ -43,6 +43,17 @@ const FOLLOW_KEY = 'shelf.followBook';
 const LOOK_KEY = 'shelf.atlas.lookingOpen';
 type Mention = { cfi: string; snippet: string };
 
+/** How far to zoom in on a place: a continent or sea needs the whole region in view, a town a close-up. */
+function focusZoom(p: ReaderPlace): number {
+  switch (p.kind) {
+    case 'continent': return 3;
+    case 'sea': return 4;
+    case 'polity': case 'region': return 5;
+    case 'island': case 'mountain': case 'lake': case 'river': return 7;
+    default: return p.certainty === 'known' ? 8 : 7;
+  }
+}
+
 export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDate, wide, onClose, findMentions, onJump, position, loadSection, sectionCount }: {
   request: MapRequest;
   book: MapBook;
@@ -113,7 +124,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openKey = (key: string, name: string, detection: Detection = 'map') => { setTarget({ written: name, detection, key }); setTab('place'); setEventQ(undefined); };
-  const openPlace = (p: ReaderPlace) => { setRes({ place: p, status: p.status, candidates: [], reason: p.why.reason }); setTarget(null); setTab('place'); setView({ lat: p.lat, lon: p.lon, zoom: 8 }); };
+  const openPlace = (p: ReaderPlace) => { setRes({ place: p, status: p.status, candidates: [], reason: p.why.reason }); setTarget(null); setTab('place'); setView({ lat: p.lat, lon: p.lon, zoom: focusZoom(p) }); };
 
   // ── Follow the book (off unless the reader turns it on) ──
   const [follow, setFollow] = useState(() => { try { return localStorage.getItem(FOLLOW_KEY) === '1'; } catch { return false; } });
@@ -129,7 +140,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   // ── Map state ──
   const mapRef = useRef<MLMap | null>(null);
   const [view, setView] = useState<AtlasView | undefined>();
-  useEffect(() => { if (place) setView({ lat: place.lat, lon: place.lon, zoom: place.certainty === 'known' ? 8 : 7 }); }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (place) setView({ lat: place.lat, lon: place.lon, zoom: focusZoom(place) }); }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
   const [layers, setLayers] = useState<string[]>([]);
   const [layersRequest, setLayersRequest] = useState<{ layers: string[]; n: number } | undefined>();
   const ensureLayers = (ids: string[]) => { const missing = ids.filter((id) => !layers.includes(id)); if (missing.length) setLayersRequest({ layers: [...layers, ...missing], n: Date.now() }); };
@@ -374,7 +385,7 @@ function Unresolved({ written, res, onRetry, onChoose, onSearch }: { written: st
           <button key={c.key} className="rabbit-node" onClick={() => onChoose(c)}>
             <span style={{ minWidth: 0 }}>
               <b>{i + 1}. {c.title}</b>
-              <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.types.slice(0, 2).join(', '), c.partOf.slice(0, 2).join(', '), c.description, `${c.lat.toFixed(1)}°, ${c.lon.toFixed(1)}°`].filter(Boolean).join(' · ')}</span>
+              <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.types.slice(0, 2).join(', '), c.partOf.slice(0, 2).join(', '), c.description ? `today: ${c.description}` : '', `${c.lat.toFixed(1)}°, ${c.lon.toFixed(1)}°`].filter(Boolean).join(' · ')}</span>
               <span className="tiny faint" style={{ display: 'block', fontWeight: 400 }}>{c.sources.map((s) => s.name).join(' · ')}</span>
             </span>
             <Icon name="chevronRight" className="faint" />

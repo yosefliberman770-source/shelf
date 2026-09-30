@@ -282,7 +282,7 @@ function PlaceInfo({ name, res, loading, year, query, onRetry, onResolved }: { n
         <button key={c.place.id} className="rabbit-node" onClick={() => choose(c.place)}>
           <span style={{ minWidth: 0 }}>
             <b>{i + 1}. {c.place.canonicalName}</b>
-            <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.place.description, c.place.countryCodes.filter((cc) => !(c.place.description ?? '').includes(cc)).join(', '), c.place.latitude !== undefined ? formatCoords(c.place.latitude, c.place.longitude!) : 'no location'].filter(Boolean).join(' · ')}</span>
+            <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.place.description ? `today: ${c.place.description}` : '', ((cc) => (cc ? `modern country ${cc}` : ''))(c.place.countryCodes.filter((cc) => !(c.place.description ?? '').includes(cc)).join(', ')), c.place.latitude !== undefined ? formatCoords(c.place.latitude, c.place.longitude!) : 'no location'].filter(Boolean).join(' · ')}</span>
             <span className="tiny faint" style={{ display: 'block', fontWeight: 400 }}>{c.place.attribution.map((a) => a.source).join(' · ')}</span>
           </span>
           <Icon name="chevronRight" className="faint" />
@@ -396,7 +396,7 @@ function ChapterPlaces({ book, chapterText, year, pinned, onView, onPins, onPick
       <div className="col" style={{ gap: 4 }}>
         {good.map((r, i) => (
           <button key={r.name} className="rabbit-node" onClick={() => onPick(r.name)}>
-            <span><b>{i + 1}. {r.res!.place!.canonicalName}</b>{r.res!.place!.canonicalName.toLowerCase() !== r.name.toLowerCase() ? <span className="small muted"> · “{r.name}”</span> : null}<span className="tiny faint" style={{ display: 'block' }}>{CONFIDENCE_LABEL[r.res!.status]}{r.res!.place!.description ? ` · ${r.res!.place!.description}` : ''}</span></span>
+            <span><b>{i + 1}. {r.res!.place!.canonicalName}</b>{r.res!.place!.canonicalName.toLowerCase() !== r.name.toLowerCase() ? <span className="small muted"> · “{r.name}”</span> : null}<span className="tiny faint" style={{ display: 'block' }}>{CONFIDENCE_LABEL[r.res!.status]}{r.res!.place!.description ? ` · today: ${r.res!.place!.description}` : ''}</span></span>
             <Icon name="chevronRight" className="faint" />
           </button>
         ))}
