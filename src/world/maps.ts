@@ -36,7 +36,27 @@ export interface HistMap {
   rights: string;
   /** Allmaps annotation found for it (undefined = not checked yet, null = none). */
   georef?: Georef | null;
+  /** Why it was ranked where it is (for the "why this map" line). */
+  why?: string[];
+  /** Other sheets found with the same title (an atlas or plate book). */
+  sheets?: number;
+  /** Present-day countries the catalogue record says the map shows (lower case). */
+  countries?: string[];
 }
+
+/** What the image server says about the scan itself (IIIF info.json). */
+export interface ScanInfo { width: number; height: number; /** Served as tiles, so it can be deep-zoomed. */ tiled: boolean }
+export async function scanInfo(service: string, signal?: AbortSignal): Promise<ScanInfo | undefined> {
+  try {
+    const d = await cachedJSON<{ width?: number; height?: number; tiles?: unknown[]; profile?: unknown }>(`${service}/info.json`, 30, signal);
+    if (!d.width || !d.height) return undefined;
+    const level = JSON.stringify(d.profile ?? '');
+    return { width: d.width, height: d.height, tiled: !!d.tiles?.length || /level[12]/.test(level) };
+  } catch { return undefined; }
+}
+
+/** How much of the ground a georeferenced map covers, from its own control points. */
+export const georefExtentKm = (g: Georef) => extentKm(g.gcps.map((c) => c.geo));
 
 export interface Georef {
   annotation: string;
@@ -52,7 +72,7 @@ const yearFrom = (s?: string): HistDate => (s ? parseDate(s) ?? UNKNOWN_DATE : U
 
 // ── Library of Congress ───────────────────────────────────────────────────
 
-interface LocResult { id: string; title: string; date?: string; image_url?: string[]; subject?: string[]; contributor?: string[]; location?: string[] }
+interface LocResult { id: string; title: string; date?: string; image_url?: string[]; subject?: string[]; contributor?: string[]; location?: string[]; location_country?: string[] }
 export async function searchLoc(q: string, from?: number, to?: number, signal?: AbortSignal): Promise<HistMap[]> {
   const p = new URLSearchParams({ q, fo: 'json', c: '25' });
   if (from !== undefined || to !== undefined) p.set('dates', `${Math.max(1000, from ?? 1000)}/${Math.min(2030, to ?? 2030)}`);
@@ -63,7 +83,7 @@ export async function searchLoc(q: string, from?: number, to?: number, signal?: 
     return {
       id: `loc:${r.id}`, title: r.title, date: yearFrom(r.date), creator: r.contributor?.[0], subjects: r.subject?.slice(0, 6) ?? [], collection: 'loc' as const, holder: COLLECTION.loc.name,
       thumb: iiif ? `${iiif}/full/300,/0/default.jpg` : r.image_url![0], iiif, page: r.id, rights: COLLECTION.loc.rights,
-      manifest: `${r.id.replace(/\/$/, '')}/manifest.json`,
+      manifest: `${r.id.replace(/\/$/, '')}/manifest.json`, countries: r.location_country?.map((c) => c.toLowerCase()),
     };
   });
 }
@@ -280,7 +300,7 @@ export function fitOverlay(g: Georef, maxWidth = 1600, limits: ImageLimits = {})
 }
 
 /** One search across the collections for a place (or area) and dates. */
-export async function searchMaps(opts: { q?: string; bbox?: [number, number, number, number]; from?: number; to?: number; subject?: string; signal?: AbortSignal }): Promise<{ maps: HistMap[]; errors: string[] }> {
+export async function searchMaps(opts: { q?: string; bbox?: [number, number, number, number]; from?: number; to?: number; subject?: string; hereCountries?: string[]; signal?: AbortSignal }): Promise<{ maps: HistMap[]; errors: string[] }> {
   const q = [opts.q, opts.subject].filter(Boolean).join(' ').trim();
   const errors: string[] = [];
   const jobs: Promise<HistMap[]>[] = [];
@@ -293,13 +313,56 @@ export async function searchMaps(opts: { q?: string; bbox?: [number, number, num
   const inRange = (m: HistMap) => opts.from === undefined || m.date.precision === 'unknown' || ((m.date.latest ?? Infinity) >= opts.from && (m.date.earliest ?? -Infinity) <= (opts.to ?? Infinity));
   const seen = new Set<string>();
   const maps = all.filter((m) => inRange(m) && !seen.has(m.iiif ?? m.id) && (seen.add(m.iiif ?? m.id), true));
-  // Maps whose title names the place first, then ones that can be overlaid, then closest in date (undated last).
-  const mid = opts.from !== undefined && opts.to !== undefined ? (opts.from + opts.to) / 2 : undefined;
-  const dist = (m: HistMap) => (m.date.precision === 'unknown' || mid === undefined ? 1e9 : Math.abs((m.date.preferred ?? m.date.earliest ?? 0) - mid));
+  const scored = maps.map((m) => ({ m, ...relevance(m, opts) }));
+  scored.sort((a, b) => b.score - a.score);
+  // Sheets of one atlas or plate book share a title: show the best one, with a count.
+  const byTitle = new Map<string, HistMap>();
+  for (const { m, why } of scored) {
+    const k = `${m.title.toLowerCase().replace(/\s+/g, ' ').trim()}|${m.holder}`;
+    const first = byTitle.get(k);
+    if (first) first.sheets = (first.sheets ?? 1) + 1;
+    else byTitle.set(k, { ...m, why });
+  }
+  return { maps: [...byTitle.values()], errors };
+}
+
+/**
+ * How relevant a map is to what's being read: does it name the place, does
+ * it cover this area at a useful scale (a town plan or regional map, not a
+ * world map), was it made near the date, and can it be laid over the map.
+ */
+export function relevance(m: HistMap, opts: { q?: string; bbox?: [number, number, number, number]; from?: number; to?: number; hereCountries?: string[] }): { score: number; why: string[] } {
+  let score = 0;
+  const why: string[] = [];
   const needle = (opts.q ?? '').toLowerCase().trim();
-  const named = (m: HistMap) => (needle && m.title.toLowerCase().includes(needle) ? 0 : 1);
-  maps.sort((a, b) => named(a) - named(b) || Number(!!b.georef) - Number(!!a.georef) || dist(a) - dist(b));
-  return { maps, errors };
+  if (needle && [m.title, ...m.subjects].some((t) => t.toLowerCase().includes(needle))) { score += 3; why.push(`names ${opts.q!.trim()}`); }
+  // Same name, different place ("Rome, N.Y." when reading about Rome in Italy): the record's country decides.
+  if (m.countries?.length && opts.hereCountries?.length) {
+    const here = opts.hereCountries.map((h) => ` ${h.toLowerCase()} `);
+    const hit = m.countries.find((c) => here.some((h) => h.includes(` ${c} `)));
+    if (hit) { score += 2; why.push(`catalogued as ${hit}`); } else { score -= 5; why.push(`catalogued as ${m.countries.join(', ')} — another place with this name?`); }
+  }
+  if (m.georef) {
+    score += 1;
+    why.push('georeferenced — can be laid over the map');
+    if (opts.bbox) {
+      const [w, s, e, n] = opts.bbox;
+      const view = Math.hypot((e - w) * 111.32 * Math.cos((((s + n) / 2) * Math.PI) / 180), (n - s) * 110.57);
+      const ext = georefExtentKm(m.georef);
+      const r = ext / Math.max(1, view);
+      if (ext < 2 || r < 1 / 30) { score += 0.5; why.push('covers only a small spot here (a building or street plan)'); }
+      else if (r <= 3) { score += 3; why.push('covers about this area'); } else if (r <= 15) { score += 1.5; why.push('a regional map of this area'); } else { score -= 1; why.push('covers a much larger area (little local detail)'); }
+    }
+  }
+  if (m.date.precision === 'unknown') { score -= 1; why.push('date not in the record'); }
+  else if (opts.from !== undefined && opts.to !== undefined) {
+    const mid = (opts.from + opts.to) / 2;
+    const half = Math.max(1, (opts.to - opts.from) / 2);
+    const d = Math.abs((m.date.preferred ?? m.date.earliest ?? mid) - mid);
+    score += 2 * Math.max(0, 1 - d / half);
+    if (d <= half / 4) why.push('made close to the date');
+  }
+  return { score, why };
 }
 
 export const mapDateLabel = (m: HistMap) => (m.date.precision === 'unknown' ? 'date not in the record' : m.date.preferred !== undefined ? yearLabel(m.date.preferred) : m.date.label ?? `${m.date.earliest}–${m.date.latest}`);
