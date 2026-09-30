@@ -3,7 +3,7 @@
 // by AI.
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
-import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity } from '../../atlas/context';
+import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
 import { existedAround, type GazPlace, nearbyPlaces, namesAround, relationLabel } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
@@ -21,7 +21,18 @@ import { EmptyNote } from './worldParts';
 
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 const polityType = (c?: string) => (c ? ` (${c})` : '');
-export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${p.n}${polityType(p.c)}`;
+export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (a detached piece of its outline in the source)' : ''}`;
+/**
+ * Polities at a spot as one phrase. More than one independent polity there means the source's
+ * outlines overlap: explained by a recorded relationship when there is one, otherwise stated as
+ * an overlap — never called a dispute, which the source doesn't record.
+ */
+export const politiesLine = (ps: Polity[]) => {
+  const names = ps.map(polityName).join(' / ');
+  if (ps.length < 2 || ps.some((p) => p.g)) return names;
+  const rel = [...new Set(ps.flatMap((p) => (p.xr ? p.xr.split(';') : [])))];
+  return rel.length ? `${names} (${rel.join('; ')})` : `${names} — the source’s outlines overlap here; it doesn’t say whether control was shared, changing or disputed`;
+};
 const kmLabel = (k: number) => `${Math.round(k / MILE_KM)} mi`;
 
 // ── Sources ───────────────────────────────────────────────────────────────
@@ -46,6 +57,14 @@ export function SourcesBlock({ sources, auto = true }: { sources: Source[]; auto
 
 // ── Why is this place here? ───────────────────────────────────────────────
 
+const NAME_RULE: Record<NonNullable<ReaderPlace['nameRoles']>['rule'], string> = {
+  'as-written': 'the book’s own wording, which the record lists',
+  english: 'the English name the record gives',
+  'record-title': 'the record’s title',
+  'latin-name': 'a Latin-script form the record gives',
+  'record-title-nonlatin': 'the record’s title (no Latin-script form recorded)',
+};
+
 export function WhyBlock({ place }: { place: ReaderPlace }) {
   const w = place.why;
   return (
@@ -53,7 +72,8 @@ export function WhyBlock({ place }: { place: ReaderPlace }) {
       <summary>Why is this place here?</summary>
       <dl className="hmap-facts">
         <dt>Matched from</dt><dd>“{place.written}”</dd>
-        <dt>Historical name</dt><dd>{place.title}{w.matchedName && !w.matchedIsTitle ? <span className="tiny faint"> — “{w.matchedName}” is recorded as one of its names</span> : null}</dd>
+        <dt>Name shown</dt><dd><bdi>{place.title}</bdi>{place.nameRoles ? <span className="tiny faint"> — {NAME_RULE[place.nameRoles.rule]}</span> : null}</dd>
+        {place.recordTitle && place.recordTitle !== place.title && <><dt>Dataset record</dt><dd><bdi>{place.recordTitle}</bdi>{w.matchedName && !w.matchedIsTitle ? <span className="tiny faint"> — “<bdi>{w.matchedName}</bdi>” is recorded as one of its names</span> : null}</dd></>}
         <dt>Found by</dt><dd>{DETECTION_LABEL[w.detection]}</dd>
         <dt>Match source</dt><dd>{w.method}</dd>
         <dt>Decision</dt><dd>{w.userChosen ? 'Your choice' : CONFIDENCE_LABEL[place.status]}{w.reason ? ` — ${w.reason}` : ''}</dd>
@@ -86,7 +106,7 @@ export function LookingAtCard({ at, year, open, setOpen }: { at?: { name: string
       {open && at && (
         busy && !la ? <div className="small muted mt-4">Reading the datasets…</div> : la && (
           <ul className="atlas-facts">
-            <li><span>Political entity</span>{la.polities.length ? la.polities.map(polityName).join(' / ') : <><i className="faint">none recorded for this spot and year</i><EmptyNote type="political" at={at} year={year} /></>}<small>Cliopatria</small></li>
+            <li><span>Political entity</span>{la.polities.length ? politiesLine(la.polities) : <><i className="faint">none recorded for this spot and year</i><EmptyNote type="political" at={at} year={year} /></>}<small>Cliopatria</small></li>
             {la.regions.length > 0 && <li><span>Region</span>{la.regions.slice(0, 3).join(' · ')}<small>Pleiades</small></li>}
             <li><span>Nearest recorded settlements</span>{la.nearest.length ? la.nearest.map((n) => `${n.place.title} (${kmLabel(n.km)})`).join(', ') : <i className="faint">none dated to this period within 40 mi</i>}<small>Pleiades</small></li>
             {la.wars.length > 0 && <li><span>Conflict nearby in this year</span>{la.wars.map((w) => w.n).join(', ')}<small>Wikidata</small></li>}
@@ -117,7 +137,7 @@ export function CompareDates({ at, year, onShow }: { at?: { name: string; lat: n
     return () => { dead = true; };
   }, [at?.lat, at?.lon, a, b]); // eslint-disable-line react-hooks/exhaustive-deps
   const setBText = () => { const d = parseHistoricalDate(text); if (d) { setB(d.year); setText(''); } };
-  const names = (ps: Polity[]) => ps.map(polityName).join(' / ') || 'none recorded';
+  const names = (ps: Polity[]) => politiesLine(ps) || 'none recorded';
   return (
     <div className="col gap-8">
       <div className="row wrap gap-4 small">
@@ -167,10 +187,11 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
   }, [place.key, year]); // eslint-disable-line react-hooks/exhaustive-deps
   const nowNames = place.gaz ? namesAround(place.gaz, year) : place.names;
   const otherNames = place.names.filter((n) => !nowNames.includes(n));
-  const nameLine = (n: { name: string; from?: number; to?: number; lang?: string }) => `${n.name}${n.from !== undefined || n.to !== undefined ? ` (${span(n.from, n.to)})` : ''}`;
+  const nameLine = (n: { name: string; from?: number; to?: number; lang?: string }, i: number) => <span key={i}>{i > 0 ? ' · ' : ''}<bdi dir="auto">{n.name}</bdi>{n.from !== undefined || n.to !== undefined ? ` (${span(n.from, n.to)})` : ''}</span>;
   return (
     <div className="card tight hmap-info">
-      <div className="book-title" style={{ fontSize: 22 }}>{place.title}</div>
+      <div className="book-title" style={{ fontSize: 22 }}><bdi>{place.title}</bdi></div>
+      {place.recordTitle && place.recordTitle !== place.title && <div className="small muted">Recorded as <bdi>{place.recordTitle}</bdi></div>}
       {place.written.toLowerCase() !== place.title.toLowerCase() && <div className="small muted">“{place.written}” in the book</div>}
       <div className="row wrap gap-4 mt-4">
         <span className={`chip cert-${place.certainty}`} style={{ minHeight: 22, fontSize: 11 }}>{CERTAINTY_LABEL[place.certainty].split(' — ')[0]}</span>
@@ -178,15 +199,15 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         {place.types.slice(0, 2).map((t) => <span key={t} className="chip" style={{ minHeight: 22, fontSize: 11 }}>{t.replace(/-\d$/, '').replace(/-/g, ' ')}</span>)}
       </div>
       <dl className="hmap-facts">
-        {nowNames.length > 0 && <><dt>Names{place.gaz ? ` around ${yearLabel(year)}` : ''}</dt><dd>{nowNames.slice(0, 8).map(nameLine).join(' · ')}</dd></>}
-        {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine).join(' · ')}</dd></>}
+        {nowNames.length > 0 && <><dt>Names{place.gaz ? ` around ${yearLabel(year)}` : ''}</dt><dd>{nowNames.slice(0, 8).map(nameLine)}</dd></>}
+        {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine)}</dd></>}
         <dt>Date range</dt><dd>{span(place.from, place.to)}{place.gaz ? <span className="tiny faint"> (Pleiades periods, not founding dates)</span> : null}</dd>
         <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{CERTAINTY_LABEL[place.certainty]}</span></dd>
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>
-          {pol && pol.length > 0 && <div>{pol.map(polityName).join(' / ')} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}
+          {pol && pol.length > 0 && <div>{politiesLine(pol)} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}
           {place.partOf.length > 0 && <div>Part of {place.partOf.join(', ')} <span className="tiny faint">(Pleiades)</span></div>}
         </dd></>}
-        {place.description && <><dt>Description</dt><dd>{place.description}</dd></>}
+        {place.description && <><dt>Today</dt><dd>{place.description} <span className="tiny faint">(present-day description)</span></dd></>}
       </dl>
       {events && events.length > 0 && (
         <div className="mt-8">

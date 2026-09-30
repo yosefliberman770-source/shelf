@@ -2,7 +2,7 @@
 // data coverage and sources, "What changed?", extra context for a place,
 // and "The world of this book". Each fact names its source; gaps in data are
 // explained as gaps in data.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { complete } from '../../ai/client';
 import { nearbyPlaces } from '../../atlas/gazetteer';
 import type { ReaderPlace } from '../../atlas/resolve';
@@ -16,7 +16,9 @@ import { whatChanged, type WhatChanged } from '../../world/changes';
 import { EVIDENCE, explainEmpty } from '../../world/evidence';
 import { formatDate } from '../../world/histdate';
 import { type ChgisPlace, type HistogisUnit, histogisWhereWas } from '../../world/live';
-import { findGeoref, type HistMap, imageLimits, mapDateLabel, type Overlay, overlayFor, searchMaps, viewerUrl } from '../../world/maps';
+import { politiesAt, polityDisplayName } from '../../atlas/context';
+import { findGeoref, type Georef, georefExtentKm, type HistMap, imageLimits, mapDateLabel, type Overlay, overlayFor, scanInfo, type ScanInfo, searchMaps, viewerUrl } from '../../world/maps';
+import type { ZoomState } from './DeepZoom';
 import { SOURCES, TIER_LABEL } from '../../world/registry';
 import { selectSources } from '../../world/select';
 import type { WorldProfile } from '../../world/bookWorld';
@@ -61,7 +63,12 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
     try {
       const from = span ? year - span : undefined;
       const to = span ? year + span : undefined;
-      setRes(await searchMaps({ q: q.trim() || undefined, bbox: here ? bbox() : undefined, from, to, subject: subject || undefined }));
+      // The present-day country at the map's centre tells same-named places elsewhere apart.
+      // Sampled across the view (its centre may be sea), plus the place in focus.
+      const b = bbox();
+      const pts: [number, number][] = [...(at ? [[at.lon, at.lat] as [number, number]] : []), ...(b ? [0.2, 0.5, 0.8].flatMap((fx) => [0.2, 0.5, 0.8].map((fy) => [b[0] + (b[2] - b[0]) * fx, b[1] + (b[3] - b[1]) * fy] as [number, number])) : [])];
+      const hereCountries = [...new Set((await Promise.all(pts.map((pt) => politiesAt(pt, 2020, 0).catch(() => [])))).flat().map((p) => polityDisplayName(p).toLowerCase()))];
+      setRes(await searchMaps({ q: q.trim() || undefined, bbox: here ? b : undefined, from, to, subject: subject || undefined, hereCountries }));
     } finally { setBusy(false); }
   };
   const overlay = async (m: HistMap) => {
@@ -123,6 +130,8 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
                   <div className="small" style={{ fontWeight: 700 }}>{m.title}</div>
                   <div className="tiny faint">{mapDateLabel(m)}{m.creator ? ` · ${m.creator}` : ''}</div>
                   <div className="tiny faint">{m.holder}</div>
+                  {m.sheets && m.sheets > 1 ? <div className="tiny faint">One of {m.sheets} sheets found with this title</div> : null}
+                  {m.why?.length ? <div className="tiny faint">Why here: {m.why.join(' · ')}</div> : null}
                   <div className="row wrap gap-4 mt-4">
                     <button className="btn xs" onClick={() => setView(m)}>View</button>
                     {checking[m.id] === 'none' ? <span className="tiny faint">Not georeferenced yet — view only</span>
@@ -142,20 +151,77 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
 }
 
 /** Full-screen viewer for one original map: pinch or buttons to zoom, drag to pan. */
+const DeepZoom = lazy(() => import('./DeepZoom'));
+
 export function MapViewer({ map, onClose }: { map: HistMap; onClose: () => void }) {
+  const [scan, setScan] = useState<ScanInfo | null | undefined>(undefined);
+  const [deep, setDeep] = useState<'try' | 'failed'>('try');
+  const [zoom, setZoom] = useState<ZoomState | null>(null);
+  const [georef, setGeoref] = useState<Georef | null | undefined>(map.georef);
+  const cmd = useRef<{ zoomIn?: () => void; zoomOut?: () => void; home?: () => void }>({});
+  useEffect(() => {
+    let dead = false;
+    if (map.iiif) scanInfo(map.iiif).then((i) => !dead && setScan(i ?? null)).catch(() => !dead && setScan(null)); else setScan(null);
+    if (map.georef === undefined) findGeoref(map).then((g) => !dead && setGeoref(g)).catch(() => !dead && setGeoref(null));
+    return () => { dead = true; };
+  }, [map.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const useDeep = !!map.iiif && !!scan?.tiled && deep === 'try';
+  const georefLine = georef === undefined ? 'checking whether it has been georeferenced…'
+    : georef === null ? 'not georeferenced — it can be viewed, but not laid over the map'
+    : `georeferenced in Allmaps with ${georef.gcps.length} control points, covering ${georefExtentKm(georef) < 1 ? 'less than 1 km (a building or street plan)' : `about ${Math.round(georefExtentKm(georef))} km`}`;
+  return (
+    <div className="map-viewer" role="dialog" aria-label={`Historical map: ${map.title}`}>
+      <div className="map-viewer-bar">
+        <button className="btn sm ghost" onClick={onClose}>✕ Close</button>
+        {useDeep && (
+          <span className="row" style={{ gap: 4 }}>
+            <button className="btn sm ghost" onClick={() => cmd.current.zoomIn?.()} disabled={zoom?.atMax} aria-label="Zoom in">+</button>
+            <button className="btn sm ghost" onClick={() => cmd.current.zoomOut?.()} aria-label="Zoom out">−</button>
+            <button className="btn sm ghost" onClick={() => cmd.current.home?.()}>Whole map</button>
+          </span>
+        )}
+      </div>
+      <div className="map-viewer-stage">
+        {scan === undefined ? <div className="small muted" style={{ padding: 16 }}>Loading the scan…</div>
+          : useDeep ? (
+            <Suspense fallback={<div className="small muted" style={{ padding: 16 }}>Loading the viewer…</div>}>
+              <DeepZoom service={map.iiif!} title={map.title} onState={setZoom} onFail={() => setDeep('failed')} commands={cmd} />
+            </Suspense>
+          ) : <FlatViewer map={map} />}
+        {useDeep && zoom?.atMax && <div className="map-viewer-limit tiny">Full resolution of the scan — there is no more detail to show.</div>}
+      </div>
+      <div className="map-viewer-caption">
+        <b>{map.title}</b>
+        <div className="tiny">{mapDateLabel(map)}{map.creator ? ` · ${map.creator}` : ''} · {map.holder}</div>
+        <div className="tiny">
+          {scan ? `Scan ${scan.width.toLocaleString()} × ${scan.height.toLocaleString()} px` : 'Scan size not given by the server'}
+          {useDeep ? ' · deep zoom from the collection’s image server' : scan === null || deep === 'failed' || (scan && !scan.tiled) ? ' · this server offers a single image only, so zoom is limited to its size' : ''}
+          {zoom && useDeep ? ` · now at ${zoom.ratio >= 1 ? '100' : Math.max(1, Math.round(zoom.ratio * 100))}% of full resolution` : ''}
+        </div>
+        <div className="tiny">{georefLine}</div>
+        <div className="tiny">An original map of its time — it reflects its maker’s knowledge and purposes, not an objective record of everything that existed. · {map.rights} · <a href={map.page} target="_blank" rel="noreferrer">Catalogue record ↗</a></div>
+      </div>
+    </div>
+  );
+}
+
+/** Pinch/drag viewer for servers without tiles: one image, zoomable only up to its own pixel size. */
+function FlatViewer({ map }: { map: HistMap }) {
   const [z, setZ] = useState(1);
+  const [maxZ, setMaxZ] = useState(1);
   const [pan, setPan] = useState<[number, number]>([0, 0]);
   const pts = useRef(new Map<number, [number, number]>());
   const last = useRef<{ d?: number; c?: [number, number] }>({});
   const [src, setSrc] = useState<string | undefined>(map.thumb);
   useEffect(() => { if (map.iiif) viewerUrl(map.iiif).then(setSrc).catch(() => {}); }, [map.iiif]);
+  const clamp = (v: number) => Math.max(1, Math.min(maxZ, v));
   const onMove = (e: React.PointerEvent) => {
     if (!pts.current.has(e.pointerId)) return;
     pts.current.set(e.pointerId, [e.clientX, e.clientY]);
     const p = [...pts.current.values()];
     if (p.length === 2) {
       const d = Math.hypot(p[0][0] - p[1][0], p[0][1] - p[1][1]);
-      if (last.current.d) setZ((v) => Math.max(1, Math.min(8, v * (d / last.current.d!))));
+      if (last.current.d) setZ((v) => clamp(v * (d / last.current.d!)));
       last.current.d = d;
     } else if (p.length === 1) {
       const c = p[0];
@@ -165,24 +231,11 @@ export function MapViewer({ map, onClose }: { map: HistMap; onClose: () => void 
   };
   const end = (e: React.PointerEvent) => { pts.current.delete(e.pointerId); last.current = {}; };
   return (
-    <div className="map-viewer" role="dialog" aria-label={`Historical map: ${map.title}`}>
-      <div className="map-viewer-bar">
-        <button className="btn sm ghost" onClick={onClose}>✕ Close</button>
-        <span className="row" style={{ gap: 4 }}>
-          <button className="btn sm ghost" onClick={() => setZ((v) => Math.min(8, v * 1.5))} aria-label="Zoom in">+</button>
-          <button className="btn sm ghost" onClick={() => setZ((v) => Math.max(1, v / 1.5))} aria-label="Zoom out">−</button>
-          <button className="btn sm ghost" onClick={() => { setZ(1); setPan([0, 0]); }}>Reset</button>
-        </span>
-      </div>
-      <div className="map-viewer-stage" onPointerDown={(e) => { pts.current.set(e.pointerId, [e.clientX, e.clientY]); (e.target as Element).setPointerCapture?.(e.pointerId); }} onPointerMove={onMove} onPointerUp={end} onPointerCancel={end}
-        onWheel={(e) => setZ((v) => Math.max(1, Math.min(8, v * (e.deltaY < 0 ? 1.15 : 0.87))))}>
-        {src && <img src={src} alt={map.title} draggable={false} style={{ transform: `translate(${pan[0]}px, ${pan[1]}px) scale(${z})` }} />}
-      </div>
-      <div className="map-viewer-caption">
-        <b>{map.title}</b>
-        <div className="tiny">{mapDateLabel(map)}{map.creator ? ` · ${map.creator}` : ''} · {map.holder}</div>
-        <div className="tiny">An original map of its time — it reflects its maker’s knowledge and purposes, not an objective record of everything that existed. · {map.rights} · <a href={map.page} target="_blank" rel="noreferrer">Catalogue record ↗</a></div>
-      </div>
+    <div className="map-viewer-flat" onPointerDown={(e) => { pts.current.set(e.pointerId, [e.clientX, e.clientY]); (e.target as Element).setPointerCapture?.(e.pointerId); }} onPointerMove={onMove} onPointerUp={end} onPointerCancel={end}
+      onWheel={(e) => setZ((v) => clamp(v * (e.deltaY < 0 ? 1.15 : 0.87)))} onDoubleClick={() => { setZ(1); setPan([0, 0]); }}>
+      {src && <img src={src} alt={map.title} draggable={false} style={{ transform: `translate(${pan[0]}px, ${pan[1]}px) scale(${z})` }}
+        // Zoom stops where one image pixel fills one screen pixel: beyond that it would only blur.
+        onLoad={(e) => { const im = e.currentTarget; setMaxZ(Math.max(1, im.naturalWidth / Math.max(1, im.clientWidth))); }} />}
     </div>
   );
 }

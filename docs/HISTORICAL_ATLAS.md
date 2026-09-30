@@ -174,6 +174,13 @@ better) to those points, states the fitting error, and refuses maps with too few
 points or too large an error. The image is requested at a size the IIIF server
 allows. Placement is approximate: it is only as good as the georeference.
 
+### How names, time, polities and labels are decided
+
+See [HISTORICAL_GEOGRAPHY_DIAGNOSIS.md](HISTORICAL_GEOGRAPHY_DIAGNOSIS.md) — the root causes found in the
+original pipeline and, for each, the general rule that replaced it (text evidence before lookups, spelling
+evidence, the book's geography as a prior, entity types, name roles, the time-fit model, Cliopatria's
+hierarchy and contested territory, importance classes, the label hierarchy, deep zoom and map relevance).
+
 ### Limits
 
 - Allmaps coverage varies a lot by place; many regions have no georeferenced maps.

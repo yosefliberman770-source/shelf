@@ -182,7 +182,7 @@ function wdPlace(e: WdEntity, name: string): HistoricalPlace | undefined {
     latitude: coord.latitude,
     longitude: coord.longitude,
     locationPrecision: 'approximate',
-    placeType: e.descriptions?.en?.value,
+    // Wikidata's description is a present-day summary ("city in …"), not a historical type.
     description: e.descriptions?.en?.value,
     countryCodes: [],
     historicalStartYear: wdYear(c.P571?.[0]?.mainsnak.datavalue?.value) ?? wdYear(c.P580?.[0]?.mainsnak.datavalue?.value),
@@ -214,7 +214,7 @@ export const wikidataProvider: PlaceProvider = {
         const p = wdPlace(e, q.name);
         if (!p) continue;
         wikidataProminence.set(p.id, Object.keys(e.sitelinks ?? {}).length);
-        const exact = [p.canonicalName, ...p.alternativeNames].some((n) => n.toLowerCase() === q.name.toLowerCase());
+        const exact = [p.canonicalName, ...p.alternativeNames].some((n) => !/\.$/.test(n.trim()) && n.toLowerCase() === q.name.toLowerCase());
         cands.push({ place: p, exactName: exact });
       }
       out.push(cands);

@@ -15,7 +15,8 @@ import { type HistYear, yearLabel } from '../../atlas/time';
 import type { TimelineMark } from '../../atlas/Timeline';
 import type { MapBookmarkRow } from '../../db/types';
 import { unionBBox, zoomForBBox } from '../../lib/history/geometry';
-import { type DateContext, dateContextFor, detectPlaces, saveBookDate } from '../../lib/history/placeDetect';
+import { type DateContext, dateContextFor, detectPlaces, saveBookDate, screenMentions } from '../../lib/history/placeDetect';
+import type { MentionEvidence } from '../../atlas/mention';
 import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
 import { EventCard, LookingAtCard, NearbyPanel, PlaceHistory, SavedPanel, SearchPanel, WarEvents } from './atlasParts';
@@ -41,6 +42,17 @@ const TABS: { id: Tab; label: string }[] = [
 const FOLLOW_KEY = 'shelf.followBook';
 const LOOK_KEY = 'shelf.atlas.lookingOpen';
 type Mention = { cfi: string; snippet: string };
+
+/** How far to zoom in on a place: a continent or sea needs the whole region in view, a town a close-up. */
+function focusZoom(p: ReaderPlace): number {
+  switch (p.kind) {
+    case 'continent': return 3;
+    case 'sea': return 4;
+    case 'polity': case 'region': return 5;
+    case 'island': case 'mountain': case 'lake': case 'river': return 7;
+    default: return p.certainty === 'known' ? 8 : 7;
+  }
+}
 
 export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDate, wide, onClose, findMentions, onJump, position, loadSection, sectionCount }: {
   request: MapRequest;
@@ -112,7 +124,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openKey = (key: string, name: string, detection: Detection = 'map') => { setTarget({ written: name, detection, key }); setTab('place'); setEventQ(undefined); };
-  const openPlace = (p: ReaderPlace) => { setRes({ place: p, status: p.status, candidates: [], reason: p.why.reason }); setTarget(null); setTab('place'); setView({ lat: p.lat, lon: p.lon, zoom: 8 }); };
+  const openPlace = (p: ReaderPlace) => { setRes({ place: p, status: p.status, candidates: [], reason: p.why.reason }); setTarget(null); setTab('place'); setView({ lat: p.lat, lon: p.lon, zoom: focusZoom(p) }); };
 
   // ── Follow the book (off unless the reader turns it on) ──
   const [follow, setFollow] = useState(() => { try { return localStorage.getItem(FOLLOW_KEY) === '1'; } catch { return false; } });
@@ -128,7 +140,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   // ── Map state ──
   const mapRef = useRef<MLMap | null>(null);
   const [view, setView] = useState<AtlasView | undefined>();
-  useEffect(() => { if (place) setView({ lat: place.lat, lon: place.lon, zoom: place.certainty === 'known' ? 8 : 7 }); }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (place) setView({ lat: place.lat, lon: place.lon, zoom: focusZoom(place) }); }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
   const [layers, setLayers] = useState<string[]>([]);
   const [layersRequest, setLayersRequest] = useState<{ layers: string[]; n: number } | undefined>();
   const ensureLayers = (ids: string[]) => { const missing = ids.filter((id) => !layers.includes(id)); if (missing.length) setLayersRequest({ layers: [...layers, ...missing], n: Date.now() }); };
@@ -294,8 +306,9 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
           </div>
         )}
 
-        {tab === 'chapter' && (
-          <ChapterPanel key={request.mode === 'section' ? `s:${request.text?.slice(0, 40)}` : 'chapter'} text={request.mode === 'section' && request.text ? request.text : chapterText()}
+        {/* Wait for the date context (it is worked out after the first render): places are resolved for a date, once. */}
+        {tab === 'chapter' && date && (
+          <ChapterPanel key={`${request.mode === 'section' ? `s:${request.text?.slice(0, 40)}` : 'chapter'}|${known ?? 'undated'}`} text={request.mode === 'section' && request.text ? request.text : chapterText()}
             section={request.mode === 'section'} year={known} bookId={book.bookId} bookTitle={book.title} chapter={book.chapter} names={names}
             findMentions={findMentions} onJump={onJump} onOpen={(p) => openPlace(p)}
             onPins={(pins) => {
@@ -373,7 +386,7 @@ function Unresolved({ written, res, onRetry, onChoose, onSearch }: { written: st
           <button key={c.key} className="rabbit-node" onClick={() => onChoose(c)}>
             <span style={{ minWidth: 0 }}>
               <b>{i + 1}. {c.title}</b>
-              <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.types.slice(0, 2).join(', '), c.partOf.slice(0, 2).join(', '), c.description, `${c.lat.toFixed(1)}°, ${c.lon.toFixed(1)}°`].filter(Boolean).join(' · ')}</span>
+              <span className="small muted" style={{ display: 'block', fontWeight: 400 }}>{[c.types.slice(0, 2).join(', '), c.partOf.slice(0, 2).join(', '), c.description ? `today: ${c.description}` : '', `${c.lat.toFixed(1)}°, ${c.lon.toFixed(1)}°`].filter(Boolean).join(' · ')}</span>
               <span className="tiny faint" style={{ display: 'block', fontWeight: 400 }}>{c.sources.map((s) => s.name).join(' · ')}</span>
             </span>
             <Icon name="chevronRight" className="faint" />
@@ -387,7 +400,7 @@ function Unresolved({ written, res, onRetry, onChoose, onSearch }: { written: st
 
 // ── Places in this chapter / this section ─────────────────────────────────
 
-interface Row { written: string; index: number; detection: Detection; res?: Resolution }
+interface Row { written: string; index: number; detection: Detection; res?: Resolution; mention?: MentionEvidence }
 
 function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, findMentions, onJump, onOpen, onPins, route, line, setRoute }: {
   text: string; section: boolean; year?: HistYear; bookId: string; bookTitle: string; chapter?: string;
@@ -402,22 +415,25 @@ function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, 
     if (ran.current) return;
     ran.current = true;
     const how = new Map(names.known.map((k) => [k.name.toLowerCase(), k.detection]));
-    const found = detectPlaces(text, names.known.map((k) => k.name), names.people).slice(0, 40);
-    const base: Row[] = found.map((m) => ({ written: m.name, index: m.index, detection: how.get(m.name.toLowerCase()) ?? 'cue' }));
-    setRows(base);
+    const detected = detectPlaces(text, names.known.map((k) => k.name), names.people).slice(0, 40);
     let dead = false;
     (async () => {
+      // Only names the text gives reason to treat as places (not ordinary words after "of"/"at").
+      const found = await screenMentions(detected, year);
+      const base: Row[] = found.map((m) => ({ written: m.name, index: m.index, detection: how.get(m.name.toLowerCase()) ?? 'cue', mention: m.evidence }));
+      if (dead) return;
+      setRows(base);
       const out = [...base];
       // Offline first for every name, then the online service for the rest.
       for (const [i, r] of out.entries()) {
-        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, online: false }).catch(() => undefined);
+        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, online: false, mention: r.mention, nearby: base.map((b) => b.written) }).catch(() => undefined);
         out[i] = { ...r, res };
       }
       if (dead) return;
       setRows([...out]);
       for (const [i, r] of out.entries()) {
         if (r.res?.place) continue;
-        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, nearby: base.map((b) => b.written), chapter, bookTitle, passage: text.slice(Math.max(0, r.index - 500), r.index + 500) }).catch(() => undefined);
+        const res = await resolvePlace(r.written, { year, bookId, detection: r.detection, mention: r.mention, nearby: base.map((b) => b.written), chapter, bookTitle, passage: text.slice(Math.max(0, r.index - 500), r.index + 500) }).catch(() => undefined);
         if (dead) return;
         out[i] = { ...r, res };
         setRows([...out]);

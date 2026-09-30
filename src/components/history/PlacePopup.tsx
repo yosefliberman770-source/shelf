@@ -7,7 +7,7 @@ import { type GazPlace, GAZETTEERS, matchName, namesAround, normName } from '../
 import { CERTAINTY_LABEL, type Detection, DETECTION_LABEL } from '../../atlas/resolve';
 import { yearLabel } from '../../atlas/time';
 import { DATE_SOURCE_LABEL, type DateContext } from '../../lib/history/placeDetect';
-import { span } from './atlasParts';
+import { politiesLine, span } from './atlasParts';
 
 export function PlacePopup({ written, place, date, detection, colors, onMap, onClose }: {
   written: string;
@@ -37,17 +37,17 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
       <div className="row between" style={{ alignItems: 'flex-start' }}>
         <div style={{ minWidth: 0 }}>
           <div className="place-pop-title">{written}</div>
-          {normName(place.title) !== normName(written) && <div className="small" style={{ color: colors.muted }}>{place.title} <span className="tiny">({info.name})</span></div>}
+          {normName(place.title) !== normName(written) && <div className="small" style={{ color: colors.muted }}>Recorded as <bdi>{place.title}</bdi> <span className="tiny">({info.name})</span></div>}
         </div>
         <button className="btn sm ghost" style={{ color: colors.fg }} onClick={onClose} aria-label="Close">✕</button>
       </div>
       <dl className="place-pop-facts">
-        {names.length > 0 && <><dt>Historical names</dt><dd>{names.map((n) => n.name).join(' · ')}</dd></>}
+        {names.length > 0 && <><dt>Historical names</dt><dd>{names.map((n, i) => <span key={i}>{i > 0 ? ' · ' : ''}<bdi dir="auto">{n.name}</bdi></span>)}</dd></>}
         <dt>Historical date</dt>
         <dd>{year !== undefined ? <>{yearLabel(year)}{date.approximate ? ' (approx.)' : ''} <span className="tiny" style={{ color: colors.muted }}>· {DATE_SOURCE_LABEL[date.source]}</span></> : <span style={{ color: colors.muted }}>Not given by the book — set it on the map</span>}</dd>
         <dt>Recorded</dt><dd>{span(place.from, place.to)}</dd>
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && (
-          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${pol.map((p) => `${p.edge ? 'at the edge of ' : ''}${p.n}`).join(' / ')} (${yearLabel(year!)})` : '', place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
+          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${politiesLine(pol)} (${yearLabel(year!)})` : '', place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
         )}
       </dl>
       <div className="row wrap" style={{ gap: 6 }}>
@@ -56,7 +56,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
       </div>
       {why && (
         <div className="tiny mt-8" style={{ color: colors.muted, lineHeight: 1.5 }}>
-          <div>Matched from: “{written}” → <b>{place.title}</b> in {info.name}.</div>
+          <div>Matched from: “{written}” → <b><bdi>{place.title}</bdi></b> in {info.name}.</div>
           {reason && <div>{reason}</div>}
           <div>{DETECTION_LABEL[detection]}.</div>
           <div>{CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license})</div>

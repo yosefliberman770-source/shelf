@@ -1,0 +1,15 @@
+common-words.txt: the lowercase entries (3+ letters) of the SCOWL "american-english"
+word list (Debian package wamerican 2020.12.07-2), used by Shelf to recognise ordinary
+English words so they aren't mistaken for place names.
+
+SCOWL (Spell Checker Oriented Word Lists), Copyright 2000-2011 by Kevin Atkinson,
+and the copyrights of its component lists (see data/historical/raw/scowl/).
+
+  Permission to use, copy, modify, distribute and sell these word
+  lists, the associated scripts, the output created from the scripts,
+  and its documentation for any purpose is hereby granted without fee,
+  provided that the above copyright notice appears in all copies and
+  that both that copyright notice and this permission notice appear in
+  supporting documentation. Kevin Atkinson makes no representations
+  about the suitability of this array for any purpose. It is provided
+  "as is" without express or implied warranty.

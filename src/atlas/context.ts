@@ -10,7 +10,20 @@ import { type HistYear, shiftYear } from './time';
 /** Dataset rows keep dates as f/t. */
 const span = (x: { f?: number; t?: number }) => ({ from: x.f, to: x.t });
 
-export interface Polity { n: string; q?: string; c?: string; f: HistYear; t: HistYear; /** The point is just outside the (simplified) outline, not inside it. */ edge?: boolean }
+export interface Polity {
+  n: string; q?: string; c?: string; f: HistYear; t: HistYear;
+  /** The point is just outside the (simplified) outline, not inside it. */ edge?: boolean;
+  /** A Cliopatria grouping (its name is in parentheses) rather than a polity. */ g?: 1;
+  /** Groupings this polity belongs to (";"-separated). */ m?: string;
+  /** Polities whose outlines overlap this one in the same years with no recorded relationship (";"-separated): source uncertainty, not a claim. */ x?: string;
+  /** Recorded relationships (allegiance, vassalage, personal union…) that explain an overlap. */ xr?: string;
+  /** A small outlying piece of the polity's outline. */ op?: 1;
+  /** Area of the outline, km². */ a?: number;
+  /** Groupings containing this point that the polity belongs to, without parentheses. */ partOf?: string[];
+}
+
+/** A polity's name for display: Cliopatria's parentheses removed from groupings. */
+export const polityDisplayName = (p: Pick<Polity, 'n'>) => p.n.replace(/^\(|\)$/g, '');
 export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
 export interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 
@@ -25,13 +38,19 @@ export async function politiesAt(p: Pos, year: HistYear, edgeKm = 20): Promise<P
   const slice = index.find((s) => s.from <= year && year <= s.to);
   if (!slice) return [];
   const fc = await pack<FC<Polity>>(slice.file);
-  const now = fc.features.filter((f) => f.properties.f <= year && f.properties.t >= year);
+  const now = fc.features.filter((f) => f.properties.f <= year && f.properties.t >= year && f.geometry?.type !== 'Point');
   const seen = new Set<string>();
   const uniq = (xs: Polity[]) => xs.filter((x) => (seen.has(x.n) ? false : (seen.add(x.n), true)));
-  const inside = uniq(now.filter((f) => contains(f.geometry, p)).map((f) => f.properties));
+  const containing = now.filter((f) => contains(f.geometry, p)).map((f) => f.properties);
+  // Hierarchy: groupings are reported as what the polity is part of, not as
+  // rival polities. Independent polities that overlap here are an overlap in the source (see Polity.x / xr).
+  const groups = containing.filter((x) => x.g);
+  const members = containing.filter((x) => !x.g).sort((a, b) => (a.op ? 1 : 0) - (b.op ? 1 : 0) || (a.a ?? Infinity) - (b.a ?? Infinity));
+  const withParents = members.map((x) => ({ ...x, partOf: groups.filter((g) => (x.m ?? '').split(';').includes(g.n)).map(polityDisplayName) }));
+  const inside = uniq(withParents.length ? withParents : groups);
   if (inside.length || !edgeKm) return inside;
   const rings = (g: Feature['geometry']) => ({ type: 'MultiLineString', coordinates: g?.type === 'Polygon' ? g.coordinates : g?.type === 'MultiPolygon' ? (g.coordinates as Pos[][][]).flat() : [] });
-  return uniq(now.map((f) => ({ f, d: distanceToLine(rings(f.geometry), p) })).filter((x) => x.d <= edgeKm).sort((a, b) => a.d - b.d).slice(0, 1).map((x) => ({ ...x.f.properties, edge: true })));
+  return uniq(now.filter((f) => !f.properties.g).map((f) => ({ f, d: distanceToLine(rings(f.geometry), p) })).filter((x) => x.d <= edgeKm).sort((a, b) => a.d - b.d).slice(0, 1).map((x) => ({ ...x.f.properties, edge: true })));
 }
 
 let eventsP: Promise<AtlasEvent[]> | undefined;

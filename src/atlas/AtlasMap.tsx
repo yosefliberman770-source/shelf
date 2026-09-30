@@ -3,9 +3,9 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, SOURCE_SPECS } from './catalog';
+import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
 import { getJSON } from './data';
-import { type HistYear, yearLabel } from './time';
+import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
 
 export interface AtlasFocus { name: string; lat: number; lon: number; certainty?: 'known' | 'approximate' | 'uncertain' | 'disputed'; note?: string }
@@ -129,11 +129,12 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const [enabled, setEnabled] = useState<string[]>(loadEnabled);
   const [panel, setPanel] = useState(false);
   const [eventWindow, setEventWindow] = useState(0);
+  const [showUndated, setShowUndated] = useState(false);
   const [warOwn, setWarOwn] = useState<string | undefined>();
   const war = onWarChange ? warProp : warOwn;
   const setWar = onWarChange ?? setWarOwn;
   const [info, setInfo] = useState<Info | null>(null);
-  const ctx: LayerCtx = useMemo(() => ({ year, base, world: `${import.meta.env.BASE_URL}world/`, eventWindow, war }), [year, base, eventWindow, war]);
+  const ctx: LayerCtx = useMemo(() => ({ year, base, world: `${import.meta.env.BASE_URL}world/`, eventWindow, war, showUndated }), [year, base, eventWindow, war, showUndated]);
   const ctxRef = useRef(ctx);
   ctxRef.current = ctx;
   const enabledRef = useRef(enabled);
@@ -192,6 +193,11 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
 
+  /** Which layer definition added a map layer. */
+  const managedDef = (layerId: string) => [...managed.current].find(([, ids]) => ids.includes(layerId))?.[0];
+  /** The lowest label layer we manage (the start of the label band). */
+  const labelBandStart = (map: MLMap) => map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined)?.id;
+
   // ── Keep layers in step with the toggles and the year ──
   const sync = useCallback(async () => {
     const map = mapRef.current;
@@ -212,9 +218,15 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         for (const spec of specs) if ('filter' in spec && spec.filter && map.getLayer(spec.id)) map.setFilter(spec.id, spec.filter);
         continue;
       }
-      // Insert below the next layer in draw order that's already on the map.
-      const after = DRAW_ORDER.slice(DRAW_ORDER.indexOf(def.id) + 1).map((id) => managed.current.get(id)?.[0]).find(Boolean) ?? TOP;
-      for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, after);
+      // Geometry goes below the next layer in draw order that's already on
+      // the map. Labels go in one band above all geometry, ordered by the
+      // label hierarchy, so a polity's name isn't hidden by a shire's.
+      const isLabel = (id: string) => map.getLayer(id)?.type === 'symbol';
+      const geomAfter = DRAW_ORDER.slice(DRAW_ORDER.indexOf(def.id) + 1).map((id) => managed.current.get(id)?.find((l) => !isLabel(l))).find(Boolean)
+        ?? labelBandStart(map) ?? TOP;
+      const rank = labelKey(def.id);
+      const labelAfter = map.getStyle().layers.find((l) => l.type === 'symbol' && managedDef(l.id) !== undefined && labelKey(managedDef(l.id)!) > rank)?.id ?? TOP;
+      for (const spec of specs) if (!map.getLayer(spec.id)) map.addLayer(spec as LayerSpecification, spec.type === 'symbol' ? labelAfter : geomAfter);
       managed.current.set(def.id, specs.map((s) => s.id));
     }
     // Borders come in time slices; load the slice that covers the year.
@@ -328,7 +340,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         <button className="btn sm atlas-layers-btn" onClick={() => setPanel(!panel)} aria-expanded={panel}>☰ Layers</button>
         {!ready && <div className="atlas-loading">Loading the atlas…</div>}
         {children}
-        {panel && <LayerPanel enabled={enabled} toggle={toggle} year={year} eventWindow={eventWindow} setEventWindow={setEventWindow} war={war} setWar={setWar} base={base} onClose={() => setPanel(false)} />}
+        {panel && <LayerPanel enabled={enabled} toggle={toggle} year={year} eventWindow={eventWindow} setEventWindow={setEventWindow} war={war} setWar={setWar} base={base} showUndated={showUndated} setShowUndated={setShowUndated} onClose={() => setPanel(false)} />}
       </div>
       <Timeline year={year} onChange={onYearChange} marks={marks} />
       {info && <FeatureCard info={info} onClose={() => setInfo(null)}
@@ -348,9 +360,9 @@ function coverageNote(d: AtlasLayerDef, year: HistYear): string | undefined {
   return undefined;
 }
 
-function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, setWar, base, onClose }: {
+function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, setWar, base, showUndated, setShowUndated, onClose }: {
   enabled: string[]; toggle: (id: string) => void; year: HistYear; eventWindow: number; setEventWindow: (n: number) => void;
-  war?: string; setWar: (q: string | undefined) => void; base: string; onClose: () => void;
+  war?: string; setWar: (q: string | undefined) => void; base: string; showUndated: boolean; setShowUndated: (v: boolean) => void; onClose: () => void;
 }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
@@ -359,6 +371,10 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <b>Layers</b>
         <button className="btn xs ghost" onClick={onClose} aria-label="Close layers">✕</button>
       </div>
+      <label className="row small" style={{ gap: 8, alignItems: 'flex-start' }}>
+        <input type="checkbox" checked={showUndated} onChange={(e) => setShowUndated(e.target.checked)} aria-label="Include undated records" />
+        <span>Include undated records <span className="tiny faint">— records with no temporal evidence at all (no dates, nothing dated linked to them, no source period). Shown faint at any date and marked undated. Off by default: such a record isn’t evidence that something existed in {yearLabel(year)}. Records without exact dates but with a known period (e.g. a place from the Barrington Atlas, or a village with a dated temple) are shown inside that period anyway.</span></span>
+      </label>
       {GROUPS.map((g) => {
         const defs = LAYERS.filter((l) => l.group === g.id || l.alsoIn?.includes(g.id));
         return (
@@ -373,7 +389,7 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
                     <input type="checkbox" checked={on} disabled={!!d.unavailable} onChange={() => toggle(d.id)} aria-label={d.label} />
                     <span className="grow">
                       <span className={d.unavailable ? 'faint' : ''}>{d.label}</span>
-                      {d.unavailable && <span className="tiny faint"> — no open dataset</span>}
+                      {d.unavailable && <span className="tiny faint"> — {d.unavailableKind ? UNAVAILABLE_LABEL[d.unavailableKind] : 'not available'}</span>}
                       {note && <span className="tiny" style={{ display: 'block', color: 'var(--warn)' }}>{note}</span>}
                     </span>
                     <button type="button" className="why-link tiny" onClick={(e) => { e.preventDefault(); setOpen(open === d.id ? null : d.id); }} aria-label={`About ${d.label}`}>ⓘ</button>
@@ -404,6 +420,13 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <div>● filled — precise location · ○ hollow — rough location</div>
         <div>Faded or “?” — the source marks it uncertain, or its date isn’t recorded</div>
         <div>Dashed red road — period not recorded in the source</div>
+        <div>Bigger dots and names that appear first — places with a larger recorded role (capital, administrative centre, urban, port, road hub, sites recorded there). Based on the evidence available, not population, which the sources don’t record</div>
+        <div className="mt-4"><b>Political map</b></div>
+        <div className="row wrap" style={{ gap: 3 }} aria-hidden="true">{POLITY_PALETTE.map((c) => <span key={c} style={{ width: 12, height: 12, borderRadius: 2, background: c, opacity: 0.55, border: `1px solid ${c}` }} />)}</div>
+        <div>Each colour marks one polity, kept through time; neighbours get different colours. Colour doesn’t mean empire, kingdom or republic — those are the separate layers above, and each polity’s type is in its details.</div>
+        <div><span style={{ borderBottom: '2px dashed #555', paddingBottom: 1 }}>Dashed outline, no fill</span> — a grouping of polities (an empire’s provinces, a heptarchy, a personal union), not a separate state</div>
+        <div><span style={{ borderBottom: '1px dashed #555', paddingBottom: 1, opacity: 0.7 }}>Faint, dashed</span> — the source’s outline overlaps another polity’s in the same years (it records no claims, so this is shown as uncertainty, not as a dispute), or a small detached piece far from the main territory</div>
+        <div>Names appear by size: large states when zoomed out, small ones as you zoom in. Each polity is named once.</div>
         <div>Borders show one scholarly reconstruction; real frontiers were rarely sharp lines.</div>
       </div>
     </div>
@@ -454,22 +477,39 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'pleiades-places':
     case 'pleiades-lines':
     case 'pleiades-provinces': {
-      const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '', `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
+      const env = str('eo') as EnvelopeBasis | undefined;
+      const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '',
+        env ? `No dates of its own. Shown for ${range(num('ef'), num('et'))} — the period of ${ENVELOPE_LABEL[env]}`
+          : num('f') === undefined && num('t') === undefined && src === 'pleiades-places' ? 'Undated: no dates, and nothing dated is linked to it'
+          : `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
       if (str('a')) lines.push(`Also: ${str('a')!.split('|').join(' · ')}`);
       if (src === 'pleiades-places') lines.push(num('p') === 1 ? `Precise location${num('r') ? ` (± ${num('r')} m)` : ''}` : 'Rough location');
+      if (str('iw')) lines.push(`Drawn prominently because it is recorded as: ${str('iw')!.split(',').join(', ')} (not a population figure)`);
       return {
         title: str('n') ?? 'Place', lines: lines.filter(Boolean),
         pick: src === 'pleiades-places' && pt ? { key: `pleiades:${num('i')}`, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
         link: { href: `https://pleiades.stoa.org/places/${num('i')}`, label: 'Pleiades record ↗' }, source: credit('pleiades'),
-        caution: num('u') ? 'Pleiades marks this location as less certain.' : num('f') === undefined && num('t') === undefined ? 'The source gives no dates; shown for the ancient period only.' : 'Pleiades dates are broad periods, not founding or abandonment dates.',
+        caution: num('u') ? 'Pleiades marks this location as less certain.' : env ? 'Approximate: exact dates aren’t known, so it is shown throughout the period its evidence allows.' : num('f') === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no evidence for when it existed.' : 'Pleiades dates are broad periods, not founding or abandonment dates.',
       };
     }
     case 'cliopatria': {
       const c = str('c');
+      const grouping = p.g !== undefined;
+      const lines = [
+        grouping ? 'A grouping of polities in Cliopatria (outlined, not a separate state)' : `${c ? c[0].toUpperCase() + c.slice(1) : 'Type not recorded'}${c ? ' (type from Wikidata)' : ''}`,
+        `This outline: ${range(num('f'), num('t'))}`,
+      ];
+      if (str('m')) lines.push(`Part of: ${str('m')!.split(';').map((x) => x.replace(/^\(|\)$/g, '')).join(', ')}`);
+      if (grouping && str('cm')) lines.push(`Made up of: ${str('cm')!.split(';').join(', ')}`);
+      if (num('a')) lines.push(`Area in this outline: about ${num('a')!.toLocaleString()} km²`);
+      const cautions = ['One scholarly reconstruction of the territory; borders were rarely this precise.'];
+      if (p.op !== undefined) cautions.unshift('A small detached piece of this polity’s outline, far from its main territory. Cliopatria includes it in the outline but doesn’t say whether it was held, briefly occupied, or is an artefact of the reconstruction.');
+      if (str('x')) cautions.unshift(`Overlapping outlines: the source’s outline for this polity overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria records territory per period and records no claims or disputes, so this may be shared or changing control within the period, or imprecision in the reconstruction — the source doesn’t say which.`);
+      if (str('xr')) cautions.unshift(`Overlap explained by a relationship Cliopatria records: ${str('xr')!.split(';').join('; ')}.`);
       return {
-        title: str('n') ?? 'Polity', lines: [`${c ? c[0].toUpperCase() + c.slice(1) : 'Type not recorded'}${c ? ' (type from Wikidata)' : ''}`, `This outline: ${range(num('f'), num('t'))}`],
+        title: grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity', lines,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : undefined, source: credit('cliopatria'),
-        caution: 'One scholarly reconstruction of the territory; borders were rarely this precise.',
+        caution: cautions.join(' '),
       };
     }
     case 'wikidata-events':

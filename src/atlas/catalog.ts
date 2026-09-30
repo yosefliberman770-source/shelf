@@ -5,6 +5,15 @@
 import type { ExpressionSpecification, FilterSpecification, LayerSpecification, SourceSpecification } from 'maplibre-gl';
 import { eventNear, existedIn, type HistYear, ohmExisted } from './time';
 
+/** Why a layer can't be shown: each reason is stated as it is, never lumped together as "no data". */
+export type UnavailableKind = 'no-dataset' | 'licence' | 'online-only' | 'not-integrated';
+export const UNAVAILABLE_LABEL: Record<UnavailableKind, string> = {
+  'no-dataset': 'no suitable open dataset exists',
+  licence: 'licence doesn’t allow publishing it here',
+  'online-only': 'available online only',
+  'not-integrated': 'not added to Shelf yet',
+};
+
 export type GroupId = 'places' | 'physical' | 'infrastructure' | 'political' | 'military' | 'economic';
 export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'places', label: 'Places' },
@@ -50,6 +59,12 @@ export interface LayerCtx {
   world?: string;
   /** Show events within ± this many years. */
   eventWindow: number;
+  /**
+   * Also draw records that carry no dates — only inside their dataset's own period,
+   * hollow and faint. Off by default: an undated record is not evidence that
+   * something existed in the chosen year.
+   */
+  showUndated?: boolean;
   /** A war picked in the Military panel (Wikidata id). */
   war?: string;
 }
@@ -68,6 +83,8 @@ export interface AtlasLayerDef {
   coverage?: [HistYear, HistYear];
   /** Set when no suitable open scholarly dataset exists yet. The toggle is shown but disabled. */
   unavailable?: string;
+  /** Why it's unavailable, in short — shown next to the layer name. */
+  unavailableKind?: UnavailableKind;
   sources: string[];
   specs: (ctx: LayerCtx) => LayerSpecification[];
 }
@@ -85,8 +102,6 @@ const FONT = ['OpenHistorical'];
 const FONT_BOLD = ['OpenHistorical Bold'];
 const FONT_ITALIC = ['OpenHistorical Italic'];
 
-/** Pleiades covers the ancient world; undated Pleiades records are shown only up to 640 CE, faintly. */
-const PLEIADES_UNDATED_UNTIL = 640;
 /** AWMC/Barrington data covers the Greek and Roman world, c. 750 BCE – 640 CE. */
 const BARRINGTON: [HistYear, HistYear] = [-750, 640];
 
@@ -142,14 +157,19 @@ export function credit(id: DatasetId): string {
 
 // ── Layer builders ────────────────────────────────────────────────────────
 function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, opts: { labelZoom?: number; radius?: number; minzoom?: number } = {}): LayerSpecification[] {
-  const filter = ['all', ['in', cat, ['get', 'l']], existedIn(ctx.year, { undated: { until: PLEIADES_UNDATED_UNTIL } })] as FilterSpecification;
+  // Own dates → shown inside them. No dates but an evidence period (ef/et, from linked records or the
+  // source's period — see the build) → shown inside that period, faded. No temporal evidence at all →
+  // only when the reader asks to see undated records, and then marked as undated.
+  const filter = ['all', ['in', cat, ['get', 'l']], existedIn(ctx.year, { envelope: { from: 'ef', to: 'et' }, undated: ctx.showUndated ? 'show' : 'hide' })] as FilterSpecification;
   const r = opts.radius ?? 3.5;
+  const imp: ExpressionSpecification = ['match', ['coalesce', ['get', 'im'], 1], 4, 1.5, 3, 1.15, 2, 0.9, 0.7];
   return [
     {
       id: `${id}-pt`, type: 'circle', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.minzoom ?? 3,
       paint: {
         // Small when zoomed out: thousands of sites would otherwise hide the map.
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, r * 0.3, 5, r * 0.55, 8, r * 1.3, 12, r * 2],
+        // Size by importance class (from the build: names, links and sites recorded for the place).
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, ['*', r * 0.3, imp], 5, ['*', r * 0.5, imp], 8, ['*', r * 1.05, imp], 12, ['*', r * 1.7, imp]],
         // Rough locations are drawn hollow; precise ones filled.
         'circle-color': color,
         'circle-opacity': ['case', ['==', ['get', 'p'], 0], 0.12, certaintyOpacity()],
@@ -159,12 +179,19 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
       },
     },
     {
-      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.labelZoom ?? 7,
+      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: Math.min(5, opts.labelZoom ?? 7),
       layout: {
         // Pleiades titles unnamed sites "Untitled": keep the dot, skip the label.
         'text-field': ['case', ['==', ['get', 'n'], 'Untitled'], '', ['>=', u(), 1], ['concat', ['get', 'n'], ' ?'], ['get', 'n']],
-        'text-font': FONT,
-        'text-size': 11.5, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true,
+        'text-font': ['case', ['>=', ['coalesce', ['get', 'im'], 1], 4], ['literal', FONT_BOLD], ['literal', FONT]],
+        // Prominent places are named first; the rest only once there's room (size 0 = not shown yet).
+        'text-size': ['step', ['zoom'],
+          ['case', ['>=', ['coalesce', ['get', 'im'], 1], 4], 11.5, 0],
+          6, ['case', ['>=', ['coalesce', ['get', 'im'], 1], 3], 11.5, 0],
+          Math.max(7, opts.labelZoom ?? 7), ['case', ['>=', ['coalesce', ['get', 'im'], 1], 2], 11.5, 0],
+          Math.max(9, (opts.labelZoom ?? 7) + 2), 11.5],
+        'symbol-sort-key': ['-', 0, ['coalesce', ['get', 'im'], 1]],
+        'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true,
       },
       paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.4, 'text-opacity': certaintyOpacity(1) },
     },
@@ -179,12 +206,51 @@ function ohmPlaces(id: string, types: string[], color: string, minzoom: number, 
   ];
 }
 
-function polityClass(id: string, match: ExpressionSpecification, color: string, ctx: LayerCtx): LayerSpecification[] {
-  const filter = ['all', match, existedIn(ctx.year)] as FilterSpecification;
+/**
+ * Political colours. Each polity has a fixed palette index from the build
+ * (by its Seshat/Wikidata identity, so a state keeps its colour through time),
+ * chosen so neighbours and overlapping polities differ. Colour identifies the
+ * polity; it does not encode its type (empire/kingdom/… are separate layers
+ * and are named in the legend and the details).
+ */
+export const POLITY_PALETTE = ['#c0392b', '#2e86c1', '#27ae60', '#8e44ad', '#d68910', '#16a085', '#a04000', '#2c3e50', '#c2185b', '#7d8c1f', '#5d6d7e', '#1f618d'];
+/** Darker text versions of the same colours, readable on the parchment base. */
+const POLITY_TEXT = ['#8e2419', '#1b5e89', '#1b7a43', '#5f2d77', '#8f5a05', '#0e6b59', '#6e2c00', '#1a252f', '#880e4f', '#556113', '#3d4955', '#123f5f'];
+const polityColour = (pal: string[]): ExpressionSpecification => ['match', ['%', ['coalesce', ['get', 'ci'], 0], pal.length], ...pal.slice(1).flatMap((c, i) => [i + 1, c]), pal[0]] as unknown as ExpressionSpecification;
+const isOutline: ExpressionSpecification = ['!=', ['geometry-type'], 'Point'];
+/** Label size by the polity's area: only large polities are named at world scale; small ones appear as you zoom in. */
+const areaLabelSize: ExpressionSpecification = ['step', ['zoom'],
+  ['case', ['>=', ['get', 'a'], 400000], 11, 0],
+  3, ['case', ['>=', ['get', 'a'], 120000], 12, 0],
+  4, ['case', ['>=', ['get', 'a'], 30000], 12, 0],
+  5, ['case', ['>=', ['get', 'a'], 8000], 13, 0],
+  6, ['case', ['>=', ['get', 'a'], 2000], 13, 0],
+  7, 13];
+
+function polityClass(id: string, match: ExpressionSpecification, _color: string, ctx: LayerCtx): LayerSpecification[] {
+  const alive = existedIn(ctx.year);
+  const area = ['all', match, alive, isOutline, ['!', ['has', 'lbl']]] as ExpressionSpecification;
+  // Members and independent polities are filled. A grouping (Cliopatria's
+  // parenthesised collections: an empire's provinces, a heptarchy, a
+  // personal union) is only outlined around its members — it isn't a rival.
+  const filled = ['all', area, ['!', ['has', 'g']]] as FilterSpecification;
+  const grouping = ['all', area, ['has', 'g']] as FilterSpecification;
+  const labels = ['all', match, alive, ['has', 'lbl']] as FilterSpecification;
+  // Outlines that overlap another polity's with no recorded relationship to explain it, and small
+  // outlying pieces far from the main territory are drawn fainter and dashed.
+  const doubtful: ExpressionSpecification = ['any', ['has', 'x'], ['has', 'op']];
   return [
-    { id: `${id}-fill`, type: 'fill', source: 'cliopatria', filter, paint: { 'fill-color': color, 'fill-opacity': 0.13 } },
-    { id: `${id}-edge`, type: 'line', source: 'cliopatria', filter, paint: { 'line-color': color, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.6, 7, 1.6], 'line-opacity': 0.65, 'line-blur': 0.6 } },
-    { id: `${id}-label`, type: 'symbol', source: 'cliopatria', filter, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['interpolate', ['linear'], ['zoom'], 2, 10, 6, 14], 'text-transform': 'uppercase', 'text-letter-spacing': 0.08, 'text-max-width': 8, 'symbol-placement': 'point', 'text-optional': true }, paint: { 'text-color': color, 'text-opacity': 0.8, 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+    { id: `${id}-fill`, type: 'fill', source: 'cliopatria', filter: filled, paint: { 'fill-color': polityColour(POLITY_PALETTE), 'fill-opacity': ['case', ['has', 'op'], 0.07, ['has', 'x'], 0.1, 0.16] } },
+    { id: `${id}-edge`, type: 'line', source: 'cliopatria', filter: filled, paint: { 'line-color': polityColour(POLITY_PALETTE), 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.6, 7, 1.6], 'line-opacity': ['case', doubtful, 0.5, 0.7], 'line-blur': 0.6 } },
+    { id: `${id}-edge-doubt`, type: 'line', source: 'cliopatria', filter: ['all', filled, doubtful] as FilterSpecification, paint: { 'line-color': polityColour(POLITY_TEXT), 'line-width': 1, 'line-dasharray': [2, 2], 'line-opacity': 0.6 } },
+    { id: `${id}-group`, type: 'line', source: 'cliopatria', filter: grouping, paint: { 'line-color': polityColour(POLITY_TEXT), 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 1, 7, 2.2], 'line-dasharray': [4, 2], 'line-opacity': 0.55 } },
+    { id: `${id}-label`, type: 'symbol', source: 'cliopatria', filter: labels, layout: {
+      // Groupings are named without Cliopatria's parentheses, in italic, so they read as "a grouping", not a state.
+      'text-field': ['case', ['has', 'g'], ['slice', ['get', 'n'], 1, ['-', ['length', ['get', 'n']], 1]], ['get', 'n']],
+      'text-font': ['case', ['has', 'g'], ['literal', FONT_ITALIC], ['literal', FONT_BOLD]],
+      'text-size': areaLabelSize, 'text-transform': 'uppercase', 'text-letter-spacing': 0.08, 'text-max-width': 8,
+      'symbol-placement': 'point', 'symbol-sort-key': ['-', 0, ['get', 'a']], 'text-padding': 6, 'text-optional': true,
+    }, paint: { 'text-color': polityColour(POLITY_TEXT), 'text-opacity': ['case', ['has', 'x'], 0.6, 0.85], 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
   ];
 }
 
@@ -198,6 +264,8 @@ function events(id: string, kind: string | string[], color: string, ctx: LayerCt
 
 /** Viabundus covers 1350–1650 (a little either side is kept so the edges of the period still show). */
 const VIABUNDUS: [HistYear, HistYear] = [1250, 1700];
+/** Viabundus documents that records without dates apply to its core period, 1350–1650 — and only that. */
+const VIABUNDUS_CORE: [HistYear, HistYear] = [1350, 1650];
 /** al-Ṯurayyā follows Cornu's atlas of the 9th–10th centuries. */
 const THURAYYA: [HistYear, HistYear] = [700, 1100];
 /** Domesday Book records 1086; its units are shown twenty years either side, and labelled as 1086. */
@@ -228,7 +296,7 @@ export const LAYERS: AtlasLayerDef[] = [
   // PLACES
   {
     id: 'settlements', group: 'places', label: 'Ancient settlements', datasets: ['pleiades'], defaultOn: true, coverage: [-3000, 1500],
-    hint: 'Cities, towns and villages of the ancient world. Pleiades doesn’t record size, so they aren’t split into city/town/village. Hollow = rough location; faded = uncertain or undated.',
+    hint: 'Cities, towns and villages of the ancient world. Pleiades records no population, so dot size and the order places appear come from their recorded role and evidence — capital, administrative centre, urban place, port, road hub (Itiner-e), sites recorded there — with how well documented they are counting only a little. It is not a size. Hollow = rough location; faded = uncertain.',
     sources: ['pleiades-places'], specs: (c) => pleiadesPoints('settlements', 'settlement', C.settlement, c, { labelZoom: 6, radius: 3.6 }),
   },
   {
@@ -261,11 +329,11 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'medieval-places', group: 'places', label: 'Medieval towns & places (N. Europe)', datasets: ['viabundus'], defaultOn: true, coverage: VIABUNDUS,
     hint: 'Towns, settlements and other places of northern Europe, 1350–1650 (Viabundus). Towns larger; a town is shown as one from the year its town status is recorded. Undated records are shown for the whole period, as Viabundus intends.', sources: ['viabundus-nodes'],
     specs: (c) => {
-      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' })] as FilterSpecification;
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: { within: VIABUNDUS_CORE }, window: VIABUNDUS })] as FilterSpecification;
       const town: ExpressionSpecification = ['all', ['in', 'town', ['get', 'l']], ['any', ['!', ['has', 'tf']], ['<=', ['get', 'tf'], c.year]]];
       return [
         { id: 'medieval-places-pt', type: 'circle', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, ['case', town, 2.2, 0.8], 9, ['case', town, 5, 2.4], 11, ['case', town, 6, 3.2]], 'circle-color': ['case', town, C.city, C.village], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
-        { id: 'medieval-places-label', type: 'symbol', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['case', town, 12, 10.5], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': ['case', town, C.city, C.village], 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+        { id: 'medieval-places-label', type: 'symbol', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['step', ['zoom'], ['case', town, 12, 0], 8, ['case', town, 12, 10.5]], 'symbol-sort-key': ['case', town, 0, 1], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': ['case', town, C.city, C.village], 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ];
     },
   },
@@ -277,7 +345,7 @@ export const LAYERS: AtlasLayerDef[] = [
       const big: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['capitals', 'towns']]];
       return [
         { id: 'islamic-places-pt', type: 'circle', source: 'thurayya-places', 'source-layer': 'places', filter, paint: { 'circle-radius': ['case', ['==', ['get', 'k'], 'capitals'], 5, big, 3.2, 2], 'circle-color': ['match', ['get', 'k'], 'capitals', '#1b5e20', 'towns', '#2e7d32', 'waystations', '#8d6e63', '#6d8b74'], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
-        { id: 'islamic-places-label', type: 'symbol', source: 'thurayya-places', 'source-layer': 'places', filter, minzoom: 5, layout: { 'text-field': ['get', 'n'], 'text-font': FONT, 'text-size': ['case', big, 12, 10], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#1b5e20', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+        { id: 'islamic-places-label', type: 'symbol', source: 'thurayya-places', 'source-layer': 'places', filter, minzoom: 5, layout: { 'text-field': ['get', 'n'], 'text-font': ['case', ['==', ['get', 'k'], 'capitals'], ['literal', FONT_BOLD], ['literal', FONT]], 'text-size': ['step', ['zoom'], ['case', big, 12, 0], 7, ['case', big, 12, 10]], 'symbol-sort-key': ['match', ['get', 'k'], 'capitals', 0, 'towns', 1, 2], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#1b5e20', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ];
     },
   },
@@ -296,7 +364,7 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'coast-ancient', group: 'physical', label: 'Ancient coastlines', datasets: ['awmc'], defaultOn: true, coverage: BARRINGTON,
     hint: 'Shorelines of the Greek and Roman world by period (Barrington Atlas via AWMC). Lighter lines are marked as less accurate in the source.', sources: ['awmc-shoreline'],
-    specs: (c) => [{ id: 'coast-ancient-line', type: 'line', source: 'awmc-shoreline', filter: existedIn(c.year, { undated: { until: 640 } }) as FilterSpecification, paint: { 'line-color': C.ancientCoast, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.8], 'line-opacity': ['case', ['>=', u(), 1], 0.4, ['==', ['get', 'as'], 1], 0.4, 0.85] } }],
+    specs: (c) => [{ id: 'coast-ancient-line', type: 'line', source: 'awmc-shoreline', filter: existedIn(c.year, { undated: { within: BARRINGTON } }) as FilterSpecification, paint: { 'line-color': C.ancientCoast, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.8], 'line-opacity': ['case', ['>=', u(), 1], 0.4, ['==', ['get', 'as'], 1], 0.4, 0.85] } }],
   },
   {
     id: 'rivers', group: 'physical', label: 'Rivers', datasets: ['naturalearth', 'pleiades'], defaultOn: true,
@@ -343,7 +411,7 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'roads-medieval', group: 'infrastructure', alsoIn: ['economic'], label: 'Medieval roads & waterways (N. Europe)', datasets: ['viabundus'], defaultOn: true, coverage: VIABUNDUS,
     hint: 'Land roads, rivers, canals, coastal routes, ferries and winter roads of northern Europe 1350–1650 (Viabundus) — the Hanseatic trade roads. Viabundus rates each stretch: solid dark = very certain (mostly inside towns), solid = “more or less” on the old road (most), dashed grey = uncertain or not yet checked against old maps.', sources: ['viabundus-edges'],
     specs: (c) => {
-      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' })] as FilterSpecification;
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: { within: VIABUNDUS_CORE }, window: VIABUNDUS })] as FilterSpecification;
       const water: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['river', 'canal', 'coast', 'ferry']]];
       return [
         { id: 'roads-medieval-sure', type: 'line', source: 'viabundus-edges', 'source-layer': 'edges', filter: ['all', filter, ['<', ['get', 'c'], 3]] as FilterSpecification, paint: { 'line-color': ['case', water, '#2b6f95', ['==', ['get', 'c'], 1], '#5b2c0f', '#8d5524'], 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.6, 10, 2.2], 'line-opacity': 0.8 } },
@@ -418,7 +486,7 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'borders', group: 'political', label: 'Historical borders', datasets: ['cliopatria', 'ohm'], defaultOn: true,
     hint: 'Outlines of every polity in the chosen year (Cliopatria), plus country borders mapped in OpenHistoricalMap (dated features, mainly after 1500).', sources: ['cliopatria', 'ohm'],
     specs: (c) => [
-      { id: 'borders-clio', type: 'line', source: 'cliopatria', filter: existedIn(c.year) as FilterSpecification, paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 7, 1.2], 'line-opacity': 0.55 } },
+      { id: 'borders-clio', type: 'line', source: 'cliopatria', filter: ['all', existedIn(c.year), isOutline, ['!', ['has', 'g']], ['!', ['has', 'lbl']]] as FilterSpecification, paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.5, 7, 1.2], 'line-opacity': 0.55 } },
       { id: 'borders-ohm', type: 'line', source: 'ohm', 'source-layer': 'land_ohm_lines', filter: ['all', ['==', ['get', 'admin_level'], 2], ohmExisted(c.year)] as FilterSpecification, paint: { 'line-color': C.border, 'line-width': 1.2, 'line-dasharray': [3, 1.5], 'line-opacity': 0.7 } },
     ],
   },
@@ -455,6 +523,7 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'movements', group: 'military', label: 'Military movements', datasets: [], defaultOn: false,
+    unavailableKind: 'no-dataset',
     unavailable: 'No open scholarly dataset of army routes is available. Pick a war under “Wars” to see its battles numbered in date order — the order of events, not the route taken.',
     hint: '', sources: [], specs: () => [],
   },
@@ -478,6 +547,7 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'rural-settlement', group: 'places', alsoIn: ['physical'], label: 'Rural settlement provinces (England)', datasets: ['ruralsettlement'], defaultOn: false,
+    unavailableKind: LOCAL_DATA ? undefined : 'licence',
     unavailable: LOCAL_DATA ? undefined : 'Not published: the Atlas of Rural Settlement terms allow personal and business use, not republishing on a public site. Available in local builds of Shelf.',
     hint: 'Roberts & Wrathmell’s settlement provinces, sub-provinces and local regions, and the nucleated settlements (villages and hamlets) they mapped from nineteenth-century Ordnance Survey maps. A characterisation of settlement patterns used to study medieval England — not a dated map of any one year.', sources: ['rural-settlement'],
     specs: () => {
@@ -528,7 +598,7 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'tolls-fairs', group: 'economic', label: 'Tolls, fairs & staple markets (N. Europe)', datasets: ['viabundus'], defaultOn: false, coverage: VIABUNDUS,
     hint: 'Places where Viabundus records a toll, an annual fair or staple rights (1350–1650). Each role has its own dates in the source — tap a place for them.', sources: ['viabundus-nodes'],
     specs: (c) => {
-      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: 'show' }), ['any', ['in', 'toll', ['get', 'l']], ['in', 'fair', ['get', 'l']], ['in', 'staple', ['get', 'l']]]] as FilterSpecification;
+      const filter = ['all', inWindow(c.year, VIABUNDUS), existedIn(c.year, { undated: { within: VIABUNDUS_CORE }, window: VIABUNDUS }), ['any', ['in', 'toll', ['get', 'l']], ['in', 'fair', ['get', 'l']], ['in', 'staple', ['get', 'l']]]] as FilterSpecification;
       return [{ id: 'tolls-fairs-pt', type: 'circle', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 2, 10, 5], 'circle-color': ['case', ['in', 'staple', ['get', 'l']], '#6a1b9a', ['in', 'fair', ['get', 'l']], C.market, '#37474f'], 'circle-stroke-color': C.halo, 'circle-stroke-width': 1 } }];
     },
   },
@@ -550,6 +620,19 @@ export const layerById = (id: string) => LAYERS.find((l) => l.id === id);
 export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable).map((l) => l.id);
 
 /** Order in which layers are drawn, bottom to top (areas under lines under points). */
+/**
+ * Label hierarchy: where several labels compete for the same space, higher
+ * wins (MapLibre places the top-most layer's labels first). Polity names are
+ * gated by area and zoom, so they never crowd out towns when zoomed in.
+ */
+const LABEL_PRIORITY: Record<string, number> = {
+  empires: 100, kingdoms: 99, republics: 98, 'other-states': 97, territories: 90, provinces: 85,
+  cities: 80, ports: 75, settlements: 72, towns: 70, 'islamic-places': 68, 'medieval-places': 66,
+  domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
+};
+/** Sort key for a layer's labels (priority, then draw order). */
+export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
+
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'rivers', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 

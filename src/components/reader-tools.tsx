@@ -2,6 +2,7 @@
 // without losing your page. Everything is tied to one shared entity, so a
 // person you tap in the text is the same person on the map, in images, in
 // your notes and in your Knowledge Atlas.
+import { useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'react-router-dom';
 import { db } from '../db/db';
@@ -15,7 +16,7 @@ import { EntityDetail, findEntity, TYPE_KIND, useBookGraph } from './bookworld';
 import { atOrBefore } from '../lib/book/resolve';
 import { locTitle } from '../lib/book/text';
 import type { MapRequest } from './history/HistoricalMapPanel';
-import { detectPlaces } from '../lib/history/placeDetect';
+import { detectPlaces, type PlaceMention, screenMentions } from '../lib/history/placeDetect';
 import type { EntityCacheRow } from '../db/types';
 import type { XRayEntry } from '../lib/xray';
 import { Icon, type IconName } from './icons';
@@ -193,6 +194,19 @@ function Group({ title, terms, onPick, empty, badge }: { title: string; terms: {
   );
 }
 
+/** Mentions after screening (async); until screening finishes only known names and strong cues are shown. */
+function useScreened(ms: PlaceMention[]): PlaceMention[] {
+  const key = ms.map((m) => m.name).join('|');
+  const [out, setOut] = useState<{ key: string; ms: PlaceMention[] }>();
+  useEffect(() => {
+    let live = true;
+    screenMentions(ms).then((r) => { if (live) setOut({ key, ms: r }); }).catch(() => undefined);
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return out?.key === key ? out.ms : ms.filter((m) => m.known || (m.evidence.strength === 'strong' && !m.evidence.loose));
+}
+
 /** The Map tab: places named on this page, and the whole chapter on a map. */
 function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingContext; chapterText: () => string; xrayRows: EntityCacheRow[]; onOpenMap: (r: MapRequest) => void }) {
   const idx = useLibrary();
@@ -210,8 +224,10 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
     ...xrayRows.flatMap((r) => r.names).filter((n) => n.kind === 'person').map((n) => n.name),
     ...graphNames(['character']),
   ];
-  const onPage = detectPlaces(ctx.pageText, knownPlaces, people);
-  const inChapter = detectPlaces(chapterText(), knownPlaces, people).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);
+  // Capitalised words after a weak cue are only candidates: ordinary English
+  // words ("Guild", "Mass") are dropped unless the offline data knows them.
+  const onPage = useScreened(detectPlaces(ctx.pageText, knownPlaces, people));
+  const inChapter = useScreened(detectPlaces(chapterText(), knownPlaces, people)).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);
   const open = (name: string, text: string) => {
     const i = text.indexOf(name);
     onOpenMap({ name, passage: i >= 0 ? text.slice(Math.max(0, i - 600), i + 600) : undefined, mentionIndex: i >= 0 ? Math.min(i, 600) : undefined, detection: knownPlaces.includes(name) ? 'known' : 'cue' });

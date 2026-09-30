@@ -37,7 +37,9 @@ beforeEach(async () => { whg = undefined; whgCalls.length = 0; resetWhgCooldown(
 describe('place resolution with combined evidence', () => {
   it('keeps working offline: WHG unreachable leaves the offline answer intact', async () => {
     const r = await resolvePlace('Carthage', { year: -218, detection: 'cue' });
-    expect(r.place?.title).toBe('Carthago');
+    // Shown by the book's own word; the dataset's title is kept as the record title.
+    expect(r.place?.title).toBe('Carthage');
+    expect(r.place?.recordTitle).toBe('Carthago');
     expect(r.status).toBe('HIGH');
     // A clear offline match doesn't wait for WHG.
     expect(whgCalls).toHaveLength(0);
@@ -52,7 +54,8 @@ describe('place resolution with combined evidence', () => {
     whg = () => new Response(JSON.stringify(ROME_INDEX), { status: 200 });
     const r = await resolvePlace('Rome', { detection: 'cue' });
     expect(r.status).toBe('MEDIUM');
-    expect(r.place?.title).toBe('Roma');
+    expect(r.place?.title).toBe('Rome');
+    expect(r.place?.recordTitle).toBe('Roma');
     expect(r.place?.gaz?.gazetteer).toBe('pleiades');
     // The other reading is kept, not discarded.
     expect(r.candidates.map((c) => c.gaz?.gazetteer)).toContain('viabundus');

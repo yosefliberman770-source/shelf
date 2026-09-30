@@ -720,8 +720,11 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .map-viewer { position: fixed; inset: 0; z-index: 60; background: #1b1814; color: #f4efe6; display: flex; flex-direction: column; }
 .map-viewer-bar { display: flex; justify-content: space-between; align-items: center; padding: calc(8px + env(safe-area-inset-top)) 10px 8px; }
 .map-viewer-bar .btn { color: #f4efe6; }
-.map-viewer-stage { flex: 1; overflow: hidden; display: grid; place-items: center; touch-action: none; cursor: grab; }
-.map-viewer-stage img { max-width: 100%; max-height: 100%; transform-origin: center; user-select: none; }
+.map-viewer-stage { flex: 1; min-height: 0; overflow: hidden; position: relative; display: grid; place-items: center; touch-action: none; cursor: grab; }
+.map-viewer-stage .deepzoom { position: absolute; inset: 0; }
+.map-viewer-flat { width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
+.map-viewer-flat img { max-width: 100%; max-height: 100%; transform-origin: center; user-select: none; }
+.map-viewer-limit { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(0,0,0,.65); padding: 4px 10px; border-radius: 12px; pointer-events: none; }
 .map-viewer-caption { padding: 8px 12px calc(12px + env(safe-area-inset-bottom)); font-size: 13px; line-height: 1.4; background: rgba(0,0,0,.35); }
 .map-viewer-caption a { color: #f4efe6; text-decoration: underline; }
 .atlas-matrix { display: flex; flex-direction: column; font-size: 11px; overflow-x: auto; }

@@ -25,6 +25,7 @@
     "epubjs": "^0.3.93",
     "leaflet": "^1.9.4",
     "maplibre-gl": "^5.24.0",
+    "openseadragon": "^6.1.1",
     "pmtiles": "^4.5.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

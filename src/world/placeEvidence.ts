@@ -14,10 +14,11 @@
 // Missing data is never evidence: a source with no record says nothing about
 // whether a place existed, and an undated record is "unknown", not "outside".
 import { km } from '../atlas/data';
-import { gazetteerInfo, gazetteersFor, type GazetteerId, type GazPlace, placesByName } from '../atlas/gazetteer';
+import { GAZETTEERS, gazetteerInfo, type GazetteerId, type GazPlace, placesByName, recordFit } from '../atlas/gazetteer';
 import type { Disagreement } from '../atlas/resolve';
 import { yearLabel } from '../atlas/time';
 import { norm } from '../lib/history/assess';
+import { contextFit, type GeoContext } from '../atlas/geocontext';
 import { type WhgAttestation, type WhgLookup, whgLookup, whgNameMatch, type WhgOptions } from './whg';
 
 export type DateFit = 'within' | 'possible' | 'unknown' | 'outside';
@@ -53,6 +54,10 @@ export interface Claim {
 }
 
 export interface EvidenceCluster {
+  /** How well its location fits the places already identified in the book (1 = fits, lower = far away). */
+  geoFit?: number;
+  /** Supported only by present-day reference gazetteers with no dates — says nothing about the period read about. */
+  modernOnly?: boolean;
   lat: number;
   lon: number;
   title: string;
@@ -106,14 +111,16 @@ function fit(spans: [number, number][], year: number | undefined, broad: boolean
 
 export function claimFromGaz(p: GazPlace, written: string, year?: number): Claim {
   const info = gazetteerInfo(p.gazetteer);
-  const spans: [number, number][] = p.from !== undefined || p.to !== undefined ? [[p.from ?? -99999, p.to ?? 99999]] : [];
+  // Own dates, or — for a record without them — the period its evidence allows (counts only as "possible").
+  const spans: [number, number][] = p.from !== undefined || p.to !== undefined ? [[p.from ?? -99999, p.to ?? 99999]]
+    : p.envelope ? [[p.envelope.from ?? info.coverage[0], p.envelope.to ?? info.coverage[1]]] : [];
   const w = norm(written);
   const nameMatch = norm(p.title) === w ? 'exact' : p.names.some((n) => norm(n.name) === w) ? 'variant' : 'none';
   // Pleiades periods and dataset-wide periods are broad: they make a date "possible", not certain.
-  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.datasetPeriod);
+  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.envelope);
   return {
     family: p.gazetteer, source: info.name, kind: 'gazetteer', id: p.key, title: p.title, names: p.names.map((n) => n.name),
-    lat: p.lat, lon: p.lon, spans, periodOnly: p.datasetPeriod, types: p.types, url: p.url, licence: info.license, nameMatch, dateFit,
+    lat: p.lat, lon: p.lon, spans, periodOnly: !!p.envelope, types: p.types, url: p.url, licence: info.license, nameMatch, dateFit,
     weight: sourceWeight(p.gazetteer, 'gazetteer') * NAME_FACTOR[nameMatch] * DATE_FACTOR[dateFit] * (p.uncertain >= 1 ? 0.8 : 1), gaz: p,
   };
 }
@@ -150,7 +157,7 @@ function cluster(claims: Claim[]): EvidenceCluster[] {
   }).sort((a, b) => b.score - a.score);
 }
 
-export function combineEvidence(input: { written: string; year?: number; local: GazPlace[]; localSources: GazetteerId[]; whg?: WhgLookup }): PlaceEvidence {
+export function combineEvidence(input: { written: string; year?: number; local: GazPlace[]; localSources: GazetteerId[]; whg?: WhgLookup; context?: GeoContext }): PlaceEvidence {
   const { written, year } = input;
   const claims: Claim[] = [
     ...input.local.map((p) => claimFromGaz(p, written, year)),
@@ -159,6 +166,13 @@ export function combineEvidence(input: { written: string; year?: number; local: 
   const located = claims.filter((c) => c.lat !== undefined && c.lon !== undefined && !c.restricted);
   const unlocated = claims.filter((c) => !(c.lat !== undefined && c.lon !== undefined) || c.restricted);
   const clusters = cluster(located);
+  // Priors: the book's own geography, and whether anything but present-day reference data supports a candidate.
+  for (const c of clusters) {
+    c.geoFit = contextFit(input.context, [c.lon, c.lat]);
+    c.modernOnly = year !== undefined && year < 1800 && c.claims.every((x) => x.kind === 'whg' && CORE.has(x.family) && !x.spans.length);
+    c.score *= c.geoFit * (c.modernOnly ? 0.5 : 1);
+  }
+  clusters.sort((a, b) => b.score - a.score);
 
   // ── Decide, from the evidence as a whole ──
   const viable = year === undefined ? clusters : clusters.filter((c) => c.dateFit !== 'outside');
@@ -173,8 +187,8 @@ export function combineEvidence(input: { written: string; year?: number; local: 
     const named = top.claims.some((c) => c.nameMatch !== 'none');
     const indep = top.families.length;
     const dated = top.dateFit === 'within' || top.dateFit === 'possible';
-    confidence = indep >= 2 && named && (dated || year === undefined) ? 'strong'
-      : (indep >= 2 && named) || (named && top.claims.some((c) => c.kind === 'gazetteer') && (dated || year === undefined)) ? 'moderate' : 'weak';
+    confidence = indep >= 2 && named && (dated || year === undefined) && (top.geoFit ?? 1) === 1 && !top.modernOnly ? 'strong'
+      : ((indep >= 2 && named) || (named && top.claims.some((c) => c.kind === 'gazetteer') && (dated || year === undefined))) && (top.geoFit ?? 1) === 1 ? 'moderate' : 'weak';
   } else if (status === 'ambiguous') confidence = 'weak';
 
   // ── Say it plainly ──
@@ -196,6 +210,8 @@ export function combineEvidence(input: { written: string; year?: number; local: 
     }
     if (w.some((c) => c.family === 'pleiades') && top.claims.some((c) => c.family === 'pleiades' && c.kind === 'gazetteer')) statements.push('WHG’s Pleiades record is the same source as Shelf’s Pleiades data, so it is not counted as separate confirmation.');
     statements.push(top.families.length >= 2 ? `${top.families.length} independent sources agree on this location.` : 'Only one source supports this identification.');
+    if (input.context?.points.length) statements.push((top.geoFit ?? 1) === 1 ? 'It lies near the other places already identified in this book.' : 'It lies far from the other places already identified in this book, so it needs other evidence.');
+    if (top.modernOnly) statements.push(`Only present-day reference gazetteers record it, with no dates — that says nothing about ${yearLabel(year!)}.`);
     if (top.spreadKm >= 2) {
       statements.push(`The sources place it up to ${top.spreadKm.toFixed(1)} km apart — often different points (centre, site, parish) of the same place.`);
       // Show the two records furthest apart, side by side (only when the gap is more than a few km).
@@ -260,9 +276,10 @@ export function combineEvidence(input: { written: string; year?: number; local: 
  * record carrying the name (for the period) plus, when online, what the World
  * Historical Gazetteer holds. Works offline (WHG is then simply not consulted).
  */
-export async function assessPlace(written: string, opts: { year?: number; online?: boolean; local?: GazPlace[] } & WhgOptions = {}): Promise<PlaceEvidence> {
-  const localSources = gazetteersFor(opts.year).map((g) => g.id);
-  const local = opts.local ?? (await placesByName(written).catch(() => [])).map((h) => h.place).filter((p) => localSources.includes(p.gazetteer));
+export async function assessPlace(written: string, opts: { year?: number; online?: boolean; local?: GazPlace[]; context?: GeoContext } & WhgOptions = {}): Promise<PlaceEvidence> {
+  const localSources = GAZETTEERS.map((g) => g.id);
+  // Every gazetteer is consulted; only records attested exclusively after the year are left out.
+  const local = opts.local ?? (await placesByName(written).catch(() => [])).map((h) => h.place).filter((p) => recordFit(p, opts.year) !== 'later');
   const whg = opts.online === false ? undefined : await whgLookup(written, opts).catch((e) => { if ((e as Error).name === 'AbortError') throw e; return undefined; });
-  return combineEvidence({ written, year: opts.year, local, localSources, whg });
+  return combineEvidence({ written, year: opts.year, local, localSources, whg, context: opts.context });
 }
