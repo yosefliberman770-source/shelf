@@ -153,6 +153,12 @@
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
   "downloaded": "2026-09-30"
  },
+ "finland-heritage/original/tutkija.zip": {
+  "url": "https://mverkkodatashare.blob.core.windows.net/share/tutkija.zip",
+  "bytes": 38319125,
+  "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
+  "downloaded": "2026-09-30"
+ },
  "germania-sacra/original/diocese-borders.geojson": {
   "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
   "bytes": 3956104,
@@ -428,6 +434,24 @@
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
   "downloaded": "2026-09-29"
  },
+ "markets-fairs/original/MFEngland.txt": {
+  "url": "https://sas-space.sas.ac.uk/106/3/MFEngland.txt",
+  "bytes": 650667,
+  "sha256": "1f7d6a88f26083ed0e2856f4c6d0074095ba2db355c3cc941e11296cb51f281a",
+  "downloaded": "2026-09-30"
+ },
+ "markets-fairs/original/MFWales.txt": {
+  "url": "https://sas-space.sas.ac.uk/106/4/MFWales.txt",
+  "bytes": 38073,
+  "sha256": "ce680123f34dbce113441c6aa85f3b57bb97258b8a91a23ff1a1a17d0dd1f8cd",
+  "downloaded": "2026-09-30"
+ },
+ "markets-fairs/original/Markets and Fairs 13C guide.DOC": {
+  "url": "https://sas-space.sas.ac.uk/106/2/Markets%20and%20Fairs%2013C%20guide.DOC",
+  "bytes": 648704,
+  "sha256": "84afa972c77a9e93c7b7173a1d7d82ee48188ceafbb82c0da1b355c0fbb418ef",
+  "downloaded": "2026-09-30"
+ },
  "medieval-bridges/original/General_Guide_bridges.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3426-1/dissemination/General_Guide_bridges.pdf",
   "bytes": 1108662,
@@ -445,6 +469,12 @@
   "bytes": 66959,
   "sha256": "0d9bd6e76da3fe63204aaf9e4068e1f0316c3f7215329c671ae9cc9c9fc449d1",
   "downloaded": "2026-09-29"
+ },
+ "merimee/original/merimee.csv": {
+  "url": "https://ministere-culture.s3.sbg.io.cloud.ovh.net/POP/merimee.csv",
+  "bytes": 100102040,
+  "sha256": "1866e937c412e61b462a265de88cd1ab4d525b2667e6c5352e1685a0a6637422",
+  "downloaded": "2026-09-30"
  },
  "periodo/original/periodo-dataset.json": {
   "url": "https://data.perio.do/d.json",
@@ -493,6 +523,450 @@
   "bytes": 136020531,
   "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
   "downloaded": "2026-09-29"
+ },
+ "princes-townspeople/original/cities_dynasties.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047015",
+  "bytes": 24907909,
+  "sha256": "7d1d71e5cfce0df1327bc95b0e5a70ead23201f0d49a5a588c8c47d8e2c505d5",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/cities_polities.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047016",
+  "bytes": 45399973,
+  "sha256": "a7385a1c6f217c810d147f898a1cab14774f2c61c1aed791dfd616de58480c8f",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_borders_2019.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/4099960",
+  "bytes": 564648,
+  "sha256": "4f12e1861523428bba464da1a573f9ff71613efd4fe9c6ac5db156681e392a4f",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588457",
+  "bytes": 1931538,
+  "sha256": "e5df2f74971d6730828ade8712c67ca805d4ec5bbab0e2dc209ed51304d7da63",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/city_locations.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588458",
+  "bytes": 370892,
+  "sha256": "1c9a5f736f4f623e81fe4d308498dede36c2cb932200637f427c66fdd2661114",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/conflict_incidents.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588455",
+  "bytes": 662950,
+  "sha256": "a5d8da46316160328bd040e24fbe4afaa1880a06673e9f743924051b5af01621",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/conflict_incidents_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/5588456",
+  "bytes": 409510,
+  "sha256": "fed280a7493bdbdb9f1872ed9bf3909085c063fca95441e511496db204d1e7c2",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/construction.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047022",
+  "bytes": 3018305,
+  "sha256": "1be481534c3ffcf3bd9b6573b99331647e7d41b14f341bca4744d38e582b45e9",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/construction_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047032",
+  "bytes": 128931,
+  "sha256": "1a864910914cee8c61d6941df107152f897f7b625131c9fb20366c9943b7beaf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/legal_families.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806259",
+  "bytes": 3073,
+  "sha256": "53fbb1e7d4bb6c868c90fd8945bc883f45260c2457af1b33eed3d9895f7cf7cf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/markets.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806263",
+  "bytes": 1062284,
+  "sha256": "7e7927d1130d224139dd4a0c3affe94d5ccfeea714d9c729bb693bec7b045ed8",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/markets_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806264",
+  "bytes": 80727,
+  "sha256": "0939645bd896ca9eab91fed3988e0d432b3e636be2ce79f031836359182c33e5",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territories_all.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047017",
+  "bytes": 5037241,
+  "sha256": "8da0a9fc9c32aa01cea7c2e6c2a0c460b16411bedcb0b46883756365f7c0f3fc",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_blueprints.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806256",
+  "bytes": 418969,
+  "sha256": "11c577dc9bccf447e34bad20a90918bbca868dc1662b15b60842afb83da740bf",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_codes.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/4099956",
+  "bytes": 211954,
+  "sha256": "903f546da18efc50aedce4e906e9ca2cbded7ec2584ee2b94d99b65dafde128c",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/territory_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/10047031",
+  "bytes": 350604,
+  "sha256": "c94b237254549e9e37b2f3bc62962838e4d38ae48108bead7a6dee2dddfe8520",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/towncharter.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806261",
+  "bytes": 682015,
+  "sha256": "ad069820fcfa0a5e36e79c6c781ecee74f9e16a5ef1bb1bd4150e716ed0fed98",
+  "downloaded": "2026-09-30"
+ },
+ "princes-townspeople/original/towncharter_documentation.pdf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3806260",
+  "bytes": 78926,
+  "sha256": "f9e9a457422c73a3c22b0f354e4cb5f864d3ed97b300ac9baf4133767e6bfead",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-001.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=1",
+  "bytes": 475768,
+  "sha256": "196f0719900ea9cdb24f5fe9b18910680c59477758211bd3ee743ce3c54ca25f",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-002.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=2",
+  "bytes": 467002,
+  "sha256": "752ea9598206b9f4f7a9e04c7b25021ed92715f628013b2da8f6bde429d12c38",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-003.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=3",
+  "bytes": 617491,
+  "sha256": "5efa52f1fe335c4a7480d65144c7976bf1001a780a6d761a524e827f32df58c7",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-004.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=4",
+  "bytes": 507197,
+  "sha256": "919809cda8fb2552ae67b2076aca6daeb0915a1a8f0c452a177829068be74748",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-005.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=5",
+  "bytes": 718215,
+  "sha256": "c6ea833f18f0543fa5a8784f0a7d152cef28837fb9027cabf4690e7f1e198d0c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-006.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=6",
+  "bytes": 556137,
+  "sha256": "12033be95844301a422d2ead5ae3d5fb5692ead55839bbeba762691c7e5018fc",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-007.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=7",
+  "bytes": 659569,
+  "sha256": "cb1e045121bd67532ad786af9723af2efd7f04c02d37831d901b4c1576efec9a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-008.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=8",
+  "bytes": 851135,
+  "sha256": "936de897ffa8d73a6bd45213df38c0f094871d5daf9dd6aa2c623710963c47a2",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-009.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=9",
+  "bytes": 533630,
+  "sha256": "b5c6ccb2acd825211ee455d7614c077025a2bc99e15530f0bf7c19bb47bfc5b5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-010.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=10",
+  "bytes": 506224,
+  "sha256": "c2040873a70c3ecf9a07a2c6f458ec7834f16c531f8ff40b2bd43329724aaa37",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-011.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=11",
+  "bytes": 639102,
+  "sha256": "3a00b03b31d5002ed7002fb8d0b0fe219af78aedda735ebc5b5ee7770bbd1cb0",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-012.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=12",
+  "bytes": 812068,
+  "sha256": "350cd7e56308a4973d2e1c30fd56684f4766143b08cebdd2d2d24229fe6fe4e3",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-013.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=13",
+  "bytes": 484080,
+  "sha256": "080f93a8fade4cacc3cff6e5311d6bda978644040b2cebf7eb8a8fc43d5df649",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-014.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=14",
+  "bytes": 543131,
+  "sha256": "add4aea3dd06e6481d9806f432bdcc2fa0aefbccf50c858136f71c2b077e947c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-015.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=15",
+  "bytes": 632053,
+  "sha256": "513d66f6e6192f2412705a59cabee3cc85a30ce6a83ce35a159166d6ae64ff94",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-016.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=16",
+  "bytes": 388411,
+  "sha256": "3dccf0de6b6961708503062005d6f6fb5ef99e118548848c8a58f055e5e77dc5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-017.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=17",
+  "bytes": 473347,
+  "sha256": "cb08b8dae993af9ab49deca79a1bcaa65b3afbbb56353a2d9af014fe60d88e23",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-018.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=18",
+  "bytes": 706402,
+  "sha256": "c8d7799df9817a0a6e52221b2e467c7f52741ae7eb0497223284fd54442a3372",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-019.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=19",
+  "bytes": 716289,
+  "sha256": "8e4e92ad6dd8f217b86b6760f8a92eb18314c86fe36af4f99a136cbea3dd9184",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-020.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=20",
+  "bytes": 528496,
+  "sha256": "a51115959aab822ee9450eab6b12bb676fd231d39d456b0506d9d02c01af9313",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-021.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=21",
+  "bytes": 514822,
+  "sha256": "a726def9dc5bd822ed8a28a7791017b098086a9c8c04ee7c7494552a7a67818a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-022.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=22",
+  "bytes": 498144,
+  "sha256": "a34cedcdfc8a86c4bf564c4205c02727def1838b6dd49c7e06a578b7d6396003",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-023.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=23",
+  "bytes": 770729,
+  "sha256": "cc099e20595aebd1714894c3ca6f7d3f90995f5f8d6827b0a7d0f712db81f598",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-024.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=24",
+  "bytes": 641847,
+  "sha256": "667e29ff3b44965f6998912d88cedecd4911630e89aa67715785e4c534a608b5",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-025.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=25",
+  "bytes": 628728,
+  "sha256": "8f420ae7e4bef32a9f6ec5c0e322e529b5f4bbbc28b1b314abc75a5ca3fa4ecd",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-026.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=26",
+  "bytes": 488632,
+  "sha256": "84d1eaf5ab8d3bc5e8fe7a345e4ac2f95c14a6e858e36de1a0cc03994094425c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-027.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=27",
+  "bytes": 507847,
+  "sha256": "ce0bd050bcf7d6ba76c434a4eb2ca96ff7cbb09bbd8152a1b4314026c22f9e9b",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-028.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=28",
+  "bytes": 814687,
+  "sha256": "512278b33adfc42f94589ba70509449d40c8efb03db3db1e1ea29f2af85c47b4",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-029.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=29",
+  "bytes": 658657,
+  "sha256": "e03f72e2e4cee1685ea521abf68794be81861900cf6806a34fc2053fa20ff57a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-030.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=30",
+  "bytes": 525181,
+  "sha256": "be3d321e515ea3f6571b0933791275a5beca12b608c6723d0f6a01f16c6bda61",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-031.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=31",
+  "bytes": 584411,
+  "sha256": "5d48f1cd7e5369f35a0a3bb3e074d426d2e86f6b64f2a9451afe97fdf637bb8e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-032.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=32",
+  "bytes": 696114,
+  "sha256": "ba2176cb0842070c3e5cda94f199bd9a67a643589288b2ceac113fbb90f0982e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-033.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=33",
+  "bytes": 777642,
+  "sha256": "d124615c8c0dc815039fc46edc2b4fc37118cb164fcee322ddeffd96e6f2bca6",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-034.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=34",
+  "bytes": 616154,
+  "sha256": "19cce9a5ad063b38526593a061c5cce25f44d2a182ce01dd58bd48a0de193c31",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-035.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=35",
+  "bytes": 414177,
+  "sha256": "67d576dad5563281075a011c485cedec5041385119f38e21a527fb237b3ea538",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-036.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=36",
+  "bytes": 521077,
+  "sha256": "c7e8bb03981fd58a82483c1f46c60aff223272cf45941d5a44111c934028d21c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-037.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=37",
+  "bytes": 476368,
+  "sha256": "b64fec499905bffad90f9c775b590baee6464e3d922068420a195a857aee0a1b",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-038.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=38",
+  "bytes": 658588,
+  "sha256": "f98846d8a370d9efea3bcbca2776ce09fead3a7fe5722e71ae8b5ac2a94b0c54",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-039.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=39",
+  "bytes": 966719,
+  "sha256": "11c1e35d15400b295ca595e4c121daa00e422b6f31d7769f6813bc5621c39219",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-040.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=40",
+  "bytes": 654158,
+  "sha256": "7945341f55d989f8064e4f8bb907d95d72d609c8cd29a2c53c498a834a64f566",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-041.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=41",
+  "bytes": 842057,
+  "sha256": "a7c29fb46695cd013075ce3b77bdfdf28d1062d939e14181f3722a0714872c55",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-042.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=42",
+  "bytes": 597517,
+  "sha256": "91f9601dedfd667eb3b8b1ba9e67c3e362c050148932e158c19d0f520d69cc70",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-043.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=43",
+  "bytes": 498104,
+  "sha256": "66b9b546300fd5e99e69b5c9f23b5379034b80b515f16c34777c0f7e4fc1e067",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-044.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=44",
+  "bytes": 723212,
+  "sha256": "b8ca5d1736cc9e1a2cde746f0dd9e8ae7c10f37e3b9de96ec1491ac1685b19b3",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-045.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=45",
+  "bytes": 634672,
+  "sha256": "620d3e9d9dbfec24ea18a3bc474e4559944880036519bf1e4b472f8504d8c73d",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-046.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=46",
+  "bytes": 712149,
+  "sha256": "bfd76b645c1006ac502bbed75984d222500732b089d5627d5ba4cbb590847e6a",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-047.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=47",
+  "bytes": 882072,
+  "sha256": "17dae6a59730deadebb0a5795408d261ba94441eeef1c06c23c78d44ef7762e8",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-048.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=48",
+  "bytes": 553105,
+  "sha256": "b416e8a3fdd0dd977454b9dd8145b003b8834f82aff211fba3a8bb0c021cc033",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-049.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=49",
+  "bytes": 542494,
+  "sha256": "e4ff3e828515d9e344883d5fbbbcb154aba680265c602bcf033382d1706165fd",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-050.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=50",
+  "bytes": 629452,
+  "sha256": "833bc925bbb9a43dd248d063f1b7e6a27a2c82cfd70c0695e480e9f34c4a1925",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-051.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=51",
+  "bytes": 712323,
+  "sha256": "34337a1958ebbe19b0140f72cc411891a6b27e9c49a7d0c3d4e06975ed6fa837",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-052.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=52",
+  "bytes": 628704,
+  "sha256": "4dd6e264a3914a456d66cbcb8a2a9892aeea17fc070610c2949431ace07af103",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-053.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=53",
+  "bytes": 592707,
+  "sha256": "d2c3da5a4845676d46e779412d24480857d6a953d9a0d7e6331f0497f4aa78c7",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-054.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=54",
+  "bytes": 680391,
+  "sha256": "ece50c1c0b295a6548830b2a42554d4cc1cea242db14d273c5f3004c12b7eb3c",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-055.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=55",
+  "bytes": 581475,
+  "sha256": "ec98ef912fd93af7de114cc370f22e363e88eba9a4f4a885cfcbe3d13f4cd52e",
+  "downloaded": "2026-09-30"
+ },
+ "tib-maps-of-power/original/places-page-056.json": {
+  "url": "https://openatlas.maps-of-power.at/api/0.4/system_class/place?format=lp&limit=100&page=56",
+  "bytes": 75055,
+  "sha256": "ebd6ac3540b9c316928d522fcec78d3f70c156d9d9056d17269f469f754f3de0",
+  "downloaded": "2026-09-30"
  },
  "tribal-hidage/original/Individuals_Data.csv": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
@@ -649,6 +1123,36 @@
   "bytes": 19141157,
   "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
   "downloaded": "2026-09-29"
+ },
+ "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {
+  "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",
+  "bytes": 458894,
+  "sha256": "9431669a8159e2ede82836e85c997b8d81a465d82adb542afa744e2a9b704c5c",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/Data_Dictionary.csv": {
+  "url": "https://zenodo.org/records/21479034/files/Data_Dictionary.csv?download=1",
+  "bytes": 1140,
+  "sha256": "1f4d00c9f01ffe224b771136c64fd83b439805036a594ed3ad52a140dbdc54d3",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/License for Dataset.txt": {
+  "url": "https://zenodo.org/records/21479034/files/License%20for%20Dataset.txt?download=1",
+  "bytes": 1881,
+  "sha256": "74cb0a1e60ade2167384fd9f3c9416ada1d1fe7144618fc729076c1faf5822cb",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/README.md": {
+  "url": "https://zenodo.org/records/21479034/files/README.md?download=1",
+  "bytes": 7134,
+  "sha256": "6e25c0dabea2f518bff643320dbdb77007a81543da52e1360d6cb90781cbb70e",
+  "downloaded": "2026-09-30"
+ },
+ "western-bohemia-toponyms/original/Western_Bohemia_place_names_key.csv": {
+  "url": "https://zenodo.org/records/21479034/files/Western_Bohemia_place_names_key.csv?download=1",
+  "bytes": 1563,
+  "sha256": "7aa90ccec4078249e5f255e18539902749aedc6f2db5e0c6f9694fc9a09f2cbe",
+  "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/battle.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/battle.names.rq)",

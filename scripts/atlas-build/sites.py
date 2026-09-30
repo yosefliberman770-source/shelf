@@ -36,6 +36,7 @@ from collections import Counter, defaultdict
 
 import tiler
 import translit
+import regional
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
@@ -275,7 +276,7 @@ def main_name(t):
     return norm(re.split(r'[,(]', t['city'])[0])
 
 
-def match_english(towns, recs):
+def match_english(towns, recs, repair=True):
     """Give each Buringh town the Wikidata city/town/settlement whose label (in any language) is one of
     the town's own names, within 12 km. Unmatched towns keep Buringh's name.
 
@@ -323,7 +324,7 @@ def match_english(towns, recs):
 
     matched, kept, dropped = 0, [], []
     for t in towns:
-        if plausible(t['lon'], t['lat']):
+        if plausible(t['lon'], t['lat']) or not repair:
             best = find(t, t['lon'], t['lat'])
         else:
             lons = [t['lon']] if abs(t['lon']) < 70 else decimal_readings(t['lon'])
@@ -338,7 +339,7 @@ def match_english(towns, recs):
                 continue
             best, t['lon'], t['lat'] = best
             t['fixed'] = True
-        if not best:
+        if not best and repair:
             # The source's position may simply be wrong (Riga at 21.1°E instead of 24.1°E). If exactly one
             # present-day town with one of its names lies within 800 km, use that position and say so.
             # Within 60 km any of its names may confirm it; farther away only a town whose English label is
@@ -511,13 +512,17 @@ def build(rows_only=False):
         mz = 3 if peak >= 50 else 4 if peak >= 20 else 5 if peak >= 10 else 6 if peak >= 5 else 7
         town_feats.append(({'type': 'Point', 'coordinates': [round(t['lon'], 4), round(t['lat'], 4)]}, props, mz))
 
+    hre_feats, local_feats, reg_stats = regional_layers(recs, rows, sites)
+    log('  regional', reg_stats)
+
     log('  place-index rows', len(rows), Counter(r[0] for r in rows), ' skipped', dict(skipped))
     if rows_only:
         return rows, {}
 
     stats = {}
     # Level of detail: major church sites first, then religious houses and castles, then the rest.
-    zoom = {'cathedral': 5, 'university': 5, 'diocese': 6, 'monastery': 7, 'castle': 7, 'fortification': 8, 'bridge': 9, 'settlement': 9}
+    zoom = {'cathedral': 5, 'university': 5, 'diocese': 6, 'monastery': 7, 'castle': 7, 'fortification': 8, 'bridge': 9, 'settlement': 9,
+            'church': 9, 'market': 7, 'site': 9}
     feats = []
     for p in sites:
         ll = p.pop('_ll')
@@ -525,6 +530,11 @@ def build(rows_only=False):
         if p.get('st') in ('abbey',):
             mz -= 1
         feats.append(({'type': 'Point', 'coordinates': list(ll)}, p, mz))
+    stats['hre'] = tiler.build(os.path.join(TILES, 'hre-towns.pmtiles'), 'towns', hre_feats, 10, 'Towns of the Holy Roman Empire',
+                               'Princes and Townspeople (Bogucka, Cantoni, Mohr, Weigand), CC0')
+    # Licence not verified: local builds only (git-ignored; removed from public builds by vite.config.ts).
+    stats['local'] = tiler.build(os.path.join(TILES, 'local-sites.pmtiles'), 'sites', local_feats, 11, 'Local-only sites',
+                                 'TIB Maps of Power (ÖAW); Letters, Markets and Fairs to 1516 — local use only')
     stats['sites'] = tiler.build(os.path.join(TILES, 'medieval-sites.pmtiles'), 'sites', feats, 11, 'Medieval sites of Europe',
                                  'Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)')
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',
@@ -574,3 +584,132 @@ def hced_battles():
 
 if __name__ == '__main__':
     build()
+
+
+# ── Regional specialist datasets (second audit pass; see regional.py) ─────
+
+FIN_PERIODS = {'keskiaikainen': (1150, 1550), 'rautakautinen': (-500, 1150), 'historiallinen': (1150, 1900)}
+
+
+def _site_props(i, name, kind, lon, lat, **kw):
+    p = {'i': i, 'n': name[:70], 'k': kind}
+    p.update({k: v for k, v in kw.items() if v not in (None, '', [])})
+    return p | {'_ll': (lon, lat)}
+
+
+def regional_layers(recs, rows, sites_out):
+    """Adds rows (place index) and site features for the regional datasets; returns
+    (HRE town features, local-only features, stats)."""
+    stats = {}
+
+    # Holy Roman Empire towns — English names matched like Buringh's, positions never moved (the source is precise).
+    hre = regional.princes_townspeople()
+    adapt = [{'city': t['name'], 'syn': [x for x in (t['alt'], t['foreign']) if x], 'lon': t['lon'], 'lat': t['lat'], 't': t} for t in hre]
+    m = match_english(adapt, recs, repair=False)
+    hre_feats = []
+    for a in adapt:
+        t = a['t']
+        title = a.get('en') or t['name']
+        names = [[x, None, None, lang] for x, lang in ((t['name'], 'de'), (t['alt'], 'de'), (t['foreign'], '')) if x and x != title]
+        rule = t['rule']
+        start = t['mention'] if t['mention'] is not None else t['founded']
+        basis = 'first mention' if t['mention'] is not None and (t['founded'] is None or t['mention'] <= t['founded']) else 'founded' if t['founded'] is not None else None
+        extra = {'k': 'town', **({'fb': basis} if basis else {}), **({'tn': 0} if title != t['name'] else {}),
+                 **({'q': a['q']} if a.get('q') else {}), 'ch': t['charter'], 'lf': t['legal'], 'fm1': t['firstMarket'],
+                 'rule': rule[:40]}
+        rows.append(['hre', t['id'], title, t['lon'], t['lat'], 1, 'town', start, None, 0, names[:6], [rule[0][0]] if rule else [], [], extra])
+        props = {'i': t['id'], 'n': title[:60]}
+        for k, v in (('f', start), ('fb', basis), ('ch', t['charter']), ('fd', t['founded']), ('cc', t['character']), ('lf', t['legal']),
+                     ('m', t['firstMarket'][0] if t['firstMarket'] else None), ('mt', t['firstMarket'][1] if t['firstMarket'] else None),
+                     ('a', t['name'] if title != t['name'] else None), ('q', a.get('q'))):
+            if v is not None:
+                props[k] = v
+        if rule:
+            props['rl'] = ';'.join(f'{n}|{x}|{y}' for n, x, y in rule)[:3000]
+        mz = 5 if (t['charter'] or 9999) <= 1300 else 6 if t['charter'] else 8
+        hre_feats.append(({'type': 'Point', 'coordinates': [t['lon'], t['lat']]}, props, mz))
+    stats['hre'] = {'towns': len(hre), 'englishNames': m['matched'], 'withRulers': sum(1 for t in hre if t['rule'])}
+
+    # France — Mérimée. A monument within 250 m of a Wikidata site of the same kind is that site (the
+    # Mérimée reference and building-campaign century are added to it); otherwise it is its own site.
+    group = {'castle': 'castle', 'fortification': 'castle', 'monastery': 'relig', 'cathedral': 'relig', 'church': 'relig', 'bridge': 'bridge', 'market': 'market'}
+    wd_sites = {p['i']: p for p in sites_out if isinstance(p.get('i'), str) and p['i'].startswith('Q')}
+    grid = Grid(0.01)
+    for p in wd_sites.values():
+        grid.add(p['_ll'][0], p['_ll'][1], p)
+    mer = regional.merimee()
+    merged = 0
+    for x in mer:
+        g = group[x['kind']]
+        near = [p for p in grid.near(x['lon'], x['lat'], 1) if group.get(p['k']) == g and dist_km((x['lon'], x['lat']), p['_ll']) <= 0.25]
+        if near:
+            p = min(near, key=lambda p: dist_km((x['lon'], x['lat']), p['_ll']))
+            if 'mr' not in p:
+                p['mr'] = x['ref']
+                p['bc'] = x['centuries']
+                merged += 1
+                continue
+        span = x['span']
+        # Dated by the century of the main building campaign: an evidence period, not a founding year.
+        extra = {'k': x['kind'], 'nl': 'fr', 'nb': 'label', 'fb': 'main building campaign (Mérimée)', 'bc': x['centuries'],
+                 'env': [span[0], None, 'source'] if not x['moyenAge'] else [500, 1500, 'source']}
+        rows.append(['merimee', x['ref'], x['name'], x['lon'], x['lat'], 1, x['kind'], None, None, 0, [], [x['commune']] if x['commune'] else [], [], extra])
+        sites_out.append(_site_props(x['ref'], x['name'], x['kind'], x['lon'], x['lat'], ef=span[0], bc=x['centuries'][:60], fb='building campaign', nl='fr', nb='label', src='merimee'))
+    stats['merimee'] = {'medievalMonuments': len(mer), 'mergedIntoWikidataSites': merged, 'ownSites': len(mer) - merged}
+
+    # Finland — register sites classed medieval. Dated only by the register's period classes → evidence period.
+    fin = regional.finland()
+    for x in fin:
+        spans = [FIN_PERIODS[c.strip()] for c in (x['period'] or '').split(',') if c.strip() in FIN_PERIODS]
+        lo, hi = min(s[0] for s in spans), max(s[1] for s in spans)
+        kind = x['kind'] if x['kind'] in ('church', 'fortification', 'settlement') else 'site'
+        extra = {'k': kind, 'nl': 'fi', 'nb': 'label', 'env': [lo, hi, 'source'], 'st': x['type'][:40], 'per': x['period']}
+        rows.append(['finreg', x['id'], x['name'], x['lon'], x['lat'], 1, kind, None, None, 0, [], [x['kunta']] if x['kunta'] else [], [], extra])
+        sites_out.append(_site_props('fi' + x['id'], x['name'], kind, x['lon'], x['lat'], ef=lo, et=hi, st=x['type'][:40], per=x['period'][:40], nl='fi', nb='label', src='finreg'))
+    stats['finland'] = len(fin)
+
+    # West Bohemia — dated historical name forms. A Wikidata settlement within 2 km with the same Czech label is
+    # the same place: the attested form (with its year and source) is added to it; otherwise a place of its own.
+    by_cs = defaultdict(list)
+    for r in rows:
+        if r[0] == 'wikidata' and (r[13] or {}).get('k') == 'settlement':
+            for n in [r[2], *[x[0] for x in r[10]]]:
+                by_cs[norm(n)].append(r)
+    wb, merged = regional.western_bohemia(), 0
+    for x in wb:
+        hit = next((r for r in by_cs.get(norm(x['name']), []) if dist_km((x['lon'], x['lat']), (r[3], r[4])) <= 2), None)
+        form = [x['form'] or x['de'], x['first'], None, 'historical form'] if (x['form'] or x['de']) else None
+        if hit:
+            if form:
+                hit[10].insert(0, form)
+            if x['first'] is not None and (hit[7] is None or x['first'] < hit[7]):
+                hit[7] = x['first']
+                hit[13]['fb'] = 'first mention'
+                hit[13]['fbs'] = 'Western Bohemia toponyms (Janovská 2026)'
+            merged += 1
+            continue
+        rows.append(['wbohemia', x['id'], x['name'], x['lon'], x['lat'], 1, 'settlement', x['first'], None, 0, [form] if form else [], [], [],
+                     {'k': 'settlement', 'fb': 'first mention', 'src1': x['src'], 'nl': 'cs', 'nb': 'label'}])
+        sites_out.append(_site_props('wb' + str(x['id']), x['name'], 'settlement', x['lon'], x['lat'], f=x['first'], fb='first mention', nl='cs', nb='label', src='wbohemia'))
+    stats['westernBohemia'] = {'places': len(wb), 'mergedIntoWikidata': merged}
+
+    # England — bridges and fords attested to c. 1250.
+    br = regional.bridges()
+    for x in br:
+        rows.append(['bridges1250', x['id'], x['name'].lstrip('?'), x['lon'], x['lat'], 0 if x['uncertain'] else 1, 'bridge', x['first'], None, 1 if x['uncertain'] else 0,
+                     [[x['form'], x['first'], None, 'attested form']] if x['form'] else [], [x['river']] if x['river'] else [], [], {'k': 'bridge', 'fb': 'first mention'}])
+        sites_out.append(_site_props('br' + x['id'], x['name'].lstrip('?'), 'bridge', x['lon'], x['lat'], f=x['first'], fb='first mention', riv=x['river'], src='bridges1250', u=1 if x['uncertain'] else None))
+    stats['bridges'] = len(br)
+
+    # Local only: TIB places; markets and fairs of England & Wales.
+    local = []
+    for x in regional.tib():
+        local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
+                      {k: v for k, v in {'i': 'tib' + x['id'], 'n': x['name'][:70], 'k': x['kind'], 'f': x['first'], 'fb': 'first attestation (TIB)' if x['first'] is not None else None,
+                                         'ty': ', '.join(x['types'])[:80], 'src': 'tib'}.items() if v is not None}, 6))
+    for x in regional.markets_fairs():
+        local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
+                      {k: v for k, v in {'i': 'mf' + x['id'], 'n': x['name'], 'k': 'market', 'm': x['first'], 'mk': x['markets'], 'fr': x['fairs'],
+                                         'bo': 1 if x['borough'] else None, 'src': 'markets-fairs'}.items() if v is not None}, 6))
+    stats['local'] = len(local)
+    return hre_feats, local, stats

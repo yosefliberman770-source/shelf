@@ -199,3 +199,55 @@ describe('Buringh towns: corrections are stated, never silent', () => {
     }
   });
 });
+
+describe('regional specialist datasets are used where Wikidata is not enough', () => {
+  const ex = (r: Row) => (r[13] ?? {}) as Record<string, unknown>;
+  it('Holy Roman Empire towns carry first mention, charter and the ruling territory per period — from the specialist dataset', () => {
+    const hre = rows.filter((r) => r[0] === 'hre');
+    expect(hre.length).toBeGreaterThan(2000);
+    const withRule = hre.filter((r) => Array.isArray(ex(r).rule) && (ex(r).rule as unknown[]).length > 0);
+    expect(withRule.length / hre.length).toBeGreaterThan(0.95);
+    for (const r of withRule.slice(0, 300)) {
+      const rule = ex(r).rule as [string, number, number][];
+      for (let i = 1; i < rule.length; i++) expect(rule[i][1]).toBeGreaterThan(rule[i - 1][1]); // spans in order, never overlapping
+    }
+    // A charter is never before the first written mention of the same town unless the charter founded it.
+    const bad = hre.filter((r) => r[7] !== null && ex(r).ch != null && (ex(r).ch as number) < (r[7] as number) && ex(r).fb === 'first mention');
+    expect(bad.length / hre.length).toBeLessThan(0.02);
+  });
+  it('a town of the Empire before its first written mention is "not yet attested", not "later"', async () => {
+    const t = rows.find((r) => r[0] === 'hre' && ex(r).fb === 'first mention' && (r[7] as number) > 1200)!;
+    const p = (await getPlace(`hre:${t[1]}`))!;
+    expect(recordFit(p, (t[7] as number) - 150)).toBe('unattested');
+  });
+  it('French monuments are dated by their building campaign as an evidence period, never as a founding', async () => {
+    const m = rows.find((r) => r[0] === 'merimee')!;
+    const p = (await getPlace(`merimee:${m[1]}`))!;
+    expect(p.from).toBeUndefined();
+    expect(p.envelope?.from).toBeDefined();
+    expect(p.dateBasis).toMatch(/building campaign/);
+  });
+  it('Finnish sites are dated only by the register’s period classes', () => {
+    const f = rows.filter((r) => r[0] === 'finreg');
+    expect(f.length).toBeGreaterThan(1000);
+    expect(f.every((r) => r[7] === null && Array.isArray(ex(r).env))).toBe(true);
+  });
+  it('a West Bohemian attested name form is attached to the matching place rather than duplicating it', () => {
+    const merged = rows.filter((r) => r[0] === 'wikidata' && ex(r).fbs === 'Western Bohemia toponyms (Janovská 2026)');
+    expect(merged.length).toBeGreaterThan(0); // where the attested year is earlier than Wikidata's
+    const withForm = rows.filter((r) => r[0] === 'wikidata' && (r[10] as [string, unknown, unknown, string][]).some((n) => n[3] === 'historical form'));
+    expect(withForm.length).toBeGreaterThan(300);
+  });
+  it('datasets whose licence is not verified never reach the public place index', () => {
+    expect(rows.some((r) => ['tib', 'markets-fairs', 'mf'].includes(r[0] as string))).toBe(false);
+    const gi = readFileSync(join(__dirname, '../../.gitignore'), 'utf8');
+    expect(gi).toMatch(/local-sites\.pmtiles/);
+  });
+  it('the Empire towns layer draws a town light from its first mention and dark from its charter', () => {
+    const spec = LAYERS.find((l) => l.id === 'hre-towns')!.specs(ctx(1300)).find((s) => s.type === 'circle')! as { filter: unknown };
+    const f = (p: Record<string, unknown>) => featureFilter(spec.filter as never).filter({ zoom: 8 } as never, { type: 1, properties: p } as never);
+    expect(f({ f: 1350 })).toBe(false);
+    expect(f({ f: 1250 })).toBe(true);
+    expect(f({ f: 1250, ch: 1280 })).toBe(true);
+  });
+});

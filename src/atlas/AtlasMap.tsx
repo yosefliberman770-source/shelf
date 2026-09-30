@@ -3,7 +3,7 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -607,12 +607,22 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       if (nb) lines.push(nb.startsWith('romanized') ? `No English name recorded — romanized from ${str('nl')} (${nb.replace('romanized: ', '')})` : nb === 'original script' ? 'No English or Latin-script name recorded — shown in its own script' : 'No English name recorded — shown in its own language');
       const notYet = f0 !== undefined && f0 > year && fb !== 'founded';
       const q = str('i')?.startsWith('Q') ? str('i') : undefined;
+      const src = str('src') as DatasetId | undefined;
+      const ownId = src && src !== 'merimee' ? str('i')!.slice(2) : str('i');
+      if (str('bc')) lines.push(`Main building campaign: ${str('bc')}${str('mr') ? ' (Mérimée)' : ''}`);
+      if (str('per')) lines.push(`Register period class: ${str('per')}`);
+      if (str('riv')) lines.push(`River: ${str('riv')}`);
+      const byPeriod = f0 === undefined && num('t') === undefined && (num('ef') !== undefined || num('et') !== undefined);
+      if (byPeriod) lines[1] = `Dated only by ${src === 'merimee' ? 'the century of its main building campaign' : 'the register’s period class'}: ${range(num('ef'), num('et'))}`;
+      const merimeeRef = src === 'merimee' ? str('i') : str('mr');
       return {
         title: str('n') ?? 'Site', lines,
-        pick: pt ? (q ? { key: `wikidata:${q}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : str('gs') ? { key: `germaniasacra:${str('gs')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined) : undefined,
-        link: q ? { href: `https://www.wikidata.org/wiki/${q}`, label: 'Wikidata ↗' } : str('gs') ? { href: `https://klosterdatenbank.germania-sacra.de/gsn/${str('gs')}`, label: 'Germania Sacra ↗' } : undefined,
-        source: str('gs') ? `${credit('wikidata')}; ${credit('germaniasacra')}` : credit('wikidata'),
-        caution: f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
+        pick: pt ? (q ? { key: `wikidata:${q}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : src ? { key: `${src}:${ownId}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : str('gs') ? { key: `germaniasacra:${str('gs')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined) : undefined,
+        link: q ? { href: `https://www.wikidata.org/wiki/${q}`, label: 'Wikidata ↗' } : merimeeRef ? { href: `https://www.pop.culture.gouv.fr/notice/merimee/${merimeeRef}`, label: 'Mérimée record ↗' } : str('gs') ? { href: `https://klosterdatenbank.germania-sacra.de/gsn/${str('gs')}`, label: 'Germania Sacra ↗' } : src ? { href: DATASET_CREDIT[src].url, label: 'Dataset ↗' } : undefined,
+        source: [q ? credit('wikidata') : '', str('gs') ? credit('germaniasacra') : '', merimeeRef ? credit('merimee') : '', src && src !== 'merimee' ? credit(src) : ''].filter(Boolean).join('; '),
+        caution: byPeriod ? (src === 'merimee' ? 'The date is when the present building was mainly built; the site may be older, and the building is shown from the start of that century.' : 'Dated only by the register’s broad period class, so it is shown for the whole period.')
+          : num('u') ? 'The identification of this location is uncertain in the source.'
+          : f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
           : notYet ? `Not yet recorded in ${yearLabel(year)}: the first record is from ${yearLabel(f0!)}. It may be older, but nothing places it at this date — shown because “Include undated records” is on.`
           : num('t') === undefined ? 'No end is recorded, so it is drawn to the present; many houses and castles ended earlier than their record says.' : undefined,
       };
@@ -627,6 +637,29 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “—” = below the dataset’s threshold.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
       };
     }
+    case 'hre-towns': {
+      const rule = (str('rl') ?? '').split(';').map((x) => x.split('|')).filter((x) => x.length === 3).map(([n, a, b]) => ({ n, a: +a, b: +b }));
+      const now = rule.find((r) => r.a <= year && year <= r.b);
+      const lines = [
+        num('f') !== undefined ? `${str('fb') === 'founded' ? 'Founded' : 'First written mention'}: ${yearLabel(num('f')!)}` : 'No first mention recorded',
+        num('ch') !== undefined ? `Town charter: ${yearLabel(num('ch')!)}${str('lf') ? ` (legal family ${str('lf')})` : ''}` : 'No formal town charter recorded',
+        ...(num('m') !== undefined ? [`First market grant: ${yearLabel(num('m')!)}${str('mt') ? ` — ${str('mt')}` : ''}`] : []),
+        now ? `Ruled in ${yearLabel(year)} by: ${now.n} (${now.a}–${now.b})` : rule.length ? `Ruling territory recorded from ${rule[0].a}` : 'No ruling territory recorded',
+      ];
+      if (str('a')) lines.push(`Called “${str('a')}” in the Deutsches Städtebuch`);
+      return {
+        title: str('n') ?? 'Town', lines,
+        pick: pt ? { key: `hre:${str('i') ?? num('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
+        link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.7910/DVN/ZGSJED', label: 'Dataset ↗' },
+        source: credit('hre'),
+        caution: year < 1300 ? 'Rulers are recorded year by year from 1300; the dataset’s authors consider earlier records less complete.' : 'Territories are recorded as ruling lineages, as the dataset does (e.g. a Wittelsbach line rather than “Bavaria”).',
+      };
+    }
+    case 'local-sites':
+      return {
+        title: str('n') ?? 'Place', lines: [str('k') ?? '', num('f') !== undefined ? `First attested: ${yearLabel(num('f')!)}` : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}` : 'No date recorded', ...(str('ty') ? [str('ty')!] : [])].filter(Boolean),
+        source: credit('localonly'), caution: 'Local build only: the licence for republishing this dataset has not been verified.',
+      };
     case 'gs-dioceses':
       return { title: `Diocese of ${str('n') ?? '?'}`, lines: ['Holy Roman Empire'], source: credit('germaniasacra'), caution: 'Germania Sacra’s reconstruction for no single stated date; borders changed over the centuries.' };
     case 'hced-battles': {

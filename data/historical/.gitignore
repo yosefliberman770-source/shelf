@@ -67,6 +67,23 @@ raw/*/nightly-export/**
 !raw/pleiades/original/dumps/pleiades-names-20260929.csv.gz
 !raw/pleiades/original/dumps/pleiades-places-20260929.csv.gz
 !raw/pleiades/original/json/pleiades-errata-20260929.json.gz
+!raw/princes-townspeople/original/cities_dynasties.tab
+!raw/princes-townspeople/original/city_borders_2019.zip
+!raw/princes-townspeople/original/city_documentation.pdf
+!raw/princes-townspeople/original/city_locations.tab
+!raw/princes-townspeople/original/conflict_incidents.tab
+!raw/princes-townspeople/original/conflict_incidents_documentation.pdf
+!raw/princes-townspeople/original/construction.tab
+!raw/princes-townspeople/original/construction_documentation.pdf
+!raw/princes-townspeople/original/legal_families.tab
+!raw/princes-townspeople/original/markets.tab
+!raw/princes-townspeople/original/markets_documentation.pdf
+!raw/princes-townspeople/original/territories_all.tab
+!raw/princes-townspeople/original/territory_blueprints.tab
+!raw/princes-townspeople/original/territory_codes.tab
+!raw/princes-townspeople/original/territory_documentation.pdf
+!raw/princes-townspeople/original/towncharter.tab
+!raw/princes-townspeople/original/towncharter_documentation.pdf
 !raw/tribal-hidage/original/Individuals_Data.csv
 !raw/tribal-hidage/original/Objects_Data.csv
 !raw/tribal-hidage/original/Sites_data.csv
@@ -90,6 +107,11 @@ raw/*/nightly-export/**
 !raw/viabundus/original/population.csv
 !raw/viabundus/original/towns.csv
 !raw/viabundus/original/water-1500.csv
+!raw/western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv
+!raw/western-bohemia-toponyms/original/Data_Dictionary.csv
+!raw/western-bohemia-toponyms/original/License for Dataset.txt
+!raw/western-bohemia-toponyms/original/README.md
+!raw/western-bohemia-toponyms/original/Western_Bohemia_place_names_key.csv
 !raw/wikidata-medieval/original/battle.names.tsv
 !raw/wikidata-medieval/original/battle.tsv
 !raw/wikidata-medieval/original/bridge.names.tsv

@@ -1,0 +1,21 @@
+﻿Category;Column definitions;;;;;;
+ID;identification number within the complete dataset of place names in Bohemia;;;;;;
+name;modern name according to A. Profous;;;;;;
+name2;alternative name according to A. Profous;;;;;;
+type;settlement type according to A. Profous;;;;;;
+district;district according to A. Profous;;;;;;
+YY, XX;coordinates;;;;;;
+Year1 and 2, Source1 and 2;earliest written attestations and year;;;;;;
+Orig_form_MC;original name according to M. Čornejová (2009) – reconstruction of the original form;;;;;;
+Class;word-formation category codes: ;1 - (Trans)onymization;2.1 Prefixal and prefixal-conversion processes;2.2 Prefixal-suffixal process;2.3 Pluralisation of appellatives;2.4 Deverbal nouns: formants -Ø, -a, -l, -el;2.5 Diminutive formants
+;"
+
+";2.17 Pluralisation of proper names;2.18 Formant -(ov)’ané;2.19 Formant -(ov)ici;3 Compounding;4 Adjective + noun syntagma;5 name of foreign origin
+Basismorpheme;potential base morpheme according to H. Bichlmeier;;;;;;
+Analogy_Bavaria_HB;potential analogy or similarity of the name in Bavaria according to the H. Bichlmeier's lexicon;;;;;;
+Analogy_JR;critical assessment of the probability of the analogy according to J. Rejzek;;;;;;
+analogy;code indicating whether an analogy exists in Bavaria (1 = yes, 0 = no, G = Germanic origin of the name);;;;;;
+Slav_Germ;Slavic / Germanic origin of the name;;;;;;
+Etymology_Profous;etymology according to A. Profous;;;;;;
+Lexeme;name base;;;;;;
+Antrhoponym;name base derived from an anthroponym (1) or an appellative (0);;;;;;
