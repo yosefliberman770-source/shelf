@@ -1042,6 +1042,119 @@ def polity_aliases():
     return {'aliases': n_al, 'demonyms': n_dm}
 
 
+def normalize_name(x):
+    return re.sub(r'\s+', ' ', re.sub(r'[^a-z ]', ' ', x.lower().strip('()'))).strip()
+
+
+def polity_common_names():
+    """The everyday English name to show for a polity ('cn'), when its Cliopatria name is a formal title.
+
+    Two rules, both checked against the data, never applied blindly:
+      1. Cliopatria's own Wikipedia title for the polity, when it is a plain name the formal title
+         contains ("Federated Republic of Germany" → Germany, "Old Kingdom of Norway" → Norway).
+      2. For modern regimes (from 1800), the country Wikidata records for them (P17), only when the
+         formal title itself refers to that country — shares a word stem with the country's name, an
+         alias or its demonym ("Third Hellenic Republic" → Greece via Hellas; "French Second Republic"
+         → France). Earlier polities are never renamed after a modern country (the Roman Republic is
+         not "Italy", the Frankish kingdom not "France").
+    The formal name stays in 'n' and is shown in the details.
+    """
+    log('Cliopatria: common names')
+    z = zipfile.ZipFile(fetch('cliopatria', SOURCES['cliopatria']))
+    d = json.load(z.open(next(n for n in z.namelist() if n.endswith('.geojson'))))
+    wiki = {}
+    for f in d['features']:
+        p = f['properties']
+        if p.get('Type') == 'POLITY' and p.get('Wikipedia'):
+            wiki.setdefault(p['Name'], p['Wikipedia'])
+    path = os.path.join(OUT, 'cliopatria', 'names.json')
+    rows = json.load(open(path, encoding='utf-8'))
+    norm = lambda x: re.sub(r'[^a-z ]', ' ', x.lower()).split()
+    # Country records for modern regimes (QLever's copy of Wikidata; cached).
+    cache_path = os.path.join(CACHE, 'cliopatria-countries.json')
+    countries = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+    todo = sorted({r['q'] for r in rows if r.get('q') and r['t'] >= 1800} - set(countries))
+    for i in range(0, len(todo), 150):
+        chunk = todo[i:i + 150]
+        query = ('PREFIX wd: <http://www.wikidata.org/entity/> PREFIX wdt: <http://www.wikidata.org/prop/direct/> '
+                 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> '
+                 f'SELECT ?p ?cl ?al ?dm WHERE {{ VALUES ?p {{ {" ".join("wd:" + q for q in chunk)} }} ?p wdt:P17 ?c . '
+                 '?c rdfs:label ?cl FILTER(LANG(?cl) = "en") OPTIONAL { ?c skos:altLabel ?al FILTER(LANG(?al) = "en") } '
+                 'OPTIONAL { ?c wdt:P1549 ?dm FILTER(LANG(?dm) = "en") } }')
+        res = None
+        for attempt in range(5):
+            try:
+                req = urllib.request.Request('https://qlever.dev/api/wikidata', data=urllib.parse.urlencode({'query': query}).encode(),
+                                             headers={'User-Agent': UA, 'Accept': 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded'})
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    res = json.load(r)['results']['bindings']
+                break
+            except Exception as e:  # noqa: BLE001 — wait and retry
+                log('   countries:', str(e)[:60], '— retrying')
+                time.sleep(30 * (attempt + 1))
+        if res is None:
+            log('   countries unavailable; rule 2 applies only to what is cached')
+            break
+        got = {q: {'c': [], 'w': []} for q in chunk}
+        for r in res:
+            q = r['p']['value'].rsplit('/', 1)[1]
+            got[q]['c'].append(r['cl']['value'])
+            got[q]['w'] += [r[k]['value'] for k in ('cl', 'al', 'dm') if k in r]
+        for q, v in got.items():
+            countries[q] = {'c': sorted(set(v['c'])), 'w': sorted(set(v['w']))}
+        json.dump(countries, open(cache_path, 'w'))
+    common = {}
+    taken = {normalize_name(r['n']) for r in rows}
+    for r in rows:
+        n = r['n']
+        if n.startswith('('):
+            continue
+        w = re.sub(r'\s*\([^)]*\)\s*$', '', wiki.get(n, '')).strip()  # drop Wikipedia disambiguation "(1798–1799)"
+        words = norm(n)
+        if w and w != n and norm(w) and ' '.join(norm(w)) in ' '.join(words) and len(w) < len(n):
+            common[n] = w
+            continue
+        # Rule 2 applies only to a regime title of the country itself: ordinals + ONE country adjective +
+        # a form word ("Third Hellenic Republic", "Second Spanish Republic", "Greek junta"), and only when
+        # the country's own name is a plain name (no form words). Colonies, factions, parties, renamed
+        # countries ("Burma", "Republic of China") are never renamed.
+        c = countries.get(r.get('q') or '')
+        forms = {'republic', 'empire', 'junta', 'state', 'confederation', 'kingdom'}
+        ordinals = {'first', 'second', 'third', 'fourth', 'fifth', 'sixth'}
+        rest = [x for x in words if x not in forms and x not in ordinals]
+        if (r['f'] >= 1800 and c and len(c['c']) == 1 and any(x in forms for x in words) and len(rest) == 1
+                and not set(norm(c['c'][0])) & (forms | {'union', 'reich', 'people', 'peoples', 'socialist', 'federal', 'united', 'colonial', 'of'})):
+            stems = {x[:4] for x in norm(' '.join(c['w'])) if len(x) >= 4}
+            if len(rest[0]) >= 4 and rest[0][:4] in stems:
+                common[n] = c['c'][0]
+    # A common name that is another polity's own name would confuse them ("Revolutionary Roman Republic"
+    # of 1799 is not shown as "Roman Republic"); several regimes of one country may share one ("France").
+    common = {n: c for n, c in common.items() if normalize_name(c) == normalize_name(n) or normalize_name(c) not in taken}
+    for r in rows:
+        r.pop('cn', None)  # recomputed from scratch every time
+        if r['n'] in common:
+            r['cn'] = common[r['n']]
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
+    # The map labels come from the time slices: add the common name there too.
+    folder = os.path.join(OUT, 'cliopatria')
+    for fn in os.listdir(folder):
+        if not re.match(r'^-?\d+_-?\d+\.json$', fn):
+            continue
+        fp = os.path.join(folder, fn)
+        fcol = json.load(open(fp, encoding='utf-8'))
+        for f in fcol['features']:
+            cn = common.get(f['properties']['n'])
+            if cn:
+                f['properties']['cn'] = cn
+            else:
+                f['properties'].pop('cn', None)
+        with open(fp, 'w', encoding='utf-8') as fh:
+            json.dump(fcol, fh, ensure_ascii=False, separators=(',', ':'))
+    log(f'  {len(common)} polities get an everyday name')
+    return {'commonNames': len(common)}
+
+
 def polity_names():
     """cliopatria/names.json: every polity name once, with its full date range
     (from the slices already built), for historical search."""
@@ -1122,7 +1235,7 @@ def main():
     mpath = os.path.join(OUT, 'manifest.json')
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
-    steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases),
+    steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases), ('common', polity_common_names),
              ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
@@ -1131,7 +1244,7 @@ def main():
         world.build_world()
     # The manifest keeps counts per dataset; extra steps fold into their dataset.
     stats['pleiades'] = {**(stats.get('pleiades') or {}), 'gazetteer': stats.pop('gazetteer', None)}
-    stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None), 'aliases': stats.pop('aliases', None)}
+    stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None), 'aliases': stats.pop('aliases', None), 'commonNames': stats.pop('common', None)}
     manifest(stats)
 
 

@@ -86,6 +86,8 @@ half-fixed by the first round of corrections:
 | R15 | **Polities ranked by label-point distance.** Between polities of one name the nearest *label point* to the book's places won. A label point is where a name is drawn, not where the polity was. | "Roman" in a Punic-war chapter → Roman Kingdom (its label sits at Rome) |
 | R16 | **Chapter places resolved before the date was known.** The atlas works out the date after its first render; the chapter list resolved once, on mount, with no date. | Book places resolved as if undated even when the chapter says "218 BC" |
 | R17 | **Every overlap called "contested".** Cliopatria records territory per period and records relationships (allegiance, alliance, vassalage, personal union) — never claims or disputes. | Norway/Yorkshire and 1,400 other overlaps described as disputes the source never states |
+| R19 | **Map labels used the local-language name.** OpenHistoricalMap's `name` field is the name in the local language and script; its English and other-language names (`name_en`, `name_fr`…) were ignored. | Middle-Eastern cities in Arabic/Hebrew, Chinese and Japanese cities in their scripts, Greek places in Greek |
+| R20 | **States shown by their formal title.** Cliopatria names each regime formally ("Third Hellenic Republic", "Federated Republic of Germany", "French Fifth Republic"); nothing gave the everyday name. | Greece labelled "Third Hellenic Republic" |
 | R18 | **Importance = documentation.** The first ranking counted names and links: well documented ≠ important. | Well-studied small sites outranking capitals and ports |
 
 ### 4.2 What changed, for each general problem
@@ -105,6 +107,8 @@ half-fixed by the first round of corrections:
 | R11 | Unavailable layers and empty areas give the actual reason. | `atlas/catalog.ts`, `world/evidence.ts` |
 | R12 | Non-Latin names isolated (FSI…PDI, `<bdi>`), never reversed. | `atlas/names.ts` |
 | R14 | Polity names, **Wikidata aliases and demonyms** (P1549; fetched per Cliopatria polity at build time from QLever's copy of Wikidata, falling back to Wikidata's own API; cached — 1,053 polities with aliases, 260 with demonyms) and spelling-derived adjectives. All routes are collected and **the date decides first**, then how strongly the words match ("Hungarian" in 1400 → Kingdom of Hungary by spelling, not the later Hungarian Republic by name). Detection covers -an/-ic/-ch adjectives; adjectives followed by language/artefact words ("English translation", "Roman numerals") or after "in"/"into" are not places. A match is confident only when it comes from a recorded name/alias/demonym **and** the book's places don't lie outside that polity at the date; otherwise it is "likely". | `build.py` (`polity_aliases`), `atlas/mention.ts`, `atlas/resolve.ts`, `lib/history/placeDetect.ts` |
+| R19 | Map labels use a readable name: the English name if recorded, else the name when it is already in Latin script (including transliterations with marks, ʿ Ḥ), else a Latin-script name in another language. If none is recorded, no label is drawn — the dot stays, and tapping it shows the original name with the note that no English name is recorded. The local name is shown as a second line in the details. | `atlas/catalog.ts` (`ohmLabel`), `atlas/AtlasMap.tsx` |
+| R20 | States get an everyday name (`cn`) by two checked rules: Cliopatria's own Wikipedia title when it is a plain name inside the formal one ("Old Kingdom of Norway" → Norway); and, for regimes from 1800 only, the country Wikidata records for them when the title is ordinal + that country's adjective + a form word ("Third Hellenic Republic" → Greece, "French Second Republic" → France). Never applied to earlier states (Wikidata would call the Roman Republic "Italy"), to renamed countries (Burma is not "Myanmar"), to colonies or factions, or when the name belongs to another polity. 201 states; the formal title stays in the details. | `build.py` (`polity_common_names`), `atlas/catalog.ts`, `atlas/context.ts`, `atlas/resolve.ts` |
 | R16 | Chapter places are resolved once the date context exists, and again if the reader changes the date. | `components/history/AtlasPanel.tsx` |
 
 Answers cached on a phone under earlier rules are recomputed (versioned cache keys and book-analysis version).
@@ -129,6 +133,8 @@ Answers cached on a phone under earlier rules are recomputed (versioned cache ke
 | "no open data set" | R11 |
 | Arabic/Hebrew bidi; non-English primary names | R12 + R5 |
 | (found in review) "Roman" → Roman Kingdom in a 218 BC chapter | R15 + R16 |
+| Middle-Eastern cities in Arabic, Asian cities in Asian scripts, Greek places in Greek | R19 |
+| Greece shown as "Third Hellenic Republic" | R20 |
 
 ### 4.4 What remains uncertain because of the sources
 
@@ -145,6 +151,9 @@ Answers cached on a phone under earlier rules are recomputed (versioned cache ke
   the adjective is not linked to a polity — it isn't guessed. Where Wikidata records a demonym for a
   polity some readers wouldn't expect ("Roman" → Holy Roman Empire in 1100), the book's places temper it:
   in a book set in Constantinople it is only "likely", with the reason shown.
+- **Names in other scripts**: many cities in China, Japan and Russia have no English or Latin-script name in
+  OpenHistoricalMap (about two thirds of those sampled). Shelf does not transliterate them itself; they keep
+  their dot without a label, and the original name is available on tap.
 - **Map relevance by country** uses the Library of Congress's catalogue field; other collections don't give one.
 
 ### 4.5 What Shelf intentionally does NOT infer
@@ -182,5 +191,5 @@ in a Byzantine-set book —
   piece, unlabelled), 1300 (Iberia; north Italy z6: Florence, Papal States, Aquileia), 1850 (Europe; India:
   British Empire, Nepal, residual Mughal Empire). No duplicated polity labels in any view.
 
-- **Final test count**: 224 passed across the suite (63 passed in `geography.test.ts`), 0 failing.
+- **Final test count**: 230 passed across the suite (69 passed in `geography.test.ts`), 0 failing.
 - **Production build** (`SHELF_BASE=/shelf/ npx vite build`, with `tsc -b`): succeeds.

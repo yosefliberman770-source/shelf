@@ -3,7 +3,8 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
@@ -502,12 +503,13 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       if (str('m')) lines.push(`Part of: ${str('m')!.split(';').map((x) => x.replace(/^\(|\)$/g, '')).join(', ')}`);
       if (grouping && str('cm')) lines.push(`Made up of: ${str('cm')!.split(';').join(', ')}`);
       if (num('a')) lines.push(`Area in this outline: about ${num('a')!.toLocaleString()} km²`);
+      if (str('cn')) lines.unshift(`Formal name in the source: ${str('n')}`);
       const cautions = ['One scholarly reconstruction of the territory; borders were rarely this precise.'];
       if (p.op !== undefined) cautions.unshift('A small detached piece of this polity’s outline, far from its main territory. Cliopatria includes it in the outline but doesn’t say whether it was held, briefly occupied, or is an artefact of the reconstruction.');
       if (str('x')) cautions.unshift(`Overlapping outlines: the source’s outline for this polity overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria records territory per period and records no claims or disputes, so this may be shared or changing control within the period, or imprecision in the reconstruction — the source doesn’t say which.`);
       if (str('xr')) cautions.unshift(`Overlap explained by a relationship Cliopatria records: ${str('xr')!.split(';').join('; ')}.`);
       return {
-        title: grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity', lines,
+        title: str('cn') ?? (grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity'), lines,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : undefined, source: credit('cliopatria'),
         caution: cautions.join(' '),
       };
@@ -592,7 +594,13 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'ohm': {
       const s = str('start_date');
       const e = str('end_date');
-      return { title: str('name') ?? 'Feature', lines: [str('type') ?? '', s || e ? `Mapped for ${s ?? '?'} – ${e ?? 'present'}` : ''].filter(Boolean), source: credit('ohm') };
+      // A readable name first (English, else a Latin-script one); the local-language name kept as a second line.
+      const local = str('name');
+      const latin = str('name_en') ?? (local && isLatinScript(local) ? local : undefined) ?? OHM_LATIN_LANGS.map((l) => str(`name_${l}`)).find(Boolean);
+      const lines = [str('type') ?? '', s || e ? `Mapped for ${s ?? '?'} – ${e ?? 'present'}` : ''];
+      if (local && latin && local !== latin) lines.push(`Local name: ${isolate(local)}`);
+      if (local && !latin) lines.push('No English or Latin-script name is recorded for it in OpenHistoricalMap, so the map shows no label.');
+      return { title: latin ?? (local ? isolate(local) : 'Feature'), lines: lines.filter(Boolean), source: credit('ohm') };
     }
     default:
       return { title: str('n') ?? str('name') ?? 'Feature', lines: [], source: '' };

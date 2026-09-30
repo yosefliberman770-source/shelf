@@ -20,8 +20,8 @@ import { assessCandidates, hasSpellingEvidence } from '../lib/history/assess';
 import { detectPlaces, screenMentions } from '../lib/history/placeDetect';
 import type { PlaceCandidate } from '../lib/history/types';
 import { relevance, type HistMap } from '../world/maps';
-import { LAYERS, UNAVAILABLE_LABEL, type LayerCtx } from './catalog';
-import { politiesAt } from './context';
+import { LAYERS, ohmLabel, UNAVAILABLE_LABEL, type LayerCtx } from './catalog';
+import { politiesAt, polityDisplayName } from './context';
 import { getPlace, type GazPlace, matchName, recordFit } from './gazetteer';
 import { isCommonWord, loadCommonWords, macroRegion, matchPolity, mentionEvidence, plausibleMention } from './mention';
 import { hasRtl, isolate, joinNames, nameRoles } from './names';
@@ -131,6 +131,16 @@ describe('REGRESSION — the reported problems', () => {
   });
   it('"no open dataset": unavailable layers say which reason applies', () => {
     for (const l of LAYERS.filter((x) => x.unavailable)) expect(l.unavailableKind && UNAVAILABLE_LABEL[l.unavailableKind]).toBeTruthy();
+  });
+  it('map labels for Middle-Eastern cities use their English name, not the local script', () => {
+    expect(evalAt(ohmLabel, 6, { name: 'دمشق', name_en: 'Damascus' })).toBe('Damascus');
+    expect(evalAt(ohmLabel, 6, { name: 'חדרה', name_en: 'Hadera', name_he: 'חדרה' })).toBe('Hadera');
+  });
+  it('modern Greece is labelled "Greece", not by its formal title — and only when it exists', async () => {
+    const now = await politiesAt([23.73, 37.98], 2000); // Athens
+    expect(now.map(polityDisplayName)).toContain('Greece');
+    const ancient = await politiesAt([23.73, 37.98], -400);
+    expect(ancient.map(polityDisplayName).join(' ')).not.toMatch(/Greece|Hellenic Republic/);
   });
   it('Arabic and Hebrew names are isolated, never reversed', () => {
     const arabic = 'القاهرة';
@@ -315,10 +325,42 @@ describe('GENERALISATION — same mechanisms, different cases', () => {
     it('a modern name for an ancient place is flagged as such', async () => {
       expect((await matchName('Constantinople', -500)).reason).toMatch(/modern name/);
     });
+    it('map labels in any script: English first, then a Latin-script name, never local script', () => {
+      expect(evalAt(ohmLabel, 6, { name: 'Москва', name_en: 'Moscow' })).toBe('Moscow');
+      expect(evalAt(ohmLabel, 6, { name: 'Αθήνα', name_de: 'Athen' })).toBe('Athen'); // no English: another Latin-script name
+      expect(evalAt(ohmLabel, 6, { name: 'Thebes' })).toBe('Thebes'); // already Latin
+      expect(evalAt(ohmLabel, 6, { name: 'Ḥimṣ' })).toBe('Ḥimṣ'); // Latin transliteration with marks
+      expect(evalAt(ohmLabel, 6, { name: 'ʿAkko' })).toBe('ʿAkko');
+      expect(evalAt(ohmLabel, 6, { name: '廣平府' })).toBe(''); // no readable name recorded: no label (the dot stays)
+      expect(evalAt(ohmLabel, 6, { name: '東京', name_ja: '東京', name_en: 'Tokyo' })).toBe('Tokyo');
+    });
     it('Greek and Cyrillic names are isolated too; Latin-script names are left alone', () => {
       expect(isolate('Ἀθῆναι')).toBe('⁨Ἀθῆναι⁩');
       expect(isolate('Москва')).toBe('⁨Москва⁩');
       expect(isolate('Lutetia')).toBe('Lutetia');
+    });
+  });
+
+  describe('everyday names for states', () => {
+    const names = JSON.parse(readFileSync(join(PUB, 'atlas/cliopatria/names.json'), 'utf8')) as { n: string; cn?: string }[];
+    const cn = (n: string) => names.find((x) => x.n === n)?.cn;
+    it('formal titles get the everyday name', () => {
+      expect(cn('Federated Republic of Germany')).toBe('Germany');
+      expect(cn('French Third Republic')).toBe('France');
+      expect(cn('Old Kingdom of Norway')).toBe('Norway');
+      expect(cn('Kingdom of Wessex')).toBe('Wessex');
+    });
+    it('earlier states are never renamed after a modern country, and renamed countries keep their own name', () => {
+      expect(cn('Roman Republic')).toBeUndefined(); // Wikidata's "country" would say Italy
+      expect(cn('Kingdom of the Franks')).toBeUndefined(); // …and France
+      expect(cn('Burma')).toBeUndefined(); // not "Myanmar"
+      expect(cn('Republic of China')).toBeUndefined(); // not the People's Republic
+      expect(cn('Revolutionary Roman Republic')).toBeUndefined(); // would be confused with the ancient one
+    });
+    it('the map label uses the everyday name and keeps the formal one otherwise', () => {
+      const label = LAYERS.find((l) => l.id === 'republics')!.specs(ctx(2000)).find((s) => s.type === 'symbol') as { layout: { 'text-field': unknown } };
+      expect(evalAt(label.layout['text-field'], 5, { n: 'Third Hellenic Republic', cn: 'Greece' })).toBe('Greece');
+      expect(evalAt(label.layout['text-field'], 5, { n: 'Roman Republic' })).toBe('Roman Republic');
     });
   });
 
