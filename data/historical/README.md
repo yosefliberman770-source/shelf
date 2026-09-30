@@ -27,7 +27,7 @@ regenerated daily, so their checksums change on every download.
 `python3 scripts/historical-data/describe.py` rewrites the SOURCE.md and
 LICENSE.md files from the manifest.
 
-## Status (2026-09-30)
+## Status (2026-10-01)
 
 - **Downloaded automatically:** Tribal Hidage, Medieval Bridges, Viabundus, Itiner-e, Pleiades, al-Ṯurayyā,
   Living with Machines, Historic England, CShapes, and parts of the ADS collections.
@@ -45,6 +45,22 @@ LICENSE.md files from the manifest.
   beside results — re-run with `scripts/historical-data/wikidata_snapshot.py`), Germania Sacra (monasteries and
   dioceses of the Empire), Buringh's European urban population 700–2000, the Historical Conflict Event Dataset
   and PeriodO. Processed by `scripts/atlas-build/sites.py`; see docs/MEDIEVAL_EUROPE_DATA_AUDIT.md.
+- **Added 2026-10-01 (second pass):**
+  - Open licences, public:
+    - Princes and Townspeople (CC0)
+    - Mérimée medieval monuments (Licence Ouverte 2.0)
+    - Finnish register (CC BY 4.0)
+    - Western Bohemia toponyms (CC BY 4.0)
+  - Licence not verified, so `local_only` (kept out of git; tiles only in local builds):
+    - TIB Maps of Power (`scripts/historical-data/openatlas_snapshot.py`)
+    - Markets and Fairs to 1516
+    - Atlas Fontium's 16th-century Poland (WFS)
+    - Denmark's Fund og Fortidsminder (raw only)
+  - Regional parsers are in `scripts/atlas-build/regional.py`.
+- **Audit files** (`audit/`), each rebuilt by its script:
+  - `seed-candidates.json` and `reconciliation_entries.py` → `reconciliation.json` (`reconciliation.py`)
+  - `import-audit.json` (`audit_imports.py`)
+  - `vault-audit.json`: files, checksums, docs, leaks into git and what the app uses (`audit_vault.py`)
 - **Measured coverage:** `coverage-measured.json` (built by `scripts/historical-data/coverage.py`).
 - **Skipped:** GB1900 (owner's decision).
 - **Online-only:** KEPN and PASE (see their SOURCE.md). The World Historical Gazetteer is an external

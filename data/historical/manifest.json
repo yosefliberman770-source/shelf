@@ -59,6 +59,72 @@
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
  },
+ "atlas-fontium-poland/original/akweny.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:akweny&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 14577201,
+  "sha256": "c4218374d1df3109065707b9c2ff396687fcc146f45032dc98258d75850c6ee1",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/archidiakonaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:archidiakonaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1315490,
+  "sha256": "3e6c2c93a5a7ffb9d3cb16f8e167c10a6f7f0db58fdd1cd455030e1a9ffbef5d",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/dekanaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:dekanaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 2698642,
+  "sha256": "4761e7b97d13f7750b23664e5dd4e73c243a88783c81f12464276ec54957645e",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/diecezje.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:diecezje&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 854612,
+  "sha256": "a1bb56aa875645b9560dd12f8353cab05c098d321effb61d8add3bf8347d1265",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/drogi.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:drogi&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1971085,
+  "sha256": "48e10d833f747077038b77c4fe9a510dc90c6984c225773a75e70ee32abf4683",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/lasy.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:lasy&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 121695830,
+  "sha256": "42c94259bba49728a99fd094ff41bfa9f4a5ad2a9b1c0f37857c215cbca99196",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/miejscowosci.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:miejscowosci&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 11780465,
+  "sha256": "1cf385db4ff369ea5e61c44851676c7552ceb54a77a29063b25934164985ab04",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/parafie.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:parafie&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 8394353,
+  "sha256": "ed76b4586a18450768c240f55b8d3a07d185b6c882a35b099a0c12902391cf11",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/powiaty.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:powiaty&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 2322995,
+  "sha256": "7878514fc917123181d5b3b5425428a78193b02f7a6d760b83691a4d6dbc7172",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/rzeki.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:rzeki&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 19693629,
+  "sha256": "c5d2b569f894e9649c690117f777840b493301feb9403da1b6b3f7dcaca241d1",
+  "downloaded": "2026-09-30"
+ },
+ "atlas-fontium-poland/original/wojewodztwa.geojson": {
+  "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:wojewodztwa&outputFormat=application/json&srsName=EPSG:4326",
+  "bytes": 1218099,
+  "sha256": "87cedd39f4560ff0c570ce6bea63c08d3959f60d0684180389ca7db861de1475",
+  "downloaded": "2026-09-30"
+ },
  "atlas-rural-settlement/original/atlas-gis-shapefile.zip": {
   "url": "https://archaeologydataservice.ac.uk/archives/view/atlasrural_he_2015/downloads.cfm",
   "bytes": 13213011,
@@ -125,6 +191,12 @@
   "bytes": 3722,
   "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
   "downloaded": "2026-09-29"
+ },
+ "dk-fund-og-fortidsminder/original/FF.zip": {
+  "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
+  "bytes": 109119092,
+  "sha256": "a4686a62d9b576e08e1846aad6413bda8f38e267e871552ee5f939e48bdc25a2",
+  "downloaded": "2026-09-30"
  },
  "domesday/original/DBhundreds.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/DBhundreds.zip",

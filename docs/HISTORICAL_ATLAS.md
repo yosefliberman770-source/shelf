@@ -65,7 +65,20 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Terrain Tiles](https://github.com/tilezen/joerd/blob/master/docs/attribution.md) | Various; see the linked page |
 | [Domesday Shires and Hundreds](https://doi.org/10.5284/1058999), [Gough Map GIS](https://doi.org/10.5284/1124312), [Inland Navigation GIS](https://doi.org/10.5284/1057497) (ADS) | CC BY 4.0 |
 | [Atlas of Rural Settlement in England GIS](https://doi.org/10.5284/1031493) | © English Heritage; personal and business use — not republished |
+| [Princes and Townspeople](https://doi.org/10.7910/DVN/ZGSJED) (towns of the Empire: charters, first mentions, markets, ruling territories) | CC0 |
+| [Mérimée](https://www.data.gouv.fr/) (French protected medieval monuments) | Licence Ouverte 2.0 |
+| Museovirasto spatial data (Finnish register, medieval classes) | CC BY 4.0 |
+| [Toponymic Data for Western Bohemia up to AD 1500](https://doi.org/10.5281/zenodo.21479034) | CC BY 4.0 |
+| [Bridges of Medieval England to c.1250](https://doi.org/10.5284/1053676) (ADS) | CC BY 4.0 |
 | [World Historical Gazetteer](https://whgazetteer.org/) (queried, not downloaded) | Index CC BY-NC 4.0; each source its own licence |
+
+**Local builds only** (`VITE_SHELF_LOCAL_DATA=1`). No licence has been found for these, which is not the same as a
+restriction. They stay out of this public repository and the deployed site until one is confirmed:
+- TIB *Maps of Power* (ÖAW; only its photographs are marked CC BY 4.0)
+- Letters, *Gazetteer of Markets and Fairs in England and Wales to 1516* (SAS-Space: "UNSPECIFIED")
+- Atlas Fontium, *Atlas historyczny Polski XVI w.* (IH PAN; GeoNode: "not_specified")
+
+The Atlas of Rural Settlement (above) is local-only for a different reason: its terms do not allow republishing.
 
 Attribution for datasets appears in three places:
 

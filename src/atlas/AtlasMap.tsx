@@ -657,7 +657,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     }
     case 'local-sites':
       return {
-        title: str('n') ?? 'Place', lines: [str('k') ?? '', num('f') !== undefined ? `First attested: ${yearLabel(num('f')!)}` : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}` : 'No date recorded', ...(str('ty') ? [str('ty')!] : [])].filter(Boolean),
+        title: str('n') ?? 'Place', lines: [str('k') ?? '', num('f') !== undefined ? `First attested: ${yearLabel(num('f')!)}` : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}` : str('per') ? `Recorded for ${str('per')} — the period of the source, not the place’s dates` : 'No date recorded', ...(str('ty') ? [str('ty')!] : []), ...(str('a') ? [`Today: ${str('a')}`] : [])].filter(Boolean),
         source: credit('localonly'), caution: 'Local build only: the licence for republishing this dataset has not been verified.',
       };
     case 'gs-dioceses':

@@ -49,7 +49,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   finreg: { name: 'Finnish Heritage Agency register', url: 'https://www.museovirasto.fi/', license: 'CC BY 4.0' },
   wbohemia: { name: 'Janovská, Toponymic Data for Western Bohemia to 1500', url: 'https://doi.org/10.5281/zenodo.21479034', license: 'CC BY 4.0' },
   bridges1250: { name: 'Bridges of Medieval England to c.1250 (Brookes, Rye, Oksanen, ADS)', url: 'https://doi.org/10.5284/1053676', license: 'CC BY 4.0' },
-  localonly: { name: 'TIB Maps of Power (ÖAW); Letters, Markets and Fairs to 1516', url: 'https://maps-of-power.oeaw.ac.at/', license: 'local use only — licence not verified' },
+  localonly: { name: 'TIB Maps of Power (ÖAW); Letters, Markets and Fairs to 1516; Atlas Fontium, Poland 16th c. (IH PAN)', url: 'https://maps-of-power.oeaw.ac.at/', license: 'local use only — licence not verified' },
   hced: { name: 'Historical Conflict Event Dataset (Miller et al. 2022)', url: 'https://doi.org/10.7910/DVN/6ZFC0V', license: 'CC0' },
   ruralsettlement: { name: 'Atlas of Rural Settlement in England GIS (Roberts & Wrathmell, English Heritage)', url: 'https://doi.org/10.5284/1031493', license: '© English Heritage — personal use' },
 };
@@ -315,10 +315,14 @@ function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, o
   const notYetRecorded: ExpressionSpecification = ['all', ['has', 'f'], ['>', ['get', 'f'], y], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'],
     ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]];
   // Records dated only by an evidence period (a building-campaign century, a register's period class): shown inside it.
-  const when = existedIn(y, { undated: ctx.showUndated ? 'show' : 'hide', envelope: { from: 'ef', to: 'et' } });
-  const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], ctx.showUndated ? ['any', when, notYetRecorded] : when] as FilterSpecification;
+  // A record with only an end (a dissolution, a destruction) existed at some time before it, but nothing says
+  // since when: before its end it is as unevidenced as an undated record.
+  const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
+  const when: ExpressionSpecification = ['all', existedIn(y, { undated: ctx.showUndated ? 'show' : 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]];
+  const unevidenced: ExpressionSpecification = ['any', notYetRecorded, ['all', endOnly, ['boolean', y >= SITES[0]]]];
+  const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], ctx.showUndated ? ['any', when, unevidenced] : when] as FilterSpecification;
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
-  const dated: ExpressionSpecification = ['all', ['any', ['has', 'f'], ['has', 't']], ['any', ['!', ['has', 'f']], ['<=', ['get', 'f'], y]]];
+  const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];
   const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']]];
   return (LOCAL_DATA ? ['medieval-sites', 'local-sites'] : ['medieval-sites']).flatMap((source, i): LayerSpecification[] => [
     { id: `${id}-pt${i ? '-local' : ''}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {

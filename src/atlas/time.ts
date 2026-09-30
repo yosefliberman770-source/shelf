@@ -82,10 +82,17 @@ export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envel
     // not begun yet — that is not proof the place did not exist.
     return year < lo ? 'unattested' : year > hi ? 'earlier' : 'period';
   }
+  const slack = opts.slack ?? 0;
+  if (span.from === undefined && span.to !== undefined) {
+    // Only an end is recorded (a dissolution, a destruction): the place existed at some time before it,
+    // but nothing says since when — before its end it is as unevidenced as an undated record.
+    if (year === span.to) return 'within';
+    if (Math.abs(year - span.to) <= slack) return 'near';
+    return year > span.to ? 'earlier' : 'unattested';
+  }
   const lo = span.from ?? opts.window?.[0] ?? -Infinity;
   const hi = span.to ?? opts.window?.[1] ?? Infinity;
   if (lo <= year && year <= hi) return 'within';
-  const slack = opts.slack ?? 0;
   if (lo - slack <= year && year <= hi + slack) return 'near';
   if (year > hi) return 'earlier';
   // Before the start: only a founding / construction date says it did not exist yet.

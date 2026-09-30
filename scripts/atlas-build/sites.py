@@ -612,8 +612,11 @@ def regional_layers(recs, rows, sites_out):
         title = a.get('en') or t['name']
         names = [[x, None, None, lang] for x, lang in ((t['name'], 'de'), (t['alt'], 'de'), (t['foreign'], '')) if x and x != title]
         rule = t['rule']
-        start = t['mention'] if t['mention'] is not None else t['founded']
-        basis = 'first mention' if t['mention'] is not None and (t['founded'] is None or t['mention'] <= t['founded']) else 'founded' if t['founded'] is not None else None
+        # The town existed from its earliest dated evidence of any kind: the Städtebuch sometimes dates a charter or
+        # foundation before the first "mention" (whose year can be an upper bound, e.g. "Middle Ages" = 1500 at the latest).
+        dated = [(y, b) for y, b in ((t['founded'], 'founded'), (t['mention'], 'first mention'), (t['charter'], 'first mention'),
+                                     (t['character'], 'first mention')) if y is not None]
+        start, basis = min(dated, key=lambda d: (d[0], d[1] != 'founded')) if dated else (None, None)
         extra = {'k': 'town', **({'fb': basis} if basis else {}), **({'tn': 0} if title != t['name'] else {}),
                  **({'q': a['q']} if a.get('q') else {}), 'ch': t['charter'], 'lf': t['legal'], 'fm1': t['firstMarket'],
                  'rule': rule[:40]}
@@ -711,5 +714,15 @@ def regional_layers(recs, rows, sites_out):
         local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
                       {k: v for k, v in {'i': 'mf' + x['id'], 'n': x['name'], 'k': 'market', 'm': x['first'], 'mk': x['markets'], 'fr': x['fairs'],
                                          'bo': 1 if x['borough'] else None, 'src': 'markets-fairs'}.items() if v is not None}, 6))
+    # Poland c. 1550–1600 (Atlas Fontium): settlements, and parish churches where the place was a parish seat.
+    for x in regional.atlas_fontium():
+        per = f'{regional.AF_PERIOD[0]}–{regional.AF_PERIOD[1]} (Atlas historyczny Polski, 2nd half of the 16th c.)'
+        ty = ' · '.join(v for v in (x['character'], x['owner'], x['size'], x['mills'], 'location approximate' if x['approx'] else None) if v)
+        base = {'n': x['name'][:70], 'ef': regional.AF_PERIOD[0], 'et': regional.AF_PERIOD[1], 'per': per, 'ty': ty[:120],
+                'a': x['modern'] if x['modern'] and x['modern'] != x['name'] else None, 'src': 'atlas-fontium'}
+        for kind in ('settlement', 'church') if x['parish'] else ('settlement',):
+            local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
+                          {k: v for k, v in {'i': ('afc' if kind == 'church' else 'af') + x['id'], 'k': kind, **base}.items() if v is not None},
+                          5 if x['character'] == 'town' else 8))
     stats['local'] = len(local)
     return hre_feats, local, stats

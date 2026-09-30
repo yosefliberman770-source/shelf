@@ -182,6 +182,18 @@ describe('what a start date means', () => {
   it('a house is not drawn after its recorded dissolution, even with unevidenced records on', () => {
     expect(layerFilter('religious-houses', 1600, true)({ k: 'monastery', f: 1100, t: 1539, fb: 'founded' })).toBe(false);
   });
+  it('a site with only an end date is not evidence for any earlier year: not drawn at 3000 BCE, nor offered for it', async () => {
+    const endOnly = { k: 'castle', t: 1600 };
+    for (const y of [-3000, 117, 1300]) expect(layerFilter('castles', y)(endOnly)).toBe(false);
+    expect(layerFilter('castles', 1300, true)(endOnly)).toBe(true); // shown hollow when unevidenced records are asked for
+    expect(layerFilter('castles', -3000, true)(endOnly)).toBe(false); // never before the layer's own period
+    expect(layerFilter('castles', 1600)(endOnly)).toBe(true);
+    const r = rows.find((x) => x[0] === 'wikidata' && x[7] === null && x[8] !== null && (x[8] as number) > 1000)!;
+    const p = (await getPlace(`wikidata:${r[1]}`))!;
+    expect(recordFit(p, -3000)).toBe('unattested');
+    expect(recordFit(p, (r[8] as number) - 100)).toBe('unattested');
+    expect(recordFit(p, (r[8] as number) + 100)).toBe('earlier');
+  });
 });
 
 describe('Buringh towns: corrections are stated, never silent', () => {
@@ -211,9 +223,10 @@ describe('regional specialist datasets are used where Wikidata is not enough', (
       const rule = ex(r).rule as [string, number, number][];
       for (let i = 1; i < rule.length; i++) expect(rule[i][1]).toBeGreaterThan(rule[i - 1][1]); // spans in order, never overlapping
     }
-    // A charter is never before the first written mention of the same town unless the charter founded it.
-    const bad = hre.filter((r) => r[7] !== null && ex(r).ch != null && (ex(r).ch as number) < (r[7] as number) && ex(r).fb === 'first mention');
-    expect(bad.length / hre.length).toBeLessThan(0.02);
+    // A town's start is its earliest dated evidence of any kind: no charter is ever dated before it (the source
+    // sometimes records a charter or foundation before the first "mention", whose year can be an upper bound).
+    const bad = hre.filter((r) => ex(r).ch != null && (r[7] === null || (ex(r).ch as number) < (r[7] as number)));
+    expect(bad).toEqual([]);
   });
   it('a town of the Empire before its first written mention is "not yet attested", not "later"', async () => {
     const t = rows.find((r) => r[0] === 'hre' && ex(r).fb === 'first mention' && (r[7] as number) > 1200)!;

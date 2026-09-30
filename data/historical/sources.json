@@ -678,5 +678,21 @@
   "local_only": true,
   "files": [],
   "note": "Fetched page by page by scripts/historical-data/openatlas_snapshot.py"
+ },
+ {
+  "id": "dk-fund-og-fortidsminder",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
+    "path": "original/FF.zip"
+   }
+  ]
+ },
+ {
+  "id": "atlas-fontium-poland",
+  "local_only": true,
+  "files": [],
+  "note": "WFS GetFeature (GeoJSON, EPSG:4326) of the 16th-century layers of geonode.ontohgis.pl, 2026-09-30"
  }
 ]

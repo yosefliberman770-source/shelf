@@ -315,3 +315,41 @@ def markets_fairs():
                     'first': min(ys) if ys else None, 'markets': sum(1 for g in rec['grants'] if g[1] == 'market'),
                     'fairs': sum(1 for g in rec['grants'] if g[1] == 'fair'), 'borough': rec['borough']})
     return res
+
+
+# Atlas Fontium — Atlas historyczny Polski: the Crown of Poland in the second half of the 16th century (IH PAN).
+# Codes and terms as used in the layer's attributes; unknown values are passed through unchanged.
+AF_CHARACTER = {'wieś': 'village', 'miasto': 'town', 'osada młyńska': 'mill settlement', 'osada folwarczna': 'manor-farm settlement',
+                'osada kuźnicza': 'forge settlement', 'pustka': 'deserted holding', 'przedmieście': 'suburb'}
+AF_OWNER = {'s': 'noble-owned', 'k': 'royal', 'd': 'church-owned', 'm': 'burgher-owned'}
+AF_SIZE = re.compile(r'do (\d+) mieszkańców')
+AF_PERIOD = (1550, 1600)
+AF_WORKS = [(re.compile(r'\bfolwark\w*'), 'manor farm'), (re.compile(r'\bkarczm\w*'), 'inn'), (re.compile(r'\bwiatrak\w*'), 'windmill'), (re.compile(r'\bmłyn\s+(\w+)'), r'mill (\1)'),
+            (re.compile(r'\bmłyn\b'), 'mill')]
+
+
+def _af_works(text):
+    for rx, en in AF_WORKS:
+        text = rx.sub(en, text)
+    return text  # the atlas's reference period, "second half of the 16th century"
+
+
+def atlas_fontium():
+    path = os.path.join(RAW, 'atlas-fontium-poland', 'original', 'miejscowosci.geojson')
+    if not os.path.exists(path):
+        return []
+    out = []
+    for ft in json.load(open(path, encoding='utf-8'))['features']:
+        p, g = ft['properties'], ft.get('geometry') or {}
+        name = (p.get('nazwa_16w') or p.get('nazwa_wspo') or '').strip()
+        if g.get('type') != 'Point' or not name:
+            continue
+        lon, lat = g['coordinates'][:2]
+        char = (p.get('charakter_') or '').strip()
+        owner = ', '.join(AF_OWNER.get(c, c) for c in (p.get('rodzaj_wla') or '').strip())
+        size = AF_SIZE.search(p.get('wielkosc_o') or '')
+        out.append({'id': str(p['id']), 'name': name, 'modern': (p.get('nazwa_wspo') or '').strip(), 'lon': round(lon, 5), 'lat': round(lat, 5),
+                    'character': AF_CHARACTER.get(char, char), 'owner': owner, 'size': f'up to {size.group(1)} inhabitants' if size else None,
+                    'parish': 'parafia' in (p.get('funkcje__1') or ''), 'mills': _af_works((p.get('obiekty_go') or '').strip()),
+                    'approx': bool((p.get('rodzaj_lok') or '').strip())})
+    return out
