@@ -14,11 +14,14 @@ import math
 from collections import defaultdict
 
 import mapbox_vector_tile
+from mapbox_vector_tile.encoder import on_invalid_geometry_make_valid
 from pmtiles.tile import Compression, TileType, zxy_to_tileid
 from pmtiles.writer import Writer
 from shapely.geometry import box, mapping, shape
 from shapely.ops import transform, unary_union
 from shapely.validation import make_valid
+
+import quality
 
 R = 6378137.0
 ORIGIN = math.pi * R
@@ -48,16 +51,29 @@ def tile_range(z, b):
 
 
 def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoom: int, name: str, attribution: str, min_zoom: int = 0):
-    """features: (geojson geometry, properties, minzoom)."""
-    geoms = []
+    """features: (geojson geometry, properties, minzoom).
+
+    Returns {'tiles', 'features', 'rejected'}: geometries with impossible coordinates (see quality.py) are left out
+    and listed with their id and the reason, never silently moved or dropped."""
+    geoms, rejected = [], []
     for g, props, mz in features:
         try:
-            geo = transform(to_merc, shape(g))
+            src = shape(g)
         except Exception:
+            rejected.append({'id': props.get('i'), 'reason': 'unreadable geometry'})
             continue
+        why = quality.geometry_problem(src.bounds) if not src.is_empty else 'empty geometry'
+        if why:
+            rejected.append({'id': props.get('i'), 'reason': why})
+            continue
+        geo = transform(to_merc, src)
+        if geo.geom_type != 'Point' and not geo.is_valid:
+            geo = _same_dimension(make_valid(geo), geo.geom_type)  # a self-intersecting source ring, repaired
         if geo.is_empty:
             continue
         geoms.append((geo, props, max(min_zoom, mz)))
+    if rejected:
+        print(f'  {path}: {len(rejected)} geometries left out ({", ".join(sorted({r["reason"] for r in rejected}))})')
     fields: dict[str, str] = {}
     for _, p, _ in geoms:
         for k, v in p.items():
@@ -85,17 +101,19 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
                 if geo.geom_type != 'Point':
                     if i not in simp:
                         simp[i] = geo.simplify(tol, preserve_topology=False) if z < max_zoom else geo
+                        # Simplification that ignores topology can turn a thin polygon into a bow-tie or collapse a
+                        # ring: repair every invalid result (not only the ones that make clipping fail).
+                        if not simp[i].is_valid:
+                            simp[i] = _same_dimension(make_valid(simp[i]), geo.geom_type)
                     try:
                         g = simp[i].intersection(clip)
-                    except Exception:  # simplification can leave an invalid ring: repair it and clip again
-                        simp[i] = make_valid(simp[i])
+                    except Exception:  # still unclippable: repair and clip again
+                        simp[i] = _same_dimension(make_valid(simp[i]), geo.geom_type)
                         g = simp[i].intersection(clip)
                     if g.geom_type == 'GeometryCollection':
                         # Clipping can leave slivers of a lower dimension (a polygon touching the tile edge → a line
                         # or point): keep only parts of the feature's own dimension, which the tile format can encode.
-                        dim = geo.geom_type.replace('Multi', '')
-                        parts = [p for p in g.geoms if p.geom_type.replace('Multi', '') == dim]
-                        g = unary_union(parts) if parts else g.__class__()
+                        g = _same_dimension(g, geo.geom_type)
                 else:
                     g = geo
                 if g.is_empty:
@@ -103,10 +121,13 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
                 feats.append({'geometry': g, 'properties': props})
             if not feats:
                 continue
-            data = mapbox_vector_tile.encode([{'name': layer, 'features': feats}], default_options={'quantize_bounds': b, 'extents': 4096})
+            # Snapping to the 4096-unit tile grid can pinch a narrow neck or collapse a sliver into an invalid ring;
+            # the encoder repairs those instead of writing them as they are (its default).
+            data = mapbox_vector_tile.encode([{'name': layer, 'features': feats}], default_options={
+                'quantize_bounds': b, 'extents': 4096, 'on_invalid_geometry': on_invalid_geometry_make_valid})
             tiles.append((zxy_to_tileid(z, x, y), gzip.compress(data)))
     tiles.sort()
-    allb = [g.bounds for g, _, _ in geoms]
+    allb = [g.bounds for g, _, _ in geoms] or [(0.0, 0.0, 0.0, 0.0)]
     def ll(xm, ym):
         return xm / ORIGIN * 180.0, math.degrees(2 * math.atan(math.exp(ym / R)) - math.pi / 2)
     w, s = ll(min(b[0] for b in allb), min(b[1] for b in allb))
@@ -121,4 +142,13 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
             'min_lon_e7': int(w * 1e7), 'min_lat_e7': int(s * 1e7), 'max_lon_e7': int(e * 1e7), 'max_lat_e7': int(n * 1e7),
             'center_zoom': min_zoom + 2, 'center_lon_e7': int((w + e) / 2 * 1e7), 'center_lat_e7': int((s + n) / 2 * 1e7),
         }, {'name': name, 'attribution': attribution, 'vector_layers': [{'id': layer, 'fields': fields, 'minzoom': min_zoom, 'maxzoom': max_zoom}]})
-    return len(tiles)
+    return {'tiles': len(tiles), 'features': len(geoms), 'rejected': rejected}
+
+
+def _same_dimension(g, geom_type: str):
+    """Only the parts of g with the dimension of geom_type (a repaired polygon can gain lines or points)."""
+    dim = geom_type.replace('Multi', '')
+    if g.geom_type.replace('Multi', '') == dim:
+        return g
+    parts = [p for p in getattr(g, 'geoms', [g]) if p.geom_type.replace('Multi', '') == dim]
+    return unary_union(parts) if parts else g.__class__()

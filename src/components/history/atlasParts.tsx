@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
-import { existedAround, type GazPlace, nearbyPlaces, namesAround, relationLabel } from '../../atlas/gazetteer';
+import { dateBasisNote, existedAround, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
@@ -201,7 +201,8 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
       <dl className="hmap-facts">
         {nowNames.length > 0 && <><dt>Names{place.gaz ? ` around ${yearLabel(year)}` : ''}</dt><dd>{nowNames.slice(0, 8).map(nameLine)}</dd></>}
         {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine)}</dd></>}
-        <dt>Date range</dt><dd>{span(place.from, place.to)}{place.gaz ? <span className="tiny faint"> (Pleiades periods, not founding dates)</span> : null}</dd>
+        <dt>Date range</dt><dd>{span(place.from, place.to)}{place.gaz ? <span className="tiny faint"> ({dateBasisNote(place.gaz)})</span> : null}</dd>
+        {place.gaz && <><dt>At {yearLabel(year)}</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place.gaz, year))]}</dd></>}
         <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{CERTAINTY_LABEL[place.certainty]}</span></dd>
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>
           {pol && pol.length > 0 && <div>{politiesLine(pol)} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}

@@ -3,7 +3,7 @@
 // with a way to see why the name was matched. "View on map" opens the atlas.
 import { useEffect, useState } from 'react';
 import { politiesAt, type Polity } from '../../atlas/context';
-import { type GazPlace, GAZETTEERS, matchName, namesAround, normName } from '../../atlas/gazetteer';
+import { dateBasisNote, type GazPlace, GAZETTEERS, matchName, namesAround, normName, recordFit, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, type Detection, DETECTION_LABEL } from '../../atlas/resolve';
 import { yearLabel } from '../../atlas/time';
 import { DATE_SOURCE_LABEL, type DateContext } from '../../lib/history/placeDetect';
@@ -45,7 +45,8 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
         {names.length > 0 && <><dt>Historical names</dt><dd>{names.map((n, i) => <span key={i}>{i > 0 ? ' · ' : ''}<bdi dir="auto">{n.name}</bdi></span>)}</dd></>}
         <dt>Historical date</dt>
         <dd>{year !== undefined ? <>{yearLabel(year)}{date.approximate ? ' (approx.)' : ''} <span className="tiny" style={{ color: colors.muted }}>· {DATE_SOURCE_LABEL[date.source]}</span></> : <span style={{ color: colors.muted }}>Not given by the book — set it on the map</span>}</dd>
-        <dt>Recorded</dt><dd>{span(place.from, place.to)}</dd>
+        <dt>Recorded</dt><dd>{span(place.from, place.to)} <span className="tiny" style={{ color: colors.muted }}>({dateBasisNote(place)})</span></dd>
+        {year !== undefined && <><dt>At this date</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place, year))]}</dd></>}
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && (
           <><dt>Region / political entity</dt><dd>{[pol?.length ? `${politiesLine(pol)} (${yearLabel(year!)})` : '', place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
         )}

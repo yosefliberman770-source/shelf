@@ -28,6 +28,7 @@ import zlib
 from collections import Counter, defaultdict
 from datetime import date
 
+import quality
 import tiler
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -156,11 +157,24 @@ def write_json(path, obj):
 
 
 def places_index(rows, base=None):
+    """Write the tiled gazetteer index. Rows with an impossible position or dates, and second rows with an id already
+    used in their dataset (which the id index could not reach), are left out and returned under 'rejected' with the
+    reason — for every dataset, not case by case."""
     cells = defaultdict(list)
     names = defaultdict(list)
     ids = defaultdict(dict)
+    rejected, seen_ids, kept = [], set(), 0
     for r in rows:
         src, pid, title, lon, lat = r[:5]
+        why = quality.position_problem(lon, lat) or quality.date_problem(r[7], r[8]) \
+            or ((r[13] or {}).get('env') and quality.date_problem((r[13]['env'][0]), r[13]['env'][1])) or None
+        if not why and (src, str(pid)) in seen_ids:
+            why = 'duplicate id (first record kept)'
+        if why:
+            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': why})
+            continue
+        seen_ids.add((src, str(pid)))
+        kept += 1
         c = cell_of(lon, lat)
         cells[c].append(r)
         k = (zlib.crc32(str(pid).encode()) % 16)
@@ -184,7 +198,9 @@ def places_index(rows, base=None):
         write_json(os.path.join(base, 'n', f'{s}.json'), sorted(es))
     for k, m in ids.items():
         write_json(os.path.join(base, 'i', f'{k}.json'), m)
-    return {'cells': len(cells), 'nameShards': len(names), 'rows': len(rows)}
+    if rejected:
+        log(f'  place index: {len(rejected)} rows left out ({", ".join(sorted({r["reason"] for r in rejected}))})')
+    return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected}
 
 
 # ── Vector tiles ──
