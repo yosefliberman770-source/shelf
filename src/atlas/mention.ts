@@ -29,12 +29,14 @@ export interface MentionEvidence {
   /** The lowercase form is an ordinary English word. Filled in by commonWord(). */
   commonWord?: boolean;
   demonym?: boolean;
+  /** The cue is a movement or direction ("went to", "near"): strong for an unusual name, not for an ordinary word ("went to Mass"). */
+  loose?: boolean;
 }
 
 // ── Cues ──────────────────────────────────────────────────────────────────
 
 /** Strong cues mean the next name is a location or polity; weak ones only allow it. */
-const STRONG: [RegExp, EntityKind | undefined][] = [
+const STRONG: [RegExp, EntityKind | undefined, 'loose'?][] = [
   [/\b(?:siege|walls|gates|city|town|village|port|harbour|harbor|fortress|citadel|bishop|archbishop|abbey|diocese|cathedral|sack|fall|capture|garrison) of$/i, 'settlement'],
   [/\b(?:kingdom|realm|crown|empire|duchy|county|earldom|principality|emirate|caliphate|sultanate|khanate|republic|marquisate|margraviate|lordship|king|queen|duke|duchess|earl|count|emperor|sultan|emir|caliph|prince|lord) of$/i, 'polity'],
   [/\b(?:province|region|land|lands|coast|shores|plains?|valley|borders?|frontier|march|marches) of$/i, 'region'],
@@ -43,16 +45,16 @@ const STRONG: [RegExp, EntityKind | undefined][] = [
   [/\b(?:mount|mountains? of)$/i, 'mountain'],
   [/\blake$/i, 'lake'],
   [/\bbattle of$/i, undefined],
-  [/\b(?:marched|sailed|rode|fled|withdrew|retreated|returned|travelled|traveled|journeyed|advanced|landed|arrived|sent|exiled|banished|moved|went|came|set out|headed) (?:to|toward|towards|into|from|for|at|in|on)$/i, undefined],
+  [/\b(?:marched|sailed|rode|fled|withdrew|retreated|returned|travelled|traveled|journeyed|advanced|landed|arrived|sent|exiled|banished|moved|went|came|set out|headed) (?:to|toward|towards|into|from|for|at|in|on)$/i, undefined, 'loose'],
   [/\b(?:besieged|conquered|captured|sacked|founded|invaded|occupied|garrisoned|fortified|reached|entered|crossed|annexed|razed|stormed|evacuated|colonised|colonized)$/i, undefined],
-  [/\b(?:near|toward|towards|beyond|across|outside|north of|south of|east of|west of|between)$/i, undefined],
+  [/\b(?:near|toward|towards|beyond|across|outside|north of|south of|east of|west of|between)$/i, undefined, 'loose'],
 ];
 const WEAK = /\b(?:to|from|at|in|into|of|through|around|left|took|attacked|abandoned|on|by|for|with)$/i;
 
 /** How strongly the words just before a name say it is a place, and of what kind. */
-export function cueEvidence(before: string): { cue?: string; strength: CueStrength; expected?: EntityKind } {
+export function cueEvidence(before: string): { cue?: string; strength: CueStrength; expected?: EntityKind; loose?: boolean } {
   const b = before.replace(/\s+/g, ' ').trimEnd().replace(/\bthe$/i, '').trimEnd();
-  for (const [re, kind] of STRONG) { const m = re.exec(b); if (m) return { cue: m[0], strength: 'strong', expected: kind }; }
+  for (const [re, kind, loose] of STRONG) { const m = re.exec(b); if (m) return { cue: m[0], strength: 'strong', expected: kind, ...(loose ? { loose: true } : {}) }; }
   const w = WEAK.exec(b);
   return w ? { cue: w[0], strength: 'weak' } : { strength: 'none' };
 }
@@ -92,8 +94,9 @@ export function isCommonWord(w: string): boolean | undefined {
  * independently knows the name (`knownOffline`).
  */
 export function plausibleMention(m: MentionEvidence, written: string, knownOffline: boolean): { ok: boolean; reason?: string } {
-  if (m.strength === 'strong' || m.multiword || knownOffline) return { ok: true };
+  if (m.multiword || knownOffline) return { ok: true };
   const common = m.commonWord ?? isCommonWord(written.split(/\s+/)[0]);
+  if (m.strength === 'strong' && !(m.loose && common)) return { ok: true };
   if (common) return { ok: false, reason: `“${written}” is also an ordinary English word, and nothing in the sentence says it is a place (${m.cue ? `“${m.cue}” alone` : 'no place wording'} isn’t enough), so it wasn’t looked up.` };
   return { ok: true };
 }
@@ -188,7 +191,8 @@ function stemMatches(adj: string, core: string): boolean {
     let n = 0;
     while (n < stem.length && n < core.length && stem[n] === core[n]) n++;
     if (n >= 5 && n >= 0.75 * Math.min(stem.length, core.length)) return true;
-    if (n === stem.length && n >= 4 && core.length - n <= 2) return true;
+    // "Norman" → Normandy, "German" → Germany: the whole stem, plus a short ending on the name.
+    if (n === stem.length && n >= 4 && core.length - n <= 4) return true;
   }
   return false;
 }

@@ -204,7 +204,7 @@ function useScreened(ms: PlaceMention[]): PlaceMention[] {
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
-  return out?.key === key ? out.ms : ms.filter((m) => m.known || m.evidence.strength === 'strong');
+  return out?.key === key ? out.ms : ms.filter((m) => m.known || (m.evidence.strength === 'strong' && !m.evidence.loose));
 }
 
 /** The Map tab: places named on this page, and the whole chapter on a map. */

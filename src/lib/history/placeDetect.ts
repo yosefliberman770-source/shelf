@@ -68,7 +68,7 @@ export async function screenMentions(ms: PlaceMention[], year?: number): Promise
     if (m.known) { out.push(m); continue; }
     if (m.evidence.demonym) { if ((await matchPolity(m.name, year).catch(() => [])).length) out.push(m); continue; }
     const common = isCommonWord(m.name.split(/\s+/)[0]);
-    if (!common || m.evidence.strength === 'strong' || m.evidence.multiword) { out.push(m); continue; }
+    if (!common || (m.evidence.strength === 'strong' && !m.evidence.loose) || m.evidence.multiword) { out.push(m); continue; }
     const offline = !!macroRegion(m.name) || (await placesByName(m.name).catch(() => [])).length > 0 || (await matchPolity(m.name, year).catch(() => [])).length > 0;
     if (plausibleMention({ ...m.evidence, commonWord: common }, m.name, offline).ok) out.push(m);
   }

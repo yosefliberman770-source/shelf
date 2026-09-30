@@ -45,6 +45,8 @@ export interface GazPlace {
 export interface GazetteerInfo {
   id: GazetteerId; name: string; license: string; url: string;
   coverage: [HistYear, HistYear];
+  /** The period the dataset is really about; an undated record is only plausible inside it. */
+  core: [HistYear, HistYear];
   /** Rough box [W, S, E, N] of where the dataset has records. */
   box: [number, number, number, number];
   describe: string;
@@ -53,11 +55,13 @@ export interface GazetteerInfo {
 
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
 export const GAZETTEERS: GazetteerInfo[] = [
-  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], box: [-20, 5, 90, 60], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
-  { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
-  { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], box: [-10, 10, 80, 45], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
+  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], core: [-750, 640], box: [-20, 5, 90, 60], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
+  { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], core: [1350, 1650], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
+  { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], core: [800, 1000], box: [-10, 10, 80, 45], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
+/** Undated, but the year is inside the dataset's own core period — possible, not attested. */
+export const undatedInCore = (p: GazPlace, year: HistYear) => p.from === undefined && p.to === undefined && year >= gazetteerInfo(p.gazetteer).core[0] && year <= gazetteerInfo(p.gazetteer).core[1];
 /** Gazetteers whose period covers the year (all of them when the year is unknown). */
 export const gazetteersFor = (year?: HistYear) => GAZETTEERS.filter((g) => year === undefined || (year >= g.coverage[0] && year <= g.coverage[1]));
 
@@ -327,7 +331,15 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   const nm = main.isTitle ? { name: main.place.title, isTitle: true } : { ...(main.place.names.find((n) => normName(n.name) === k) ?? { name: written }), isTitle: false };
   const others = chosen.filter((x) => x !== main).map((x) => x.place);
   const fit = recordFit(main.place, year);
-  const when = fit === 'earlier' ? ` ${gazetteerInfo(main.place.gazetteer).name} records it for an earlier period only (to ${main.place.to !== undefined ? (main.place.to < 0 ? `${-main.place.to} BCE` : `${main.place.to} CE`) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.` : fit === 'undated' ? ' The record has no dates.' : '';
+  // The name itself may be later (or earlier) than the date: say so, with the names attested then.
+  const yl = (y: number) => (y < 0 ? `${-y} BCE` : `${y} CE`);
+  const nameWhen = year !== undefined && !nm.isTitle && ((nm.from !== undefined && year < nm.from - 50) || (nm.to !== undefined && year > nm.to + 50))
+    ? ` ${nm.from !== undefined && nm.from >= 1700 && year < 1650
+      // Gazetteers date present-day exonyms to the modern period; that is a label, not a first attestation.
+      ? `“${nm.name}” is a modern name for this place`
+      : `The name “${nm.name}” is recorded ${nm.from !== undefined && year < nm.from ? `only from ${yl(nm.from)}` : `only until ${yl(nm.to!)}`}`}${((then) => (then.length ? `; around ${yl(year)} it is recorded as ${then.join(', ')}` : `; the record’s own name is “${main.place.title}”`))(namesAround(main.place, year).filter((n) => (n.from !== undefined || n.to !== undefined) && normName(n.name) !== k).map((n) => `“${n.name}”`).slice(0, 3))}.`
+    : '';
+  const when = nameWhen + (fit === 'earlier' ? ` ${gazetteerInfo(main.place.gazetteer).name} records it for an earlier period only (to ${main.place.to !== undefined ? (main.place.to < 0 ? `${-main.place.to} BCE` : `${main.place.to} CE`) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.` : fit === 'undated' ? ' The record has no dates.' : '');
   return {
     status: 'unique', place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm, fit,
     reason: `${why || `The only place in ${where} recorded with the name “${written}”.`}${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}${when}`,
