@@ -24,6 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
 BUILD = os.path.join(ROOT, 'data', 'private-pack', 'build')
 OUT = os.path.join(ROOT, 'data', 'private-pack', 'shelf-private-data.pack')
+PART = 25 * 1000 * 1000  # bytes per part file
 EXTRA_TILES = [os.path.join(ROOT, 'public', 'world', 'tiles', 'rural-settlement.pmtiles')]
 
 # id → (name, licence as recorded in the vault). Names match src/atlas/gazetteer.ts.
@@ -81,6 +82,19 @@ def main():
                         break
                     out.write(b)
     print(f'{OUT}: {os.path.getsize(OUT) / 1e6:.1f} MB, {len(files)} files')
+    # Also in parts small enough to send to a phone; the app joins parts it is given together (by name order).
+    for old in os.listdir(os.path.dirname(OUT)):
+        if old.startswith('shelf-private-data.part'):
+            os.remove(os.path.join(os.path.dirname(OUT), old))
+    with open(OUT, 'rb') as f:
+        n = 0
+        while True:
+            chunk = f.read(PART)
+            if not chunk:
+                break
+            n += 1
+            open(OUT.replace('.pack', f'.part{n}.pack'), 'wb').write(chunk)
+    print(f'  split into {n} parts of at most {PART / 1e6:.0f} MB')
     for d in datasets:
         print(f"  {d['id']:16} {d['records']:>7}  {d['name']}")
 

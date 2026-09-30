@@ -36,6 +36,14 @@ describe('private data pack', () => {
     expect([...got]).toEqual([3, 4, 5]);
     expect(await privateJSON('places/c/0_0.json')).toBeNull();
   });
+  it('a pack sent in parts opens once the parts are joined in order', async () => {
+    const whole = pack({ 'places/c/5_46.json': '[["dicotopo","P1","Aisne",4.8,46.3,1,"settlement",946,null,0,[],[],[],{}]]' });
+    const bytes = new Uint8Array(await whole.arrayBuffer());
+    const cut = [0, 7, 40, bytes.length];
+    const parts = cut.slice(1).map((end, i) => new Blob([bytes.slice(cut[i], end)]));
+    await openPrivateData(new Blob(parts));
+    expect((await privateJSON<unknown[][]>('places/c/5_46.json'))?.[0]?.[2]).toBe('Aisne');
+  });
   it('refuses a file that is not a Shelf pack', async () => {
     await expect(readHeader(new Blob(['PK\u0003\u0004 not a pack at all']))).rejects.toThrow(/not a Shelf private data file/);
   });

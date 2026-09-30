@@ -771,11 +771,13 @@ function PrivateDataControl() {
   const [header, setHeader] = useState(privateHeader());
   const [busy, setBusy] = useState<string>();
   useEffect(() => { loadPrivateData().then(setHeader); }, []);
-  const load = async (f: File | undefined) => {
-    if (!f) return;
+  const load = async (list: FileList | null) => {
+    if (!list?.length) return;
     setBusy('Loading…');
     try {
-      await installPrivateData(f);
+      // The file may come in parts (…part1.pack, …part2.pack): they are joined in name order.
+      const files = [...list].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+      await installPrivateData(files.length === 1 ? files[0] : new Blob(files));
       location.reload();
     } catch (e) {
       setBusy(e instanceof Error ? e.message : 'Could not read that file.');
@@ -786,7 +788,7 @@ function PrivateDataControl() {
       <summary>Your private data {header ? `· ${header.datasets.length} datasets on this device` : '· not loaded'}</summary>
       <p className="tiny">
         Some historical datasets can be used privately but not republished on a public website. They come in a separate
-        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Load the file “shelf-private-data.pack” to add them.'}
+        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Load the file “shelf-private-data.pack” — or, if it came in parts, select all the parts together.'}
       </p>
       {header && (
         <ul>
@@ -795,7 +797,7 @@ function PrivateDataControl() {
       )}
       <label className="btn xs">
         {header ? 'Replace with a newer file' : 'Load private data file'}
-        <input type="file" accept=".pack,application/octet-stream" hidden onChange={(e) => load(e.target.files?.[0])} />
+        <input type="file" accept=".pack,application/octet-stream" multiple hidden onChange={(e) => load(e.target.files)} />
       </label>
       {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
       {busy && <p className="tiny">{busy}</p>}
