@@ -22,6 +22,7 @@ const STORE = 'pack';
 export const PRIVATE_TILE_PREFIX = 'shelf-private/';
 
 let loaded: Loaded | null = null;
+let loadError: string | null = null;
 
 function idb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -31,13 +32,20 @@ function idb(): Promise<IDBDatabase> {
     req.onerror = () => reject(req.error);
   });
 }
+/** Run one request; a write resolves only once the transaction has committed (a page reload before that loses it). */
 async function tx<T>(mode: IDBTransactionMode, run: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
   const db = await idb();
-  return new Promise((resolve, reject) => {
-    const r = run(db.transaction(STORE, mode).objectStore(STORE));
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-  });
+  try {
+    return await new Promise((resolve, reject) => {
+      const t = db.transaction(STORE, mode);
+      const r = run(t.objectStore(STORE));
+      t.oncomplete = () => resolve(r.result);
+      t.onerror = () => reject(t.error ?? r.error);
+      t.onabort = () => reject(t.error ?? new Error('The browser cancelled saving.'));
+    });
+  } finally {
+    db.close();
+  }
 }
 
 /** Read and check a pack's header. Throws with a plain message if the file is not a Shelf data pack. */
@@ -121,8 +129,10 @@ export async function loadPrivateData(): Promise<PrivateHeader | null> {
   try {
     const blob = await tx<Blob | undefined>('readonly', (s) => s.get('current'));
     loaded = blob ? await readHeader(blob) : null;
-  } catch {
+    loadError = null;
+  } catch (e) {
     loaded = null;
+    loadError = e instanceof Error ? e.message : String(e);
   }
   return loaded?.header ?? null;
 }
@@ -133,13 +143,22 @@ export async function openPrivateData(file: Blob): Promise<PrivateHeader> {
   return loaded.header;
 }
 
-/** Store a pack file on this device (replacing any earlier one). */
+/**
+ * Store a pack file on this device (replacing any earlier one). The bytes are copied first, so the stored copy does not
+ * depend on the picked files staying readable (phones may withdraw access to them after a reload), and the stored copy
+ * is read back and checked before this returns.
+ */
 export async function installPrivateData(file: Blob): Promise<PrivateHeader> {
-  const l = await readHeader(file);
-  await tx('readwrite', (s) => s.put(file, 'current'));
+  await readHeader(file);
+  const copy = new Blob([await file.arrayBuffer()]);
+  await tx('readwrite', (s) => s.put(copy, 'current'));
+  const stored = await tx<Blob | undefined>('readonly', (s) => s.get('current'));
+  if (!stored || stored.size !== file.size) throw new Error(`The phone did not keep the file (saved ${stored ? stored.size : 0} of ${file.size} bytes). It may be low on storage space.`);
+  const l = await readHeader(stored);
   // Ask the browser not to clear it when space runs low (it may say no; the data still works).
   await navigator.storage?.persist?.().catch(() => false);
   loaded = l;
+  loadError = null;
   return l.header;
 }
 
@@ -152,6 +171,8 @@ export async function removePrivateData(): Promise<void> {
 }
 
 export const privateHeader = (): PrivateHeader | null => loaded?.header ?? null;
+/** Why the stored pack could not be opened at start-up, if it could not. */
+export const privateLoadError = (): string | null => loadError;
 export const privateHas = (path: string): boolean => !!loaded?.header.files[path];
 
 function slice(path: string): Blob | null {
