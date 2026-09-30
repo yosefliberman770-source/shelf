@@ -12,3 +12,4 @@ public/world/tiles/rural-settlement.pmtiles
 public/world/tiles/local-sites.pmtiles
 __pycache__/
 *.pyc
+data/private-pack/

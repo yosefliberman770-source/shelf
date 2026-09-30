@@ -30,7 +30,6 @@ USE = {
     'domesday': (None, ['domesday.pmtiles'], 'atlas-build/england.py'),
     'gough-map': (None, ['gough.pmtiles'], 'atlas-build/england.py'),
     'inland-navigation': (None, ['navigation.pmtiles'], 'atlas-build/england.py'),
-    'atlas-rural-settlement': (None, ['rural-settlement.pmtiles'], 'atlas-build/england.py (local builds only)'),
     'wikidata-medieval': ('wikidata', ['medieval-sites.pmtiles'], 'atlas-build/sites.py'),
     'germania-sacra': ('germaniasacra', ['medieval-sites.pmtiles', 'gs-dioceses.pmtiles'], 'atlas-build/sites.py'),
     'buringh-urban': ('buringh', ['towns.pmtiles'], 'atlas-build/sites.py'),
@@ -40,9 +39,19 @@ USE = {
     'finland-heritage': ('finreg', ['medieval-sites.pmtiles'], 'atlas-build/regional.py'),
     'western-bohemia-toponyms': ('wbohemia', ['medieval-sites.pmtiles'], 'atlas-build/regional.py'),
     'medieval-bridges': ('bridges1250', ['medieval-sites.pmtiles'], 'atlas-build/regional.py'),
-    'tib-maps-of-power': (None, ['local-sites.pmtiles'], 'atlas-build/regional.py (local builds only)'),
-    'atlas-fontium-poland': (None, ['local-sites.pmtiles'], 'atlas-build/regional.py (local builds only)'),
-    'markets-fairs': (None, ['local-sites.pmtiles'], 'atlas-build/regional.py (local builds only)'),
+    'norway-kulturminner': ('nokm', ['medieval-sites.pmtiles'], 'atlas-build/regional.py'),
+    'nordic-spatial-humanities': ('nsh', ['medieval-sites.pmtiles'], 'atlas-build/regional.py'),
+    # Private data pack (data/private-pack/, never in git or the public site): place-index rows counted from the pack build.
+    'tib-maps-of-power': ('tib', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'atlas-fontium-poland': ('afontium', ['private-sites.pmtiles', 'private-lines.pmtiles'], 'atlas-build/regional.py, sites.py → private data pack'),
+    'markets-fairs': ('mfairs', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'ran-romania': ('ran', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'dicotopo': ('dicotopo', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'dk-fund-og-fortidsminder': ('dkff', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'darmc': ('darmc', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'ebidat': ('ebidat', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'sweden-lamningar': ('raa', ['private-sites.pmtiles'], 'atlas-build/regional.py → private data pack'),
+    'atlas-rural-settlement': (None, ['rural-settlement.pmtiles'], 'atlas-build/england.py → private data pack'),
 }
 
 
@@ -59,10 +68,11 @@ def main():
     manifest = json.load(open(os.path.join(HIST, 'manifest.json')))
     tracked = set(subprocess.run(['git', 'ls-files', 'data/historical/raw'], cwd=ROOT, capture_output=True, text=True).stdout.split())
     rows = Counter()
-    cdir = os.path.join(ROOT, 'public', 'world', 'places', 'c')
-    for f in os.listdir(cdir):
-        for r in json.load(open(os.path.join(cdir, f), encoding='utf-8')):
-            rows[r[0]] += 1
+    for cdir in (os.path.join(ROOT, 'public', 'world', 'places', 'c'), os.path.join(ROOT, 'data', 'private-pack', 'build', 'places', 'c')):
+        for f in (os.listdir(cdir) if os.path.isdir(cdir) else []):
+            for r in json.load(open(os.path.join(cdir, f), encoding='utf-8')):
+                rows[r[0]] += 1
+    tile_dirs = [os.path.join(ROOT, 'public', 'world', 'tiles'), os.path.join(ROOT, 'data', 'private-pack', 'build', 'tiles')]
     catalog = open(os.path.join(ROOT, 'src', 'atlas', 'catalog.ts'), encoding='utf-8').read()
     ids = sorted({d['id'] for d in sources} | {k.split('/')[0] for k in manifest} | set(os.listdir(RAW)))
     local_only = {d['id'] for d in sources if d.get('local_only')}
@@ -73,7 +83,7 @@ def main():
         present = [k for k in recs if os.path.exists(os.path.join(RAW, k))]
         mism = [k for k in present if os.path.getsize(os.path.join(RAW, k)) < 300_000_000 and sha256(os.path.join(RAW, k)) != recs[k]['sha256']]
         gaz, tiles, script = USE.get(ds, (None, [], None))
-        tiles_ok = [t for t in tiles if os.path.exists(os.path.join(ROOT, 'public', 'world', 'tiles', t))]
+        tiles_ok = [t for t in tiles if any(os.path.exists(os.path.join(d, t)) for d in tile_dirs)]
         if ds == 'hced' and os.path.exists(os.path.join(ROOT, 'public', 'atlas', 'hced-battles.json')):
             tiles_ok = ['atlas/hced-battles.json']
         leaked = [k for k in recs if ds in local_only and f'data/historical/raw/{k}' in tracked]
@@ -87,9 +97,11 @@ def main():
         }
         o = out[ds]
         if ds == 'atlas-rural-settlement':
-            o['localOnly'] = True  # handled by england.py / vite.config.ts
-        o['status'] = ('integrated' if (o['placeIndexRows'] or o['tiles']) and not o['localOnly'] else
-                       'integrated (local builds only)' if o['localOnly'] and o['tiles'] else
+            o['localOnly'] = True  # its terms forbid republishing; handled by england.py / vite.config.ts
+        # A dataset with its own place-index id is integrated only if it has rows there (a shared tile file is not proof).
+        used = o['placeIndexRows'] > 0 if gaz else bool(o['tiles'])
+        o['status'] = ('integrated' if used and not o['localOnly'] else
+                       'integrated (private data pack)' if o['localOnly'] and used else
                        'raw only' if o['filesPresent'] else 'recorded, files not present here' if o['filesRecorded'] else 'metadata only')
     json.dump(out, open(os.path.join(HIST, 'audit', 'vault-audit.json'), 'w'), indent=1)
     write_doc_table(out)

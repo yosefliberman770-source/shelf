@@ -17,7 +17,8 @@ import mapbox_vector_tile
 from pmtiles.tile import Compression, TileType, zxy_to_tileid
 from pmtiles.writer import Writer
 from shapely.geometry import box, mapping, shape
-from shapely.ops import transform
+from shapely.ops import transform, unary_union
+from shapely.validation import make_valid
 
 R = 6378137.0
 ORIGIN = math.pi * R
@@ -84,7 +85,17 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
                 if geo.geom_type != 'Point':
                     if i not in simp:
                         simp[i] = geo.simplify(tol, preserve_topology=False) if z < max_zoom else geo
-                    g = simp[i].intersection(clip)
+                    try:
+                        g = simp[i].intersection(clip)
+                    except Exception:  # simplification can leave an invalid ring: repair it and clip again
+                        simp[i] = make_valid(simp[i])
+                        g = simp[i].intersection(clip)
+                    if g.geom_type == 'GeometryCollection':
+                        # Clipping can leave slivers of a lower dimension (a polygon touching the tile edge → a line
+                        # or point): keep only parts of the feature's own dimension, which the tile format can encode.
+                        dim = geo.geom_type.replace('Multi', '')
+                        parts = [p for p in g.geoms if p.geom_type.replace('Multi', '') == dim]
+                        g = unary_union(parts) if parts else g.__class__()
                 else:
                     g = geo
                 if g.is_empty:

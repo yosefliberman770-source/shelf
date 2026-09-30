@@ -155,7 +155,7 @@ def write_json(path, obj):
         json.dump(obj, fh, ensure_ascii=False, separators=(',', ':'))
 
 
-def places_index(rows):
+def places_index(rows, base=None):
     cells = defaultdict(list)
     names = defaultdict(list)
     ids = defaultdict(dict)
@@ -175,7 +175,7 @@ def places_index(rows):
                 continue
             seen.add(nn)
             names[shard(nn)].append([nn, src, pid, c, 1 if i == 0 and own_title else 0])
-    base = os.path.join(OUT, 'places')
+    base = base or os.path.join(OUT, 'places')
     if os.path.exists(base):
         shutil.rmtree(base)
     for c, rs in cells.items():
@@ -380,6 +380,9 @@ def build_world(only=None):
         rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + sites.build(rows_only=True)[0]
         return places_index(rows)
     site_rows, site_stats = sites.build(rows_only=bool(only) and 'sites' not in only)
+    # The private place index goes with the private tiles into the private data pack (never into public/).
+    if sites.private_rows:
+        site_stats['privatePlaces'] = places_index(sites.private_rows, os.path.join(sites.PRIVATE_BUILD, 'places'))
     rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows
     stats = {'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
     if site_stats:

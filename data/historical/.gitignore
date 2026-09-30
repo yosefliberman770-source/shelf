@@ -4,6 +4,7 @@
 *.tmp
 raw/*/original/**
 raw/*/nightly-export/**
+raw/*/derived-*.json
 !raw/*/original/**/
 !raw/*/nightly-export/**/
 !raw/al-thurayya/original/DATA-LICENSE.md
@@ -62,6 +63,11 @@ raw/*/nightly-export/**
 !raw/medieval-bridges/original/General_Guide_bridges.pdf
 !raw/medieval-bridges/original/gis/Bridges1250.csv
 !raw/medieval-bridges/original/gis/Bridges1250.zip
+!raw/nordic-spatial-humanities/original/source-data.zip
+!raw/norway-kulturminner/original/cl-kulturminnedatering.json
+!raw/norway-kulturminner/original/cl-kulturminneenkeltminneart.json
+!raw/norway-kulturminner/original/cl-kulturminnefunksjon.json
+!raw/norway-kulturminner/original/cl-kulturminnekategori.json
 !raw/periodo/original/periodo-dataset.json
 !raw/pleiades/original/dumps/README.txt
 !raw/pleiades/original/dumps/pleiades-names-20260929.csv.gz

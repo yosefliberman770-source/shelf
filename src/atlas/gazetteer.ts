@@ -9,12 +9,16 @@
 // for it; places from different datasets are treated as the same place only
 // when they carry the name *and* lie within a few kilometres of each other.
 import { getJSON, km, type Pos } from './data';
+import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
 import type { EntityKind } from './mention';
 import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, type HistYear, type StartKind, timeFit, type TimeFit } from './time';
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
-export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250';
+export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250'
+  | 'nsh' | 'nokm'
+  // From the owner's private data pack only (see privateData.ts):
+  | 'tib' | 'mfairs' | 'afontium' | 'ran' | 'dicotopo' | 'raa' | 'ebidat' | 'darmc' | 'dkff';
 export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
 export interface GazPlace {
   /** "<gazetteer>:<id>", e.g. "pleiades:423025" */
@@ -75,6 +79,17 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'finreg', name: 'Finnish register of archaeological sites', license: 'CC BY 4.0', url: 'https://www.museovirasto.fi/', coverage: [-500, 1900], core: [1150, 1550], box: [19, 59, 32, 70.5], describe: 'Sites the Finnish Heritage Agency classes as medieval (churches, strongholds, village sites…), dated only by period classes.', record: () => 'https://www.kyppi.fi/' },
   { id: 'wbohemia', name: 'Western Bohemia toponyms to 1500', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.21479034', coverage: [900, 1500], core: [1100, 1500], box: [12, 49, 14.5, 50.6], describe: 'Place names of West Bohemia with their first attested year and historical form.', record: () => 'https://doi.org/10.5281/zenodo.21479034' },
   { id: 'bridges1250', name: 'Bridges of Medieval England to c.1250', license: 'CC BY 4.0', url: 'https://doi.org/10.5284/1053676', coverage: [600, 1300], core: [700, 1250], box: [-6, 49.9, 2, 55.9], describe: 'Bridges and fords attested in documents and place-names before c. 1250.', record: () => 'https://doi.org/10.5284/1053676' },
+  { id: 'nsh', name: 'Nordic Spatial Humanities (saints’ churches, sagas, chronicles)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.14871254', coverage: [800, 1600], core: [1000, 1537], box: [-25, 54, 32, 71.5], describe: 'Medieval parish churches of the Nordic countries with medieval diocese and first attestation, and places named in the Icelandic sagas and Old Norse chronicles.', record: () => 'https://doi.org/10.5281/zenodo.14871254' },
+  { id: 'nokm', name: 'Norwegian heritage register (Riksantikvaren)', license: 'NLOD', url: 'https://kulturminnesok.no/', coverage: [400, 1537], core: [800, 1537], box: [4, 57.9, 31.5, 71.5], describe: 'Norwegian monuments the register dates to the Migration period, Viking Age or Middle Ages: farms and settlements, churches and churchyards, forts, trade sites and burial mounds.', record: (id) => `https://kulturminnesok.no/ra/lokalitet/${String(id).split('-')[0]}` },
+  { id: 'tib', name: 'Tabula Imperii Byzantini — Maps of Power (private data)', license: 'not stated (private use)', url: 'https://maps-of-power.oeaw.ac.at/', coverage: [300, 1500], core: [500, 1453], box: [12, 34, 32, 50], describe: 'Byzantine places of the Balkans and Greece with their first attestation.', record: () => 'https://maps-of-power.oeaw.ac.at/' },
+  { id: 'mfairs', name: 'Markets and Fairs in England and Wales to 1516 (private data)', license: 'not stated (private use)', url: 'https://sas-space.sas.ac.uk/106/', coverage: [600, 1516], core: [1100, 1516], box: [-6, 49.9, 2, 55.9], describe: 'Market and fair grants of England and Wales.', record: () => 'https://sas-space.sas.ac.uk/106/' },
+  { id: 'afontium', name: 'Atlas Fontium — Poland in the 16th century (private data)', license: 'not stated (private use)', url: 'https://atlasfontium.pl/', coverage: [1550, 1600], core: [1550, 1600], box: [14, 48.5, 27, 55], describe: 'Settlements and parishes of the Crown of Poland, second half of the 16th century.', record: () => 'https://atlasfontium.pl/' },
+  { id: 'ran', name: 'Romanian national archaeological register (private data)', license: 'OGL (not verified; private use)', url: 'https://ran.cimec.ro/', coverage: [300, 1800], core: [500, 1600], box: [20, 43.5, 30, 48.5], describe: 'Romanian sites the register dates to the migration period or Middle Ages, with their periods and components.', record: (id) => `https://ran.cimec.ro/sel.asp?codran=${id}` },
+  { id: 'dicotopo', name: 'Dictionnaire topographique de la France (private data)', license: 'CC BY-NC-ND (private use)', url: 'https://dicotopo.cths.fr/', coverage: [500, 1900], core: [800, 1600], box: [-5, 41, 10, 51.5], describe: 'French communes with their old name forms, each dated and sourced; the earliest is the first attestation.', record: (id) => `https://dicotopo.cths.fr/places/${id}` },
+  { id: 'raa', name: 'Swedish register of ancient remains (private data)', license: 'not verified (private use)', url: 'https://app.raa.se/open/fornsok/', coverage: [400, 1600], core: [800, 1550], box: [10.5, 55, 24.5, 69.5], describe: 'Swedish remains the register dates to the Iron Age or Middle Ages.', record: () => 'https://app.raa.se/open/fornsok/' },
+  { id: 'ebidat', name: 'EBIDAT castle database (private data)', license: 'not stated (private use)', url: 'https://www.ebidat.de/', coverage: [700, 1800], core: [900, 1600], box: [3, 45.5, 28, 60], describe: 'Castles of Germany and central Europe dated by the European Castle Institute (begin and end of use).', record: (id) => `https://www.ebidat.de/cgi-bin/ebidat.pl?id=${id}` },
+  { id: 'darmc', name: 'DARMC scholarly datasets (private data)', license: 'not stated (private use)', url: 'https://darmc.harvard.edu/', coverage: [1, 1500], core: [400, 1500], box: [-12, 25, 45, 65], describe: 'Dated shipwrecks, Carolingian coin hoards and rural Anglo-Saxon settlements.', record: () => 'https://darmc.harvard.edu/' },
+  { id: 'dkff', name: 'Danish register of ancient monuments (private data)', license: 'not verified (private use)', url: 'https://www.kulturarv.dk/fundogfortidsminder/', coverage: [400, 1600], core: [800, 1536], box: [8, 54.5, 15.5, 58], describe: 'Danish monuments the register dates to the Viking Age or Middle Ages.', record: () => 'https://www.kulturarv.dk/fundogfortidsminder/' },
   { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
@@ -154,10 +169,17 @@ function toPlace(r: Row): GazPlace {
   };
 }
 
+/** A public index file joined with the same file from the private data pack, if one is loaded on this device. */
+async function withPrivate<T>(file: string, pub: Promise<T[]>): Promise<T[]> {
+  await loadPrivateData();
+  const [a, b] = await Promise.all([pub.catch(() => [] as T[]), privateJSON<T[]>(`places/${file}`).catch(() => null)]);
+  return b ? [...a, ...b] : a;
+}
+
 export function placesInCell(cell: string): Promise<GazPlace[]> {
   let p = cells.get(cell);
   if (!p) {
-    p = getJSON<Row[]>(`${base()}c/${cell}.json`).then((rows) => rows.map(toPlace)).catch(() => []);
+    p = withPrivate(`c/${cell}.json`, getJSON<Row[]>(`${base()}c/${cell}.json`)).then((rows) => rows.map(toPlace)).catch(() => []);
     cells.set(cell, p);
   }
   return p;
@@ -166,7 +188,7 @@ function nameEntries(norm: string): Promise<NameEntry[]> {
   const s = nameShard(norm);
   let p = shards.get(s);
   if (!p) {
-    p = getJSON<NameEntry[]>(`${base()}n/${s}.json`).catch(() => []);
+    p = withPrivate(`n/${s}.json`, getJSON<NameEntry[]>(`${base()}n/${s}.json`)).catch(() => []);
     shards.set(s, p);
   }
   return p;
@@ -188,7 +210,10 @@ export async function getPlace(key: string): Promise<GazPlace | undefined> {
   if (!GAZETTEERS.some((g) => g.id === src)) return undefined;
   const shard = `${src}-${crc32(id) % 16}`;
   let p = idShards.get(shard);
-  if (!p) { p = getJSON<Record<string, string>>(`${base()}i/${shard}.json`).catch(() => ({})); idShards.set(shard, p); }
+  if (!p) {
+    p = loadPrivateData().then(async () => ({ ...(await getJSON<Record<string, string>>(`${base()}i/${shard}.json`).catch(() => ({}))), ...(await privateJSON<Record<string, string>>(`places/i/${shard}.json`).catch(() => null)) }));
+    idShards.set(shard, p);
+  }
   const cell = (await p)[id];
   if (!cell) return undefined;
   return (await placesInCell(cell)).find((x) => x.key === key);

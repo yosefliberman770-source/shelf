@@ -44,6 +44,9 @@ RAW = os.path.join(ROOT, 'data', 'historical', 'raw')
 WD = os.path.join(RAW, 'wikidata-medieval', 'original')
 TILES = os.path.join(ROOT, 'public', 'world', 'tiles')
 ATLAS = os.path.join(ROOT, 'public', 'atlas')
+# Private data pack build output (git-ignored): tiles and place index for datasets that must not be republished.
+PRIVATE_BUILD = os.path.join(ROOT, 'data', 'private-pack', 'build')
+private_rows = []  # filled by build(); world.py writes them as the private place index
 
 # An item in several classes is filed under the first that applies.
 KINDS = ['cathedral', 'monastery', 'university', 'castle', 'fortification', 'bridge', 'diocese', 'settlement']
@@ -512,7 +515,7 @@ def build(rows_only=False):
         mz = 3 if peak >= 50 else 4 if peak >= 20 else 5 if peak >= 10 else 6 if peak >= 5 else 7
         town_feats.append(({'type': 'Point', 'coordinates': [round(t['lon'], 4), round(t['lat'], 4)]}, props, mz))
 
-    hre_feats, local_feats, reg_stats = regional_layers(recs, rows, sites)
+    hre_feats, private_feats, private_rows[:], reg_stats = regional_layers(recs, rows, sites)
     log('  regional', reg_stats)
 
     log('  place-index rows', len(rows), Counter(r[0] for r in rows), ' skipped', dict(skipped))
@@ -522,7 +525,7 @@ def build(rows_only=False):
     stats = {}
     # Level of detail: major church sites first, then religious houses and castles, then the rest.
     zoom = {'cathedral': 5, 'university': 5, 'diocese': 6, 'monastery': 7, 'castle': 7, 'fortification': 8, 'bridge': 9, 'settlement': 9,
-            'church': 9, 'market': 7, 'site': 9}
+            'church': 9, 'market': 7, 'site': 9, 'hoard': 9, 'wreck': 9, 'road': 9}
     feats = []
     for p in sites:
         ll = p.pop('_ll')
@@ -532,9 +535,15 @@ def build(rows_only=False):
         feats.append(({'type': 'Point', 'coordinates': list(ll)}, p, mz))
     stats['hre'] = tiler.build(os.path.join(TILES, 'hre-towns.pmtiles'), 'towns', hre_feats, 10, 'Towns of the Holy Roman Empire',
                                'Princes and Townspeople (Bogucka, Cantoni, Mohr, Weigand), CC0')
-    # Licence not verified: local builds only (git-ignored; removed from public builds by vite.config.ts).
-    stats['local'] = tiler.build(os.path.join(TILES, 'local-sites.pmtiles'), 'sites', local_feats, 11, 'Local-only sites',
-                                 'TIB Maps of Power (ÖAW); Letters, Markets and Fairs to 1516 — local use only')
+    # Private data pack only (never in git or the public site): see scripts/atlas-build/private_pack.py.
+    os.makedirs(os.path.join(PRIVATE_BUILD, 'tiles'), exist_ok=True)
+    stats['private'] = tiler.build(os.path.join(PRIVATE_BUILD, 'tiles', 'private-sites.pmtiles'), 'sites', private_feats, 11, 'Private sites',
+                                   'Private data pack — used privately in Shelf, not republished')
+    stats['privateLines'] = tiler.build(os.path.join(PRIVATE_BUILD, 'tiles', 'private-lines.pmtiles'), 'features', private_lines(), 11,
+                                        'Private lines and areas', 'Atlas Fontium (IH PAN) — private use, not republished')
+    stale = os.path.join(TILES, 'local-sites.pmtiles')
+    if os.path.exists(stale):
+        os.remove(stale)
     stats['sites'] = tiler.build(os.path.join(TILES, 'medieval-sites.pmtiles'), 'sites', feats, 11, 'Medieval sites of Europe',
                                  'Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)')
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',
@@ -546,6 +555,36 @@ def build(rows_only=False):
     stats['hced'] = hced_battles()
     log('  ', stats)
     return rows, stats
+
+
+def private_lines():
+    """Atlas Fontium (Crown of Poland, 2nd half of the 16th c.): roads with the atlas's weight class, rivers, forests and
+    water, and the administrative and church units — for the private data pack. One period for the whole atlas."""
+    from shapely.geometry import mapping, shape
+    from shapely.ops import unary_union
+    base = os.path.join(RAW, 'atlas-fontium-poland', 'original')
+    layers = [('drogi', 'road', lambda p: {'w': p.get('waga_drogi') or None}, 5, 0.0005), ('rzeki', 'river', lambda p: {'n': p.get('nazwa') or None}, 6, 0.0005),
+              ('lasy', 'forest', lambda p: {}, 6, 0.002), ('akweny', 'water', lambda p: {}, 7, 0.001),
+              ('wojewodztwa', 'voivodeship', lambda p: {'n': p.get('woj_p')}, 4, 0.002), ('powiaty', 'district', lambda p: {'n': p.get('powiat_p')}, 5, 0.001),
+              ('diecezje', 'diocese', lambda p: {'n': p.get('g_diecezja')}, 4, 0.002), ('parafie', 'parish', lambda p: {'n': p.get('g_parafia')}, 8, 0.0005)]
+    out = []
+    for fn, kind, props, mz, tol in layers:
+        path = os.path.join(base, fn + '.geojson')
+        if not os.path.exists(path):
+            continue
+        for f in json.load(open(path, encoding='utf-8'))['features']:
+            if not f.get('geometry'):
+                continue
+            src = shape(f['geometry'])
+            g = src.simplify(tol, preserve_topology=True)
+            if g.geom_type == 'GeometryCollection':  # simplification can mix dimensions: keep the parts like the source
+                keep = [x for x in g.geoms if x.geom_type.replace('Multi', '') == src.geom_type.replace('Multi', '')]
+                g = unary_union(keep) if keep else g
+            if g.is_empty or g.geom_type == 'GeometryCollection':
+                continue
+            pr = {'k': kind, 'ef': regional.AF_PERIOD[0], 'et': regional.AF_PERIOD[1], **{k: v for k, v in props(f['properties']).items() if v}}
+            out.append((mapping(g), pr, mz))
+    return out
 
 
 def hced_battles():
@@ -595,6 +634,15 @@ def _site_props(i, name, kind, lon, lat, **kw):
     p = {'i': i, 'n': name[:70], 'k': kind}
     p.update({k: v for k, v in kw.items() if v not in (None, '', [])})
     return p | {'_ll': (lon, lat)}
+
+
+# Norwegian monuments kept although their original function is not settlement, church, fort or trade: burial mounds and
+# house sites, which carry the Viking-age and medieval landscape. Their Norwegian category names in English for titles.
+NO_KEEP_ART = {'Gravhaug', 'Gravrøys', 'Tuft', 'Hustuft', 'Kirkegård', 'Kirkested', 'Bygdeborg', 'Båtstø', 'Naust', 'Nausttuft', 'Gårdshaug'}
+NO_ART_EN = {'Gravhaug': 'Burial mound', 'Gravrøys': 'Burial cairn', 'Tuft': 'House site', 'Hustuft': 'House site', 'Kirkegård': 'Churchyard',
+             'Kirkested': 'Church site', 'Kirke': 'Church', 'Bygdeborg': 'Hillfort', 'Båtstø': 'Boat landing', 'Naust': 'Boathouse',
+             'Nausttuft': 'Boathouse site', 'Gårdshaug': 'Farm mound', 'Borg': 'Castle', 'Bosetning-aktivitetsområde': 'Settlement area',
+             'Gårdstun': 'Farmstead', 'Kaupang': 'Trading place', 'Handelssted': 'Trading place'}
 
 
 def regional_layers(recs, rows, sites_out):
@@ -704,25 +752,72 @@ def regional_layers(recs, rows, sites_out):
         sites_out.append(_site_props('br' + x['id'], x['name'].lstrip('?'), 'bridge', x['lon'], x['lat'], f=x['first'], fb='first mention', riv=x['river'], src='bridges1250', u=1 if x['uncertain'] else None))
     stats['bridges'] = len(br)
 
-    # Local only: TIB places; markets and fairs of England & Wales.
-    local = []
+    # Public, open licences: Nordic Spatial Humanities (CC BY 4.0) and the Norwegian heritage register (NLOD).
+    for x in regional.nordic():
+        if x['first'] is not None:
+            rows.append(['nsh', x['id'], x['name'], x['lon'], x['lat'], 1, x['kind'], x['first'], None, 0, [], [x['diocese']] if x.get('diocese') else [], [],
+                         {'k': x['kind'], 'fb': 'first mention', 'st': x['type'], 'nb': 'label', **({'q': x['q']} if x.get('q') else {})}])
+            sites_out.append(_site_props('ns' + x['id'], x['name'], x['kind'], x['lon'], x['lat'], f=x['first'], fb='first mention', st=x['type'],
+                                         dio=x.get('diocese'), src='nsh'))
+        else:
+            lo, hi = x['period']
+            rows.append(['nsh', x['id'], x['name'], x['lon'], x['lat'], 1, x['kind'], None, None, 0, [], [], [],
+                         {'k': x['kind'], 'env': [lo, hi, 'source'], 'st': x['type'], 'saga': x['saga'], 'nb': 'label'}])
+            sites_out.append(_site_props('ns' + x['id'], x['name'], x['kind'], x['lon'], x['lat'], ef=lo, et=hi, st=x['type'],
+                                         per=f"named in {x['saga']} (the sagas narrate c. 870–1030)", src='nsh'))
+    no = [x for x in regional.norway() if x['kind'] != 'site' or x['art'] in NO_KEEP_ART]
+    no = [x for x in no if x['period'][1] - x['period'][0] <= 700]
+    for x in no:
+        lo, hi, label = x['period']
+        title = x['name'] or NO_ART_EN.get(x['art'], x['art'] or 'Monument')
+        rows.append(['nokm', x['id'], title, x['lon'], x['lat'], 1, x['kind'], None, None, 0, [], [], [],
+                     {'k': x['kind'], 'env': [lo, hi, 'source'], 'st': x['art'], 'per': label, 'nb': 'label'}])
+        sites_out.append(_site_props('no' + x['id'], title, x['kind'], x['lon'], x['lat'], ef=lo, et=hi, st=x['art'], per=f'{label} (register dating)', src='nokm'))
+    stats['nordic'] = {'nsh': sum(1 for r in rows if r[0] == 'nsh'), 'norway': len(no)}
+
+    # Private data pack (never published): datasets with no licence to republish, or terms that forbid it.
+    private, prows = [], []
+
+    bad = Counter()
+
+    def add(src, pid, name, kind, lon, lat, mz=8, f=None, fb=None, env=None, per=None, ty=None, names=(), precise=True, **props):
+        if not (-180 <= lon <= 180 and -90 <= lat <= 90) or (lon == 0 and lat == 0):
+            bad[src] += 1  # impossible position in the source: left out, counted
+            return
+        extra = {'k': kind, 'nb': 'label', **({'fb': fb} if fb else {}), **({'env': [env[0], env[1], 'source']} if env else {}),
+                 **({'st': ty[:60]} if ty else {}), **({'per': per} if per else {})}
+        prows.append([src, pid, name, lon, lat, 1 if precise else 0, kind, f, None, 0 if precise else 1, [list(n) for n in names], [], [], extra])
+        pr = {'i': f'{src}:{pid}', 'n': name[:70], 'k': kind, 'f': f, 'fb': fb, 'ef': env[0] if env else None, 'et': env[1] if env else None,
+              'per': per, 'ty': ty[:120] if ty else None, 'src': src, 'u': None if precise else 1, **props}
+        private.append(({'type': 'Point', 'coordinates': [lon, lat]}, {k: v for k, v in pr.items() if v is not None}, mz))
+
     for x in regional.tib():
-        local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
-                      {k: v for k, v in {'i': 'tib' + x['id'], 'n': x['name'][:70], 'k': x['kind'], 'f': x['first'], 'fb': 'first attestation (TIB)' if x['first'] is not None else None,
-                                         'ty': ', '.join(x['types'])[:80], 'src': 'tib'}.items() if v is not None}, 6))
+        add('tib', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 6, f=x['first'], fb='first attestation (TIB)' if x['first'] is not None else None,
+            ty=', '.join(x['types']))
     for x in regional.markets_fairs():
-        local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
-                      {k: v for k, v in {'i': 'mf' + x['id'], 'n': x['name'], 'k': 'market', 'm': x['first'], 'mk': x['markets'], 'fr': x['fairs'],
-                                         'bo': 1 if x['borough'] else None, 'src': 'markets-fairs'}.items() if v is not None}, 6))
-    # Poland c. 1550–1600 (Atlas Fontium): settlements, and parish churches where the place was a parish seat.
+        add('mfairs', x['id'], x['name'], 'market', x['lon'], x['lat'], 6, ty='borough' if x['borough'] else None, m=x['first'], mk=x['markets'], fr=x['fairs'])
     for x in regional.atlas_fontium():
         per = f'{regional.AF_PERIOD[0]}–{regional.AF_PERIOD[1]} (Atlas historyczny Polski, 2nd half of the 16th c.)'
         ty = ' · '.join(v for v in (x['character'], x['owner'], x['size'], x['mills'], 'location approximate' if x['approx'] else None) if v)
-        base = {'n': x['name'][:70], 'ef': regional.AF_PERIOD[0], 'et': regional.AF_PERIOD[1], 'per': per, 'ty': ty[:120],
-                'a': x['modern'] if x['modern'] and x['modern'] != x['name'] else None, 'src': 'atlas-fontium'}
         for kind in ('settlement', 'church') if x['parish'] else ('settlement',):
-            local.append(({'type': 'Point', 'coordinates': [x['lon'], x['lat']]},
-                          {k: v for k, v in {'i': ('afc' if kind == 'church' else 'af') + x['id'], 'k': kind, **base}.items() if v is not None},
-                          5 if x['character'] == 'town' else 8))
-    stats['local'] = len(local)
-    return hre_feats, local, stats
+            add('afontium', ('c' if kind == 'church' else '') + x['id'], x['name'], kind, x['lon'], x['lat'], 5 if x['character'] == 'town' else 8,
+                env=regional.AF_PERIOD, per=per, ty=ty, names=[(x['modern'], None, None, 'pl')] if x['modern'] and x['modern'] != x['name'] else ())
+    for x in regional.ran():
+        add('ran', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 7, env=(x['from'], x['to']), per=f"{x['period']} (register dating)",
+            ty=f"{x['type']} · {x['locality']}, {x['county']}")
+    for x in regional.dicotopo():
+        add('dicotopo', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8 if x['kind'] == 'settlement' else 9, f=x['first'], fb='first mention',
+            ty=f"{x['type']} — earliest form: {x['firstForm']}", names=[(fm, y, None, 'historical form') for fm, y in x['forms']], precise=x['precise'])
+    for x in regional.denmark():
+        add('dkff', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(x['from'], x['to']), per='register dating', ty=x['type'])
+    for x in regional.darmc():
+        add('darmc', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 7, env=(x['from'], x['to']), per=f"{x['set']} (DARMC dating)", ty=x['type'])
+    for x in regional.ebidat():
+        add('ebidat', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 7, f=x['from'], fb='founded' if x['from'] is not None else None,
+            env=None if x['from'] is not None else (x['envFrom'], x['envTo']) if x.get('envFrom') is not None else None,
+            ty=x['type'], dt=x['dating'], t=x['to'])
+    for x in regional.sweden():
+        add('raa', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(x['from'], x['to']), per=f"{x['period']} (register dating)", ty=x['type'])
+    stats['private'] = dict(Counter(r[0] for r in prows))
+    stats['privateBadPositions'] = dict(bad)
+    return hre_feats, private, prows, stats

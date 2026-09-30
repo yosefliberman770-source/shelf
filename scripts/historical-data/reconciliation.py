@@ -22,6 +22,12 @@ LEVELS = [('F', 'found'), ('O', 'official project located'), ('D', 'dataset veri
           ('S', 'suitable for Shelf'), ('C', 'acquired'), ('I', 'integrated')]
 
 
+def recovery_cell(rec):
+    if not rec:
+        return ''
+    return f"{rec['outcome']} ({rec['reason']}){': ' + rec['datasets'] if rec['datasets'] else ''} — {rec['note']}"
+
+
 def licence_state(text):
     """Class what was recorded about a licence. A licence read only through a search result, an earlier audit or a
     page that could not be reached is not verified; "no licence found" is never read as a restriction."""
@@ -45,6 +51,11 @@ def main():
     ns = {}
     exec(open(os.path.join(AUD, 'reconciliation_entries.py'), encoding='utf-8').read(), ns)
     E = ns['E']
+    rec_ns = {}
+    rp = os.path.join(AUD, 'recovery_entries.py')
+    if os.path.exists(rp):
+        exec(open(rp, encoding='utf-8').read(), rec_ns)
+    RECOVERY = rec_ns.get('R', {})
     missing = [i for i in range(len(seed)) if i not in E]
     if missing:
         raise SystemExit(f'Candidates without an entry: {missing}')
@@ -54,9 +65,13 @@ def main():
         lv = set(re.sub(r'\s', '', e['levels']))
         # The licence state is classed from what was recorded; the L level only says the licence was looked for.
         lic_state = licence_state(e['licence'])
+        rec = RECOVERY.get(i + 1)
+        if rec and rec['outcome'] in ('recovered', 'acquired'):
+            lv |= {'A', 'C'} | ({'I', 'S'} if rec['outcome'] == 'recovered' else set())
         out.append({'n': i + 1, 'section': s['section'] or 'Europe-wide / cross-period', 'candidate': s['candidate'],
                     'levels': {name: code in lv for code, name in LEVELS}, 'licence': e['licence'], 'licenceState': lic_state,
-                    'useful': e['useful'], 'integrated': e['integrated'], 'why': e['why'], 'next': e['next'], 'evidence': e['evidence']})
+                    'useful': e['useful'], 'integrated': e['integrated'], 'why': e['why'], 'next': e['next'], 'evidence': e['evidence'],
+                    'recovery': rec})
     json.dump(out, open(os.path.join(AUD, 'reconciliation.json'), 'w'), ensure_ascii=False, indent=1)
 
     yn = lambda b: '✓' if b else '·'  # noqa: E731
@@ -68,17 +83,19 @@ def main():
              f"All {len(out)} bullets of the original seed list, in their original order. Evidence levels: "
              + ' · '.join(f'**{c}** {n}' for c, n in LEVELS) + '.', '',
              '| Totals | ' + ' | '.join(f'{c}: {tot[n]}' for c, n in LEVELS) + ' |', '| --- |' + ' --- |' * len(LEVELS), '',
-             'Licence state: ' + ', '.join(f'{k} {v}' for k, v in Counter(o['licenceState'] for o in out).most_common()) + '.', '']
+             'Licence state: ' + ', '.join(f'{k} {v}' for k, v in Counter(o['licenceState'] for o in out).most_common()) + '.', '',
+             'Recovery pass (' + str(len(RECOVERY)) + ' candidates revisited): ' + ', '.join(f'{k} {v}' for k, v in Counter(r['outcome'] for r in RECOVERY.values()).most_common())
+             + '. Reasons they had been left: ' + ', '.join(f'{k} {v}' for k, v in Counter(r['reason'] for r in RECOVERY.values()).most_common()) + '.', '']
     sec = None
     for o in out:
         if o['section'] != sec:
             sec = o['section']
-            lines += ['', f'#### {sec}', '', '| # | Candidate | Investigated | Verified | Downloadable | Licence | Useful? | Integrated? | Why / why not | Next action |',
-                      '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |']
+            lines += ['', f'#### {sec}', '', '| # | Candidate | Investigated | Verified | Downloadable | Licence | Useful? | Integrated? | Why / why not | Next action | Recovery pass |',
+                      '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |']
         L = o['levels']
         cell = lambda t: str(t).replace('|', '/').replace('\n', ' ')  # noqa: E731
         lines.append(f"| {o['n']} | {cell(o['candidate'])} | {yn(L['found'] and L['official project located'])} | {yn(L['dataset verified to exist'])} | "
-                     f"{yn(L['download/API tested'])} | {o['licenceState']}: {cell(o['licence'])} | {cell(o['useful'])} | {cell(o['integrated'])} | {cell(o['why'])} | {cell(o['next'])} |")
+                     f"{yn(L['download/API tested'])} | {o['licenceState']}: {cell(o['licence'])} | {cell(o['useful'])} | {cell(o['integrated'])} | {cell(o['why'])} | {cell(o['next'])} | {cell(recovery_cell(o['recovery']))} |")
     lines += ['', '<!-- RECONCILIATION:END -->']
     block = '\n'.join(lines)
     doc = open(DOC, encoding='utf-8').read() if os.path.exists(DOC) else ''
@@ -88,6 +105,7 @@ def main():
         doc += '\n' + block + '\n'
     open(DOC, 'w', encoding='utf-8').write(doc)
     print('candidates', len(out), dict(tot), Counter(o['licenceState'] for o in out))
+    print('recovery', Counter(r['outcome'] for r in RECOVERY.values()), Counter(r['reason'] for r in RECOVERY.values()))
 
 
 if __name__ == '__main__':

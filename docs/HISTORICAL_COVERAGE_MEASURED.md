@@ -16,7 +16,7 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | ◐ 57 | ○ 2 | ○ 26 | ○ 14 | ○ 22 | · 0 | ○ 7 | · 0 | ◐ 61 |
 | Italy & Malta | ● 892 | ● 72 | ● 221 | ◐ 160 | ● 446 | ○ 37 | ◐ 180 | ○ 21 | ● 777 |
 | Iberia | ● 635 | ● 44 | ◐ 64 | ◐ 71 | ● 252 | ○ 25 | ○ 47 | ○ 32 | ● 283 |
-| Scandinavia | ○ 17 | ○ 3 | ○ 2 | ○ 9 | · 0 | · 0 | · 0 | ○ 1 | ○ 9 |
+| Scandinavia | ● 951 | ○ 3 | ○ 7 | ◐ 76 | · 0 | ◐ 54 | · 0 | ○ 1 | ○ 9 |
 | Finland & Iceland | ◐ 151 | · 0 | ◐ 65 | ○ 25 | ○ 1 | ○ 10 | · 0 | · 0 | ○ 1 |
 | Poland | ○ 21 | ◐ 9 | ○ 2 | ○ 5 | ○ 5 | ○ 1 | ○ 1 | · 0 | ○ 12 |
 | Czechia | ○ 17 | ○ 1 | · 0 | ○ 8 | · 0 | · 0 | ○ 1 | · 0 | ○ 4 |
@@ -44,8 +44,8 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | ○ 32 | ○ 2 | ○ 42 | ○ 8 | ○ 1 | ○ 1 | · 0 | · 0 | ○ 49 |
 | Italy & Malta | ● 336 | ● 21 | ◐ 113 | ◐ 133 | ○ 26 | ○ 1 | ○ 14 | ○ 12 | ◐ 192 |
 | Iberia | ● 380 | ● 40 | ◐ 74 | ◐ 120 | ○ 16 | ○ 1 | ○ 3 | ◐ 51 | ◐ 161 |
-| Scandinavia | ○ 20 | ○ 4 | ○ 2 | ○ 14 | ○ 1 | · 0 | · 0 | ○ 7 | ○ 19 |
-| Finland & Iceland | ◐ 153 | ○ 2 | ◐ 65 | ○ 25 | ○ 1 | ○ 10 | · 0 | · 0 | ○ 2 |
+| Scandinavia | ● 1030 | ○ 4 | ○ 8 | ○ 18 | ○ 1 | ● 312 | · 0 | ○ 7 | ○ 19 |
+| Finland & Iceland | ● 375 | ○ 2 | ◐ 65 | ○ 25 | ○ 1 | ○ 10 | · 0 | · 0 | ○ 2 |
 | Poland | ○ 39 | ○ 1 | ○ 4 | ○ 7 | · 0 | ○ 1 | · 0 | ○ 1 | ○ 20 |
 | Czechia | ○ 46 | ○ 2 | ○ 6 | ○ 12 | · 0 | ○ 1 | · 0 | · 0 | ○ 41 |
 | Slovakia | ○ 6 | ○ 3 | · 0 | ○ 7 | · 0 | · 0 | · 0 | ○ 1 | ○ 6 |
@@ -72,8 +72,8 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | ○ 41 | ○ 1 | ◐ 187 | ◐ 51 | ○ 1 | ○ 2 | · 0 | ○ 2 | ● 230 |
 | Italy & Malta | ● 384 | ● 23 | ● 308 | ● 321 | ○ 30 | ○ 1 | ○ 14 | ○ 31 | ● 531 |
 | Iberia | ● 477 | ● 66 | ● 214 | ● 391 | ○ 23 | ○ 1 | ○ 3 | ◐ 99 | ● 510 |
-| Scandinavia | ◐ 106 | ◐ 7 | ○ 42 | ○ 28 | ○ 2 | ○ 2 | · 0 | ○ 10 | ◐ 138 |
-| Finland & Iceland | ● 347 | ○ 1 | ◐ 164 | ◐ 54 | ○ 18 | ○ 28 | · 0 | · 0 | ○ 4 |
+| Scandinavia | ● 2418 | ◐ 7 | ● 1485 | ◐ 78 | ○ 2 | ● 894 | · 0 | ○ 10 | ◐ 138 |
+| Finland & Iceland | ● 570 | ○ 1 | ◐ 164 | ◐ 54 | ○ 18 | ○ 28 | · 0 | · 0 | ○ 4 |
 | Poland | ◐ 181 | ◐ 11 | ○ 33 | ○ 21 | · 0 | ○ 12 | · 0 | ○ 10 | ◐ 117 |
 | Czechia | ● 876 | ○ 1 | ◐ 54 | ○ 28 | · 0 | ○ 3 | · 0 | ○ 8 | ● 512 |
 | Slovakia | ○ 38 | · 0 | ○ 2 | ○ 6 | · 0 | · 0 | · 0 | · 0 | ○ 33 |
@@ -100,8 +100,8 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | ◐ 60 | ◐ 9 | ● 405 | ◐ 186 | ○ 1 | ○ 2 | · 0 | ○ 10 | ● 507 |
 | Italy & Malta | ● 397 | ● 17 | ● 508 | ● 693 | ◐ 51 | ○ 1 | ○ 14 | ◐ 74 | ● 1033 |
 | Iberia | ● 453 | ● 22 | ● 331 | ● 601 | ◐ 50 | ○ 1 | ○ 3 | ◐ 84 | ● 849 |
-| Scandinavia | ● 550 | ◐ 5 | ◐ 77 | ◐ 57 | ● 1754 | ○ 8 | · 0 | ○ 19 | ● 536 |
-| Finland & Iceland | ● 428 | ○ 2 | ◐ 165 | ◐ 61 | ● 266 | ○ 28 | · 0 | ○ 2 | ◐ 56 |
+| Scandinavia | ● 2137 | ◐ 5 | ● 1583 | ◐ 131 | ● 1754 | ● 610 | · 0 | ○ 19 | ● 536 |
+| Finland & Iceland | ● 431 | ○ 2 | ◐ 195 | ◐ 69 | ● 266 | ○ 28 | · 0 | ○ 2 | ◐ 56 |
 | Poland | ● 882 | ● 83 | ● 247 | ◐ 120 | ● 3054 | ◐ 159 | · 0 | ○ 16 | ● 784 |
 | Czechia | ● 8464 | ◐ 9 | ● 271 | ● 391 | ● 262 | ○ 18 | · 0 | ○ 6 | ● 3162 |
 | Slovakia | ● 201 | ○ 1 | ○ 19 | ◐ 80 | ○ 7 | · 0 | · 0 | ○ 2 | ● 266 |
@@ -128,8 +128,8 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | ◐ 59 | ◐ 7 | ● 394 | ● 201 | ○ 6 | ○ 2 | · 0 | ○ 17 | ● 509 |
 | Italy & Malta | ● 412 | ● 16 | ● 608 | ● 798 | ◐ 63 | ○ 1 | ○ 14 | ○ 44 | ● 1223 |
 | Iberia | ● 464 | ◐ 11 | ● 396 | ● 669 | ◐ 88 | · 0 | ○ 3 | ○ 49 | ● 1027 |
-| Scandinavia | ● 578 | ○ 4 | ◐ 84 | ○ 46 | ● 1768 | ○ 12 | · 0 | ○ 4 | ● 577 |
-| Finland & Iceland | ● 465 | ○ 3 | ◐ 168 | ◐ 60 | ● 445 | ○ 28 | · 0 | · 0 | ◐ 80 |
+| Scandinavia | ● 2124 | ○ 4 | ● 1588 | ◐ 116 | ● 1768 | ● 576 | · 0 | ○ 4 | ● 577 |
+| Finland & Iceland | ● 469 | ○ 3 | ● 214 | ◐ 69 | ● 445 | ○ 28 | · 0 | · 0 | ◐ 80 |
 | Poland | ● 1036 | ● 38 | ● 317 | ● 273 | ● 3055 | ◐ 193 | · 0 | ○ 15 | ● 1030 |
 | Czechia | ● 10082 | ◐ 14 | ● 278 | ● 629 | ● 263 | ○ 21 | · 0 | ◐ 54 | ● 3638 |
 | Slovakia | ● 221 | · 0 | ○ 32 | ◐ 109 | ○ 10 | · 0 | · 0 | ○ 4 | ● 305 |
@@ -156,8 +156,8 @@ Counted from the records Shelf actually holds offline on 2026-09-30 by `scripts/
 | Switzerland | 19 | 1388 |
 | Italy & Malta | 1157 | 9120 |
 | Iberia | 392 | 7455 |
-| Scandinavia | 96 | 769 |
-| Finland & Iceland | 1743 | 31 |
+| Scandinavia | 7216 | 769 |
+| Finland & Iceland | 1989 | 31 |
 | Poland | 29 | 952 |
 | Czechia | 9 | 620 |
 | Slovakia | 3 | 188 |
@@ -197,8 +197,8 @@ Places first attested up to the end of each period, by region — a local build 
 - **Switzerland:** wikidata 502, wikidata:names 330, germaniasacra 236, germaniasacra:names 235, pleiades 78, pleiades:names 31
 - **Italy & Malta:** pleiades 1686, wikidata 1668, wikidata:names 1169, pleiades:names 681, buringh 354, hced 56
 - **Iberia:** wikidata 1788, wikidata:names 1000, pleiades 880, buringh 295, pleiades:names 220, althurayya 113
-- **Scandinavia:** viabundus 2296, viabundus:names 424, wikidata 228, wikidata:names 134, buringh 28, pleiades 16
-- **Finland & Iceland:** finreg 605, viabundus 535, viabundus:names 56, wikidata 24, wikidata:names 20, buringh 9
+- **Scandinavia:** nokm 5434, viabundus 2296, viabundus:names 424, nsh 269, wikidata 228, wikidata:names 134
+- **Finland & Iceland:** finreg 605, viabundus 535, nsh 281, viabundus:names 56, wikidata 24, wikidata:names 20
 - **Poland:** viabundus 3346, wikidata 1055, wikidata:names 657, hre 324, viabundus:names 245, germaniasacra 110
 - **Czechia:** wikidata 10110, wikidata:names 3051, wbohemia 830, wbohemia:names 438, viabundus 285, germaniasacra 130
 - **Slovakia:** wikidata 353, wikidata:names 292, buringh 15, pleiades 12, buringh:names 12, viabundus 7

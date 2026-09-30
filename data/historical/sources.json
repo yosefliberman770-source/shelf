@@ -694,5 +694,79 @@
   "local_only": true,
   "files": [],
   "note": "WFS GetFeature (GeoJSON, EPSG:4326) of the 16th-century layers of geonode.ontohgis.pl, 2026-09-30"
+ },
+ {
+  "id": "ran-romania",
+  "local_only": true,
+  "files": [],
+  "note": "Fetched by scripts/historical-data/ran_snapshot.py (register list pages + ArcGIS positions)"
+ },
+ {
+  "id": "dicotopo",
+  "local_only": true,
+  "files": [],
+  "note": "XML volumes copied from github.com/chartes/dico-topo (commit in original/COMMIT); INSEE positions from Wikidata via QLever (original/insee-coords.rq)"
+ },
+ {
+  "id": "darmc",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2446023",
+    "path": "original/shipwrecks-1-1500.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2452979",
+    "path": "original/carolingian-hoards-751-987.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2453917",
+    "path": "original/ancient-ports-harbours.xlsx"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2457775",
+    "path": "original/anglo-saxon-rural-settlements.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "ebidat",
+  "local_only": true,
+  "files": [],
+  "note": "Fetched by scripts/historical-data/ebidat_snapshot.py"
+ },
+ {
+  "id": "sweden-lamningar",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://pub.raa.se/nedladdning/datauttag/lamningar_v1/l%c3%a4mningar_sverige.gpkg",
+    "path": "original/lamningar_sverige.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "engel-hungary",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
+    "path": "original/Engel2020.zip"
+   }
+  ]
+ },
+ {
+  "id": "norway-kulturminner",
+  "files": [],
+  "note": "Geonorge download order (whole country, GML, EPSG:4258) of dataset c72906a0-2bc2-41d7-bea2-c92d368e3c49; code lists from register.geonorge.no"
+ },
+ {
+  "id": "nordic-spatial-humanities",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
+    "path": "original/source-data.zip"
+   }
+  ]
  }
 ]

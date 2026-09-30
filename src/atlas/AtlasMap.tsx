@@ -4,6 +4,7 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { installPrivateData, loadPrivateData, privateHeader, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -134,6 +135,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   const host = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const managed = useRef(new Map<string, string[]>()); // layer def id → maplibre layer ids
+  const paintSeen = useRef(new Map<string, string>());
   const clioSlice = useRef<string>('');
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState('');
@@ -163,8 +165,12 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         const ml = await import('maplibre-gl');
         // Vector tiles are read from PMTiles archives by range request: only what's on screen is fetched.
         if (!pmtilesReady) {
-          const { Protocol } = await import('pmtiles');
-          ml.addProtocol('pmtiles', new Protocol().tile);
+          const { Protocol, PMTiles } = await import('pmtiles');
+          const protocol = new Protocol();
+          // Tiles from the owner's private data pack, if one was loaded on this device, are read from it by range.
+          await loadPrivateData();
+          for (const f of privateTiles()) protocol.add(new PMTiles(privateTileSource(f)));
+          ml.addProtocol('pmtiles', protocol.tile);
           pmtilesReady = true;
         }
         await import('maplibre-gl/dist/maplibre-gl.css');
@@ -238,7 +244,16 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
       const specs = def.specs(c);
       const existing = managed.current.get(def.id);
       if (existing) {
-        for (const spec of specs) if ('filter' in spec && spec.filter && map.getLayer(spec.id)) map.setFilter(spec.id, spec.filter);
+        for (const spec of specs) {
+          if (!map.getLayer(spec.id)) continue;
+          if ('filter' in spec && spec.filter) map.setFilter(spec.id, spec.filter);
+          // Paint can depend on the year too (dated vs. only-evidenced styling): re-apply what changed.
+          for (const [k, v] of Object.entries(('paint' in spec && spec.paint) || {})) {
+            const key = `${spec.id}|${k}`;
+            const json = JSON.stringify(v);
+            if (paintSeen.current.get(key) !== json) { map.setPaintProperty(spec.id, k, v); paintSeen.current.set(key, json); }
+          }
+        }
         continue;
       }
       // Geometry goes below the next layer in draw order that's already on
@@ -377,6 +392,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
         onHistory={info.pick && onPickPlace ? () => { onPickPlace(info.pick!); setInfo(null); } : undefined}
         onEvent={info.event && onPickEvent ? () => { onPickEvent(info.event!); setInfo(null); } : undefined} />}
       <AtlasSources enabled={enabled} />
+      <PrivateDataControl />
     </div>
   );
 }
@@ -655,11 +671,21 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         caution: year < 1300 ? 'Rulers are recorded year by year from 1300; the dataset’s authors consider earlier records less complete.' : 'Territories are recorded as ruling lineages, as the dataset does (e.g. a Wittelsbach line rather than “Bavaria”).',
       };
     }
-    case 'local-sites':
+    case 'private-sites': {
+      const f = num('f');
+      const ef = num('ef'), et = num('et');
+      const when = f !== undefined ? `${str('fb') === 'founded' ? 'Built' : 'First recorded'}: ${yearLabel(f)}${num('t') !== undefined ? ` · end: ${yearLabel(num('t')!)}` : ''}`
+        : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}`
+        : ef !== undefined || et !== undefined ? `Dated only by ${str('per') ?? 'an evidence period'}: ${ef !== undefined ? yearLabel(ef) : '…'}–${et !== undefined ? yearLabel(et) : '…'}`
+        : 'No date recorded';
+      const key = str('i');
       return {
-        title: str('n') ?? 'Place', lines: [str('k') ?? '', num('f') !== undefined ? `First attested: ${yearLabel(num('f')!)}` : num('m') !== undefined ? `First market or fair recorded: ${yearLabel(num('m')!)} · markets ${num('mk') ?? 0}, fairs ${num('fr') ?? 0}` : str('per') ? `Recorded for ${str('per')} — the period of the source, not the place’s dates` : 'No date recorded', ...(str('ty') ? [str('ty')!] : []), ...(str('a') ? [`Today: ${str('a')}`] : [])].filter(Boolean),
-        source: credit('localonly'), caution: 'Local build only: the licence for republishing this dataset has not been verified.',
+        title: str('n') ?? 'Place', lines: [str('k') ?? '', when, ...(str('dt') ? [`Dating in the source: ${str('dt')}`] : []), ...(str('ty') ? [str('ty')!] : []), ...(num('u') ? ['Location approximate (placed at its commune or parish)'] : [])].filter(Boolean),
+        pick: pt && key?.includes(':') ? { key, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
+        source: privateHeader()?.datasets.find((d) => d.id === str('src'))?.name ?? credit('localonly'),
+        caution: 'From your private data file: used privately in Shelf, not published.' + (ef !== undefined && f === undefined ? ' Shown for the whole period the record is dated to — that is when evidence places it, not its founding or end.' : ''),
       };
+    }
     case 'gs-dioceses':
       return { title: `Diocese of ${str('n') ?? '?'}`, lines: ['Holy Roman Empire'], source: credit('germaniasacra'), caution: 'Germania Sacra’s reconstruction for no single stated date; borders changed over the centuries.' };
     case 'hced-battles': {
@@ -734,6 +760,46 @@ function FeatureCard({ info, onClose, onHistory, onEvent }: { info: Info; onClos
         <span dangerouslySetInnerHTML={{ __html: `Source: ${info.source}` }} />
       </div>
     </div>
+  );
+}
+
+/**
+ * The owner's private data file: datasets used privately in Shelf but not published (see privateData.ts).
+ * Loading it stores it on this device; the page then reloads so every layer and lookup picks it up.
+ */
+function PrivateDataControl() {
+  const [header, setHeader] = useState(privateHeader());
+  const [busy, setBusy] = useState<string>();
+  useEffect(() => { loadPrivateData().then(setHeader); }, []);
+  const load = async (f: File | undefined) => {
+    if (!f) return;
+    setBusy('Loading…');
+    try {
+      await installPrivateData(f);
+      location.reload();
+    } catch (e) {
+      setBusy(e instanceof Error ? e.message : 'Could not read that file.');
+    }
+  };
+  return (
+    <details className="hmap-sources">
+      <summary>Your private data {header ? `· ${header.datasets.length} datasets on this device` : '· not loaded'}</summary>
+      <p className="tiny">
+        Some historical datasets can be used privately but not republished on a public website. They come in a separate
+        file that stays on this device. {header ? `Loaded file built ${header.built}.` : 'Load the file “shelf-private-data.pack” to add them.'}
+      </p>
+      {header && (
+        <ul>
+          {header.datasets.map((d) => <li key={d.id}>{d.name}: {d.records.toLocaleString()} records ({d.licence})</li>)}
+        </ul>
+      )}
+      <label className="btn xs">
+        {header ? 'Replace with a newer file' : 'Load private data file'}
+        <input type="file" accept=".pack,application/octet-stream" hidden onChange={(e) => load(e.target.files?.[0])} />
+      </label>
+      {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
+      {busy && <p className="tiny">{busy}</p>}
+    </details>
   );
 }
 

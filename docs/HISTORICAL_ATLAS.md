@@ -72,13 +72,29 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Bridges of Medieval England to c.1250](https://doi.org/10.5284/1053676) (ADS) | CC BY 4.0 |
 | [World Historical Gazetteer](https://whgazetteer.org/) (queried, not downloaded) | Index CC BY-NC 4.0; each source its own licence |
 
-**Local builds only** (`VITE_SHELF_LOCAL_DATA=1`). No licence has been found for these, which is not the same as a
-restriction. They stay out of this public repository and the deployed site until one is confirmed:
-- TIB *Maps of Power* (ÖAW; only its photographs are marked CC BY 4.0)
-- Letters, *Gazetteer of Markets and Fairs in England and Wales to 1516* (SAS-Space: "UNSPECIFIED")
-- Atlas Fontium, *Atlas historyczny Polski XVI w.* (IH PAN; GeoNode: "not_specified")
+| [Norwegian heritage register](https://kulturminnesok.no/) (Riksantikvaren, via Geonorge) | NLOD |
+| [Nordic Spatial Humanities](https://doi.org/10.5281/zenodo.14871254) (Nordic saints' cult places, Icelandic Saga Map) | CC BY 4.0 |
 
-The Atlas of Rural Settlement (above) is local-only for a different reason: its terms do not allow republishing.
+**Your private data file.** Some datasets may be used privately but not
+republished: either no licence to republish is stated, or the terms forbid it.
+They are built into one file, `shelf-private-data.pack`
+(`scripts/atlas-build/private_pack.py`). The owner loads it under the map
+("Your private data"). It stays on that device, and it is never in this
+repository or on the website.
+
+It holds:
+- TIB *Maps of Power* (ÖAW)
+- Letters, *Markets and Fairs to 1516*
+- Atlas Fontium, Poland c. 1580 (IH PAN)
+- RAN, Romania's archaeological register (CIMEC)
+- DicoTopo (CTHS, CC BY-NC-ND)
+- EBIDAT castles
+- Denmark's Fund og Fortidsminder
+- Sweden's register of ancient remains
+- DARMC (shipwrecks, Carolingian hoards)
+- the Atlas of Rural Settlement (personal and business use only)
+
+Layers that need it say so, and switch on once it is loaded.
 
 Attribution for datasets appears in three places:
 

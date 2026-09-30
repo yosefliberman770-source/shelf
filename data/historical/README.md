@@ -57,8 +57,32 @@ LICENSE.md files from the manifest.
     - Atlas Fontium's 16th-century Poland (WFS)
     - Denmark's Fund og Fortidsminder (raw only)
   - Regional parsers are in `scripts/atlas-build/regional.py`.
+- **Recovery pass (2026-10-01).** The question for each dataset skipped
+  because of licensing or access was: "is the data obtainable and historically
+  useful for a private app?"
+  - Acquired, public:
+    - Norwegian heritage register (NLOD)
+    - Nordic Spatial Humanities (CC BY 4.0)
+  - Acquired, private:
+    - RAN, Romania (`ran_snapshot.py`)
+    - DicoTopo, France
+    - EBIDAT castles (`ebidat_snapshot.py`, resumable)
+    - Swedish remains
+    - DARMC
+    - Engel's Hungary (encrypted, not integrated)
+- **Private data pack.** Datasets that must not be republished are built into
+  `data/private-pack/shelf-private-data.pack` (git-ignored) by:
+
+  ```
+  python3 scripts/atlas-build/build.py world
+  python3 scripts/atlas-build/private_pack.py
+  ```
+
+  The owner loads the file in the app (map → "Your private data"). Their raw
+  files are flagged `local_only` in `sources.json`, so they stay out of git.
+  Derived caches (`raw/*/derived-*.json`) are git-ignored too.
 - **Audit files** (`audit/`), each rebuilt by its script:
-  - `seed-candidates.json` and `reconciliation_entries.py` → `reconciliation.json` (`reconciliation.py`)
+  - `seed-candidates.json`, `reconciliation_entries.py` and `recovery_entries.py` → `reconciliation.json` (`reconciliation.py`)
   - `import-audit.json` (`audit_imports.py`)
   - `vault-audit.json`: files, checksums, docs, leaks into git and what the app uses (`audit_vault.py`)
 - **Measured coverage:** `coverage-measured.json` (built by `scripts/historical-data/coverage.py`).

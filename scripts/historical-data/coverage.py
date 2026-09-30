@@ -85,9 +85,18 @@ def regions():
     return at
 
 
+# Datasets whose rows carry a Shelf kind (extra.k): the kind decides the theme.
+KIND_THEME = {'settlement': 'Settlements', 'church': 'Religion', 'monastery': 'Religion', 'cathedral': 'Religion', 'castle': 'Military',
+              'fortification': 'Military', 'market': 'Economy', 'hoard': 'Economy', 'wreck': 'Economy', 'road': 'Roads', 'bridge': 'Roads'}
+KIND_SOURCES = {'nsh', 'nokm', 'tib', 'mfairs', 'afontium', 'ran', 'dicotopo', 'raa', 'ebidat', 'darmc', 'dkff'}
+PRIVATE_PLACES = os.path.join(ROOT, 'data', 'private-pack', 'build', 'places', 'c')
+
+
 def theme_of(src, types, extra):
     t = types.lower()
     k = (extra or {}).get('k')
+    if src in KIND_SOURCES:
+        return KIND_THEME.get(k)
     if src == 'wikidata':
         return {'settlement': 'Settlements', 'monastery': 'Religion', 'cathedral': 'Religion', 'diocese': 'Religion', 'university': 'Religion',
                 'castle': 'Military', 'fortification': 'Military', 'bridge': 'Roads'}.get(k)
@@ -135,8 +144,8 @@ def overlaps(a, b, lo, hi):
     return (a is None or a <= hi) and (b is None or b >= lo) and not (a is None and b is None)
 
 
-def main():
-    at = regions()
+def measure(at, cell_dirs):
+    """Counts per region, theme and period from the place-index cells in cell_dirs plus the events, polities and roads."""
     counts = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # region → theme → period → n
     approx = defaultdict(lambda: defaultdict(int))
     undated = defaultdict(lambda: defaultdict(int))
@@ -156,8 +165,7 @@ def main():
             (approx if env else undated)[region][theme] += 1
 
     pol_hre = defaultdict(lambda: defaultdict(set))  # distinct ruling territories of the Empire's towns (Princes and Townspeople)
-    cdir = os.path.join(PUB, 'world', 'places', 'c')
-    for fn in os.listdir(cdir):
+    for cdir, fn in [(d, f) for d in cell_dirs for f in os.listdir(d)]:
         for r in json.load(open(os.path.join(cdir, fn), encoding='utf-8')):
             src, _, _, lon, lat, _, types, a, b, _, names, _, _, extra = r
             region = at(lon, lat)
@@ -238,10 +246,18 @@ def main():
             a, b = p.get('fromyear'), p.get('toyear')
             add(at(c[0], c[1]), 'Roads', a or 1350, b or 1650, 'viabundus')
 
+    return counts, approx, undated, by_source
+
+
+def main():
+    at = regions()
+    counts, approx, undated, by_source = measure(at, [os.path.join(PUB, 'world', 'places', 'c')])
+    with_private = measure(at, [os.path.join(PUB, 'world', 'places', 'c'), PRIVATE_PLACES])[0] if os.path.isdir(PRIVATE_PLACES) else None
     out = {'built': date.today().isoformat(), 'periods': [f'{a}-{b}' for a, b in PERIODS], 'themes': THEMES,
            'thresholds': 'strong ≥200 records, moderate 50–199, weak 1–49, absent 0 (per region, theme and period); Political counts distinct polities: strong ≥15, moderate 5–14',
            'regions': {g: {'counts': {t: dict(counts[g][t]) for t in THEMES}, 'approximate': dict(approx[g]), 'undated': dict(undated[g]),
-                           'sources': dict(sorted(by_source[g].items(), key=lambda x: -x[1]))} for g in GROUPS}}
+                           'sources': dict(sorted(by_source[g].items(), key=lambda x: -x[1])),
+                           **({'withPrivateData': {t: dict(with_private[g][t]) for t in THEMES}} if with_private else {})} for g in GROUPS}}
     json.dump(out, open(os.path.join(ROOT, 'data', 'historical', 'coverage-measured.json'), 'w'), ensure_ascii=False, indent=1)
 
     # What the local-only datasets would add (not in the public app): TIB places by first attestation.
@@ -284,11 +300,11 @@ def main():
         lines.append(f'- **{g}:** {top or "—"}')
     lines.append('')
     open(os.path.join(ROOT, 'docs', 'HISTORICAL_COVERAGE_MEASURED.md'), 'w').write('\n'.join(lines))
-    write_audit_matrices(counts, approx, undated)
+    write_audit_matrices(counts, approx, undated, with_private)
     print('wrote coverage-measured.json and HISTORICAL_COVERAGE_MEASURED.md')
 
 
-def write_audit_matrices(counts, approx, undated):
+def write_audit_matrices(counts, approx, undated, with_private=None):
     """Compact regional / thematic / temporal matrices for docs/MEDIEVAL_EUROPE_DATA_AUDIT.md (between the MATRICES markers)."""
     doc_path = os.path.join(ROOT, 'docs', 'MEDIEVAL_EUROPE_DATA_AUDIT.md')
     if not os.path.exists(doc_path) or '<!-- MATRICES:START' not in open(doc_path, encoding='utf-8').read():
@@ -304,14 +320,30 @@ def write_audit_matrices(counts, approx, undated):
     for g in GROUPS:
         weak = [t for t in themes if not good(g, t, '1200-1399')]
         L.append(f'| {g} | ' + ' | '.join(f'{sum(good(g, t, k) for t in themes)}/{len(themes)}' for k in keys) + f' | {", ".join(weak) or "—"} |')
+    if with_private:
+        goodp = lambda g, t, k: status(with_private[g][t].get(k, 0), t) in ('strong', 'moderate')  # noqa: E731
+        L += ['', '#### E.2 With your private data file loaded', '',
+              'The same measure counting the private data pack as well (datasets used privately, not republished).', '',
+              '| Region | ' + ' | '.join(k.replace('-', '–') for k in keys) + ' | Weak or absent, 1200–1399 |', '| --- |' + ' --- |' * (len(keys) + 1)]
+        for g in GROUPS:
+            weak = [t for t in themes if not goodp(g, t, '1200-1399')]
+            L.append(f'| {g} | ' + ' | '.join(f'{sum(goodp(g, t, k) for t in themes)}/{len(themes)}' for k in keys) + f' | {", ".join(weak) or "—"} |')
     L += ['', '### F. Thematic coverage matrix', '', f'Cell = how many of the {len(GROUPS)} regions have the theme at least moderate in that period.', '',
           '| Theme | ' + ' | '.join(k.replace('-', '–') for k in keys) + ' |', '| --- |' + ' --- |' * len(keys)]
     for t in THEMES:
         L.append(f'| {t} | ' + ' | '.join(f'{sum(good(g, t, k) for g in GROUPS)}/{len(GROUPS)}' for k in keys) + ' |')
+    if with_private:
+        L += ['', '#### F.2 With your private data file loaded', '', '| Theme | ' + ' | '.join(k.replace('-', '–') for k in keys) + ' |', '| --- |' + ' --- |' * len(keys)]
+        for t in THEMES:
+            L.append(f'| {t} | ' + ' | '.join(f"{sum(status(with_private[g][t].get(k, 0), t) in ('strong', 'moderate') for g in GROUPS)}/{len(GROUPS)}" for k in keys) + ' |')
     L += ['', '### G. Temporal coverage matrix', '', 'Records counted per period across all regions (a record spanning several periods counts in each; Political counts polities).', '',
           '| Theme | ' + ' | '.join(k.replace('-', '–') for k in keys) + ' |', '| --- |' + ' --- |' * len(keys)]
     for t in THEMES:
         L.append(f'| {t} | ' + ' | '.join(str(sum(counts[g][t].get(k, 0) for g in GROUPS)) for k in keys) + ' |')
+    if with_private:
+        L += ['', '#### G.2 With your private data file loaded', '', '| Theme | ' + ' | '.join(k.replace('-', '–') for k in keys) + ' |', '| --- |' + ' --- |' * len(keys)]
+        for t in THEMES:
+            L.append(f'| {t} | ' + ' | '.join(str(sum(with_private[g][t].get(k, 0) for g in GROUPS)) for k in keys) + ' |')
     L += ['', f'Included above but only approximate: {sum(sum(v.values()) for v in approx.values())} records dated only by an evidence period '
           f'(shown lighter, inside that period). Not counted at all: {sum(sum(v.values()) for v in undated.values())} records with no dates '
           '(hidden at a date unless the reader includes undated records).', '', '<!-- MATRICES:END -->']
