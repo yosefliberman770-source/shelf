@@ -8,7 +8,7 @@ import { expression, featureFilter } from '@maplibre/maplibre-gl-style-spec';
 import { describe, expect, it, vi } from 'vitest';
 import { regionAt, type RegionId } from '../world/axes';
 import { LAYERS, urbanPopulation, type LayerCtx } from './catalog';
-import { getPlace, matchName } from './gazetteer';
+import { getPlace, matchName, recordFit } from './gazetteer';
 
 const PUB = join(__dirname, '../../public');
 vi.stubGlobal('fetch', async (input: string) => {
@@ -125,5 +125,77 @@ describe('battles from two datasets are not doubled', () => {
     const km = (a: [number, number], b: [number, number]) => Math.hypot((a[0] - b[0]) * 111 * Math.cos((a[1] * Math.PI) / 180), (a[1] - b[1]) * 111);
     const dup = hc.filter((h) => wd.some((w) => Math.abs(w.properties.y - h.properties.y) <= 1 && km(w.geometry.coordinates, h.geometry.coordinates) <= 50));
     expect(dup).toHaveLength(0);
+  });
+});
+
+describe('naming: English → Latin-script label → standard romanization → own script; never dropped', () => {
+  const extra = (r: Row) => (r[13] ?? {}) as Record<string, string>;
+  const wd = rows.filter((r) => r[0] === 'wikidata');
+  const latin = (s: string) => /^[\p{Script=Latin}\p{N}\p{P}\p{Zs}’'ʼ-]+$/u.test(s);
+  it('a place with only Cyrillic, Greek or Georgian names is romanized by a named scheme, and its own name is kept', () => {
+    const rom = wd.filter((r) => extra(r).nb?.startsWith('romanized'));
+    expect(rom.length).toBeGreaterThan(100);
+    for (const r of rom.slice(0, 200)) {
+      expect(latin(r[2])).toBe(true);
+      expect(extra(r).nb).toMatch(/romanized: (BGN\/PCGN|Ukrainian|Bulgarian|Serbian|Macedonian|ELOT|Georgian)/);
+      expect((r[10] as [string, unknown, unknown, string][]).some((n) => n[3] === extra(r).nl && !latin(n[0]))).toBe(true);
+    }
+  });
+  it('a place whose only names are in scripts without a reliable romanization (Arabic, Persian…) keeps its own-script name rather than being dropped', () => {
+    const own = wd.filter((r) => extra(r).nb === 'original script');
+    expect(own.length).toBeGreaterThan(0);
+    for (const r of own) expect(latin(r[2])).toBe(false);
+  });
+  it('an English name, where one exists, is always the one shown', () => {
+    const withEn = wd.filter((r) => !extra(r).nb);
+    expect(withEn.length / wd.length).toBeGreaterThan(0.8);
+    expect(wd.filter((r) => extra(r).nb && (r[10] as [string, unknown, unknown, string][]).some((n) => n[3] === 'en')).length).toBe(0);
+  });
+});
+
+describe('what a start date means', () => {
+  it('a first mention is when evidence begins, not when the place began: before it the place is "not yet attested", not "later"', async () => {
+    const fm = rows.find((r) => r[0] === 'wikidata' && (r[13] as Record<string, string> | null)?.fb === 'first mention' && r[7] !== null && r[7] > 1100)!;
+    const p = (await getPlace(`wikidata:${fm[1]}`))!;
+    expect(p.startKind).toBe('attested');
+    expect(recordFit(p, (fm[7] as number) - 200)).toBe('unattested');
+    expect(recordFit(p, (fm[7] as number) + 10)).toBe('within');
+  });
+  it('a founding / building date does mean it did not exist before', async () => {
+    const fd = rows.find((r) => r[0] === 'wikidata' && (r[13] as Record<string, string> | null)?.fb === 'founded' && r[7] !== null && r[7] > 1100)!;
+    const p = (await getPlace(`wikidata:${fd[1]}`))!;
+    expect(p.startKind).toBe('founded');
+    expect(recordFit(p, (fd[7] as number) - 200)).toBe('later');
+  });
+  it('a settlement start taken from Wikidata "inception" is not treated as a founding (it is often a first mention)', () => {
+    const inc = rows.filter((r) => r[0] === 'wikidata' && (r[13] as Record<string, string> | null)?.k === 'settlement');
+    expect(inc.some((r) => (r[13] as Record<string, string>).fb === 'founded')).toBe(false);
+  });
+  it('on the map, a site before its first mention is hidden by default and shown (hollow) only when unevidenced records are asked for', () => {
+    const first = { k: 'castle', f: 1300, fb: 'first mention' };
+    const built = { k: 'castle', f: 1300, fb: 'founded' };
+    expect(layerFilter('castles', 1200)(first)).toBe(false);
+    expect(layerFilter('castles', 1200, true)(first)).toBe(true);
+    expect(layerFilter('castles', 1200, true)(built)).toBe(false);
+    expect(layerFilter('castles', 1350)(first)).toBe(true);
+  });
+  it('a house is not drawn after its recorded dissolution, even with unevidenced records on', () => {
+    expect(layerFilter('religious-houses', 1600, true)({ k: 'monastery', f: 1100, t: 1539, fb: 'founded' })).toBe(false);
+  });
+});
+
+describe('Buringh towns: corrections are stated, never silent', () => {
+  it('every town whose position was changed says so, with the distance', () => {
+    const fixed = rows.filter((r) => r[0] === 'buringh' && (r[13] as Record<string, string> | null)?.fix);
+    expect(fixed.length).toBeGreaterThan(0);
+    for (const r of fixed) expect((r[13] as Record<string, string>).fix).toMatch(/decimal point restored|position from Wikidata; Buringh's coordinates are \d+ km away/);
+  });
+  it('no two towns sit on the same spot under the same name (no duplicated towns)', () => {
+    const seen = new Set<string>();
+    for (const r of rows.filter((x) => x[0] === 'buringh')) {
+      const k = `${r[2]}|${(r[3] as number).toFixed(2)}|${(r[4] as number).toFixed(2)}`;
+      expect(seen.has(k)).toBe(false);
+      seen.add(k);
+    }
   });
 });

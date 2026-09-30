@@ -102,6 +102,7 @@ raw/*/nightly-export/**
 !raw/wikidata-medieval/original/city.tsv
 !raw/wikidata-medieval/original/diocese.names.tsv
 !raw/wikidata-medieval/original/diocese.tsv
+!raw/wikidata-medieval/original/fallback.names.tsv
 !raw/wikidata-medieval/original/fortification.names.tsv
 !raw/wikidata-medieval/original/fortification.tsv
 !raw/wikidata-medieval/original/labels.tsv

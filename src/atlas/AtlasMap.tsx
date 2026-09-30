@@ -595,12 +595,17 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'medieval-sites': {
       const kind = [str('st'), str('k')].filter(Boolean)[0] ?? 'site';
       const f0 = num('f');
+      const fb = str('fb');
+      const startLabel = fb === 'first mention' ? 'First mentioned' : fb === 'Germania Sacra' ? 'Earliest dated tenure (Germania Sacra)'
+        : fb === 'founded' ? 'Founded / built' : 'Start recorded in Wikidata (may be a first mention)';
       const lines = [kind[0].toUpperCase() + kind.slice(1),
         f0 === undefined && num('t') === undefined ? 'No founding date or first mention recorded'
-          : `${str('fb') === 'first mention' ? 'First mentioned' : str('fb') === 'Germania Sacra' ? 'Earliest dated tenure (Germania Sacra)' : 'Founded'}: ${f0 !== undefined ? yearLabel(f0) : '?'}${num('t') !== undefined ? ` · dissolved / ended: ${yearLabel(num('t')!)}` : ''}`];
+          : `${startLabel}: ${f0 !== undefined ? yearLabel(f0) : '?'}${num('t') !== undefined ? ` · dissolved / ended: ${yearLabel(num('t')!)}` : ''}`];
       if (str('o')) lines.push(`Order: ${str('o')}`);
       if (str('d')) lines.push(`Diocese: ${str('d')}`);
-      if (str('nl')) lines.push('No English name recorded — shown in its own language');
+      const nb = str('nb');
+      if (nb) lines.push(nb.startsWith('romanized') ? `No English name recorded — romanized from ${str('nl')} (${nb.replace('romanized: ', '')})` : nb === 'original script' ? 'No English or Latin-script name recorded — shown in its own script' : 'No English name recorded — shown in its own language');
+      const notYet = f0 !== undefined && f0 > year && fb !== 'founded';
       const q = str('i')?.startsWith('Q') ? str('i') : undefined;
       return {
         title: str('n') ?? 'Site', lines,
@@ -608,6 +613,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         link: q ? { href: `https://www.wikidata.org/wiki/${q}`, label: 'Wikidata ↗' } : str('gs') ? { href: `https://klosterdatenbank.germania-sacra.de/gsn/${str('gs')}`, label: 'Germania Sacra ↗' } : undefined,
         source: str('gs') ? `${credit('wikidata')}; ${credit('germaniasacra')}` : credit('wikidata'),
         caution: f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
+          : notYet ? `Not yet recorded in ${yearLabel(year)}: the first record is from ${yearLabel(f0!)}. It may be older, but nothing places it at this date — shown because “Include undated records” is on.`
           : num('t') === undefined ? 'No end is recorded, so it is drawn to the present; many houses and castles ended earlier than their record says.' : undefined,
       };
     }

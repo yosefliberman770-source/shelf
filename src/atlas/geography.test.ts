@@ -276,10 +276,13 @@ describe('GENERALISATION — same mechanisms, different cases', () => {
   describe('time: four kinds of temporal knowledge, across datasets', () => {
     it('the model: dates, an evidence period, or nothing', () => {
       expect(timeFit({}, 100)).toBe('undated');
-      expect(timeFit({ from: 1300 }, 100)).toBe('later');
+      // A start that is only the beginning of the evidence is not the beginning of the place…
+      expect(timeFit({ from: 1300 }, 100)).toBe('unattested');
+      // …only a founding / construction date is.
+      expect(timeFit({ from: 1300, startKind: 'founded' }, 100)).toBe('later');
       expect(timeFit({ to: -500 }, 100)).toBe('earlier');
       const env = { envelope: { from: -750, to: 640, basis: 'source' as const } };
-      expect(timeFit(env, -3000)).toBe('later');
+      expect(timeFit(env, -3000)).toBe('unattested');
       expect(timeFit(env, 100)).toBe('period');
       expect(timeFit(env, 900)).toBe('earlier');
     });
@@ -292,7 +295,7 @@ describe('GENERALISATION — same mechanisms, different cases', () => {
       const p = await place(key);
       expect(p.from).toBeUndefined();
       expect(p.envelope?.basis).toBe(basis);
-      expect(recordFit(p, before)).toBe('later');
+      expect(recordFit(p, before)).toBe('unattested');
       expect(recordFit(p, during)).toBe('period');
     });
     it('al-Ṯurayyā records carry the atlas’s 9th–10th-century period, and only that', async () => {
@@ -306,9 +309,12 @@ describe('GENERALISATION — same mechanisms, different cases', () => {
       expect(recordFit(p, -3000)).toBe('undated');
       expect(recordFit(p, 100)).toBe('undated');
     });
-    it('a later town is not found for an earlier date (Lübeck)', async () => {
-      expect((await matchName('Lübeck', 100)).status).toBe('none');
-      expect((await matchName('Lübeck', 1400)).status).toBe('unique');
+    it('a town first recorded later is only a possibility for an earlier date, never a placed answer (Lübeck)', async () => {
+      const early = await matchName('Lübeck', 100);
+      expect(early.fit).toBe('unattested');
+      expect(early.reason).toMatch(/may be older/);
+      expect((await offline('Lübeck', 100)).status).toBe('LOW');
+      expect((await matchName('Lübeck', 1400)).fit).toBe('within');
     });
     it('a record known only to a period is confirmed only when the book’s other places agree (Rome, 218 BCE)', async () => {
       expect((await offline('Rome', -218)).status).toBe('MEDIUM');

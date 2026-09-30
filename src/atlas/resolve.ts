@@ -14,7 +14,7 @@ import { norm } from '../lib/history/assess';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, recordFit, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
@@ -289,7 +289,10 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     const fitsBook = !!context?.points.length && contextDistance(context, [m.place.lon, m.place.lat]) < 1500;
     // A record known only to a period counts when the book's own geography agrees with it.
     const periodFits = m.fit === 'period' && fitsBook;
-    const status: Confidence = m.candidates.length === 1 && (attested || periodFits) ? 'HIGH' : 'MEDIUM';
+    // First recorded only after the date: a possibility the reader can see, never a placed answer.
+    // Namesakes first recorded only after the date are shown, but don't make the answer ambiguous.
+    const rivals = m.candidates.filter((c) => c.key !== m.place!.key && recordFit(c, year) !== 'unattested');
+    const status: Confidence = m.fit === 'unattested' ? 'LOW' : rivals.length === 0 && (attested || periodFits) ? 'HIGH' : 'MEDIUM';
     const method = `${[m.place, ...m.corroborating].map((p) => gazetteerInfo(p.gazetteer).name).join(' + ')} name match`;
     const place = fromGaz(m.place, written, why(m.reason, method, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status, m.corroborating, year);
     const alsoPolity = livePolity ? polityPlace(livePolity, 'LOW') : undefined;

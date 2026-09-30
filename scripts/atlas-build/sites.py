@@ -35,6 +35,7 @@ import unicodedata
 from collections import Counter, defaultdict
 
 import tiler
+import translit
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
@@ -45,7 +46,10 @@ ATLAS = os.path.join(ROOT, 'public', 'atlas')
 
 # An item in several classes is filed under the first that applies.
 KINDS = ['cathedral', 'monastery', 'university', 'castle', 'fortification', 'bridge', 'diocese', 'settlement']
-NAME_LANGS = 'mul de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl'.split()
+# Latin-script labels, in order of preference, after English (Serbian and Serbo-Croatian Latin included).
+NAME_LANGS = 'mul de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl sq tr sr-el sh lb rm fy se hsb'.split()
+# Labels in other scripts, kept as the place's own name when nothing else exists.
+OTHER_SCRIPT_LANGS = 'uk be bg sr mk ru el ka hy ar he'.split()
 LATEST = 1650  # later foundations are outside this layer's scope
 # More specific kinds, from Wikidata's own classes (English labels of P31).
 SUBTYPES = [
@@ -148,18 +152,47 @@ def wd_records(kinds):
                 'dio': qid(r[10]) if r[10] else None, 'dioN': labels.get(qid(r[10])) if r[10] else None,
                 'types': [t for t in types if t], 'sl': int(r[12]) if r[12].strip('"').isdigit() else 0,
             }
+    # Items with no label in the languages fetched: their labels in any language (fetched separately).
+    fb = os.path.join(WD, 'fallback.names.tsv')
+    if os.path.exists(fb):
+        for r in csv.reader(open(fb, encoding='utf-8'), delimiter='\t', quoting=csv.QUOTE_NONE):
+            if len(r) < 2 or r[0].startswith('?') or qid(r[0]) not in recs:
+                continue
+            rec = recs[qid(r[0])]
+            for part in r[1].strip('"').split('|'):
+                lang, _, label = part.partition(':')
+                if label:
+                    if lang == 'en' and not rec['en']:
+                        rec['en'] = label
+                    rec['names'].setdefault(lang, label)
     return recs
 
 
 def title_of(rec):
-    """English label → the item's own label in a Latin-script language. Never a made-up translation."""
+    """The name to show, and how it was chosen — never a made-up translation:
+      1. the English label (Wikidata's established English name),
+      2. the item's own label in a Latin-script language,
+      3. a romanization by a published standard scheme (Cyrillic, Greek, Georgian — see translit.py),
+      4. the label in its own script.
+    Returns (title, language, basis) with basis 'en' | 'label' | 'romanized: <scheme>' | 'original script';
+    (None, None, None) only if the item has no label at all."""
     if rec['en']:
-        return rec['en'], 'en'
+        return rec['en'], 'en', 'en'
     for lang in NAME_LANGS:
         v = rec['names'].get(lang)
         if v and latin(v):
-            return v, lang
-    return None, None
+            return v, lang, 'label'
+    for lang, v in sorted(rec['names'].items()):
+        if latin(v):
+            return v, lang, 'label'
+    r = translit.romanize(rec['names'])
+    if r:
+        return r[0], r[1], f'romanized: {r[2]}'
+    for lang in OTHER_SCRIPT_LANGS + sorted(rec['names']):
+        v = rec['names'].get(lang)
+        if v:
+            return v, lang, 'original script'
+    return None, None, None
 
 
 def subtype(rec):
@@ -376,15 +409,24 @@ def build(rows_only=False):
     for r in recs.values():
         if r['kind'] in ('city', 'town') or (r['kind'] == 'settlement' and r['q'] in town_q):
             continue
-        title, lang = title_of(r)
+        title, lang, name_basis = title_of(r)
         if not title:
-            skipped['no Latin-script name'] += 1
+            skipped['no label in any language'] += 1
             continue
         g = r.get('gs')
         # Dates: founding / first mention and dissolution as Wikidata records them; Germania Sacra's
         # dated tenure fills a gap Wikidata leaves.
         start = min((x for x in (r['inc'], r['fm']) if x is not None), default=None)
-        basis = 'first mention' if r['fm'] is not None and (r['inc'] is None or r['fm'] <= r['inc']) else 'founded' if start is not None else None
+        # What the start date means. A first written mention (P1249) says only when evidence begins. Wikidata's
+        # "inception" (P571) is a founding or building date for castles, religious houses, cathedrals, bridges and
+        # universities; for settlements it is often a first mention entered as inception, so it is not treated
+        # as a founding there.
+        if r['fm'] is not None and (r['inc'] is None or r['fm'] <= r['inc']):
+            basis = 'first mention'
+        elif start is not None:
+            basis = 'recorded start (Wikidata inception)' if r['kind'] == 'settlement' else 'founded'
+        else:
+            basis = None
         end = r['dis']
         if g and start is None and g['from'] is not None:
             start, basis = g['from'], 'Germania Sacra'
@@ -396,11 +438,13 @@ def build(rows_only=False):
         if end is not None and start is not None and end < start:
             end = None
         st = subtype(r)
-        names = [[v, None, None, k] for k, v in r['names'].items() if v != title and latin(v)][:12]
+        # Every label is kept (the name index finds a place by any of them); Latin-script ones first.
+        labels = sorted(((k, v) for k, v in r['names'].items() if v != title), key=lambda kv: (not latin(kv[1]), kv[0]))
+        names = [[v, None, None, k] for k, v in labels][:16]
         if r['en'] and r['en'] != title:
             names.insert(0, [r['en'], None, None, 'en'])
         related = [[r['dio'], 'in diocese', r['dioN'], 0]] if r['dio'] and r['dioN'] else []
-        extra = {'k': r['kind'], **({'st': st} if st else {}), **({'fb': basis} if basis else {}), **({'nl': lang} if lang != 'en' else {}),
+        extra = {'k': r['kind'], **({'st': st} if st else {}), **({'fb': basis} if basis else {}), **({'nl': lang, 'nb': name_basis} if lang != 'en' else {}),
                  **({'o': r['orders'][:4]} if r['orders'] else {}), **({'gs': g['gsn'], 'go': g['orders'][:6]} if g else {})}
         rows.append(['wikidata', r['q'], title, r['lon'], r['lat'], 1, r['kind'] + (',' + st if st else ''), start, end, 0, names,
                      [r['dioN']] if r['dioN'] else [], related, extra])
@@ -421,6 +465,7 @@ def build(rows_only=False):
             props['gs'] = g['gsn']
         if lang != 'en':
             props['nl'] = lang
+            props['nb'] = name_basis
         sites.append(props | {'_ll': (r['lon'], r['lat'])})
 
     for g in gs_only:
@@ -446,7 +491,7 @@ def build(rows_only=False):
         pops = {y: p for y, p in t['pop'].items()}
         first = min((y for y, p in sorted(pops.items()) if p > 0), default=None)
         names = [[x, None, None, ''] for x in dict.fromkeys([t['city'], *t['syn']]) if x != title][:12]
-        extra = {'k': 'town', **({'tn': 0} if title != t['city'] else {}), **({'fix': 'decimal point restored, confirmed by Wikidata'} if t.get('fixed') else {}),
+        extra = {'k': 'town', **({'fb': 'first mention (Wikidata)'} if t.get('fm') else {}), **({'tn': 0} if title != t['city'] else {}), **({'fix': 'decimal point restored, confirmed by Wikidata'} if t.get('fixed') else {}),
                  **({'fix': f"position from Wikidata; Buringh's coordinates are {t['moved']} km away"} if t.get('moved') else {}), 'pop': {str(y): p for y, p in sorted(pops.items())}, 'est': {str(y): v for y, v in sorted(t['nature'].items())},
                  **({'q': t['q']} if t.get('q') else {}), **({'env': [first, None, 'dataset']} if first is not None and not t.get('fm') else {})}
         bid = f"{t['city']}|{t['lat']:.2f}|{t['lon']:.2f}"

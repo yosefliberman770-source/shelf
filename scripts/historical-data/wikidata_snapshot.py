@@ -51,7 +51,10 @@ KINDS = {
     'city': ('wd:Q515 wd:Q3957', ''),                  # cities and towns of any date: used only to give English names to other sources' towns
     'town': ('wd:Q486972', '?i wdt:P1082 ?pp . FILTER(?pp >= 5000)'),  # any settlement of 5,000+ today (communes, boroughs…), same use
 }
-NAME_LANGS = 'de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl mul'.split()
+# Latin-script languages, then languages in other scripts (kept so that no place is left without its
+# own name; Cyrillic and Greek labels can be romanized by a standard scheme, see atlas-build/translit.py).
+NAME_LANGS = ('de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl mul '
+              'sq tr sr-el sh lb rm fy se hsb ru uk be bg sr mk el ka hy ar he').split()
 
 HEAD = '''PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>

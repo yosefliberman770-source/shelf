@@ -58,32 +58,48 @@ export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
  * its own but inside the period its evidence allows; earlier / later = outside
  * its dates (or period); undated = no temporal evidence at all.
  */
-export type TimeFit = 'within' | 'near' | 'period' | 'earlier' | 'later' | 'undated';
+/**
+ * How a record's dates relate to a year.
+ *   within / near  — its own dates cover the year (near: within the slack)
+ *   period         — no dates of its own, but its evidence period covers the year
+ *   earlier        — recorded only before the year (places usually persist)
+ *   later          — it began after the year: founded, built or created later
+ *   unattested     — its evidence begins after the year (a first mention, an attestation
+ *                    period): it may well have existed, but nothing places it at the year
+ *   undated        — no temporal evidence at all
+ */
+export type TimeFit = 'within' | 'near' | 'period' | 'earlier' | 'later' | 'unattested' | 'undated';
+/** What a record's start date means: when the thing began, or only when evidence for it begins. */
+export type StartKind = 'founded' | 'attested';
 
-export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
+export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envelope; startKind?: StartKind }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
   if (span.from === undefined && span.to === undefined) {
     const e = span.envelope;
     if (!e) return 'undated';
     const lo = e.from ?? opts.window?.[0] ?? -Infinity;
     const hi = e.to ?? opts.window?.[1] ?? Infinity;
-    // No slack: the period is already the widest the evidence allows.
-    return year < lo ? 'later' : year > hi ? 'earlier' : 'period';
+    // No slack: the period is already the widest the evidence allows. Before it, the evidence has
+    // not begun yet — that is not proof the place did not exist.
+    return year < lo ? 'unattested' : year > hi ? 'earlier' : 'period';
   }
   const lo = span.from ?? opts.window?.[0] ?? -Infinity;
   const hi = span.to ?? opts.window?.[1] ?? Infinity;
   if (lo <= year && year <= hi) return 'within';
   const slack = opts.slack ?? 0;
   if (lo - slack <= year && year <= hi + slack) return 'near';
-  return year > hi ? 'earlier' : 'later';
+  if (year > hi) return 'earlier';
+  // Before the start: only a founding / construction date says it did not exist yet.
+  // A first mention or an attestation period says only that the evidence begins later.
+  return span.from !== undefined && span.startKind !== 'founded' ? 'unattested' : 'later';
 }
 
 /** Attested at (or near) the year by its own dates. */
-export const attestedAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
+export const attestedAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope; startKind?: StartKind }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
   const f = timeFit(span, year, opts);
   return f === 'within' || f === 'near';
 };
 /** Can be shown at the year: attested, or inside the period its evidence allows (then shown as approximate). */
-export const eligibleAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
+export const eligibleAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope; startKind?: StartKind }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
   const f = timeFit(span, year, opts);
   return f === 'within' || f === 'near' || f === 'period';
 };

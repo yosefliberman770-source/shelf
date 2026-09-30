@@ -300,8 +300,15 @@ const SITES: [HistYear, HistYear] = [300, 1900];
 function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number }): LayerSpecification[] {
   // Own dates only (founding / first mention → dissolution, as recorded). A site with no recorded date
   // is not evidence it stood in the chosen year: hidden unless the reader includes undated records.
-  const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], existedIn(ctx.year, { undated: ctx.showUndated ? 'show' : 'hide' })] as FilterSpecification;
-  const dated: ExpressionSpecification = ['any', ['has', 'f'], ['has', 't']];
+  // Likewise a site before its first mention: only a founding date says it did not exist yet, so before an
+  // attestation it is "not yet recorded" — shown, hollow, only when the reader includes unevidenced records.
+  const y = ctx.year;
+  const notYetRecorded: ExpressionSpecification = ['all', ['has', 'f'], ['>', ['get', 'f'], y], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'],
+    ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]];
+  const when = existedIn(y, { undated: ctx.showUndated ? 'show' : 'hide' });
+  const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], ctx.showUndated ? ['any', when, notYetRecorded] : when] as FilterSpecification;
+  // Solid only where its own dates place it at the year.
+  const dated: ExpressionSpecification = ['all', ['any', ['has', 'f'], ['has', 't']], ['any', ['!', ['has', 'f']], ['<=', ['get', 'f'], y]]];
   return [
     { id: `${id}-pt`, type: 'circle', source: 'medieval-sites', 'source-layer': 'sites', filter, paint: {
       'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],

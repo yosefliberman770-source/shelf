@@ -652,8 +652,8 @@
  },
  "wikidata-medieval/original/battle.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/battle.names.rq)",
-  "bytes": 393312,
-  "sha256": "36529a100c8b41e26ca9f7c4de54b223c3283d1c2e43a0b387881a9a91bcf8b4",
+  "bytes": 593671,
+  "sha256": "2420394e182814442c84f3b5b819030bef8876c076c1203cb951c077bf4ca911",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/battle.tsv": {
@@ -664,8 +664,8 @@
  },
  "wikidata-medieval/original/bridge.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/bridge.names.rq)",
-  "bytes": 35606,
-  "sha256": "b7bc2d18aa43d445c8f01fa7ecfdc83df001c8bf5961e9e3482e784c2e0dc652",
+  "bytes": 46242,
+  "sha256": "0df8ec5617b450c3b78c3121bc96e26b1d5e3c4b10967b5c091e809c021df940",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/bridge.tsv": {
@@ -676,8 +676,8 @@
  },
  "wikidata-medieval/original/castle.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/castle.names.rq)",
-  "bytes": 2727959,
-  "sha256": "20c6a3340db1d5a6ec40ac0b309cd900b8499fb45848f50bffc2995fb6f07e83",
+  "bytes": 3286357,
+  "sha256": "755e5b77f1216718e9f24be0e727f94e9152c6fafde374f36b22edb49a4e74c7",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/castle.tsv": {
@@ -688,8 +688,8 @@
  },
  "wikidata-medieval/original/cathedral.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/cathedral.names.rq)",
-  "bytes": 488446,
-  "sha256": "ef304f54af55abca773a35d27fba679267af4ff70eca20c979d1106dca05e92a",
+  "bytes": 736964,
+  "sha256": "02b315752955c2fdeb91248f1c09cbd8da9c0035fc235f6538384fe3f6bc4fab",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/cathedral.tsv": {
@@ -700,8 +700,8 @@
  },
  "wikidata-medieval/original/city.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/city.names.rq)",
-  "bytes": 4618293,
-  "sha256": "6095571aa9552d66e4507a14c7b5d1846b16ef0bdee8eb0335bbb1862b06ff40",
+  "bytes": 6837534,
+  "sha256": "9a290bcabd002aecf250cbb3e0073574ffbe5d114819241fcbefe6348e220522",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/city.tsv": {
@@ -712,8 +712,8 @@
  },
  "wikidata-medieval/original/diocese.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/diocese.names.rq)",
-  "bytes": 215514,
-  "sha256": "e2d99c7d1695202986b9844dafd54a7e31a4b54bb9a2eb9d5855cf5adc620ed6",
+  "bytes": 277746,
+  "sha256": "5941170caaf9d3e9ff7ab739e0e3fb14b8a6ddc8498cd40481c78ba48516bea2",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/diocese.tsv": {
@@ -722,10 +722,16 @@
   "sha256": "e37183083e58187a15eade98cde9d827f88f76ae25cca154630d54bca51a9107",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/fallback.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/fallback.names.rq)",
+  "bytes": 8758,
+  "sha256": "d324ca3d2c56845eac3f7122a1373d1d8d6fb3e28a9c585dbd3593287728bb8c",
+  "downloaded": "2026-09-30"
+ },
  "wikidata-medieval/original/fortification.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/fortification.names.rq)",
-  "bytes": 564902,
-  "sha256": "9b044a0b7e65366391abeb5456f913da1a4bb6d310854787a279992162250850",
+  "bytes": 724948,
+  "sha256": "33407df310a66851751a8d800c6fb800411541f78a9b88f9af9728a2692a90e6",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/fortification.tsv": {
@@ -742,8 +748,8 @@
  },
  "wikidata-medieval/original/monastery.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/monastery.names.rq)",
-  "bytes": 1879551,
-  "sha256": "d45c59f9f7aa67488fbd926ca7acbcbcf4788770450e50b981e20df75a6fa05f",
+  "bytes": 2473992,
+  "sha256": "57f0ad964c303bc12a88c9c0eb2b2556f13ba49274868f35bfa9ed9581c6893b",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/monastery.tsv": {
@@ -754,8 +760,8 @@
  },
  "wikidata-medieval/original/settlement.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/settlement.names.rq)",
-  "bytes": 3824665,
-  "sha256": "9aee76c806cfd0f569cfa97a4374f2fbfaf68cbfae7b15a3decaf9c38bd3e1cc",
+  "bytes": 5461892,
+  "sha256": "4d4833b64de7dfb810feedfdf20130d0e42b4a5caaee0930fd0c24dfc171aabe",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/settlement.tsv": {
@@ -766,8 +772,8 @@
  },
  "wikidata-medieval/original/siege.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/siege.names.rq)",
-  "bytes": 194118,
-  "sha256": "1d515ab109526db866fdf19d5c053d0f1418b3559914a89a81563f006a1d5597",
+  "bytes": 276962,
+  "sha256": "805a5f9d0b189b681fdcbd07179fd2fdebacda2626eef62b2e24b491c0ab4413",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/siege.tsv": {
@@ -778,8 +784,8 @@
  },
  "wikidata-medieval/original/town.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/town.names.rq)",
-  "bytes": 5037755,
-  "sha256": "987bec65c6d3dfef8511b3b7c761d51b27162109be6040c7759ebf3647581c54",
+  "bytes": 7625491,
+  "sha256": "553ffc1b15ae30e5f0061aca7b275f32e8fe9bf25584b22178f53c638002d6ad",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/town.tsv": {
@@ -790,8 +796,8 @@
  },
  "wikidata-medieval/original/university.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/university.names.rq)",
-  "bytes": 70098,
-  "sha256": "912f77a97dd4f43bdad7bd8b8cff5d429e5d181b3fc409d2cd5927e16656b637",
+  "bytes": 121655,
+  "sha256": "493b09bddbc3930e7008f366cd31abb29033c4dcf52d1e7e4e4106c1d1ab0008",
   "downloaded": "2026-09-30"
  },
  "wikidata-medieval/original/university.tsv": {
