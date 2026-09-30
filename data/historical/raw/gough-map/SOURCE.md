@@ -7,8 +7,8 @@
 - **Licence:** Creative Commons Attribution 4.0 International (CC BY 4.0) — https://creativecommons.org/licenses/by/4.0/ (see LICENSE.md)
 - **Geographic coverage:** England and Wales (Great Britain as drawn on the Gough Map).
 - **Historical date range:** The Gough Map (c. 14th–15th century), with routes matched to Roman, medieval and post-medieval evidence.
-- **Download date:** not yet downloaded
-- **Total size:** 0 bytes in 0 files
+- **Download date:** 2026-09-30
+- **Total size:** 129.8 KB in 3 files
 
 ## What it contains
 
@@ -20,8 +20,11 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 
 | File | Size | In git | Download URL | SHA-256 |
 | --- | --- | --- | --- | --- |
+| `original/Gough_Map_website_intro.pdf` | 113.3 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf | `7cad8ed9bd9101d9ebbacc006d2a9cb3384418f6c34598be0f2e7649243b30a0` |
+| `original/gough_red_lines.zip` | 9.2 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip | `0f31837dd1cbd87487380063802de9db3d303d870003eaef874a825bcc02a397` |
+| `original/gough_way_stations.zip` | 7.3 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip | `0dca818e95c7f860d7a87b5832afd8f4c4b2b7d9dd4f11b879f6c477491848dc` |
 
-**Not yet downloaded:** `original/Gough_Map_general_guide.pdf`, `original/Gough_Map_image.pdf`, `original/Gough_Map_website_image.png`, `original/Gough_Map_website_intro.pdf`, `original/gough_red_lines.zip`, `original/gough_routes.zip`, `original/gough_way_stations.zip`
+**Not yet downloaded:** `original/Gough_Map_general_guide.pdf`, `original/Gough_Map_image.pdf`, `original/Gough_Map_website_image.png`, `original/gough_routes.zip`
 
 ## How to cite
 

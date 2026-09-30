@@ -101,6 +101,30 @@
   "sha256": "a175866ebfbcedd59072224235ea907fb295d24087bb2c57f1bbb6efcd4000a9",
   "downloaded": "2026-09-29"
  },
+ "domesday/original/LoG_GeneralGuide.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf",
+  "bytes": 220483,
+  "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
+  "downloaded": "2026-09-30"
+ },
+ "gough-map/original/Gough_Map_website_intro.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
+  "bytes": 116046,
+  "sha256": "7cad8ed9bd9101d9ebbacc006d2a9cb3384418f6c34598be0f2e7649243b30a0",
+  "downloaded": "2026-09-30"
+ },
+ "gough-map/original/gough_red_lines.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_red_lines.zip",
+  "bytes": 9469,
+  "sha256": "0f31837dd1cbd87487380063802de9db3d303d870003eaef874a825bcc02a397",
+  "downloaded": "2026-09-30"
+ },
+ "gough-map/original/gough_way_stations.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/gough_way_stations.zip",
+  "bytes": 7439,
+  "sha256": "0dca818e95c7f860d7a87b5832afd8f4c4b2b7d9dd4f11b879f6c477491848dc",
+  "downloaded": "2026-09-30"
+ },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
   "bytes": 630784,
@@ -153,6 +177,12 @@
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
   "bytes": 22841,
   "sha256": "66b01e2db6b37a8e03370158868e6a01a0567ee4a765fc60e16e919cba16797a",
+  "downloaded": "2026-09-30"
+ },
+ "inland-navigation/original/pdf/general_guide.pdf": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf",
+  "bytes": 250611,
+  "sha256": "a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327",
   "downloaded": "2026-09-30"
  },
  "itinere/nightly-export/route-segments.ndjson": {

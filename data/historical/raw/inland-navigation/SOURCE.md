@@ -8,7 +8,7 @@
 - **Geographic coverage:** England and Wales.
 - **Historical date range:** 11th century to 1348.
 - **Download date:** 2026-09-29, 2026-09-30
-- **Total size:** 82.7 KB in 2 files
+- **Total size:** 327.4 KB in 3 files
 
 ## What it contains
 
@@ -22,8 +22,9 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 | --- | --- | --- | --- | --- |
 | `original/gis/heads_of_navigation.zip` | 60.4 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/heads_of_navigation.zip | `16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303` |
 | `original/gis/pn_river_traffic.zip` | 22.3 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip | `66b01e2db6b37a8e03370158868e6a01a0567ee4a765fc60e16e919cba16797a` |
+| `original/pdf/general_guide.pdf` | 244.7 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/pdf/general_guide.pdf | `a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327` |
 
-**Not yet downloaded:** `original/gis/direct_evidence.zip`, `original/gis/indirect_evidence.zip`, `original/pdf/general_guide.pdf`, `original/png/inland_navigation.png`
+**Not yet downloaded:** `original/gis/direct_evidence.zip`, `original/gis/indirect_evidence.zip`, `original/png/inland_navigation.png`
 
 ## How to cite
 

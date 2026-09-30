@@ -7,8 +7,8 @@
 - **Licence:** Creative Commons Attribution 4.0 International (CC BY 4.0) — https://creativecommons.org/licenses/by/4.0/ (see LICENSE.md)
 - **Geographic coverage:** England and parts of Wales.
 - **Historical date range:** AD 1086 (as recorded in Domesday Book).
-- **Download date:** not yet downloaded
-- **Total size:** 0 bytes in 0 files
+- **Download date:** 2026-09-30
+- **Total size:** 215.3 KB in 1 files
 
 ## What it contains
 
@@ -20,8 +20,9 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 
 | File | Size | In git | Download URL | SHA-256 |
 | --- | --- | --- | --- | --- |
+| `original/LoG_GeneralGuide.pdf` | 215.3 KB | yes | https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3676-1/dissemination/LoG_GeneralGuide.pdf | `ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390` |
 
-**Not yet downloaded:** `original/DBhundreds.zip`, `original/DBinter.zip`, `original/DBshires.zip`, `original/LoG_GeneralGuide.pdf`
+**Not yet downloaded:** `original/DBhundreds.zip`, `original/DBinter.zip`, `original/DBshires.zip`
 
 ## How to cite
 
