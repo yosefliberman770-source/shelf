@@ -85,9 +85,15 @@ def domesday():
         feats.append((g, props(k='inter', n=txt(r.get('LAYER')), c=txt(r.get('County_1'))), 5))
     for g, r in read(os.path.join(d, 'DBhundreds.zip'), 'DBhundreds'):
         feats.append((g, props(k='hundred', n=txt(r.get('LAYER')), c=txt(r.get('County_1')), i=txt(r.get('TerrID'))), 6))
+    # One label point per unit (inside its largest piece), so names aren't repeated on every polygon part or tile.
+    for g, pr, mz in list(feats):
+        geo = shape(g)
+        if geo.geom_type == 'MultiPolygon':
+            geo = max(geo.geoms, key=lambda x: x.area)
+        feats.append((mapping(geo.representative_point()), {**pr, 'k': f"{pr['k']}-label"}, mz))
     n = tiler.build(os.path.join(OUT, 'domesday.pmtiles'), 'units', feats, 10, 'Domesday shires and hundreds (1086)',
                     'Brookes, S. (2020) Domesday Shires and Hundreds of England, ADS, doi:10.5284/1058999 (CC BY 4.0)')
-    return {'tiles': n, 'features': {k: sum(1 for f in feats if f[1]['k'] == k) for k in ('shire', 'inter', 'hundred')}}
+    return {'tiles': n, 'features': {k: sum(1 for f in feats if f[1]['k'] == k) for k in ('shire', 'inter', 'hundred')}}  # plus one label point each
 
 
 # ── The Routes and Roads of the Gough Map (Oksanen & Brookes 2024) ─────────

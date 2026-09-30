@@ -30,7 +30,7 @@ The reader never talks to WHG directly. It uses `historicalPlaces` (the service)
 
 | Variable | Purpose |
 |---|---|
-| `WHG_API_TOKEN` | World Historical Gazetteer API token. Never sent to the browser. |
+| `WHG_API_TOKEN` | World Historical Gazetteer API token (from your WHG profile page). Used only by the server for the Reconciliation API (v0.2) and its data extension (dates, names); never sent to the browser. Without it the app uses WHG's public index search. |
 | `WHG_USER_AGENT` | Optional User-Agent identifying your app to WHG. |
 | `SHELF_ALLOWED_ORIGINS` | Comma-separated origins (e.g. your GitHub Pages site) allowed to call the server. |
 

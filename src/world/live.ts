@@ -3,7 +3,7 @@
 // cache period). A source that can't be reached says "unavailable" — it is
 // never read as "nothing existed".
 import { db } from '../db/db';
-import { type HistYear, yearLabel } from '../atlas/time';
+import type { HistYear } from '../atlas/time';
 import { fromIsoRange, fromTgaz, type HistDate } from './histdate';
 
 const DAY = 86_400_000;
@@ -56,26 +56,4 @@ export async function histogisWhereWas(lat: number, lon: number, year: HistYear,
   })).sort((a, b) => (b.areaKm2 ?? 0) - (a.areaKm2 ?? 0));
 }
 
-// ── World Historical Gazetteer (cross-checking) ───────────────────────────
-
-export interface WhgRecord { title: string; dataset: string; placeId: string; lon?: number; lat?: number; timespans: [number, number][]; variants: string[]; parent: boolean; ccodes: string[] }
-
-/** Records WHG holds for a name, from all its contributing datasets. */
-export async function whgIndex(name: string, signal?: AbortSignal): Promise<WhgRecord[]> {
-  const d = await cachedJSON<{ features?: { geometry?: { type: string; coordinates?: unknown; geometries?: { type: string; coordinates: unknown }[] }; properties: Record<string, unknown> }[] }>(`https://whgazetteer.org/api/index/?name=${encodeURIComponent(name)}`, 30, signal);
-  const point = (g?: { type: string; coordinates?: unknown; geometries?: { type: string; coordinates: unknown }[] }): [number, number] | undefined => {
-    if (!g) return undefined;
-    if (g.type === 'Point') return g.coordinates as [number, number];
-    const p = g.geometries?.find((x) => x.type === 'Point');
-    return p ? (p.coordinates as [number, number]) : undefined;
-  };
-  const list = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : typeof v === 'string' ? (v.match(/'([^']*)'/g) ?? []).map((x) => x.slice(1, -1)) : []);
-  return (d.features ?? []).map((f) => {
-    const p = f.properties;
-    const pt = point(f.geometry);
-    const spans = Array.isArray(p.timespans) ? (p.timespans as { gte: number; lte: number }[]).map((t) => [t.gte, t.lte] as [number, number]) : typeof p.timespans === 'string' ? [...p.timespans.matchAll(/'gte': (-?\d+), 'lte': (-?\d+)/g)].map((m) => [Number(m[1]), Number(m[2])] as [number, number]) : [];
-    return { title: String(p.title ?? ''), dataset: String(p.dataset ?? ''), placeId: String(p.place_id ?? p.index_id ?? ''), lon: pt?.[0], lat: pt?.[1], timespans: spans, variants: list(p.variants).slice(0, 12), parent: p.index_role === 'parent', ccodes: list(p.ccodes).filter(Boolean) };
-  });
-}
-
-export const spanLabel = (s: [number, number]) => `${yearLabel(s[0] || 1)}–${yearLabel(s[1] || 1)}`;
+// World Historical Gazetteer lookups live in ./whg.ts (one client, one cache, provenance kept).

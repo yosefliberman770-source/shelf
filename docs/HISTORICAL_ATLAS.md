@@ -43,6 +43,10 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | Military | Military movements | none | Shown as unavailable: no open dataset of dated troop movements exists. |
 | Economic & cultural | Trade routes | none | Shown as unavailable: no open, dated, scholarly route dataset suits this map. |
 | Economic & cultural | Markets, religious sites, theatres/stadia | Pleiades | |
+| Political | Domesday shires & hundreds (1086) | Domesday Shires and Hundreds (Brookes 2020, ADS) | Shown 1066–1106, always as the 1086 arrangement. |
+| Infrastructure | Gough Map routes (c. 1400) | Routes and Roads of the Gough Map (Oksanen & Brookes 2024, ADS) | Way stations, schematic red lines, matched routes; 1350–1450. |
+| Infrastructure | Navigable rivers before 1348 | Inland Navigation GIS (Oksanen 2019, ADS) | Direct vs place-name evidence, heads of navigation; 1000–1348. |
+| Places | Rural settlement provinces (England) | Atlas of Rural Settlement (English Heritage) | Disabled in the public build: its terms allow personal use only. Local builds: `VITE_SHELF_LOCAL_DATA=1`. |
 
 ## Licences and attribution
 
@@ -55,6 +59,9 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Natural Earth](https://www.naturalearthdata.com/) | Public domain |
 | [OpenHistoricalMap](https://www.openhistoricalmap.org/) (tiles and fonts) | CC0 |
 | [Terrain Tiles](https://github.com/tilezen/joerd/blob/master/docs/attribution.md) | Various; see the linked page |
+| [Domesday Shires and Hundreds](https://doi.org/10.5284/1058999), [Gough Map GIS](https://doi.org/10.5284/1124312), [Inland Navigation GIS](https://doi.org/10.5284/1057497) (ADS) | CC BY 4.0 |
+| [Atlas of Rural Settlement in England GIS](https://doi.org/10.5284/1031493) | © English Heritage; personal and business use — not republished |
+| [World Historical Gazetteer](https://whgazetteer.org/) (queried, not downloaded) | Index CC BY-NC 4.0; each source its own licence |
 
 Attribution for datasets appears in three places:
 
@@ -130,12 +137,15 @@ is used offline, fetched live, only catalogued, or excluded — is in
 | `src/world/coverage.ts` | The coverage matrix (region × period × data type) built from the registry. |
 | `src/world/select.ts` | Picks the best usable source for a place, date and data type, and names better sources that can't be used. |
 | `src/world/evidence.ts` | Evidence labels and the "why is this empty?" explanation. An empty result is never presented as proof that nothing existed. |
-| `src/world/live.ts` | Live lookups (CHGIS/TGAZ, HistoGIS, World Historical Gazetteer), cached in IndexedDB. Failures are not cached. No keys are used or stored. |
-| `src/world/crosscheck.ts` | Compares a place with other gazetteers and shows agreements and disagreements side by side. |
+| `src/world/live.ts` | Live lookups (CHGIS/TGAZ, HistoGIS), cached in IndexedDB. Failures are not cached. No keys are used or stored. |
+| `src/world/whg.ts` | World Historical Gazetteer as an external reconciliation source: the Reconciliation API through Shelf's server (token stays there) or the public index; batching, device cache, time-outs, rate limits; every record keeps its id, source, names, dates, type, licence and links. |
+| `src/world/placeEvidence.ts` | Weighs every source together for a name: groups records at the same spot, counts independent sources, checks names and dates against the year, and says who identifies it as what, where they agree or differ, and how sure the result is. |
+| `src/world/crosscheck.ts` | CHGIS cross-check for Chinese places. |
 | `src/world/changes.ts` | "What changed?" between two dates at one place. |
 | `src/world/maps.ts` | The historical map archive: Library of Congress, David Rumsey, and georeferenced maps from Allmaps. Original maps are kept apart from reconstructions. |
 | `src/world/bookWorld.ts` | "The world of this book": reads the book section by section in the background, collects places, dates, wars and events with their positions in the text, and resolves them. |
 | `scripts/atlas-build/world.py`, `tiler.py` | Build the tiled place index and the vector tiles. |
+| `scripts/atlas-build/england.py` | Domesday, Gough Map, inland navigation and rural-settlement tiles, read from the original ZIPs in `data/historical/raw/`. |
 
 ### Performance
 
@@ -145,6 +155,16 @@ index (`places/i/`); only the cells in view or near a place are fetched, and
 recently used cells stay in memory. Dense layers (Pleiades, Itiner-e, Viabundus,
 al‑Ṯurayyā) are PMTiles vector tiles, so the map only requests the tiles for the
 current view and zoom. The service worker keeps what was fetched for offline use.
+
+### Combining evidence for a place
+
+Shelf doesn't take whichever database answers first. For a name read in a book it gathers every record that could
+be the place — Pleiades, Viabundus, al‑Ṯurayyā offline, and the World Historical Gazetteer online — and weighs them
+together (`placeEvidence.ts`). The place card's "How sure is this?" then says, for example: Pleiades identifies
+this as Capua; WHG has four attestations at the same spot from three other sources; these sources agree; another
+source gives a different identification 140 km away; for 216 BCE only one of them fits the date. WHG records are
+candidate evidence: they can make an ambiguous offline match "likely", never certain, and a clear offline match
+never waits for them. A source with no record is reported as silent, never as proof the place didn't exist.
 
 ### Old maps over the modern map
 
@@ -157,6 +177,7 @@ allows. Placement is approximate: it is only as good as the georeference.
 ### Limits
 
 - Allmaps coverage varies a lot by place; many regions have no georeferenced maps.
-- GB1900, DAMAST, CShapes, HGIS de las Indias, the NLS map layers and Old Maps Online are catalogued but not used. CShapes is non-commercial only.
+- DAMAST, CShapes, HGIS de las Indias, the NLS map layers and Old Maps Online are catalogued but not used. CShapes is non-commercial only. GB1900 is skipped for now.
+- The Atlas of Rural Settlement is in local builds only (its terms don't allow republishing).
 - In "What changed?", roads and routes are shown on the map only, not listed.
 - Live sources (maps, CHGIS, HistoGIS, World Historical Gazetteer) need an internet connection.

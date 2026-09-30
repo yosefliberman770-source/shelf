@@ -526,7 +526,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'thurayya-routes':
       return { title: 'Route section', lines: [num('m') ? `${Math.round(num('m')! / 1000)} km` : '', 'Period: 9th–10th c. (Cornu’s atlas)'].filter(Boolean), source: credit('althurayya') };
     case 'domesday': {
-      const k = str('k');
+      const k = str('k')?.replace(/-label$/, '');
       return {
         title: str('n') ?? 'Domesday unit', lines: [k === 'shire' ? 'Shire' : k === 'inter' ? `Intermediate district${str('c') ? ` · ${str('c')}` : ''}` : `Hundred / wapentake${str('c') ? ` · ${str('c')}` : ''}${str('i') ? ` (${str('i')})` : ''}`, 'As recorded in Domesday Book, 1086'],
         link: { href: 'https://doi.org/10.5284/1058999', label: 'Dataset (ADS) ↗' }, source: credit('domesday'),

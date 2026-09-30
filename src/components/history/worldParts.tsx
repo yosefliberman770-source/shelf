@@ -10,11 +10,12 @@ import { type HistYear, yearLabel } from '../../atlas/time';
 import { DATA_TYPES, type DataType, PERIODS, periodLabel, QUALITY_LABEL, QUALITY_MARK, regionAt, regionLabel } from '../../world/axes';
 import type { BookWorldRow } from '../../db/types';
 import { cellAt, cell } from '../../world/coverage';
-import { crossCheck, type CrossCheck, chgisFor } from '../../world/crosscheck';
+import { chgisFor } from '../../world/crosscheck';
+import { assessPlace, type Claim, type PlaceEvidence } from '../../world/placeEvidence';
 import { whatChanged, type WhatChanged } from '../../world/changes';
 import { EVIDENCE, explainEmpty } from '../../world/evidence';
 import { formatDate } from '../../world/histdate';
-import { type ChgisPlace, type HistogisUnit, histogisWhereWas, spanLabel } from '../../world/live';
+import { type ChgisPlace, type HistogisUnit, histogisWhereWas } from '../../world/live';
 import { findGeoref, type HistMap, imageLimits, mapDateLabel, type Overlay, overlayFor, searchMaps, viewerUrl } from '../../world/maps';
 import { SOURCES, TIER_LABEL } from '../../world/registry';
 import { selectSources } from '../../world/select';
@@ -298,20 +299,25 @@ export function WhatChangedPanel({ at, year, onShow }: { at?: { name: string; la
 export function PlaceWorldExtras({ place, year, onOpenMaps, onOpenPlace }: { place: ReaderPlace; year: HistYear; onOpenMaps: () => void; onOpenPlace: (key: string, name: string) => void }) {
   const [hg, setHg] = useState<HistogisUnit[] | null>(null);
   const [cg, setCg] = useState<ChgisPlace[] | null>(null);
-  const [cc, setCc] = useState<CrossCheck | null>(null);
+  const [ev, setEv] = useState<PlaceEvidence | null>(null);
   const [near, setNear] = useState<{ key: string; title: string; km: number }[] | null>(null);
   const [ai, setAi] = useState<{ text?: string; busy?: boolean; error?: string } | null>(null);
   useEffect(() => {
     const c = new AbortController();
-    setHg(null); setCg(null); setCc(null); setNear(null); setAi(null);
+    setHg(null); setCg(null); setEv(null); setNear(null); setAi(null);
     histogisWhereWas(place.lat, place.lon, year, c.signal).then(setHg).catch(() => setHg([]));
     chgisFor(place, year, c.signal).then(setCg).catch(() => setCg([]));
-    crossCheck(place, c.signal).then(setCc).catch(() => {});
+    // All sources weighed together (offline gazetteers + World Historical Gazetteer, cached on the device).
+    if (place.assessment && place.assessment.year === year) setEv(place.assessment);
+    else assessPlace(place.written || place.title, { year, signal: c.signal }).then(setEv).catch(() => {});
     nearbyPlaces([place.lon, place.lat], 25, { year, slack: 50, exclude: place.key, filter: (p) => p.title !== 'Untitled' && p.precise }).then((n) => setNear(n.slice(0, 6).map((x) => ({ key: x.place.key, title: x.place.title, km: x.km })))).catch(() => setNear([]));
     return () => c.abort();
   }, [place.key, year]); // eslint-disable-line react-hooks/exhaustive-deps
   const modern = place.names.filter((n) => (n.from ?? -Infinity) >= 1700 && n.name.toLowerCase() !== place.title.toLowerCase()).map((n) => n.name);
-  const disagreements = [...(place.disagreements ?? []), ...(cc?.disagreements ?? [])];
+  const same = ev?.clusters.find((k) => Math.abs(k.lat - place.lat) < 0.25 && Math.abs(k.lon - place.lon) < 0.25);
+  const whgHere = (same?.claims ?? []).filter((x) => x.kind === 'whg');
+  const aka = [...new Set(whgHere.map((x) => x.title))].filter((t) => t.toLowerCase() !== place.title.toLowerCase() && t.toLowerCase() !== place.written.toLowerCase()).slice(0, 3);
+  const disagreements = [...(place.disagreements ?? []), ...(place.assessment ? [] : ev?.disagreements ?? [])].filter((d, i, all) => all.findIndex((x) => JSON.stringify(x.claims) === JSON.stringify(d.claims)) === i);
   const cov = cellAt(place.lon, place.lat, year, 'places');
   const ask = async () => {
     setAi({ busy: true });
@@ -327,11 +333,11 @@ export function PlaceWorldExtras({ place, year, onOpenMaps, onOpenPlace }: { pla
       <b className="small">More about {place.title}</b>
       <dl className="hmap-facts" style={{ margin: 0 }}>
         {modern.length > 0 && <><dt>Modern name</dt><dd>{modern.slice(0, 3).join(', ')} <span className="tiny faint">({place.sources[0]?.name})</span></dd></>}
-        {cc && cc.agreeing[0]?.parent && cc.agreeing[0].title.toLowerCase() !== place.title.toLowerCase() && <><dt>Also known as</dt><dd>{cc.agreeing[0].title} <span className="tiny faint">(WHG)</span></dd></>}
+        {aka.length > 0 && <><dt>Also recorded as</dt><dd>{aka.join(', ')} <span className="tiny faint">(World Historical Gazetteer)</span></dd></>}
         {hg && hg.length > 0 && <><dt>Political & administrative ({yearLabel(year)})</dt><dd>{hg.map((u) => `${u.altName ?? u.name}${u.unit ? ` (${u.unit})` : ''}`).join(' · ')} <span className="tiny faint">(HistoGIS — {[...new Set(hg.map((u) => u.source))].join('; ')}; valid {formatDate(hg[0].when)})</span></dd></>}
         {cg && cg.length > 0 && <><dt>Chinese administrative records</dt><dd>{cg.slice(0, 4).map((r) => `${r.name} ${r.transcription} (${r.type ?? ''}${r.parent ? `, under ${r.parent}` : ''}; ${formatDate(r.when)})`).join(' · ')} <span className="tiny faint">(CHGIS)</span></dd></>}
         {near && near.length > 0 && <><dt>Nearby places then</dt><dd>{near.map((n, i) => <span key={n.key}>{i ? ', ' : ''}<button className="why-link" onClick={() => onOpenPlace(n.key, n.title)}>{n.title}</button> <span className="tiny faint">{Math.round(n.km / 1.609)} mi</span></span>)}</dd></>}
-        <dt>Evidence</dt><dd>{EVIDENCE[place.evidence ?? 'single-source'].label} — {EVIDENCE[place.evidence ?? 'single-source'].text}{cc && cc.agreeing.length ? ` WHG holds ${cc.agreeing.length} record${cc.agreeing.length === 1 ? '' : 's'} at the same spot (${[...new Set(cc.agreeing.map((r) => r.dataset))].slice(0, 4).join(', ')}).` : ''}</dd>
+        {(() => { const kind = same && same.families.length >= 2 && place.evidence === 'single-source' ? 'confirmed' : place.evidence ?? 'single-source'; return <><dt>Evidence</dt><dd>{EVIDENCE[kind].label} — {EVIDENCE[kind].text}{same && same.families.length >= 2 ? ` ${same.families.length} independent sources place it here.` : ''}</dd></>; })()}
         <dt>Data coverage</dt><dd>{QUALITY_MARK[cov.inShelf]} {QUALITY_LABEL[cov.inShelf]} for places in {regionLabel(cov.region)}, {periodLabel(cov.period)}{cov.exists !== cov.inShelf ? ` (better data exists: ${cov.sources.find((s) => s.access === 'catalogued')?.name})` : ''}.</dd>
       </dl>
       {disagreements.length > 0 && (
@@ -346,19 +352,46 @@ export function PlaceWorldExtras({ place, year, onOpenMaps, onOpenPlace }: { pla
           <div className="tiny faint mt-4">Both are shown; Shelf doesn’t average or pick one.</div>
         </div>
       )}
-      {cc?.error && <div className="tiny faint">{cc.error}</div>}
+      {ev ? <EvidencePanel ev={ev} /> : <div className="tiny faint">Weighing the sources…</div>}
       <div className="row wrap gap-4">
         <button className="btn sm" onClick={onOpenMaps}>🗺 Historical maps of {place.title}</button>
         <button className="btn sm ghost" onClick={ask} disabled={ai?.busy}>{ai?.busy ? 'Asking…' : '✨ Why was it significant? (AI)'}</button>
       </div>
       {ai?.text && <div className="atlas-ai"><div className="tiny" style={{ fontWeight: 800 }}>AI interpretation — not a historical source</div><div className="small" style={{ whiteSpace: 'pre-wrap' }}>{ai.text}</div><div className="tiny faint">Generated from the sourced facts above plus the AI’s general knowledge. Check important claims.</div></div>}
       {ai?.error && <div className="tiny faint">{ai.error}</div>}
-      {cc && cc.agreeing.length > 0 && (
+    </div>
+  );
+}
+
+// ── Evidence from all sources ─────────────────────────────────────────────
+
+const CONF_LABEL: Record<PlaceEvidence['confidence'], string> = { strong: 'Strong', moderate: 'Moderate', weak: 'Weak', none: '—' };
+const STATUS_LABEL: Record<PlaceEvidence['status'], string> = { identified: 'Identified', ambiguous: 'Not settled — several candidates', 'date-conflict': 'No candidate fits the date', 'no-evidence': 'No located record' };
+const spans = (c: Claim) => (c.spans.length ? c.spans.slice(0, 3).map(([a, b]) => `${a <= -99999 ? '?' : yearLabel(a)}–${b >= 99999 ? '?' : yearLabel(b)}`).join(', ') + (c.periodOnly ? ' (dataset period)' : '') : 'no dates');
+const FIT: Record<Claim['dateFit'], string> = { within: 'fits the date', possible: 'may fit the date', unknown: 'undated', outside: 'outside the date' };
+
+/** What every source says about this name, weighed together — never one database's answer on its own. */
+export function EvidencePanel({ ev }: { ev: PlaceEvidence }) {
+  const all = [...ev.clusters.flatMap((c, i) => c.claims.map((x) => ({ x, group: i }))), ...ev.unlocated.map((x) => ({ x, group: -1 }))];
+  return (
+    <div className="col gap-4">
+      <div className="small"><b>How sure is this?</b> {STATUS_LABEL[ev.status]}{ev.status === 'identified' ? ` · confidence ${CONF_LABEL[ev.confidence].toLowerCase()}` : ''}</div>
+      <ul className="tiny" style={{ margin: 0, paddingLeft: 18 }}>{ev.statements.map((t, i) => <li key={i}>{t}</li>)}</ul>
+      {all.length > 0 && (
         <details className="atlas-src">
-          <summary>Other records of this place (World Historical Gazetteer)</summary>
-          <ul>{cc.agreeing.slice(0, 10).map((r) => <li key={r.placeId}>{r.title} <span className="faint">· {r.dataset}{r.timespans.length ? ` · ${r.timespans.map(spanLabel).join(', ')}` : ''} · {r.km < 1 ? '<1' : Math.round(r.km)} km</span></li>)}</ul>
+          <summary>Every record ({all.length}) — sources, dates, licences</summary>
+          <ul>
+            {all.slice(0, 40).map(({ x, group }) => (
+              <li key={`${x.source}:${x.id}`}>
+                {group >= 0 && ev.clusters.length > 1 ? <span className="faint">[{group === 0 ? 'best' : `alt ${group}`}] </span> : null}
+                <b>{x.title}</b> <span className="faint">· {x.source}{x.restricted ? ' · data withheld (source forbids redistribution)' : ` · ${spans(x)} · ${FIT[x.dateFit]}`}{x.lat !== undefined && !x.restricted ? ` · ${x.lat.toFixed(3)}, ${x.lon!.toFixed(3)}` : x.restricted ? '' : ' · no location'}{x.licence ? ` · ${x.licence}` : ''}</span>
+                {x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">record ↗</a></>}
+              </li>
+            ))}
+          </ul>
         </details>
       )}
+      {ev.whg && <div className="tiny faint">World Historical Gazetteer: {ev.whg.api}; {ev.whg.status === 'ok' ? `consulted ${ev.whg.accessed.slice(0, 10)}${ev.whg.fromCache ? ' (saved copy on this device)' : ''}` : ev.whg.status === 'not-configured' ? 'not configured' : 'unavailable'}. WHG’s index is CC BY-NC 4.0; each source keeps its own licence.</div>}
     </div>
   );
 }

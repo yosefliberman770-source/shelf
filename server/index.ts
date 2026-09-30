@@ -79,10 +79,10 @@ async function handleHistorical(req: IncomingMessage, res: ServerResponse, url: 
   try {
     if (url.pathname === '/api/historical/status' && req.method === 'GET') return send(res, 200, { whg: whgConfigured() });
     if (url.pathname === '/api/historical/place-search' && req.method === 'POST') {
-      const body = (await readJson(req)) as { queries?: SearchQuery[] };
+      const body = (await readJson(req)) as { queries?: SearchQuery[]; temporal?: boolean };
       const n = Array.isArray(body.queries) ? body.queries.length : 0;
       if (!allowQueries(req.socket.remoteAddress ?? 'unknown', n)) return send(res, 429, { error: 'Too many place lookups. Try again in a minute.' });
-      return send(res, 200, await placeSearch(body.queries ?? []));
+      return send(res, 200, await placeSearch(body.queries ?? [], { temporal: body.temporal === true }));
     }
     if (url.pathname === '/api/historical/place' && req.method === 'GET') return send(res, 200, await placeGet(url.searchParams.get('id') ?? ''));
     return send(res, 404, { error: 'Not found' });

@@ -30,10 +30,14 @@ Status column:
 | European state and admin boundaries (1815–1918) | **HistoGIS** (A, live) | Cliopatria, CShapes (NC licence) |
 | World polities, long run (−3400 to 2024) | **Cliopatria** (A) | OHM (D) |
 | State borders 1886–2019 | CShapes 2.0 (A, NC licence, catalogued) | Cliopatria |
+| England's shires and hundreds in 1086 | **Domesday Shires and Hundreds** (A, ADS) | — |
+| Medieval English roads and routes (c. 1400) | **Gough Map GIS** (A, ADS) | Viabundus (not England) |
+| Navigable rivers in England and Wales before 1348 | **Inland Navigation GIS** (A, ADS) | AWMC inland water (ancient) |
+| English rural settlement patterns | Atlas of Rural Settlement (A, © English Heritage — local builds only) | — |
 | Battles, sieges, wars with dates | **Wikidata** (D, the only broad structured source) | — |
 | Original historical maps, georeferenced | **Allmaps** annotations over David Rumsey, LoC and others (B) | — |
 | Original historical maps, catalogue search | **Library of Congress** (B), **David Rumsey** (B) | Old Maps Online (no API) |
-| Global name reconciliation, cross-checking | **World Historical Gazetteer** (C framework) | Getty TGN (C), GeoNames (C) |
+| Global name reconciliation, cross-checking | **World Historical Gazetteer** (C framework; candidate evidence only) | Getty TGN (C), GeoNames (C) |
 | Modern reference geography | Natural Earth (public domain) | OSM |
 
 Tiers:
@@ -184,7 +188,32 @@ A lower tier is never used to silently override a higher one. Disagreements are 
 - **Coverage:** Great Britain, about 1888–1914. Roughly 2.5 million names transcribed from the Ordnance Survey six-inch second-edition maps (docs).
 - **Licence:** CC BY-SA 4.0 (docs).
 - **Access:** not reachable from the build environment; `visionofbritain.org.uk` timed out.
-- **Status:** **Catalogued.**
+- **Status:** **Catalogued — skipped for now at the owner’s request (2026-09-30).** Not downloaded.
+
+### Early Medieval Atlas datasets (Archaeology Data Service), added 2026-09-30
+
+All CC BY 4.0. The original ZIPs are in `data/historical/raw/` with checksums and provenance (several were
+downloaded by hand and uploaded, because ADS blocks most automated downloads; four matched copies fetched
+automatically, byte for byte). Built into vector tiles by `scripts/atlas-build/england.py`.
+
+- **Domesday Shires and Hundreds of England** (Brookes 2020, doi:10.5284/1058999): 35 shires, 21 intermediate
+  districts, 810 hundreds/wapentakes as believed to exist in 1086. Reconstructed from the Alecto Domesday maps and
+  1851 parish boundaries; thin in the far north and Wales. **Offline** (map layer shown 1066–1106).
+- **The Routes and Roads of the Gough Map** (Oksanen & Brookes 2024, doi:10.5284/1124312): 179 way stations,
+  188 schematic red lines and 455 matched route segments for the map of c. 1400. A selection of routes, not the whole
+  network. **Offline** (1350–1450).
+- **Inland Navigation in England and Wales before 1348** (Oksanen 2019, doi:10.5284/1057497): waterways with direct
+  and indirect evidence, 249 heads of navigation, 65 river-traffic place-names. **Offline** (1000–1348).
+- **Bridges of Medieval England to c.1250** and **Beyond the Tribal Hidage** (burial census): raw data held,
+  **catalogued** (not yet processed).
+
+### Atlas of Rural Settlement in England GIS (Roberts & Wrathmell; English Heritage 2011)
+
+- **Coverage:** England; settlement provinces, sub-provinces, local regions, 10,513 nucleations, terrain.
+- **Licence:** the terms inside the ZIP allow download "for personal and business use"; copyright stays with English
+  Heritage, Brian Roberts and Stuart Wrathmell. They do not grant republication.
+- **Status:** **Catalogued / local builds only.** Processed into tiles that are git-ignored and removed from builds
+  unless `VITE_SHELF_LOCAL_DATA=1`. The original ZIP was uploaded to this (public) repository by its owner.
 
 ### DAMAST (Dhimmis and Muslims)
 
@@ -225,10 +254,28 @@ A lower tier is never used to silently override a higher one. Disagreements are 
 
 | Source | Access | Licence | Role |
 | --- | --- | --- | --- |
-| **World Historical Gazetteer** | `/api/index/?name=` (verified, CORS `*`). Returns reconciled "parent" records (TGN-backed) with child records from contributed datasets, time spans and variants. | CC BY (per contributed dataset) | **Live.** Discovery, reconciliation and cross-checking; not the final authority. |
+| **World Historical Gazetteer** | Reconciliation Service API v0.2 (`POST /reconcile`, token, ≤ 50 names per request, data extension for dates; via Shelf's server) and the public index `/api/index/?name=` (no token, CORS `*`). Checked 2026-09-30. | WHG index CC BY-NC 4.0; each source its own licence; CHGIS, Native Land and Ancient Parishes forbid redistribution | **Live, external.** Candidate attestations for reconciliation, weighed with the offline gazetteers; never the final authority. See below. |
 | Getty TGN | JSON per record reachable, no CORS; SPARQL 403 | ODC-By | Catalogued; reached through WHG |
 | GeoNames | Needs a registered username (demo quota exceeded) | CC BY 4.0 | Catalogued (modern names) |
 | Natural Earth | Download | Public domain | Offline (modern base map) |
+
+### World Historical Gazetteer as an external reconciliation source
+
+WHG is **not downloaded**. Shelf asks it about a place name when needed and caches the answer on the device
+(30 days). Every record keeps: WHG id, source namespace or dataset, names, coordinates, time spans, place type,
+source licence, `redistributable`, and links to WHG and the original source — plus the API used and the access date.
+
+- **Evidence, not answers.** `src/world/placeEvidence.ts` groups all records (offline gazetteers + WHG) that point
+  to the same spot, counts independent sources (WHG's copy of Pleiades is not a second witness), checks names and
+  dates against the year read about, and reports agreements, disagreements and a confidence level. WHG can raise an
+  ambiguous offline match to "likely" (MEDIUM) at most — never to certain.
+- **Licences.** Records from sources with `redistributable: false` are reduced to a stub (id, name, source, link) on
+  the server and in the app; their names, locations and dates are not stored or passed on.
+- **Failures.** Offline, time-out (12 s), rate limit (429 → wait for Retry-After), daily quota (401 → wait until
+  midnight UTC) and upstream gateway errors give "unavailable" — never cached, never read as "no such place".
+- **Offline first.** The offline datasets work without WHG; clear offline matches don't wait for it.
+- **Token.** The reconciliation API needs a WHG token, held only by Shelf's server (`WHG_API_TOKEN` in `.env`,
+  git-ignored). Without one (e.g. on GitHub Pages) Shelf uses WHG's public index search, which needs no token.
 
 ## Tier D — collaborative
 
@@ -247,7 +294,7 @@ These are gaps in openly licensed, structured digital data. They are not gaps in
 - Southeast Asia.
 - Medieval eastern Europe outside the Hanseatic area.
 - Ottoman administrative geography with an open API.
-- Villages almost everywhere before 1800.
+- Villages almost everywhere before 1800 (England 1086–c. 1400 is now partly covered by the Domesday, Gough Map and navigation layers).
 - Trade routes outside Viabundus and al-Ṯurayyā.
 - Military movements (no dataset records dated troop movements).
 

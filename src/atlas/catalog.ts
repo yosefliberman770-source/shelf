@@ -471,8 +471,8 @@ export const LAYERS: AtlasLayerDef[] = [
         { id: 'domesday-inter', type: 'line', source: 'domesday', 'source-layer': 'units', filter: k('inter'), minzoom: 5, paint: { 'line-color': C.province, 'line-width': 1.1, 'line-opacity': 0.7, 'line-dasharray': [3, 1.5] } },
         { id: 'domesday-shires-fill', type: 'fill', source: 'domesday', 'source-layer': 'units', filter: k('shire'), paint: { 'fill-color': C.province, 'fill-opacity': 0.04 } },
         { id: 'domesday-shires', type: 'line', source: 'domesday', 'source-layer': 'units', filter: k('shire'), paint: { 'line-color': C.border, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 1, 9, 2.4], 'line-opacity': 0.85 } },
-        { id: 'domesday-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('shire'), layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 13, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
-        { id: 'domesday-hundred-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('hundred'), minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+        { id: 'domesday-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('shire-label'), layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 13, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
+        { id: 'domesday-hundred-label', type: 'symbol', source: 'domesday', 'source-layer': 'units', filter: k('hundred-label'), minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-optional': true }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ];
     },
   },
