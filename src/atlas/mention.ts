@@ -98,7 +98,7 @@ export function plausibleMention(m: MentionEvidence, written: string, knownOffli
   return { ok: true };
 }
 
-// ── Continents, oceans and seas ───────────────────────────────────────────
+// ── Continents, oceans, seas and geographic lands ─────────────────────────
 // Macro-geography: names that denote a continent or a body of water. They
 // are regions, not places; they never resolve to a settlement or province
 // that happens to share the name.
@@ -131,6 +131,24 @@ export const MACRO: MacroRegion[] = [
   { name: 'Pacific Ocean', kind: 'sea', center: [-160, 0], bbox: [120, -60, -70, 60], aliases: ['Pacific', 'the Pacific'] },
   { name: 'Indian Ocean', kind: 'sea', center: [75, -15], bbox: [20, -60, 120, 25] },
   { name: 'Arctic Ocean', kind: 'sea', center: [0, 85], bbox: [-180, 66, 180, 90] },
+  // Lands: geographic names older than (and independent of) any state that
+  // later took them. "Italy" in a book about Rome is the peninsula, not the
+  // Kingdom or Republic of Italy; the states are offered separately when
+  // they existed at the date being read about.
+  { name: 'Italy', kind: 'region', center: [12.8, 42.5], bbox: [6.6, 36.6, 18.6, 47.1], aliases: ['Italia', 'Italian peninsula'] },
+  { name: 'Greece', kind: 'region', center: [22.5, 39], bbox: [19.3, 34.8, 26.6, 41.8], aliases: ['Hellas'] },
+  { name: 'Iberia', kind: 'region', center: [-4, 40], bbox: [-9.6, 36, 3.3, 43.8], aliases: ['Iberian Peninsula', 'Hispania'] },
+  { name: 'Gaul', kind: 'region', center: [2.5, 46.5], bbox: [-4.8, 42.3, 8.3, 51.1], aliases: ['Gallia'] },
+  { name: 'Britain', kind: 'region', center: [-2.5, 54], bbox: [-6.4, 49.9, 1.8, 58.7], aliases: ['Great Britain', 'Britannia'] },
+  { name: 'Anatolia', kind: 'region', center: [32.5, 39], bbox: [26, 36, 41, 42], aliases: ['Asia Minor'] },
+  { name: 'Mesopotamia', kind: 'region', center: [44, 33.5], bbox: [38.5, 29.5, 48.5, 37.5] },
+  { name: 'Levant', kind: 'region', center: [36, 33], bbox: [34, 29.5, 39, 37], aliases: ['the Levant'] },
+  { name: 'Arabia', kind: 'region', center: [45, 23], bbox: [34.5, 12.5, 59.8, 32], aliases: ['Arabian Peninsula'] },
+  { name: 'Scandinavia', kind: 'region', center: [15, 62], bbox: [4.5, 54.5, 31, 71.2] },
+  { name: 'Balkans', kind: 'region', center: [21.5, 43], bbox: [13.5, 36.5, 29.5, 46.5], aliases: ['the Balkans', 'Balkan Peninsula'] },
+  { name: 'Caucasus', kind: 'region', center: [44, 42.5], bbox: [37, 38.8, 50, 45.5], aliases: ['the Caucasus'] },
+  { name: 'Maghreb', kind: 'region', center: [3, 32], bbox: [-17, 20, 11.6, 37.5], aliases: ['the Maghreb', 'North Africa'] },
+  { name: 'Sahara', kind: 'region', center: [10, 23], bbox: [-17, 15, 33, 31], aliases: ['the Sahara'] },
 ];
 const macroByName = new Map<string, MacroRegion>();
 for (const m of MACRO) for (const n of [m.name, ...(m.aliases ?? [])]) macroByName.set(normName(n), m);

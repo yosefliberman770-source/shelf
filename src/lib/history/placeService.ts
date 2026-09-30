@@ -17,9 +17,12 @@ import type { HistoricalPlace, PlaceCandidate, PlaceProvider, PlaceQuery, PlaceR
 const CACHE_DAYS = 30;
 
 /** Cache key: name + the century being read about + provider ("rome|-3c|whg"). */
+/** Bumped whenever the rules for accepting a match change, so answers cached under the old rules are looked up again. 2: spelling evidence, date and book-geography checks. */
+const RESOLVER_VERSION = 2;
+
 export function cacheKey(name: string, date: number | undefined, provider: string): string {
   const era = date === undefined ? 'any' : `${date < 0 ? '-' : ''}${Math.ceil(Math.abs(date) / 100)}c`;
-  return `${norm(name)}|${era}|${provider}`;
+  return `${norm(name)}|${era}|${provider}|v${RESOLVER_VERSION}`;
 }
 const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
 

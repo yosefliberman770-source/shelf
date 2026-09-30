@@ -18,8 +18,9 @@ import { detectPlaces, screenMentions } from '../lib/history/placeDetect';
 import type { MentionEvidence } from '../atlas/mention';
 import { type HistDate, UNKNOWN_DATE } from './histdate';
 
-/** 2: mentions carry their textual evidence and are screened; earlier resolutions were made without it. */
-export const BOOK_WORLD_VERSION = 2;
+/** 2: mentions carry their textual evidence and are screened; earlier resolutions were made without it.
+ *  3: geographic lands, dated polities and importance-ranked places. */
+export const BOOK_WORLD_VERSION = 3;
 
 /** What the reader page can give us for one section of the book (loaded off-screen, then released). */
 export interface SectionText { href: string; label?: string; text: string; cfiOf: (name: string) => string | undefined }

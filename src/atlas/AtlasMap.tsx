@@ -3,7 +3,7 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, SOURCE_SPECS } from './catalog';
+import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
 import { getJSON } from './data';
 import { type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
@@ -389,7 +389,7 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
                     <input type="checkbox" checked={on} disabled={!!d.unavailable} onChange={() => toggle(d.id)} aria-label={d.label} />
                     <span className="grow">
                       <span className={d.unavailable ? 'faint' : ''}>{d.label}</span>
-                      {d.unavailable && <span className="tiny faint"> — no open dataset</span>}
+                      {d.unavailable && <span className="tiny faint"> — {d.unavailableKind ? UNAVAILABLE_LABEL[d.unavailableKind] : 'not available'}</span>}
                       {note && <span className="tiny" style={{ display: 'block', color: 'var(--warn)' }}>{note}</span>}
                     </span>
                     <button type="button" className="why-link tiny" onClick={(e) => { e.preventDefault(); setOpen(open === d.id ? null : d.id); }} aria-label={`About ${d.label}`}>ⓘ</button>
@@ -420,6 +420,13 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <div>● filled — precise location · ○ hollow — rough location</div>
         <div>Faded or “?” — the source marks it uncertain, or its date isn’t recorded</div>
         <div>Dashed red road — period not recorded in the source</div>
+        <div>Bigger dots and names that appear first — places more prominent in the record (more names, links and sites recorded); not a population figure</div>
+        <div className="mt-4"><b>Political map</b></div>
+        <div className="row wrap" style={{ gap: 3 }} aria-hidden="true">{POLITY_PALETTE.map((c) => <span key={c} style={{ width: 12, height: 12, borderRadius: 2, background: c, opacity: 0.55, border: `1px solid ${c}` }} />)}</div>
+        <div>Each colour marks one polity, kept through time; neighbours get different colours. Colour doesn’t mean empire, kingdom or republic — those are the separate layers above, and each polity’s type is in its details.</div>
+        <div><span style={{ borderBottom: '2px dashed #555', paddingBottom: 1 }}>Dashed outline, no fill</span> — a grouping of polities (an empire’s provinces, a heptarchy, a personal union), not a separate state</div>
+        <div><span style={{ borderBottom: '1px dashed #555', paddingBottom: 1, opacity: 0.7 }}>Faint, dashed</span> — contested (overlaps another polity in the same years) or a small outlying holding far from the main territory</div>
+        <div>Names appear by size: large states when zoomed out, small ones as you zoom in. Each polity is named once.</div>
         <div>Borders show one scholarly reconstruction; real frontiers were rarely sharp lines.</div>
       </div>
     </div>

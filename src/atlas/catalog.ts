@@ -5,6 +5,15 @@
 import type { ExpressionSpecification, FilterSpecification, LayerSpecification, SourceSpecification } from 'maplibre-gl';
 import { eventNear, existedIn, type HistYear, ohmExisted } from './time';
 
+/** Why a layer can't be shown: each reason is stated as it is, never lumped together as "no data". */
+export type UnavailableKind = 'no-dataset' | 'licence' | 'online-only' | 'not-integrated';
+export const UNAVAILABLE_LABEL: Record<UnavailableKind, string> = {
+  'no-dataset': 'no suitable open dataset exists',
+  licence: 'licence doesn’t allow publishing it here',
+  'online-only': 'available online only',
+  'not-integrated': 'not added to Shelf yet',
+};
+
 export type GroupId = 'places' | 'physical' | 'infrastructure' | 'political' | 'military' | 'economic';
 export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'places', label: 'Places' },
@@ -74,6 +83,8 @@ export interface AtlasLayerDef {
   coverage?: [HistYear, HistYear];
   /** Set when no suitable open scholarly dataset exists yet. The toggle is shown but disabled. */
   unavailable?: string;
+  /** Why it's unavailable, in short — shown next to the layer name. */
+  unavailableKind?: UnavailableKind;
   sources: string[];
   specs: (ctx: LayerCtx) => LayerSpecification[];
 }
@@ -150,12 +161,14 @@ export function credit(id: DatasetId): string {
 function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, opts: { labelZoom?: number; radius?: number; minzoom?: number } = {}): LayerSpecification[] {
   const filter = ['all', ['in', cat, ['get', 'l']], existedIn(ctx.year, { undated: ctx.showUndated ? { within: PLEIADES_CORE } : 'hide' })] as FilterSpecification;
   const r = opts.radius ?? 3.5;
+  const imp: ExpressionSpecification = ['match', ['coalesce', ['get', 'im'], 1], 4, 1.5, 3, 1.15, 2, 0.9, 0.7];
   return [
     {
       id: `${id}-pt`, type: 'circle', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.minzoom ?? 3,
       paint: {
         // Small when zoomed out: thousands of sites would otherwise hide the map.
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, r * 0.3, 5, r * 0.55, 8, r * 1.3, 12, r * 2],
+        // Size by importance class (from the build: names, links and sites recorded for the place).
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, ['*', r * 0.3, imp], 5, ['*', r * 0.5, imp], 8, ['*', r * 1.05, imp], 12, ['*', r * 1.7, imp]],
         // Rough locations are drawn hollow; precise ones filled.
         'circle-color': color,
         'circle-opacity': ['case', ['==', ['get', 'p'], 0], 0.12, certaintyOpacity()],
@@ -165,12 +178,19 @@ function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, o
       },
     },
     {
-      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: opts.labelZoom ?? 7,
+      id: `${id}-label`, type: 'symbol', source: 'pleiades-places', 'source-layer': 'places', filter, minzoom: Math.min(5, opts.labelZoom ?? 7),
       layout: {
         // Pleiades titles unnamed sites "Untitled": keep the dot, skip the label.
         'text-field': ['case', ['==', ['get', 'n'], 'Untitled'], '', ['>=', u(), 1], ['concat', ['get', 'n'], ' ?'], ['get', 'n']],
-        'text-font': FONT,
-        'text-size': 11.5, 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true,
+        'text-font': ['case', ['>=', ['coalesce', ['get', 'im'], 1], 4], ['literal', FONT_BOLD], ['literal', FONT]],
+        // Prominent places are named first; the rest only once there's room (size 0 = not shown yet).
+        'text-size': ['step', ['zoom'],
+          ['case', ['>=', ['coalesce', ['get', 'im'], 1], 4], 11.5, 0],
+          6, ['case', ['>=', ['coalesce', ['get', 'im'], 1], 3], 11.5, 0],
+          Math.max(7, opts.labelZoom ?? 7), ['case', ['>=', ['coalesce', ['get', 'im'], 1], 2], 11.5, 0],
+          Math.max(9, (opts.labelZoom ?? 7) + 2), 11.5],
+        'symbol-sort-key': ['-', 0, ['coalesce', ['get', 'im'], 1]],
+        'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true,
       },
       paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.4, 'text-opacity': certaintyOpacity(1) },
     },
@@ -275,7 +295,7 @@ export const LAYERS: AtlasLayerDef[] = [
   // PLACES
   {
     id: 'settlements', group: 'places', label: 'Ancient settlements', datasets: ['pleiades'], defaultOn: true, coverage: [-3000, 1500],
-    hint: 'Cities, towns and villages of the ancient world. Pleiades doesn’t record size, so they aren’t split into city/town/village. Hollow = rough location; faded = uncertain or undated.',
+    hint: 'Cities, towns and villages of the ancient world. Pleiades records no population, so dot size shows how prominent a place is in the record (names, linked places and sites recorded there); prominent places appear and are named first. Hollow = rough location; faded = uncertain.',
     sources: ['pleiades-places'], specs: (c) => pleiadesPoints('settlements', 'settlement', C.settlement, c, { labelZoom: 6, radius: 3.6 }),
   },
   {
@@ -312,7 +332,7 @@ export const LAYERS: AtlasLayerDef[] = [
       const town: ExpressionSpecification = ['all', ['in', 'town', ['get', 'l']], ['any', ['!', ['has', 'tf']], ['<=', ['get', 'tf'], c.year]]];
       return [
         { id: 'medieval-places-pt', type: 'circle', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, ['case', town, 2.2, 0.8], 9, ['case', town, 5, 2.4], 11, ['case', town, 6, 3.2]], 'circle-color': ['case', town, C.city, C.village], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
-        { id: 'medieval-places-label', type: 'symbol', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['case', town, 12, 10.5], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': ['case', town, C.city, C.village], 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+        { id: 'medieval-places-label', type: 'symbol', source: 'viabundus-nodes', 'source-layer': 'nodes', filter, minzoom: 6, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['step', ['zoom'], ['case', town, 12, 0], 8, ['case', town, 12, 10.5]], 'symbol-sort-key': ['case', town, 0, 1], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': ['case', town, C.city, C.village], 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ];
     },
   },
@@ -324,7 +344,7 @@ export const LAYERS: AtlasLayerDef[] = [
       const big: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['capitals', 'towns']]];
       return [
         { id: 'islamic-places-pt', type: 'circle', source: 'thurayya-places', 'source-layer': 'places', filter, paint: { 'circle-radius': ['case', ['==', ['get', 'k'], 'capitals'], 5, big, 3.2, 2], 'circle-color': ['match', ['get', 'k'], 'capitals', '#1b5e20', 'towns', '#2e7d32', 'waystations', '#8d6e63', '#6d8b74'], 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.8 } },
-        { id: 'islamic-places-label', type: 'symbol', source: 'thurayya-places', 'source-layer': 'places', filter, minzoom: 5, layout: { 'text-field': ['get', 'n'], 'text-font': FONT, 'text-size': ['case', big, 12, 10], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#1b5e20', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+        { id: 'islamic-places-label', type: 'symbol', source: 'thurayya-places', 'source-layer': 'places', filter, minzoom: 5, layout: { 'text-field': ['get', 'n'], 'text-font': ['case', ['==', ['get', 'k'], 'capitals'], ['literal', FONT_BOLD], ['literal', FONT]], 'text-size': ['step', ['zoom'], ['case', big, 12, 0], 7, ['case', big, 12, 10]], 'symbol-sort-key': ['match', ['get', 'k'], 'capitals', 0, 'towns', 1, 2], 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#1b5e20', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ];
     },
   },
@@ -502,6 +522,7 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'movements', group: 'military', label: 'Military movements', datasets: [], defaultOn: false,
+    unavailableKind: 'no-dataset',
     unavailable: 'No open scholarly dataset of army routes is available. Pick a war under “Wars” to see its battles numbered in date order — the order of events, not the route taken.',
     hint: '', sources: [], specs: () => [],
   },
@@ -525,6 +546,7 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'rural-settlement', group: 'places', alsoIn: ['physical'], label: 'Rural settlement provinces (England)', datasets: ['ruralsettlement'], defaultOn: false,
+    unavailableKind: LOCAL_DATA ? undefined : 'licence',
     unavailable: LOCAL_DATA ? undefined : 'Not published: the Atlas of Rural Settlement terms allow personal and business use, not republishing on a public site. Available in local builds of Shelf.',
     hint: 'Roberts & Wrathmell’s settlement provinces, sub-provinces and local regions, and the nucleated settlements (villages and hamlets) they mapped from nineteenth-century Ordnance Survey maps. A characterisation of settlement patterns used to study medieval England — not a dated map of any one year.', sources: ['rural-settlement'],
     specs: () => {

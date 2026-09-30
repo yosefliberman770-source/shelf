@@ -181,16 +181,51 @@ def places_index(rows):
 
 # ── Vector tiles ──
 
+def pleiades_importance():
+    """Importance class (1–4) per Pleiades place, from the dataset's own record.
+
+    Pleiades records no population or rank. What it does record is how much
+    scholarship attaches to a place: how many names are attested for it, how
+    many other places are linked to it (roads, connections, relations) and how
+    many sites are recorded inside it (temples, theatres, walls, gates). A
+    city like Carthage or Antioch scores high on all three; a farmstead known
+    from one survey scores low. The score is a proxy for prominence, used only
+    to decide what to show first when zoomed out — never as a size claim.
+    """
+    d = json.load(open(os.path.join(CACHE, 'pleiades-gazetteer.json'), encoding='utf-8'))
+    score = defaultdict(float)
+    for r in d['rows']:
+        pid = r[0]
+        score[pid] += min(len(r[9] or []), 8)  # attested names
+        rel = r[11] if len(r) > 11 else []
+        score[pid] += 0.5 * min(len(rel), 12)
+        for x, _t in rel:
+            score[x] += 0.5
+        for x in r[10] or []:  # this place is part of x
+            score[x] += 1
+    vals = sorted(v for v in score.values() if v > 0)
+    q = lambda f: vals[int(f * (len(vals) - 1))] if vals else 0
+    t4, t3, t2 = q(0.98), q(0.9), q(0.6)
+    return {pid: (4 if v >= t4 else 3 if v >= t3 else 2 if v >= t2 else 1) for pid, v in score.items()}
+
+
 def tiles_pleiades():
     d = json.load(open(os.path.join(CACHE, 'pleiades-places.json'), encoding='utf-8'))
+    imp = pleiades_importance()
     feats = []
     for f in d['features']:
         p = dict(f['properties'])
         ty = p.get('ty', '')
         if 'a' in p:
             p['a'] = p['a'][:120]
-        # Level of detail from the dataset's own types: cities first, then settlements, then everything else.
-        mz = 3 if p.get('p') == 1 and re.search(r'\b(urban|polis)\b', ty) else 6 if p.get('p') == 1 and 'settlement' in ty else 8
+        # Urban places and the most prominent records count as the top class whatever their score.
+        cls = imp.get(p.get('i'), 1)
+        if re.search(r'\b(urban|polis)\b', ty):
+            cls = max(cls, 3)
+        p['im'] = cls
+        # Level of detail: only precise, prominent places when zoomed out; the rest as you zoom in.
+        precise = p.get('p') == 1
+        mz = {4: 3, 3: 5, 2: 7, 1: 8}[cls] if precise else max(7, {4: 5, 3: 6, 2: 8, 1: 9}[cls])
         feats.append((f['geometry'], p, mz))
     return tiler.build(os.path.join(OUT, 'tiles', 'pleiades.pmtiles'), 'places', feats, 10, 'Pleiades places', 'Pleiades (CC BY 3.0)')
 

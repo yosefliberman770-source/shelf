@@ -7,7 +7,7 @@ import type { HistYear } from '../atlas/time';
 import { type DataType, PERIODS, type PeriodId, type Quality, QUALITY_RANK, REGIONS, type RegionId, regionAt, periodAt } from './axes';
 import { type SourceEntry, SOURCES } from './registry';
 
-export interface CellSource { id: string; name: string; quality: Quality; access: SourceEntry['access']; tier: SourceEntry['tier'] }
+export interface CellSource { id: string; name: string; quality: Quality; access: SourceEntry['access']; tier: SourceEntry['tier']; /** Why a catalogued source isn't used (licence, not yet integrated…), from the registry. */ note?: string }
 export interface Cell {
   /** Best coverage among all known digital sources. */
   exists: Quality;
@@ -41,7 +41,7 @@ export function cellFor(region: RegionId | undefined, from: HistYear, to: HistYe
   const sources: CellSource[] = [];
   for (const s of SOURCES) {
     const q = sourceQuality(s, region, from, to, type);
-    if (q !== 'none') sources.push({ id: s.id, name: s.name, quality: q, access: s.access, tier: s.tier });
+    if (q !== 'none') sources.push({ id: s.id, name: s.name, quality: q, access: s.access, tier: s.tier, note: s.note });
   }
   sources.sort((a, b) => QUALITY_RANK[b.quality] - QUALITY_RANK[a.quality] || a.tier.localeCompare(b.tier));
   return {

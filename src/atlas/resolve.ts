@@ -179,7 +179,7 @@ function fromEvidence(ev: PlaceEvidence, written: string, why: ReaderPlace['why'
 export function fromMacro(m: MacroRegion, written: string, why: ReaderPlace['why']): ReaderPlace {
   return {
     key: `macro:${normName(m.name)}`, title: m.name, kind: m.kind === 'continent' ? 'continent' : m.kind === 'sea' ? 'sea' : 'region', written, lat: m.center[1], lon: m.center[0], certainty: 'approximate',
-    names: [], partOf: [], related: [], types: [m.kind], sources: [{ name: 'Shelf’s list of continents and seas (general geography, not a historical dataset)' }],
+    names: [], partOf: [], related: [], types: [m.kind], sources: [{ name: 'Shelf’s list of continents, seas and geographic lands (general geography, not a historical dataset)' }],
     evidence: 'single-source', status: 'HIGH', why,
   };
 }
@@ -233,18 +233,25 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   const expected = mention?.expected;
 
   // 2. Continents and seas are macro-regions — never a town or province that shares the name.
-  const macro = macroRegion(written);
-  if (macro && expected !== 'settlement' && expected !== 'polity') {
-    const place = fromMacro(macro, written, why(`“${written}” is the name of a ${macro.kind === 'sea' ? 'sea or ocean' : macro.kind}, so it is shown as a region, not matched to a town or province that happens to share the name.`, 'General geography'));
-    return { place, status: 'HIGH', candidates: [], reason: place.why.reason };
-  }
-
   // 3. Political entities (Cliopatria) — by name, or by demonym ("Aragonese" → Aragon).
   const polities = await matchPolity(written, year).catch(() => [] as PolityMatch[]);
-  const livePolity = polities.find((x) => x.fit === 'within' || x.fit === 'near' || x.fit === 'undated-year');
+  // A polity is only "the" answer when it existed at the date. Without a date
+  // its existence can't be checked, so it is at most a possibility (LOW),
+  // unless the words themselves name a polity (a demonym, "the Kingdom of …").
+  const livePolity = polities.find((x) => x.fit === 'within' || x.fit === 'near' || (x.fit === 'undated-year' && (expected === 'polity' || !!mention?.demonym)));
+  const possiblePolity = livePolity ?? polities.find((x) => x.fit === 'undated-year');
   const polityPlace = (pm: PolityMatch, status: Confidence) => fromPolity(pm, written, why(pm.via === 'demonym'
     ? `“${written}” is an adjective for ${pm.polity.n.replace(/^\(|\)$/g, '')}, a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}.`
-    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : ''}.`, pm.via === 'demonym' ? 'Demonym → polity (Cliopatria)' : 'Polity name (Cliopatria)'), status);
+    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : pm.fit === 'undated-year' ? ' — the date being read about isn’t known, so whether it existed then can’t be checked' : ''}.`, pm.via === 'demonym' ? 'Demonym → polity (Cliopatria)' : 'Polity name (Cliopatria)'), status);
+
+  const macro = macroRegion(written);
+  if (macro && expected !== 'settlement' && expected !== 'polity') {
+    const what = macro.kind === 'sea' ? 'sea or ocean' : macro.kind === 'continent' ? 'continent' : 'geographic region (a land, not a state)';
+    const place = fromMacro(macro, written, why(`“${written}” is the name of a ${what}, so it is shown as a region, not matched to a town, province or state that happens to share the name.`, 'General geography'));
+    // A state of the same name that existed at the date is offered as another reading.
+    const alt = macro.kind === 'region' && livePolity ? polityPlace(livePolity, 'LOW') : undefined;
+    return { place, status: 'HIGH', candidates: alt ? [alt] : [], reason: place.why.reason };
+  }
   if (livePolity && (expected === 'polity' || expected === 'region' || mention?.demonym)) {
     const place = polityPlace(livePolity, 'HIGH');
     if (place) return { place, status: 'HIGH', candidates: polities.filter((x) => x !== livePolity).slice(0, 4).map((x) => polityPlace(x, 'LOW')).filter((x): x is ReaderPlace => !!x), reason: place.why.reason };
@@ -271,6 +278,11 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   if (!local && livePolity) {
     const place = polityPlace(livePolity, 'MEDIUM');
     if (place) return { place, status: 'MEDIUM', candidates: [], reason: place.why.reason };
+  }
+  // Without a date, a polity of that name is only a possibility — shown to the reader, never placed on its own.
+  if (!local && possiblePolity && opts.online === false) {
+    const place = polityPlace(possiblePolity, 'LOW');
+    if (place) return { status: 'LOW', candidates: [place], reason: place.why.reason };
   }
   if (opts.online === false) return local ?? { status: 'UNRESOLVED', candidates: [], reason: m?.reason ?? `“${written}” isn’t in the offline gazetteers.` };
 
@@ -308,6 +320,8 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
       const cands = ev.clusters.slice(0, 8).map((c) => fromEvidence({ ...ev, clusters: [c] }, written, why(ev.statements.find((x) => x.includes('doesn’t settle')) ?? '', 'World Historical Gazetteer attestation'), 'AMBIGUOUS')).filter((x): x is ReaderPlace => !!x);
       if (cands.length) return { status: 'AMBIGUOUS', candidates: cands, reason: `“${written}” could be ${cands.length} different places.`, evidence: ev };
     }
+    const maybe = !local && possiblePolity && !livePolity ? polityPlace(possiblePolity, 'LOW') : undefined;
+    if (maybe) return { status: 'LOW', candidates: [maybe], reason: maybe.why.reason, evidence: ev };
     return { status: 'UNRESOLVED', candidates: [], reason: res?.reason || (ev?.statements.find((x) => x.startsWith('No record')) ?? ''), error: res?.error ?? (res ? undefined : 'Historical place lookup unavailable. Try again.'), evidence: ev };
   }
   const onlineWhy = (h: HistoricalPlace) => why(res.reason ?? '', `${h.source} search`);
