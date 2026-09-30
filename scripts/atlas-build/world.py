@@ -17,6 +17,8 @@ from __future__ import annotations
 import csv
 import html
 import json
+import io
+import zipfile
 import math
 import os
 import re
@@ -86,9 +88,10 @@ def pleiades_rows():
     for r in d['rows']:
         pid, title, lon, lat, precise, types, a, b, unc, names, parts = r[:11]
         rel = [[x, t, byid.get(str(x)) or titles.get(str(x)), 0] for x, t in (r[11] if len(r) > 11 else []) if byid.get(str(x)) or titles.get(str(x))]
+        env = r[12] if len(r) > 12 and r[12] else None
         out.append(['pleiades', pid, title, lon, lat, precise, types, a, b, unc, names,
                     [byid.get(str(x)) or titles.get(str(x)) for x in parts if byid.get(str(x)) or titles.get(str(x))],
-                    (rel + reverse.get(str(pid), []))[:16], None])
+                    (rel + reverse.get(str(pid), []))[:16], {'env': env} if env else None])
     return out
 
 
@@ -119,7 +122,9 @@ def viabundus_rows():
         tos = [x[2] for x in roles if x[2] is not None]
         out.append(['viabundus', int(r['id']), txt(r['name']), round(lon, 5), round(lat, 5), 1, ','.join(x[0] for x in roles),
                     min(froms) if froms else None, None if open_end or not tos else max(tos), 0,
-                    [n for n in alt.get(r['id'], []) if n[0] != txt(r['name'])][:10], [], [], {'roles': roles, 'z': num(r['zoomlevel'])}])
+                    [n for n in alt.get(r['id'], []) if n[0] != txt(r['name'])][:10], [], [],
+                    # Undated nodes: Viabundus records them as valid for its core period (1350–1650) — the dataset's own semantics.
+                    {'roles': roles, 'z': num(r['zoomlevel']), **({'env': [1350, 1650, 'dataset']} if not froms and not tos else {})}])
     return out
 
 
@@ -182,31 +187,102 @@ def places_index(rows):
 # ── Vector tiles ──
 
 def pleiades_importance():
-    """Importance class (1–4) per Pleiades place, from the dataset's own record.
+    """Map prominence class (1–4) for each Pleiades place, from recorded evidence.
 
-    Pleiades records no population or rank. What it does record is how much
-    scholarship attaches to a place: how many names are attested for it, how
-    many other places are linked to it (roads, connections, relations) and how
-    many sites are recorded inside it (temples, theatres, walls, gates). A
-    city like Carthage or Antioch scores high on all three; a farmstead known
-    from one survey scores low. The score is a proxy for prominence, used only
-    to decide what to show first when zoomed out — never as a size claim.
+    Pleiades records no population, and "well documented" is not the same as
+    "important", so documentation is only a small, capped part. The signals:
+      role       — recorded as the capital of something; other places recorded
+                   as administratively part of it
+      type       — urban / polis, fortified settlement, settlement, station,
+                   villa or farm (Pleiades' own place types)
+      port       — port or harbour type, or recorded as the port of a place
+      roads      — Itiner-e road segments that end at the place (a road hub;
+                   main roads count more)
+      sites      — sites recorded at / in / part of it (temples, theatres, walls)
+      documents  — attested names (at most +1)
+    Returns {pid: (class, [reasons])}. Used only to decide what to draw and name
+    first when zoomed out — never shown as a size or rank claim.
     """
-    d = json.load(open(os.path.join(CACHE, 'pleiades-gazetteer.json'), encoding='utf-8'))
-    score = defaultdict(float)
-    for r in d['rows']:
-        pid = r[0]
-        score[pid] += min(len(r[9] or []), 8)  # attested names
-        rel = r[11] if len(r) > 11 else []
-        score[pid] += 0.5 * min(len(rel), 12)
-        for x, _t in rel:
-            score[x] += 0.5
-        for x in r[10] or []:  # this place is part of x
-            score[x] += 1
-    vals = sorted(v for v in score.values() if v > 0)
-    q = lambda f: vals[int(f * (len(vals) - 1))] if vals else 0
-    t4, t3, t2 = q(0.98), q(0.9), q(0.6)
-    return {pid: (4 if v >= t4 else 3 if v >= t3 else 2 if v >= t2 else 1) for pid, v in score.items()}
+    z = zipfile.ZipFile(os.path.join(CACHE, 'pleiades_gis.zip'))
+
+    def rows(name):
+        member = next(n for n in z.namelist() if n.endswith('/' + name))
+        return csv.DictReader(io.TextIOWrapper(z.open(member), encoding='utf-8-sig'))
+
+    types = defaultdict(set)
+    for r in rows('places_place_types.csv'):
+        types[r['place_id']].add(r['place_type'])
+    places = {r['id']: r for r in rows('places.csv')}
+    capital, admin_children, sites, port_of = set(), defaultdict(int), defaultdict(int), set()
+    for r in rows('connections.csv'):
+        ct = r['connection_type']
+        src, dst = r['place_id'], (r['connects_to'] or '').rstrip('/').rsplit('/', 1)[-1]
+        if ct == 'capital':
+            capital.add(src)
+        elif ct == 'part_of_admin':
+            admin_children[dst] += 1
+        elif ct in ('at', 'in', 'part_of_physical'):
+            sites[dst] += 1
+        elif ct == 'port_of':
+            port_of.add(src)
+    names = defaultdict(int)
+    for r in rows('names.csv'):
+        names[r['place_id']] += 1
+    # Road hubs: Itiner-e segment ends within ~2 km of the place.
+    ends = defaultdict(list)
+    for line in open(os.path.join(CACHE, 'itinere.ndjson'), encoding='utf-8'):
+        f = json.loads(line)
+        g = f.get('geometry') or {}
+        cs = g.get('coordinates') or []
+        parts = cs if g.get('type') == 'MultiLineString' else [cs]
+        w = 1.0 if (f.get('properties') or {}).get('type') == 'Main Road' else 0.5
+        for part in parts:
+            if len(part) < 2:
+                continue
+            for lon, lat in (part[0][:2], part[-1][:2]):
+                ends[(round(lon * 50), round(lat * 50))].append((lon, lat, w))
+
+    def hub(lon, lat):
+        k = (round(lon * 50), round(lat * 50))
+        tot = 0.0
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for x, y, w in ends.get((k[0] + dx, k[1] + dy), []):
+                    if abs(x - lon) < 0.025 and abs(y - lat) < 0.02:
+                        tot += w
+        return tot / 2  # a road through the place ends two segments there
+
+    out = {}
+    for pid, p in places.items():
+        if not p['representative_latitude']:
+            continue
+        t = types.get(pid, set())
+        score, why = 0.0, []
+        if pid in capital:
+            score += 4; why.append('capital')
+        if admin_children[pid]:
+            score += 2 + (1 if admin_children[pid] >= 3 else 0); why.append('administrative centre')
+        if t & {'urban', 'polis'}:
+            score += 3; why.append('urban')
+        elif 'fortified-settlement' in t:
+            score += 1.5; why.append('fortified settlement')
+        elif 'settlement' in t:
+            score += 1
+        elif t & {'vicus', 'station'}:
+            score += 0.5
+        if t & {'villa', 'farm'} and not t & {'urban', 'polis', 'settlement'}:
+            score -= 0.5
+        if t & {'port', 'harbor'} or pid in port_of:
+            score += 1; why.append('port')
+        h = hub(float(p['representative_longitude']), float(p['representative_latitude']))
+        if h >= 1:
+            score += min(3, h * 0.75); why.append('road hub' if h >= 2 else 'on a road')
+        if sites[pid]:
+            score += min(2, sites[pid] * 0.4); why.append('sites recorded there')
+        score += min(1, names[pid] * 0.15)
+        cls = 4 if score >= 7 else 3 if score >= 4.5 else 2 if score >= 2.5 else 1
+        out[int(pid)] = (cls, why)
+    return out
 
 
 def tiles_pleiades():
@@ -218,11 +294,10 @@ def tiles_pleiades():
         ty = p.get('ty', '')
         if 'a' in p:
             p['a'] = p['a'][:120]
-        # Urban places and the most prominent records count as the top class whatever their score.
-        cls = imp.get(p.get('i'), 1)
-        if re.search(r'\b(urban|polis)\b', ty):
-            cls = max(cls, 3)
+        cls, why = imp.get(p.get('i'), (1, []))
         p['im'] = cls
+        if why:
+            p['iw'] = ','.join(why)
         # Level of detail: only precise, prominent places when zoomed out; the rest as you zoom in.
         precise = p.get('p') == 1
         mz = {4: 3, 3: 5, 2: 7, 1: 8}[cls] if precise else max(7, {4: 5, 3: 6, 2: 8, 1: 9}[cls])

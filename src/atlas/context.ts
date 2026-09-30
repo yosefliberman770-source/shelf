@@ -15,7 +15,8 @@ export interface Polity {
   /** The point is just outside the (simplified) outline, not inside it. */ edge?: boolean;
   /** A Cliopatria grouping (its name is in parentheses) rather than a polity. */ g?: 1;
   /** Groupings this polity belongs to (";"-separated). */ m?: string;
-  /** Polities this outline overlaps in the same years (";"-separated): contested. */ x?: string;
+  /** Polities whose outlines overlap this one in the same years with no recorded relationship (";"-separated): source uncertainty, not a claim. */ x?: string;
+  /** Recorded relationships (allegiance, vassalage, personal union…) that explain an overlap. */ xr?: string;
   /** A small outlying piece of the polity's outline. */ op?: 1;
   /** Area of the outline, km². */ a?: number;
   /** Groupings containing this point that the polity belongs to, without parentheses. */ partOf?: string[];
@@ -42,7 +43,7 @@ export async function politiesAt(p: Pos, year: HistYear, edgeKm = 20): Promise<P
   const uniq = (xs: Polity[]) => xs.filter((x) => (seen.has(x.n) ? false : (seen.add(x.n), true)));
   const containing = now.filter((f) => contains(f.geometry, p)).map((f) => f.properties);
   // Hierarchy: groupings are reported as what the polity is part of, not as
-  // rival polities. Independent polities that overlap here are contested.
+  // rival polities. Independent polities that overlap here are an overlap in the source (see Polity.x / xr).
   const groups = containing.filter((x) => x.g);
   const members = containing.filter((x) => !x.g).sort((a, b) => (a.op ? 1 : 0) - (b.op ? 1 : 0) || (a.a ?? Infinity) - (b.a ?? Infinity));
   const withParents = members.map((x) => ({ ...x, partOf: groups.filter((g) => (x.m ?? '').split(';').includes(g.n)).map(polityDisplayName) }));

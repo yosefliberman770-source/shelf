@@ -5,7 +5,7 @@ import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, credit, DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
 import { getJSON } from './data';
-import { type HistYear, yearLabel } from './time';
+import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
 
 export interface AtlasFocus { name: string; lat: number; lon: number; certainty?: 'known' | 'approximate' | 'uncertain' | 'disputed'; note?: string }
@@ -373,7 +373,7 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
       </div>
       <label className="row small" style={{ gap: 8, alignItems: 'flex-start' }}>
         <input type="checkbox" checked={showUndated} onChange={(e) => setShowUndated(e.target.checked)} aria-label="Include undated records" />
-        <span>Include undated records <span className="tiny faint">— records whose source gives no dates, shown faint and only within their dataset’s own period. Off by default: an undated record isn’t evidence that something existed in {yearLabel(year)}.</span></span>
+        <span>Include undated records <span className="tiny faint">— records with no temporal evidence at all (no dates, nothing dated linked to them, no source period). Shown faint at any date and marked undated. Off by default: such a record isn’t evidence that something existed in {yearLabel(year)}. Records without exact dates but with a known period (e.g. a place from the Barrington Atlas, or a village with a dated temple) are shown inside that period anyway.</span></span>
       </label>
       {GROUPS.map((g) => {
         const defs = LAYERS.filter((l) => l.group === g.id || l.alsoIn?.includes(g.id));
@@ -420,12 +420,12 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <div>● filled — precise location · ○ hollow — rough location</div>
         <div>Faded or “?” — the source marks it uncertain, or its date isn’t recorded</div>
         <div>Dashed red road — period not recorded in the source</div>
-        <div>Bigger dots and names that appear first — places more prominent in the record (more names, links and sites recorded); not a population figure</div>
+        <div>Bigger dots and names that appear first — places with a larger recorded role (capital, administrative centre, urban, port, road hub, sites recorded there). Based on the evidence available, not population, which the sources don’t record</div>
         <div className="mt-4"><b>Political map</b></div>
         <div className="row wrap" style={{ gap: 3 }} aria-hidden="true">{POLITY_PALETTE.map((c) => <span key={c} style={{ width: 12, height: 12, borderRadius: 2, background: c, opacity: 0.55, border: `1px solid ${c}` }} />)}</div>
         <div>Each colour marks one polity, kept through time; neighbours get different colours. Colour doesn’t mean empire, kingdom or republic — those are the separate layers above, and each polity’s type is in its details.</div>
         <div><span style={{ borderBottom: '2px dashed #555', paddingBottom: 1 }}>Dashed outline, no fill</span> — a grouping of polities (an empire’s provinces, a heptarchy, a personal union), not a separate state</div>
-        <div><span style={{ borderBottom: '1px dashed #555', paddingBottom: 1, opacity: 0.7 }}>Faint, dashed</span> — contested (overlaps another polity in the same years) or a small outlying holding far from the main territory</div>
+        <div><span style={{ borderBottom: '1px dashed #555', paddingBottom: 1, opacity: 0.7 }}>Faint, dashed</span> — the source’s outline overlaps another polity’s in the same years (it records no claims, so this is shown as uncertainty, not as a dispute), or a small detached piece far from the main territory</div>
         <div>Names appear by size: large states when zoomed out, small ones as you zoom in. Each polity is named once.</div>
         <div>Borders show one scholarly reconstruction; real frontiers were rarely sharp lines.</div>
       </div>
@@ -477,14 +477,19 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'pleiades-places':
     case 'pleiades-lines':
     case 'pleiades-provinces': {
-      const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '', `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
+      const env = str('eo') as EnvelopeBasis | undefined;
+      const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '',
+        env ? `No dates of its own. Shown for ${range(num('ef'), num('et'))} — the period of ${ENVELOPE_LABEL[env]}`
+          : num('f') === undefined && num('t') === undefined && src === 'pleiades-places' ? 'Undated: no dates, and nothing dated is linked to it'
+          : `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
       if (str('a')) lines.push(`Also: ${str('a')!.split('|').join(' · ')}`);
       if (src === 'pleiades-places') lines.push(num('p') === 1 ? `Precise location${num('r') ? ` (± ${num('r')} m)` : ''}` : 'Rough location');
+      if (str('iw')) lines.push(`Drawn prominently because it is recorded as: ${str('iw')!.split(',').join(', ')} (not a population figure)`);
       return {
         title: str('n') ?? 'Place', lines: lines.filter(Boolean),
         pick: src === 'pleiades-places' && pt ? { key: `pleiades:${num('i')}`, name: str('n') ?? 'Place', lon: pt[0], lat: pt[1] } : undefined,
         link: { href: `https://pleiades.stoa.org/places/${num('i')}`, label: 'Pleiades record ↗' }, source: credit('pleiades'),
-        caution: num('u') ? 'Pleiades marks this location as less certain.' : num('f') === undefined && num('t') === undefined ? 'The source gives no dates; shown for the ancient period only.' : 'Pleiades dates are broad periods, not founding or abandonment dates.',
+        caution: num('u') ? 'Pleiades marks this location as less certain.' : env ? 'Approximate: exact dates aren’t known, so it is shown throughout the period its evidence allows.' : num('f') === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no evidence for when it existed.' : 'Pleiades dates are broad periods, not founding or abandonment dates.',
       };
     }
     case 'cliopatria': {
@@ -498,8 +503,9 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       if (grouping && str('cm')) lines.push(`Made up of: ${str('cm')!.split(';').join(', ')}`);
       if (num('a')) lines.push(`Area in this outline: about ${num('a')!.toLocaleString()} km²`);
       const cautions = ['One scholarly reconstruction of the territory; borders were rarely this precise.'];
-      if (p.op !== undefined) cautions.unshift('A small outlying piece of this polity’s outline, far from its main territory — a holding or claim as the source records it.');
-      if (str('x')) cautions.unshift(`Contested: this outline overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria draws each polity’s extent for a period, so overlaps are rival claims or control that changed within it.`);
+      if (p.op !== undefined) cautions.unshift('A small detached piece of this polity’s outline, far from its main territory. Cliopatria includes it in the outline but doesn’t say whether it was held, briefly occupied, or is an artefact of the reconstruction.');
+      if (str('x')) cautions.unshift(`Overlapping outlines: the source’s outline for this polity overlaps ${str('x')!.split(';').join(', ')} in the same years. Cliopatria records territory per period and records no claims or disputes, so this may be shared or changing control within the period, or imprecision in the reconstruction — the source doesn’t say which.`);
+      if (str('xr')) cautions.unshift(`Overlap explained by a relationship Cliopatria records: ${str('xr')!.split(';').join('; ')}.`);
       return {
         title: grouping ? (str('n') ?? '').replace(/^\(|\)$/g, '') : str('n') ?? 'Polity', lines,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : undefined, source: credit('cliopatria'),

@@ -47,8 +47,10 @@ describe('historical dates', () => {
 describe('place detection and date context', () => {
   it('offers known places and names that read like places, not every capitalised word', () => {
     const text = 'The Roman army marched from Rome toward Capua. Hannibal waited near Cannae while Fabius watched. Later they besieged Syracuse.';
-    const found = detectPlaces(text, ['Rome'], ['Hannibal', 'Fabius']).map((p) => p.name);
-    expect(found).toEqual(['Rome', 'Capua', 'Cannae', 'Syracuse']);
+    const found = detectPlaces(text, ['Rome'], ['Hannibal', 'Fabius']);
+    // "Roman" is offered as an adjective (demonym) — which polity it means, if any, is decided later from data.
+    expect(found.filter((p) => !p.evidence.demonym).map((p) => p.name)).toEqual(['Rome', 'Capua', 'Cannae', 'Syracuse']);
+    expect(found.find((p) => p.name === 'Roman')?.evidence.demonym).toBe(true);
   });
   it('prefers a date written near the place, then the chapter, then the book period', () => {
     expect(dateContextFor({ bookId: 'x1', passage: 'In 216 BC the armies met at Cannae.' })).toMatchObject({ year: -216, source: 'nearby' });

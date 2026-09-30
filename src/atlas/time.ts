@@ -31,11 +31,44 @@ export const clampYear = (y: HistYear) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, 
 // end means "open on that side *within the dataset's own period*": a source
 // only speaks for the period it covers, so the window caps open ranges.
 
-/** within = attested at the year; near = within the slack; earlier = its dates end before the year; later = they start after it. */
-export type TimeFit = 'within' | 'near' | 'earlier' | 'later' | 'undated';
+//
+// Four kinds of temporal knowledge, kept apart:
+//   A. known dates        — the record's own dates (from/to)
+//   B/C. a period         — no dates of its own, but evidence bounds when it
+//                           existed: dated records linked to it, the larger
+//                           place it belongs to, or a source/dataset whose own
+//                           period is defined (the Barrington Atlas; Viabundus
+//                           1350–1650; al-Ṯurayyā 9th–10th c.). Eligible inside
+//                           that period, shown as approximate — never outside it.
+//   D. unknown            — no evidence at all. Not placed in dated views.
 
-export function timeFit(span: { from?: HistYear; to?: HistYear }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
-  if (span.from === undefined && span.to === undefined) return 'undated';
+/** Why a record without dates is still bounded in time. */
+export type EnvelopeBasis = 'related' | 'part-of' | 'source' | 'dataset' | 'names';
+export interface Envelope { from?: HistYear; to?: HistYear; basis: EnvelopeBasis }
+export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
+  related: 'dated records linked to it (sites at it, roads it lies on, connections)',
+  'part-of': 'the dated larger place or region it is recorded as part of',
+  source: 'the period covered by the reference work it comes from',
+  dataset: 'the period the whole dataset covers',
+  names: 'the dates of its recorded names',
+};
+
+/**
+ * within = attested at the year; near = within the slack; period = no dates of
+ * its own but inside the period its evidence allows; earlier / later = outside
+ * its dates (or period); undated = no temporal evidence at all.
+ */
+export type TimeFit = 'within' | 'near' | 'period' | 'earlier' | 'later' | 'undated';
+
+export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
+  if (span.from === undefined && span.to === undefined) {
+    const e = span.envelope;
+    if (!e) return 'undated';
+    const lo = e.from ?? opts.window?.[0] ?? -Infinity;
+    const hi = e.to ?? opts.window?.[1] ?? Infinity;
+    // No slack: the period is already the widest the evidence allows.
+    return year < lo ? 'later' : year > hi ? 'earlier' : 'period';
+  }
   const lo = span.from ?? opts.window?.[0] ?? -Infinity;
   const hi = span.to ?? opts.window?.[1] ?? Infinity;
   if (lo <= year && year <= hi) return 'within';
@@ -44,20 +77,37 @@ export function timeFit(span: { from?: HistYear; to?: HistYear }, year: HistYear
   return year > hi ? 'earlier' : 'later';
 }
 
-/** Attested at (or near) the year. Undated records are never "existing" at a date. */
-export const attestedAt = (span: { from?: HistYear; to?: HistYear }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
+/** Attested at (or near) the year by its own dates. */
+export const attestedAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
   const f = timeFit(span, year, opts);
   return f === 'within' || f === 'near';
+};
+/** Can be shown at the year: attested, or inside the period its evidence allows (then shown as approximate). */
+export const eligibleAt = (span: { from?: HistYear; to?: HistYear; envelope?: Envelope }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}) => {
+  const f = timeFit(span, year, opts);
+  return f === 'within' || f === 'near' || f === 'period';
 };
 
 /**
  * Filter for features that existed in year y, from their own from/to fields.
  * `undated` decides what happens to features that carry no dates at all.
  */
-export function existedIn(y: HistYear, opts: { from?: string; to?: string; undated?: 'show' | 'hide' | { within: [HistYear, HistYear] }; window?: [HistYear, HistYear] } = {}): ExpressionSpecification {
+export function existedIn(y: HistYear, opts: { from?: string; to?: string; undated?: 'show' | 'hide' | { within: [HistYear, HistYear] }; window?: [HistYear, HistYear]; envelope?: { from: string; to: string } } = {}): ExpressionSpecification {
   const f = opts.from ?? 'f';
   const t = opts.to ?? 't';
   const dated: ExpressionSpecification = ['any', ['has', f], ['has', t]];
+  if (opts.envelope) {
+    // Records without dates but with an evidence period: shown inside it only.
+    const { from: ef, to: et } = opts.envelope;
+    const hasEnv: ExpressionSpecification = ['any', ['has', ef], ['has', et]];
+    const inEnv: ExpressionSpecification = ['all', ['!', dated], hasEnv,
+      ['any', ['!', ['has', ef]], ['<=', ['get', ef], y]], ['any', ['!', ['has', et]], ['>=', ['get', et], y]],
+      ...(opts.window ? [['boolean', y >= opts.window[0] && y <= opts.window[1]] as ExpressionSpecification] : [])];
+    const rest = existedIn(y, { ...opts, envelope: undefined });
+    // "undated" now means no evidence at all (neither dates nor a period).
+    const noEvidence: ExpressionSpecification = ['all', ['!', dated], ['!', hasEnv]];
+    return ['any', inEnv, ['all', ['any', dated, noEvidence], rest]];
+  }
   // An open side is capped by the dataset's own window, never unbounded.
   const w = opts.window;
   const inRange: ExpressionSpecification = ['all',

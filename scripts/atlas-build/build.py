@@ -32,7 +32,7 @@ import time
 import urllib.parse
 import urllib.request
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 
 from shapely.geometry import mapping, shape
@@ -164,6 +164,78 @@ def period_range(code: str | None):
 
 # ── Pleiades ─────────────────────────────────────────────────────────────────
 
+# Connection types that mean two places existed at the same time (a site *at*
+# a town, a station *on* a road, a district *part of* a city). "near",
+# "succeeds" and "flows into" say nothing about coexistence and are not used.
+COEXIST = {'at', 'on', 'in', 'connection', 'route_next', 'part_of_physical', 'part_of_regional', 'part_of_admin', 'part_of_analytical'}
+
+
+def pleiades_envelopes(rows, dated):
+    """The narrowest defensible period for Pleiades places that carry no dates.
+
+    Evidence, strongest first:
+      related  — dated records that can only exist while this place does
+                 (a dated connection record; a dated site recorded at/on/in or
+                 part of this place). The union of their spans.
+      part-of  — the dated larger place/region this one is recorded as part of.
+      source   — the record comes from a reference work with a defined period
+                 (the Barrington Atlas: Pleiades' own Archaic…Late Antique
+                 period bounds, read from time_periods.csv).
+    Places with none of these stay undated: no period is assumed for them.
+    Returns {pid: [from, to, basis]} (from/to may be None = open on that side).
+    """
+    periods = {r['key']: r for r in rows('time_periods.csv')}
+
+    def bound(v):
+        m = re.match(r'(?:AD )?(\d+)(?: (BC|AD))?', (v or '').strip())
+        if not m:
+            return None
+        n = int(m.group(1))
+        return -n if (m.group(2) == 'BC' or 'BC' in v) else n
+
+    barrington = (bound(periods.get('archaic', {}).get('lower_bound')), bound(periods.get('late-antique', {}).get('upper_bound')))
+    direct = defaultdict(list)
+    parent = defaultdict(list)
+    for r in rows('connections.csv'):
+        ctype = (r.get('connection_type') or '').strip()
+        if ctype not in COEXIST:
+            continue
+        src = r.get('place_id') or ''
+        dst = (r.get('connects_to') or '').rstrip('/').rsplit('/', 1)[-1]
+        a, b = year(r['year_after_which']), year(r['year_before_which'])
+        if a is not None or b is not None:
+            # The connection itself is dated: both ends existed then.
+            direct[src].append((a, b))
+            direct[dst].append((a, b))
+        if dst in dated:
+            (parent if ctype.startswith('part_of') else direct)[src].append(dated[dst])
+        if src in dated:
+            # Something dated is recorded at/in/part of this place: the place existed then.
+            direct[dst].append(dated[src])
+    places = {r['id']: r for r in rows('places.csv')}
+    out = {}
+
+    def union(spans):
+        # Records dated to the modern period describe the place today, not its history.
+        spans = [x for x in spans if x[0] is None or x[0] < 1700] or [(None, None)]
+        spans = [(x[0], None if x[1] is not None and x[1] >= 1700 else x[1]) for x in spans]
+        a = [x[0] for x in spans]
+        b = [x[1] for x in spans]
+        return [None if any(v is None for v in a) else min(a), None if any(v is None for v in b) else max(b)]
+
+    for pid, p in places.items():
+        if pid in dated:
+            continue
+        d, pa = union(direct.get(pid, [])), union(parent.get(pid, []))
+        if d != [None, None]:
+            out[pid] = d + ['related']
+        elif pa != [None, None]:
+            out[pid] = pa + ['part-of']
+        elif re.search(r'barrington|batlas', p.get('provenance') or '', re.I) and None not in barrington:
+            out[pid] = [barrington[0], barrington[1], 'source']
+    return out
+
+
 def pleiades():
     log('Pleiades')
     z = zipfile.ZipFile(fetch('pleiades_gis', SOURCES['pleiades_gis']))
@@ -225,6 +297,23 @@ def pleiades():
 
     from shapely import wkt as shp_wkt
 
+    own = {}
+    for pid in places:
+        a, b = loc_dates.get(pid, [None, None])
+        if a is None and b is None:
+            a, b = name_dates.get(pid, [None, None])
+        if a is not None or b is not None:
+            own[pid] = (a, b)
+    envelopes = pleiades_envelopes(rows, own)
+    # The gazetteer dates records by their locations only; name-dated places carry those spans as their period.
+    for pid in own:
+        if pid not in loc_dates or loc_dates[pid] == [None, None]:
+            envelopes.setdefault(pid, [own[pid][0], own[pid][1], 'names'])
+    with open(os.path.join(CACHE, 'pleiades-envelopes.json'), 'w') as fh:
+        json.dump(envelopes, fh)
+    envelopes = {k: v for k, v in envelopes.items() if v[2] != 'names'}
+    log(f'  undated places with a defensible period: {len(envelopes)} ({", ".join(f"{k}: {v}" for k, v in sorted(Counter(e[2] for e in envelopes.values()).items()))})')
+
     feats = []
     for pid, p in places.items():
         t = types.get(pid, set())
@@ -253,6 +342,14 @@ def pleiades():
             props['t'] = b
         if basis != 'location':
             props['db'] = basis
+        env = envelopes.get(pid) if basis == 'none' else None
+        if env:
+            # No dates of its own: the period the evidence allows (see pleiades_envelopes).
+            if env[0] is not None:
+                props['ef'] = env[0]
+            if env[1] is not None:
+                props['et'] = env[1]
+            props['eo'] = env[2]
         if certainty.get(pid):
             props['u'] = certainty[pid]
         if radius.get(pid):
@@ -533,13 +630,18 @@ def same_as_member(p):
 PALETTE_SIZE = 12
 
 
-def polity_relations(out, geoms):
+def polity_relations(out, geoms, relations=()):
     """Contested overlaps and colours, computed once from the outlines.
 
-    Contested: two polities (neither a grouping, neither a member of the
-    other) whose outlines overlap substantially at the same time. Cliopatria
-    draws each polity's maximal claimed extent, so such overlaps are claims or
-    shifting control within the period — they are flagged, not shown as fact.
+    Overlaps: two polities (neither a grouping) whose outlines overlap
+    substantially in the same years. Cliopatria records territory per period
+    and records relationships between polities (allegiance, alliance,
+    vassalage, personal union) — it records no claims or disputes. So an
+    overlap is explained by a recorded relationship when one links the two
+    polities at that time ('xr'); otherwise it is only an overlap between the
+    source's outlines ('x': shared or changing control within the period, or
+    reconstruction imprecision — the source doesn't say which). Neither is
+    called "contested".
 
     Colour: every polity gets a fixed palette index (by its Seshat/Wikidata
     identity, so the same state keeps its colour through time), chosen so
@@ -550,6 +652,7 @@ def polity_relations(out, geoms):
     ents = sorted({f['properties']['k'] for f in out})
     nbrs = defaultdict(set)
     contested = 0
+    explained = 0
     for i, f in enumerate(out):
         p = f['properties']
         gi = geoms[i]
@@ -576,13 +679,15 @@ def polity_relations(out, geoms):
             enclave = inter > 0.05 and any(x.area > 0.05 and x.intersection(other).area > 0.5 * x.area
                                            for a, other in ((gi, gj), (gj, gi)) for x in getattr(a, 'geoms', [a]) if x.area < 0.5 * a.area)
             if small > 0 and ((inter / small > 0.08 and inter > 0.05) or enclave):
-                p.setdefault('x', [])
-                o.setdefault('x', [])
-                if o['n'] not in p['x']:
-                    p['x'].append(o['n'])
-                if p['n'] not in o['x']:
-                    o['x'].append(p['n'])
+                rel = next((r for r in relations if p['n'] in r['c'] and o['n'] in r['c'] and r['f'] <= min(p['t'], o['t']) and r['t'] >= max(p['f'], o['f'])), None)
+                key = 'xr' if rel else 'x'
+                for a, b in ((p, o), (o, p)):
+                    a.setdefault(key, [])
+                    v = rel['n'].strip('()') if rel else b['n']
+                    if v not in a[key]:
+                        a[key].append(v)
                 contested += 1
+                explained += 1 if rel else 0
     # Greedy colouring, largest-degree first; deterministic order.
     colour = {}
     for k in sorted(ents, key=lambda k: (-len(nbrs[k]), k)):
@@ -600,11 +705,12 @@ def polity_relations(out, geoms):
     for f in out:
         p = f['properties']
         p['ci'] = colour[p['k']]
-        if 'x' in p:
-            p['x'] = ';'.join(sorted(p['x'])[:6])
+        for key in ('x', 'xr'):
+            if key in p:
+                p[key] = ';'.join(sorted(p[key])[:6])
         if not p.get('op'):
             p['_lp'] = label_point(f)['coordinates']
-    log(f'  cliopatria: {contested} contested overlaps flagged; {len(ents)} polities coloured with {PALETTE_SIZE} colours')
+    log(f'  cliopatria: {contested} overlapping outlines ({explained} explained by a recorded relationship); {len(ents)} polities coloured with {PALETTE_SIZE} colours')
 
 
 def cliopatria():
@@ -676,7 +782,10 @@ def cliopatria():
                 geoms.append(o)
         out.append({'type': 'Feature', 'geometry': rnd(g, 2), 'properties': props})
         geoms.append(g)
-    polity_relations(out, geoms)
+    relations = [{'n': f['properties']['Name'], 'f': int(f['properties']['FromYear']), 't': int(f['properties']['ToYear']),
+                  'c': set(x.strip() for x in (f['properties'].get('Components') or '').split(';') if x.strip())}
+                 for f in d['features'] if f['properties'].get('Type') == 'RELATION']
+    polity_relations(out, geoms, relations)
     # Split by time so the app downloads only the era on screen. Borders change
     # almost yearly in recent centuries, so those slices are shorter.
     def slice_len(y):
@@ -701,7 +810,7 @@ def cliopatria():
         # polity split into many pieces (Denmark with Greenland) is named once.
         fs = [{**f, 'properties': {k: v for k, v in f['properties'].items() if k != '_lp'}} for f in fs] + [
             {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': f['properties']['_lp']},
-             'properties': {**{k: v for k, v in f['properties'].items() if k in ('n', 'f', 't', 'q', 'c', 'g', 'a', 'k', 'ci', 'x')}, 'lbl': 1}} for f in fs if not f['properties'].get('op') and not same_as_member(f['properties'])]
+             'properties': {**{k: v for k, v in f['properties'].items() if k in ('n', 'f', 't', 'q', 'c', 'g', 'a', 'k', 'ci', 'x', 'xr')}, 'lbl': 1}} for f in fs if not f['properties'].get('op') and not same_as_member(f['properties'])]
         name = f'{a}_{b}.json'
         total += write(f'cliopatria/{name}', fc(fs))
         index.append({'from': a, 'to': b, 'file': f'cliopatria/{name}', 'count': len(fs)})
@@ -806,6 +915,9 @@ def gazetteer():
         elif ctype in RELATED and len(related[src]) < 10:
             related[src].append([int(dst), ctype])
 
+    # Periods for undated places, from the same evidence as the map (built by pleiades()).
+    env_path = os.path.join(CACHE, 'pleiades-envelopes.json')
+    envelopes = json.load(open(env_path)) if os.path.exists(env_path) else {}
     out = []
     titles = {}
     for pid, p in places.items():
@@ -827,14 +939,71 @@ def gazetteer():
             [n for n in names.get(pid, []) if n[0] != p['title']],
             par,
             rel,
+            envelopes.get(pid) if a is None and b is None else None,
         ])
-    doc = {'v': 1, 'fields': ['id', 'title', 'lon', 'lat', 'precise', 'types', 'from', 'to', 'uncertain', 'names', 'partOf', 'related'], 'titles': titles, 'rows': out}
+    doc = {'v': 1, 'fields': ['id', 'title', 'lon', 'lat', 'precise', 'types', 'from', 'to', 'uncertain', 'names', 'partOf', 'related', 'envelope'], 'titles': titles, 'rows': out}
     # Kept in the build cache: the app reads it through the tiled World index (public/world/places), never whole.
     path = os.path.join(CACHE, 'pleiades-gazetteer.json')
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
     log(f'  wrote pleiades-gazetteer.json: {len(out)} places, {os.path.getsize(path)/1e6:.2f} MB')
     return {'places': len(out), 'withParents': sum(1 for r in out if r[10])}
+
+
+def polity_aliases():
+    """cliopatria/names.json gains, per polity, the English aliases ('al') and
+    demonyms ('dm', Wikidata P1549) that Wikidata records for its item — so
+    "Venetian", "Byzantium" or "Eastern Roman Empire" find their polity from
+    data, not from a hand-made list. Cached; re-queried only when missing."""
+    log('Cliopatria: Wikidata aliases and demonyms')
+    path = os.path.join(OUT, 'cliopatria', 'names.json')
+    rows = json.load(open(path, encoding='utf-8'))
+    cache_path = os.path.join(CACHE, 'cliopatria-aliases.json')
+    cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+    qids = sorted({r['q'] for r in rows if r.get('q')} - set(cache))
+    # Wikidata's entity API (50 items a request), paced and backing off: shared build machines are often rate-limited.
+    wait = 90
+    i = 0
+    while i < len(qids):
+        chunk = qids[i:i + 50]
+        url = 'https://www.wikidata.org/w/api.php?' + urllib.parse.urlencode({'action': 'wbgetentities', 'ids': '|'.join(chunk), 'props': 'aliases|claims', 'languages': 'en', 'format': 'json'})
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': UA}), timeout=120) as r:
+                ents = json.load(r).get('entities', {})
+        except Exception as e:  # noqa: BLE001 — rate limited or offline: wait longer and try again
+            log('   wikidata', str(e)[:80], f'— waiting {wait}s')
+            time.sleep(wait)
+            wait = min(wait * 2, 900)
+            continue
+        for q in chunk:
+            e = ents.get(q, {})
+            al = [a['value'] for a in e.get('aliases', {}).get('en', [])]
+            dm = [c['mainsnak'].get('datavalue', {}).get('value', {}).get('text') for c in e.get('claims', {}).get('P1549', [])
+                  if c['mainsnak'].get('datavalue', {}).get('value', {}).get('language') == 'en']
+            cache[q] = {'al': sorted(set(al))[:20], 'dm': sorted(set(x for x in dm if x))[:6]}
+        json.dump(cache, open(cache_path, 'w'))  # keep progress
+        log(f'   {len(cache)} polities fetched')
+        i += 50
+        wait = 90
+        time.sleep(90)
+    json.dump(cache, open(cache_path, 'w'))
+    n_al = n_dm = 0
+    for r in rows:
+        c = cache.get(r.get('q') or '')
+        if not c:
+            continue
+        # Latin-script aliases short enough to be a name as written in a book.
+        al = [a for a in c['al'] if len(a) <= 40 and re.match(r"^[A-Za-zÀ-ɏ' .\-]+$", a)]
+        if al:
+            r['al'] = al
+            n_al += 1
+        if c['dm']:
+            r['dm'] = c['dm']
+            n_dm += 1
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
+    log(f'  {n_al} polities with aliases, {n_dm} with demonyms')
+    return {'aliases': n_al, 'demonyms': n_dm}
 
 
 def polity_names():
@@ -917,7 +1086,7 @@ def main():
     mpath = os.path.join(OUT, 'manifest.json')
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
-    steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names),
+    steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases),
              ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
@@ -926,7 +1095,7 @@ def main():
         world.build_world()
     # The manifest keeps counts per dataset; extra steps fold into their dataset.
     stats['pleiades'] = {**(stats.get('pleiades') or {}), 'gazetteer': stats.pop('gazetteer', None)}
-    stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None)}
+    stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None), 'aliases': stats.pop('aliases', None)}
     manifest(stats)
 
 

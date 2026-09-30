@@ -18,8 +18,12 @@ export interface PlaceMention {
 
 const PLACE_CUE = /\b(?:to|from|at|in|near|toward|towards|into|of|across|through|beyond|around|reached|besieged|entered|left|crossed|captured|took|sacked|founded|conquered|invaded|attacked|abandoned|occupied|garrisoned|siege of|battle of|walls of|city of|port of|island of|kingdom of|province of|river|mount|lake)\s+((?:[A-Z][\p{Ll}'’-]+)(?:\s+(?:[A-Z][\p{Ll}'’-]+|de|del|la|le|of|on|upon|am|an)){0,3})/gu;
 /** Adjectives that may name a polity or region ("the Aragonese fleet", "Castilian troops"), not at the start of a sentence. */
-const DEMONYM_CUE = /(?<=[\p{Ll},;:]\s+(?:the\s+|an?\s+)?)(\p{Lu}\p{Ll}{3,}(?:ese|ian|ean|ish|ine))(?=\s+\p{Ll})/gu;
-const NOT_PLACE = new Set(('I Me My He She It They We You His Her Their Our The A An This That These Those Then There Here When Where Why How What Who God Lord Sir Lady Mr Mrs Dr King Queen Prince Emperor Pope Saint St Chapter Book Part Volume Section Figure Table Note Notes Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July August September October November December Christ Jesus Latin Greek English French German Romans Greeks Christians Muslims Jews Senate Consul Consuls Army General Caesar').split(' '));
+// An adjective of place/people used attributively ("the Venetian fleet", "Norman lords"). Which
+// polity it names — if any — is decided from recorded data (screenMentions → matchPolity).
+const DEMONYM_CUE = /(?<=[\p{Ll},;:]\s+(?:the\s+|an?\s+)?)(\p{Lu}\p{Ll}{2,}(?:ese|ian|ean|ish|ine|an|ic|ch))(?=\s+(\p{Ll}+))/gu;
+/** Words after an adjective that make it about language, script or a thing — not a place ("English translation", "Roman numerals"). */
+const NOT_GEOGRAPHIC = /^(?:language|languages|tongue|translation|translations|translator|text|texts|word|words|name|names|alphabet|letters|script|numerals|grammar|dialect|dialects|speakers?|speaking|spelling|literature|poetry|poems?|poets?|novels?|scholars?|scholarship|style|fashion|cuisine|food|dish|dishes|horses?|breed|history|historians?|studies|version|edition|original)$/;
+const NOT_PLACE = new Set(('I Me My He She It They We You His Her Their Our The A An This That These Those Then There Here When Where Why How What Who God Lord Sir Lady Mr Mrs Dr King Queen Prince Emperor Pope Saint St Chapter Book Part Volume Section Figure Table Note Notes Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July August September October November December Christ Jesus Romans Greeks Christians Muslims Jews Senate Consul Consuls Army General Caesar').split(' '));
 const STRENGTH_RANK = { strong: 0, weak: 1, none: 2 } as const;
 
 /**
@@ -50,7 +54,11 @@ export function detectPlaces(text: string, known: string[] = [], people: string[
     for (const m of text.matchAll(re)) add(n, m.index ?? 0, true);
   }
   for (const m of text.matchAll(PLACE_CUE)) add(m[1], (m.index ?? 0) + m[0].length - m[1].length, false);
-  for (const m of text.matchAll(DEMONYM_CUE)) add(m[1], m.index ?? 0, false, true);
+  for (const m of text.matchAll(DEMONYM_CUE)) {
+    // "in English", "English translation": language, not geography.
+    if (NOT_GEOGRAPHIC.test(m[2]) || /\b(?:in|into|from)\s+$/i.test(text.slice(Math.max(0, (m.index ?? 0) - 6), m.index ?? 0))) continue;
+    add(m[1], m.index ?? 0, false, true);
+  }
   return [...out.values()].sort((a, b) => Number(b.known) - Number(a.known) || a.index - b.index);
 }
 

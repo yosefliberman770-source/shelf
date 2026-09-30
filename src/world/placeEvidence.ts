@@ -111,14 +111,16 @@ function fit(spans: [number, number][], year: number | undefined, broad: boolean
 
 export function claimFromGaz(p: GazPlace, written: string, year?: number): Claim {
   const info = gazetteerInfo(p.gazetteer);
-  const spans: [number, number][] = p.from !== undefined || p.to !== undefined ? [[p.from ?? -99999, p.to ?? 99999]] : [];
+  // Own dates, or — for a record without them — the period its evidence allows (counts only as "possible").
+  const spans: [number, number][] = p.from !== undefined || p.to !== undefined ? [[p.from ?? -99999, p.to ?? 99999]]
+    : p.envelope ? [[p.envelope.from ?? info.coverage[0], p.envelope.to ?? info.coverage[1]]] : [];
   const w = norm(written);
   const nameMatch = norm(p.title) === w ? 'exact' : p.names.some((n) => norm(n.name) === w) ? 'variant' : 'none';
   // Pleiades periods and dataset-wide periods are broad: they make a date "possible", not certain.
-  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.datasetPeriod);
+  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.envelope);
   return {
     family: p.gazetteer, source: info.name, kind: 'gazetteer', id: p.key, title: p.title, names: p.names.map((n) => n.name),
-    lat: p.lat, lon: p.lon, spans, periodOnly: p.datasetPeriod, types: p.types, url: p.url, licence: info.license, nameMatch, dateFit,
+    lat: p.lat, lon: p.lon, spans, periodOnly: !!p.envelope, types: p.types, url: p.url, licence: info.license, nameMatch, dateFit,
     weight: sourceWeight(p.gazetteer, 'gazetteer') * NAME_FACTOR[nameMatch] * DATE_FACTOR[dateFit] * (p.uncertain >= 1 ? 0.8 : 1), gaz: p,
   };
 }

@@ -12,6 +12,7 @@
 //   • demonyms ("Aragonese", "Castilian") point to polities or regions;
 //   • continents, oceans and seas are macro-regions, never a town or province
 //     that happens to carry the same name.
+import { politiesAt } from './context';
 import { atlasBase, pack, type Pos } from './data';
 import { normName } from './gazetteer';
 import type { HistYear } from './time';
@@ -159,7 +160,11 @@ export const macroRegion = (written: string) => macroByName.get(normName(written
 
 // ── Polities (Cliopatria) and demonyms ────────────────────────────────────
 
-export interface PolityName { n: string; f: HistYear; t: HistYear; q?: string; x?: number; y?: number; m?: string }
+export interface PolityName {
+  n: string; f: HistYear; t: HistYear; q?: string; x?: number; y?: number; m?: string; g?: 1;
+  /** English aliases Wikidata records for the polity ("Venetian Republic", "Byzantium"). */ al?: string[];
+  /** Demonyms Wikidata records for it (P1549: "Venetian", "English"). */ dm?: string[];
+}
 /** Words that name a political form, not a polity ("Kingdom of Aragon" → Aragon). */
 const FORM = '(?:grand |great |holy |united |old |new |late |early |second |first |third )?(?:kingdom|kingdoms|crown|county|duchy|grand duchy|empire|republic|principality|emirate|caliphate|sultanate|khanate|khaganate|tsardom|despotate|margraviate|march|lordship|earldom|electorate|state|states|city-states|confederation|confederacy|league|dominion|colony|protectorate|viceroyalty|governorate|bishopric|archbishopric|prince-bishopric|theme|satrapy|province|dynasty|realm|commonwealth|territory|federation)';
 const LEAD = new RegExp(`^(?:the )?${FORM}(?: of(?: the)?)? `);
@@ -178,7 +183,7 @@ export function polityIndex(): Promise<(PolityName & { core: string })[]> {
 }
 
 /** Adjectival/demonym endings. */
-const DEMONYM = /^\p{Lu}\p{Ll}+(?:ese|ian|ean|ans?|ish|ine|ite|ic|i)$/u;
+const DEMONYM = /^\p{Lu}\p{Ll}+(?:ese|ian|ean|ans?|ish|ine|ite|ic|i|ch)$/u;
 const SUFFIXES = ['ese', 'ian', 'ean', 'ans', 'an', 'ish', 'ine', 'ite', 'ic', 'i'];
 /** Does this adjective plausibly derive from that core name? (shared stem of ≥ 5 letters covering most of both) */
 function stemMatches(adj: string, core: string): boolean {
@@ -197,22 +202,44 @@ function stemMatches(adj: string, core: string): boolean {
   return false;
 }
 
-export interface PolityMatch { polity: PolityName & { core: string }; via: 'name' | 'demonym'; fit: 'within' | 'near' | 'outside' | 'undated-year' }
+/**
+ * How the words found the polity, strongest first: its own name; an alias
+ * Wikidata records; a demonym Wikidata records; an adjective derived from the
+ * name by its spelling (the weakest — used only when nothing recorded matches).
+ */
+export type PolityVia = 'name' | 'alias' | 'demonym' | 'stem';
+export interface PolityMatch { polity: PolityName & { core: string }; via: PolityVia; fit: 'within' | 'near' | 'outside' | 'undated-year'; /** The book's other places lie inside its territory at the date. */ holdsBook?: boolean }
+export const viaDemonym = (v: PolityVia) => v === 'demonym' || v === 'stem';
 
 /**
- * Polities a name (or demonym) refers to, best first: those existing at the
- * year first; if none exists then, the nearest in time (marked "outside").
+ * Polities a name, alias or adjective refers to, best first. The same word can
+ * mean different polities at different dates ("Roman" in 100 BCE and 1100 CE)
+ * and in different books, so the order is: existing at the year; how strongly
+ * the words match; members before the groupings that contain them; whose
+ * territory at that date contains the places the book already mentions (only
+ * when the date is known — a label point's distance says nothing); nearest in time.
  */
-export async function matchPolity(written: string, year?: HistYear): Promise<PolityMatch[]> {
+export async function matchPolity(written: string, year?: HistYear, opts: { context?: { points: [number, number][] } } = {}): Promise<PolityMatch[]> {
   const idx = await polityIndex();
+  const w = normName(written.replace(/[’']s$/, ''));
   const k = polityCore(written);
   if (k.length < 3) return [];
-  let hits: { p: PolityName & { core: string }; via: 'name' | 'demonym' }[] = idx.filter((p) => p.core === k || normName(p.n.replace(/^\(|\)$/g, '')) === normName(written)).map((p) => ({ p, via: 'name' as const }));
-  if (!hits.length && DEMONYM.test(written.trim())) hits = idx.filter((p) => stemMatches(written.trim(), p.core)).map((p) => ({ p, via: 'demonym' as const }));
+  const via = (p: PolityName & { core: string }): PolityVia | undefined => {
+    if (p.core === k || normName(p.n.replace(/^\(|\)$/g, '')) === w) return 'name';
+    if (p.al?.some((a) => normName(a) === w || polityCore(a) === k)) return 'alias';
+    if (p.dm?.some((d) => normName(d) === w)) return 'demonym';
+    return undefined;
+  };
+  let hits = idx.map((p) => ({ p, via: via(p) })).filter((h): h is { p: PolityName & { core: string }; via: PolityVia } => !!h.via);
+  if (!hits.length && DEMONYM.test(written.trim())) hits = idx.filter((p) => stemMatches(written.trim(), p.core)).map((p) => ({ p, via: 'stem' as const }));
   const fit = (p: PolityName): PolityMatch['fit'] => (year === undefined ? 'undated-year' : p.f <= year && year <= p.t ? 'within' : p.f - 50 <= year && year <= p.t + 50 ? 'near' : 'outside');
   const gap = (p: PolityName) => (year === undefined ? 0 : year < p.f ? p.f - year : year > p.t ? year - p.t : 0);
+  // Which polities' territory holds the book's places at this date (from the Cliopatria outlines).
+  const pts = year !== undefined ? (opts.context?.points ?? []).slice(0, 12) : [];
+  const holding = new Set((await Promise.all(pts.map((pt) => politiesAt(pt, year!, 0).catch(() => [])))).flat().flatMap((p) => [p.n, ...(p.m ? p.m.split(';') : [])]));
   const rank = { within: 0, near: 1, 'undated-year': 2, outside: 3 } as const;
-  return hits.map(({ p, via }) => ({ polity: p, via, fit: fit(p) }))
-    // Prefer members over the collections that contain them, then the smallest gap in time.
-    .sort((a, b) => rank[a.fit] - rank[b.fit] || Number(a.polity.n.startsWith('(')) - Number(b.polity.n.startsWith('(')) || gap(a.polity) - gap(b.polity) || (b.polity.t - b.polity.f) - (a.polity.t - a.polity.f));
+  const vrank = { name: 0, alias: 1, demonym: 2, stem: 3 } as const;
+  return hits.map(({ p, via: v }) => ({ polity: p, via: v, fit: fit(p), holdsBook: holding.size ? holding.has(p.n) : undefined }))
+    .sort((a, b) => rank[a.fit] - rank[b.fit] || vrank[a.via] - vrank[b.via] || Number(a.polity.n.startsWith('(')) - Number(b.polity.n.startsWith('('))
+      || Number(!a.holdsBook) - Number(!b.holdsBook) || gap(a.polity) - gap(b.polity) || (b.polity.t - b.polity.f) - (a.polity.t - a.polity.f));
 }

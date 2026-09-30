@@ -306,8 +306,9 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
           </div>
         )}
 
-        {tab === 'chapter' && (
-          <ChapterPanel key={request.mode === 'section' ? `s:${request.text?.slice(0, 40)}` : 'chapter'} text={request.mode === 'section' && request.text ? request.text : chapterText()}
+        {/* Wait for the date context (it is worked out after the first render): places are resolved for a date, once. */}
+        {tab === 'chapter' && date && (
+          <ChapterPanel key={`${request.mode === 'section' ? `s:${request.text?.slice(0, 40)}` : 'chapter'}|${known ?? 'undated'}`} text={request.mode === 'section' && request.text ? request.text : chapterText()}
             section={request.mode === 'section'} year={known} bookId={book.bookId} bookTitle={book.title} chapter={book.chapter} names={names}
             findMentions={findMentions} onJump={onJump} onOpen={(p) => openPlace(p)}
             onPins={(pins) => {

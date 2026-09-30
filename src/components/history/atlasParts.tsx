@@ -21,9 +21,18 @@ import { EmptyNote } from './worldParts';
 
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 const polityType = (c?: string) => (c ? ` (${c})` : '');
-export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (an outlying holding in the source)' : ''}`;
-/** Polities at a spot as one phrase: more than one independent polity there means the source's outlines overlap (contested). */
-export const politiesLine = (ps: Polity[]) => (ps.length > 1 && ps.every((p) => !p.g) ? `contested — ${ps.map(polityName).join(' / ')}` : ps.map(polityName).join(' / '));
+export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (a detached piece of its outline in the source)' : ''}`;
+/**
+ * Polities at a spot as one phrase. More than one independent polity there means the source's
+ * outlines overlap: explained by a recorded relationship when there is one, otherwise stated as
+ * an overlap — never called a dispute, which the source doesn't record.
+ */
+export const politiesLine = (ps: Polity[]) => {
+  const names = ps.map(polityName).join(' / ');
+  if (ps.length < 2 || ps.some((p) => p.g)) return names;
+  const rel = [...new Set(ps.flatMap((p) => (p.xr ? p.xr.split(';') : [])))];
+  return rel.length ? `${names} (${rel.join('; ')})` : `${names} — the source’s outlines overlap here; it doesn’t say whether control was shared, changing or disputed`;
+};
 const kmLabel = (k: number) => `${Math.round(k / MILE_KM)} mi`;
 
 // ── Sources ───────────────────────────────────────────────────────────────

@@ -102,8 +102,6 @@ const FONT = ['OpenHistorical'];
 const FONT_BOLD = ['OpenHistorical Bold'];
 const FONT_ITALIC = ['OpenHistorical Italic'];
 
-/** Pleiades' core period (its period vocabulary runs from the Archaic to Late Antiquity). Undated Pleiades records can only be shown inside it, on request. */
-const PLEIADES_CORE: [HistYear, HistYear] = [-750, 640];
 /** AWMC/Barrington data covers the Greek and Roman world, c. 750 BCE – 640 CE. */
 const BARRINGTON: [HistYear, HistYear] = [-750, 640];
 
@@ -159,7 +157,10 @@ export function credit(id: DatasetId): string {
 
 // ── Layer builders ────────────────────────────────────────────────────────
 function pleiadesPoints(id: string, cat: string, color: string, ctx: LayerCtx, opts: { labelZoom?: number; radius?: number; minzoom?: number } = {}): LayerSpecification[] {
-  const filter = ['all', ['in', cat, ['get', 'l']], existedIn(ctx.year, { undated: ctx.showUndated ? { within: PLEIADES_CORE } : 'hide' })] as FilterSpecification;
+  // Own dates → shown inside them. No dates but an evidence period (ef/et, from linked records or the
+  // source's period — see the build) → shown inside that period, faded. No temporal evidence at all →
+  // only when the reader asks to see undated records, and then marked as undated.
+  const filter = ['all', ['in', cat, ['get', 'l']], existedIn(ctx.year, { envelope: { from: 'ef', to: 'et' }, undated: ctx.showUndated ? 'show' : 'hide' })] as FilterSpecification;
   const r = opts.radius ?? 3.5;
   const imp: ExpressionSpecification = ['match', ['coalesce', ['get', 'im'], 1], 4, 1.5, 3, 1.15, 2, 0.9, 0.7];
   return [
@@ -235,7 +236,7 @@ function polityClass(id: string, match: ExpressionSpecification, _color: string,
   const filled = ['all', area, ['!', ['has', 'g']]] as FilterSpecification;
   const grouping = ['all', area, ['has', 'g']] as FilterSpecification;
   const labels = ['all', match, alive, ['has', 'lbl']] as FilterSpecification;
-  // Contested outlines (overlapping another polity in the source) and small
+  // Outlines that overlap another polity's with no recorded relationship to explain it, and small
   // outlying pieces far from the main territory are drawn fainter and dashed.
   const doubtful: ExpressionSpecification = ['any', ['has', 'x'], ['has', 'op']];
   return [
@@ -295,7 +296,7 @@ export const LAYERS: AtlasLayerDef[] = [
   // PLACES
   {
     id: 'settlements', group: 'places', label: 'Ancient settlements', datasets: ['pleiades'], defaultOn: true, coverage: [-3000, 1500],
-    hint: 'Cities, towns and villages of the ancient world. Pleiades records no population, so dot size shows how prominent a place is in the record (names, linked places and sites recorded there); prominent places appear and are named first. Hollow = rough location; faded = uncertain.',
+    hint: 'Cities, towns and villages of the ancient world. Pleiades records no population, so dot size and the order places appear come from their recorded role and evidence — capital, administrative centre, urban place, port, road hub (Itiner-e), sites recorded there — with how well documented they are counting only a little. It is not a size. Hollow = rough location; faded = uncertain.',
     sources: ['pleiades-places'], specs: (c) => pleiadesPoints('settlements', 'settlement', C.settlement, c, { labelZoom: 6, radius: 3.6 }),
   },
   {

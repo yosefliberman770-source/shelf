@@ -14,11 +14,11 @@ import { norm } from '../lib/history/assess';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, undatedInCore, matchName, normName, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
-import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch } from './mention';
+import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
-import { type HistYear, yearLabel } from './time';
+import { ENVELOPE_LABEL, type HistYear, yearLabel } from './time';
 import { type HistDate, mergeDates, period, yearRange } from '../world/histdate';
 import type { EvidenceKind } from '../world/evidence';
 import { assessPlace, type Claim, type PlaceEvidence } from '../world/placeEvidence';
@@ -102,7 +102,7 @@ const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
 /** A gazetteer record's dates, keeping what kind of date they are. */
 export function gazDate(p: GazPlace): HistDate {
   const name = gazetteerInfo(p.gazetteer).name;
-  if (p.datasetPeriod) return period(p.from, p.to, 'Period of the whole dataset, not of this place', name);
+  if (p.envelope) return period(p.envelope.from, p.envelope.to, `No dates of its own — the period of ${ENVELOPE_LABEL[p.envelope.basis]}`, name);
   if (p.gazetteer === 'pleiades') return period(p.from, p.to, 'Pleiades periods', name);
   return yearRange(p.from, p.to, { source: name, qualifier: p.to === undefined && p.from !== undefined ? 'after' : 'between' });
 }
@@ -233,16 +233,24 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   const expected = mention?.expected;
 
   // 2. Continents and seas are macro-regions — never a town or province that shares the name.
-  // 3. Political entities (Cliopatria) — by name, or by demonym ("Aragonese" → Aragon).
-  const polities = await matchPolity(written, year).catch(() => [] as PolityMatch[]);
+  // Where the book is set, as far as is already known.
+  const context = opts.context ?? await bookGeoContext({ bookId: opts.bookId, nearby: opts.nearby, year, exclude: written }).catch(() => undefined);
+
+  // 3. Political entities (Cliopatria) — by name, alias or demonym, all from recorded data
+  //    (Cliopatria names; Wikidata aliases and demonyms), ranked by date and the book's geography.
+  const polities = await matchPolity(written, year, { context }).catch(() => [] as PolityMatch[]);
   // A polity is only "the" answer when it existed at the date. Without a date
   // its existence can't be checked, so it is at most a possibility (LOW),
   // unless the words themselves name a polity (a demonym, "the Kingdom of …").
   const livePolity = polities.find((x) => x.fit === 'within' || x.fit === 'near' || (x.fit === 'undated-year' && (expected === 'polity' || !!mention?.demonym)));
+  // Two different polities fit the words and the date equally, and the book's places don't separate them.
+  // (The book's places settle it only when one polity's territory holds them and the other's doesn't.)
+  const rivals = livePolity ? polities.filter((x) => x.fit === livePolity.fit && x.via === livePolity.via && !x.polity.n.startsWith('(') && x.polity.q !== livePolity.polity.q
+    && !(livePolity.holdsBook && x.holdsBook === false)) : [];
   const possiblePolity = livePolity ?? polities.find((x) => x.fit === 'undated-year');
-  const polityPlace = (pm: PolityMatch, status: Confidence) => fromPolity(pm, written, why(pm.via === 'demonym'
+  const polityPlace = (pm: PolityMatch, status: Confidence) => fromPolity(pm, written, why(viaDemonym(pm.via)
     ? `“${written}” is an adjective for ${pm.polity.n.replace(/^\(|\)$/g, '')}, a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}.`
-    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : pm.fit === 'undated-year' ? ' — the date being read about isn’t known, so whether it existed then can’t be checked' : ''}.`, pm.via === 'demonym' ? 'Demonym → polity (Cliopatria)' : 'Polity name (Cliopatria)'), status);
+    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : pm.fit === 'undated-year' ? ' — the date being read about isn’t known, so whether it existed then can’t be checked' : ''}${pm.via === 'alias' ? ' (matched through a name Wikidata records for it)' : ''}.`, pm.via === 'demonym' ? 'Recorded demonym → polity (Wikidata, Cliopatria)' : pm.via === 'stem' ? 'Adjective → polity by spelling (Cliopatria)' : pm.via === 'alias' ? 'Alias → polity (Wikidata, Cliopatria)' : 'Polity name (Cliopatria)'), status);
 
   const macro = macroRegion(written);
   if (macro && expected !== 'settlement' && expected !== 'polity') {
@@ -252,21 +260,22 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     // exactly that name ("Asia" in a Roman book may be the province of Asia).
     const alt = macro.kind === 'region' && livePolity ? polityPlace(livePolity, 'LOW') : undefined;
     const period = year === undefined ? undefined : await matchName(written, year).catch(() => undefined);
-    const regions = (period?.candidates ?? []).filter((c) => kindOf(c) === 'region' && (existedAround(c, year!, 50) || undatedInCore(c, year!)))
-      .map((c) => fromGaz(c, written, why(`${gazetteerInfo(c.gazetteer).name} records a ${(c.types[0] ?? 'region').replace(/-\d$/, '')} named “${c.title}”${existedAround(c, year!, 50) ? ` around ${yearLabel(year!)}` : ' (undated, within the period it covers)'}.`, `${gazetteerInfo(c.gazetteer).name} name match`), 'LOW', [], year));
+    const regions = (period?.candidates ?? []).filter((c) => kindOf(c) === 'region' && existedAround(c, year!, 50))
+      .map((c) => fromGaz(c, written, why(`${gazetteerInfo(c.gazetteer).name} records a ${(c.types[0] ?? 'region').replace(/-\d$/, '')} named “${c.title}”${c.from !== undefined || c.to !== undefined ? ` around ${yearLabel(year!)}` : ` (no dates of its own; within the period of ${ENVELOPE_LABEL[c.envelope!.basis]})`}.`, `${gazetteerInfo(c.gazetteer).name} name match`), 'LOW', [], year));
     const candidates = [...regions, ...(alt ? [alt] : [])];
     const note = candidates.length ? ` It could also mean ${candidates.map((c) => `“${c.recordTitle ?? c.title}”${c.types[0] ? ` (${c.types[0].replace(/-\d$/, '')})` : ''}`).join(' or ')} — choose it if that fits the passage.` : '';
     return { place: { ...place, why: { ...place.why, reason: place.why.reason + note } }, status: 'HIGH', candidates, reason: place.why.reason + note };
   }
+  if (livePolity && rivals.length && (expected === 'polity' || expected === 'region' || mention?.demonym)) {
+    const cands = [livePolity, ...rivals].slice(0, 5).map((x) => polityPlace(x, 'AMBIGUOUS')).filter((x): x is ReaderPlace => !!x);
+    return { status: 'AMBIGUOUS', candidates: cands, reason: `“${written}” could refer to ${cands.map((c) => c.title).join(' or ')} at this date, and the places already in this book don’t say which.` };
+  }
   if (livePolity && (expected === 'polity' || expected === 'region' || mention?.demonym)) {
-    const place = polityPlace(livePolity, 'HIGH');
-    if (place) return { place, status: 'HIGH', candidates: polities.filter((x) => x !== livePolity).slice(0, 4).map((x) => polityPlace(x, 'LOW')).filter((x): x is ReaderPlace => !!x), reason: place.why.reason };
+    const place = polityPlace(livePolity, livePolity.via === 'stem' ? 'MEDIUM' : 'HIGH');
+    if (place) return { place, status: place.status, candidates: polities.filter((x) => x !== livePolity).slice(0, 4).map((x) => polityPlace(x, 'LOW')).filter((x): x is ReaderPlace => !!x), reason: place.why.reason };
   }
   // A demonym never becomes a town or an online lookup.
   if (mention?.demonym && !polities.length) return { status: 'UNRESOLVED', candidates: [], reason: `“${written}” reads as an adjective, and no polity or region with that stem is recorded${year !== undefined ? ` around ${yearLabel(year)}` : ''}.` };
-
-  // Where the book is set, as far as is already known.
-  const context = opts.context ?? await bookGeoContext({ bookId: opts.bookId, nearby: opts.nearby, year, exclude: written }).catch(() => undefined);
 
   // 4. Period gazetteers, offline — scored by date, entity type and the book's geography.
   let local: Resolution | undefined;
@@ -275,8 +284,9 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     const attested = m.fit === 'within' || m.fit === 'near' || m.fit === 'no-year';
     // An undated record inside the dataset's own period counts when the book's geography agrees with it.
     const fitsBook = !!context?.points.length && contextDistance(context, [m.place.lon, m.place.lat]) < 1500;
-    const plausibleUndated = m.fit === 'undated' && year !== undefined && undatedInCore(m.place, year) && fitsBook;
-    const status: Confidence = m.candidates.length === 1 && (attested || plausibleUndated) ? 'HIGH' : 'MEDIUM';
+    // A record known only to a period counts when the book's own geography agrees with it.
+    const periodFits = m.fit === 'period' && fitsBook;
+    const status: Confidence = m.candidates.length === 1 && (attested || periodFits) ? 'HIGH' : 'MEDIUM';
     const method = `${[m.place, ...m.corroborating].map((p) => gazetteerInfo(p.gazetteer).name).join(' + ')} name match`;
     const place = fromGaz(m.place, written, why(m.reason, method, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status, m.corroborating, year);
     const alsoPolity = livePolity ? polityPlace(livePolity, 'LOW') : undefined;
