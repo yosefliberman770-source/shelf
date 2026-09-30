@@ -72,42 +72,112 @@ Where things are represented:
 | Crowded settlements | same weight for all | R8 | Internal classes (major city → hamlet, fort, port, sanctuary, site…) with rank-based minzoom, radius and label priority |
 | "no open data set" | fixed suffix | R11 | Status from the source registry: not integrated / restricted licence / online only / no dataset |
 
-## 4. What changed (by root cause)
+## 4. Final diagnosis (after the review pass)
+
+### 4.1 The actual underlying problems
+
+The original root causes R1–R12 above, plus six found in the review pass — several of them introduced or left
+half-fixed by the first round of corrections:
+
+| # | Problem | How it showed |
+| --- | --- | --- |
+| R13 | **One universal fallback for undated records.** The first fix hid undated records, then showed them "inside the dataset's core period" on request — the same shortcut in a new place (undated ⇒ Roman period). The data holds better evidence than that for most of them. | Roman-era places either missing at Roman dates or allowed on a blanket assumption |
+| R14 | **Demonyms derived only from spelling.** Adjectives were matched by stem, so irregular ones (Venetian → Venice) failed; the detection pattern skipped "-an" forms (Roman, Norman); "English", "French", "German" were on a never-a-place list. | Venetian unresolved; "Roman" never considered |
+| R15 | **Polities ranked by label-point distance.** Between polities of one name the nearest *label point* to the book's places won. A label point is where a name is drawn, not where the polity was. | "Roman" in a Punic-war chapter → Roman Kingdom (its label sits at Rome) |
+| R16 | **Chapter places resolved before the date was known.** The atlas works out the date after its first render; the chapter list resolved once, on mount, with no date. | Book places resolved as if undated even when the chapter says "218 BC" |
+| R17 | **Every overlap called "contested".** Cliopatria records territory per period and records relationships (allegiance, alliance, vassalage, personal union) — never claims or disputes. | Norway/Yorkshire and 1,400 other overlaps described as disputes the source never states |
+| R18 | **Importance = documentation.** The first ranking counted names and links: well documented ≠ important. | Well-studied small sites outranking capitals and ports |
+
+### 4.2 What changed, for each general problem
 
 | # | Now | Where |
 | --- | --- | --- |
-| R1 | Every mention carries its **text evidence**: cue strength (place-type cues like "city of", "kingdom of"; movement/direction cues like "went to", "near", which are *loose*; weak prepositions), the kind of entity the wording implies, multi-word names, demonyms. A single capitalised ordinary English word (SCOWL word list, 63k words — not a hand list) is looked up only with a place-type cue or when an offline dataset knows it. Screening runs before any lookup in the reader's Map tab, "Map this chapter" and the whole-book analysis. | `atlas/mention.ts`, `lib/history/placeDetect.ts` (`screenMentions`) |
-| R2 | Online answers need **spelling evidence**: the exact name or a full alias (abbreviations like "Mass." or "PA" and prefix hits don't count). Wikidata descriptions are no longer used as a place type. A lone far-away match is LOW, not accepted. | `lib/history/assess.ts`, `lib/history/providers.ts` |
-| R3 | **The book's geography is a prior.** Places already identified in the book (your choices, places you opened, the book analysis) and unambiguous names in the same passage form a context; between same-named places, one clearly nearer that context wins, with the distance in the reason. All period gazetteers are consulted at any date; only records that start *after* the date are excluded, so places persist past a dataset's window (flagged "recorded for an earlier period only"). | `atlas/geocontext.ts`, `atlas/gazetteer.ts` (`matchName`), `world/placeEvidence.ts` |
-| R4 | **Entity types.** Continents, seas and geographic lands (Italy, Greece, Gaul, Anatolia…) resolve as regions, never as a town or state that shares the name; a period province of the same name (Asia → the Roman province) or a state that existed at the date is offered as another reading. Polities are searched by name and by demonym ("Castilian" → Crown of Castile, "Norman" → Duchy of Normandy), and only placed when they existed at the date. Candidates of an incompatible type are dropped (a sea can't be a village). | `atlas/mention.ts` (`MACRO`, `matchPolity`), `atlas/resolve.ts` |
-| R5 | **Name roles.** A place keeps the book's wording (when the record lists it), an English name, the record's own title, names attested at the date, and names in their own scripts. The display policy is: book's wording → English name → Latin-script title → Latin-script name → title; the card says which rule chose it. When the written name is later than the date ("Constantinople" in 500 BCE) the reason says so and gives the names recorded then. | `atlas/names.ts`, `atlas/gazetteer.ts` |
-| R6 | **Undated is not "always".** Time fit is explicit (`within / near / earlier / later / undated`). Undated records are hidden from dated map views by default; an "Include undated records" switch shows them faintly and only inside the dataset's own core period. An undated record inside that period is accepted with confidence only when the book's other places agree with it. | `atlas/time.ts`, `atlas/catalog.ts`, `atlas/resolve.ts` |
-| R7 | **Cliopatria's hierarchy is kept.** Groupings (parenthesised collections) are outlined, not filled as rival states, and are reported as "part of". Independent polities whose outlines overlap substantially in the same years are flagged **contested**; small detached pieces far from a polity's main territory become **outlying** features (faint, dashed, unlabelled). Each polity version has one label point inside its largest part. Colours belong to the polity (by Seshat/Wikidata identity, stable through time) and neighbours get different colours. | `scripts/atlas-build/build.py` (`cliopatria`, `polity_relations`), `atlas/catalog.ts`, `atlas/context.ts` (`politiesAt`) |
-| R8 | **Importance.** Pleiades places get an importance class from the record itself (names, links and sites recorded — Pleiades has no population data); it sets tile zoom, dot size and label order. Polity labels appear by area and zoom. All labels share one band ordered by a hierarchy (polities → cities → provinces → local units → the rest). | `scripts/atlas-build/world.py` (`pleiades_importance`), `atlas/catalog.ts` (`labelKey`), `atlas/AtlasMap.tsx` |
-| R9 | Wikidata descriptions are labelled **"today:"**, WHG country codes as "modern country", and place cards show them as "Today (present-day description)". | `components/history/*` |
-| R10 | **Real deep zoom** from each collection's IIIF image server (OpenSeadragon, loaded only when a map is opened), stopping at the scan's full resolution and saying so; servers without tiles fall back to one image zoomable only to its own pixel size. The viewer shows scan size, zoom level and georeference status. Search results are ranked by: names the place, catalogued country matches the area on screen (so "Rome, N.Y." ranks below Rome in Italy), coverage scale (building plans flagged, world maps demoted), date and whether it can be overlaid — with a "why here" line. Overlays remain limited to georeferenced maps with a measured fit error. | `components/history/DeepZoom.tsx`, `world/maps.ts` (`relevance`) |
-| R11 | Unavailable layers state their reason ("no suitable open dataset exists", "licence doesn't allow publishing it here", "not added to Shelf yet"); empty-area notes name the catalogued source and the registry's reason it isn't used. | `atlas/catalog.ts` (`UNAVAILABLE_LABEL`), `world/evidence.ts` |
-| R12 | Non-Latin names are isolated (Unicode FSI…PDI in text, `<bdi>` in the UI), never reversed. | `atlas/names.ts`, place cards |
+| R1 | Every mention carries its text evidence: place-type cues ("city of", "kingdom of", "siege of"), **loose** movement/direction cues ("went to", "near" — strong for an unusual name, not for an ordinary word), weak prepositions, multi-word names, demonyms. A single capitalised ordinary English word (SCOWL list, 63k words) is looked up only with a place-type cue or when an offline dataset knows it. Runs before any lookup in every automatic path. | `atlas/mention.ts`, `lib/history/placeDetect.ts` |
+| R2 | Online answers need spelling evidence (exact name or full alias; abbreviations and prefixes don't count). A lone far-away match is LOW. | `lib/history/assess.ts`, `lib/history/providers.ts` |
+| R3, R15 | The book's places are a prior for **places**: the candidate clearly nearest them wins, with the distance stated. For **polities** they count only as territory: at a known date, a polity whose outline holds the book's places is preferred; with no date they decide nothing and an equal tie is reported as ambiguous. | `atlas/geocontext.ts`, `atlas/gazetteer.ts`, `atlas/mention.ts` (`matchPolity`), `atlas/resolve.ts` |
+| R4 | Continents, seas and geographic lands resolve as regions; a same-named period province or a state that existed then is offered as another reading. Type-incompatible candidates are dropped. | `atlas/mention.ts` (`MACRO`), `atlas/resolve.ts` |
+| R5 | Name roles and a stated display policy (book's wording → English name → Latin-script title → Latin-script name → title); other names kept; modern exonyms at ancient dates flagged. | `atlas/names.ts`, `atlas/gazetteer.ts` |
+| R6, R13 | **Four temporal states** (A dates · B/C evidence period · D unknown), see 4.5. The build derives each undated record's narrowest defensible period from its own dataset's evidence; the map shows B/C records only inside that period, faded and labelled approximate; D records are never placed in dated views (a separate "Include undated records" view shows them, marked). | `scripts/atlas-build/build.py` (`pleiades_envelopes`), `world.py`, `atlas/time.ts`, `atlas/catalog.ts` |
+| R7, R17 | Cliopatria's hierarchy kept (groupings outlined, reported as "part of"). Overlaps are explained by a **recorded relationship** when one links the two polities at that time (15 of 1,408); otherwise described as "the source's outlines overlap — it doesn't say whether control was shared, changing or disputed", drawn faint and dashed. Detached pieces far from the main territory are separate, unlabelled, and described neutrally ("the source doesn't say whether it was held, briefly occupied, or is an artefact"). One label per polity version; colours per polity identity, neighbours differ. | `build.py` (`cliopatria`, `polity_relations`), `atlas/catalog.ts`, `atlas/context.ts`, `components/history/atlasParts.tsx` |
+| R8, R18 | Prominence from **recorded role**: capital-of links, administrative parent of other places, urban/polis/fortified/settlement/station/villa types, port, Itiner-e road-hub degree (main roads weigh more), sites recorded at the place; documentation adds at most +1. Classes set tile zoom, dot size and label order; the map details say which evidence and that it is not population. Labels share one band ordered by hierarchy; polity labels gated by area and zoom. | `world.py` (`pleiades_importance`), `atlas/catalog.ts`, `atlas/AtlasMap.tsx` |
+| R9 | Modern descriptions labelled "today:"; country codes "modern country". | `components/history/*` |
+| R10 | IIIF deep zoom to the scan's own resolution (and it says so); relevance by place, catalogued country, coverage scale, date, overlay ability; sheets grouped. | `components/history/DeepZoom.tsx`, `world/maps.ts` |
+| R11 | Unavailable layers and empty areas give the actual reason. | `atlas/catalog.ts`, `world/evidence.ts` |
+| R12 | Non-Latin names isolated (FSI…PDI, `<bdi>`), never reversed. | `atlas/names.ts` |
+| R14 | Polity names, **Wikidata aliases and demonyms** (P1549, fetched per Cliopatria polity at build time, cached) and — only when nothing recorded matches — spelling-derived adjectives. Detection covers -an/-ic/-ch adjectives; adjectives followed by language/artefact words ("English translation", "Roman numerals") or after "in"/"into" are not places. A spelling-only match is at most MEDIUM. | `build.py` (`polity_aliases`), `atlas/mention.ts`, `lib/history/placeDetect.ts` |
+| R16 | Chapter places are resolved once the date context exists, and again if the reader changes the date. | `components/history/AtlasPanel.tsx` |
 
-Answers cached on a phone under the old rules are looked up again (versioned cache keys and book-analysis version).
+Answers cached on a phone under earlier rules are recomputed (versioned cache keys and book-analysis version).
 
-### Tests
+### 4.3 Which reported examples were symptoms of which problem
 
-`src/atlas/geography.test.ts` tests each rule with cases that were **not** among the observed symptoms:
-other ordinary words (Mill, Bank, Church, Chapel), other demonyms (Castilian, Frankish, Norman), other seas and
-lands (Adriatic, Balkans, Anatolia), a period province sharing a continent's name (Asia), a modern exonym
-(Constantinople), Arabic and Hebrew isolation, a later town at an earlier date (Lübeck), the same name in two
-books (Rome in Italy vs Mecklenburg), other prefix/abbreviation traps (Bathurst, "Penn."), hierarchy and contested
-territory (Winchester 900, East Yorkshire 1100), and map relevance (a same-named town in another country; a
-building plan). Browser checks covered 3000 BCE–2000 CE across Italy, England, Iberia, the Baltic, Mesopotamia,
-Greenland and western Europe at zooms 2–7, and the map viewer at full resolution.
+| Reported example | Symptom of |
+| --- | --- |
+| "mass" → Massachusetts; Guild → Guilderland | R1 (ordinary word taken as a place) + R2 (abbreviation/prefix accepted as a match) |
+| Bethlehem → Bethlehem NY | R2 + R3 (no book geography; the period gazetteer dropped outside its window) |
+| Europe → a place in Bulgaria | R4 (a continent matched a province title) |
+| Aragon/Aragonese not recognised | R4 (polities never searched) + R14 (demonyms from spelling only) |
+| Exeter shown as Isca Dumnoniorum | R5 (the record title used as the display name) |
+| Roman/Italian places at 3000 BCE | R6 (undated = always) — and its over-correction R13 |
+| Modern Greece in ancient contexts | R4 + R9 (the state, not the land; modern descriptions shown as types) |
+| Anglo-Saxon England vs Wessex | R7 (grouping drawn as a rival) |
+| Norwegian geography in Yorkshire | R7 (detached piece labelled as territory) + R17 (then over-described as "contested") |
+| Dense, generic settlements | R8 + R18 |
+| Corsica/Gibraltar labelled too early; Denmark repeated over Greenland | R7 + R8 (label per polygon part, no area gating) |
+| Political colours not distinct | R7 (colour by class, not by polity) |
+| Historical-map metadata, viewer and overlay problems | R10 |
+| "no open data set" | R11 |
+| Arabic/Hebrew bidi; non-English primary names | R12 + R5 |
+| (found in review) "Roman" → Roman Kingdom in a 218 BC chapter | R15 + R16 |
 
-### Known limits
+### 4.4 What remains uncertain because of the sources
 
-- Irregular demonyms whose stem differs from the polity's name (Venetian → Venice) aren't derived; they fall back
-  to the other rules.
-- Cliopatria outlines are simplified (≈ 6 km); a coastal town can fall just outside its state (reported as
-  "at the edge of").
-- Importance for Pleiades is a proxy for prominence in the record, not size. Datasets with real classes
-  (Viabundus towns, al-Ṯurayyā capitals/towns) use their own.
-- Map relevance by country uses the Library of Congress's catalogue field; other collections don't provide one.
+- **Pleiades**: 525 of the 20,340 mapped places have no temporal evidence at all (no dates; nothing dated linked
+  to them; not from the Barrington Atlas). They are not placed in dated views. Evidence periods are as wide as
+  the evidence: a place known only from the Barrington Atlas is eligible anywhere from the Archaic to the Late
+  Antique period (750 BCE – 640 CE, Pleiades' own period bounds), shown faded as approximate.
+- **Cliopatria** outlines are per period and simplified (≈ 6 km); they record no claims. Overlaps without a
+  recorded relationship remain unexplained by the source, and are shown as such.
+- **Prominence** for ancient places comes from recorded role; no source used here records population. Places
+  whose role Pleiades doesn't record (e.g. Byzantion's) rank lower than their history deserves.
+- **Demonyms** depend on Wikidata having an alias or demonym for the polity item; where it has none, only the
+  spelling rule applies (at most "likely"). The build step keeps what it fetched in a cache; Wikimedia rate
+  limits can make a fresh fetch slow.
+- **Map relevance by country** uses the Library of Congress's catalogue field; other collections don't give one.
+
+### 4.5 What Shelf intentionally does NOT infer
+
+- **No date from nothing.** A record with no temporal evidence gets no period — not "all of history", not "the
+  dataset's period", not "Roman". The four states:
+  A. own dates → shown inside them;
+  B/C. no dates, but a period from evidence (dated linked records; the dated place it is part of; the reference
+  work's period; the dataset's documented period, e.g. Viabundus 1350–1650, al-Ṯurayyā 9th–10th c.) → shown only
+  inside that period, as approximate;
+  D. no evidence → not placed in dated views; visible only through "Include undated records", marked undated.
+- **No period from a place's type** (a "villa" is not assumed Roman, a "church" not assumed Christian-era) —
+  the source doesn't state it.
+- **No claims or disputes** from overlapping outlines; no ownership of detached pieces.
+- **No polity from an adjective without recorded support at the date**; no city from a demonym ("Roman" is
+  never the city of Rome); no polity chosen by label-point distance; no choice when two fit equally.
+- **No population or size** from prominence classes; the map says the ranking is evidence-based.
+- **No modern country for an ancient land name** ("Italy" in 218 BCE is the peninsula).
+- **Book-derived places vs searches**: names read in a book are resolved with the book's date, cues and
+  geography; the atlas search box looks names up in the gazetteers without that context, and says so by
+  listing all matches.
+
+### 4.6 Verification
+
+- **Tests**: see the final count below. `src/atlas/geography.test.ts` has a **REGRESSION** section (the reported
+  problems) and a **GENERALISATION** section (other ordinary words, other shared names — Alexandria, Tripolis,
+  Heraclea, Rome/Mecklenburg — other adjectives — Castilian, Frankish, Norman, Byzantine, Roman at two dates —
+  undated records from four datasets and four evidence types, other periods' polities — York 900, Baghdad 900,
+  Capua 218 BCE, Paris 1850 — Greek and Cyrillic scripts, label behaviour at several map scales). The map layer
+  filters and label sizes are evaluated with MapLibre's own expression engine.
+- **Map checks** (phone-sized browser): 3000 BCE (Italy: nothing; Mesopotamia: only dated early sites),
+  100 CE (Italy z4: only top-class places; z7: detail, including places placed by evidence period; Britain,
+  Levant), 883 (Carolingian Empire, Wessex, Brittany), 1100 (Europe z3; East Yorkshire z7: faint detached
+  piece, unlabelled), 1300 (Iberia; north Italy z6: Florence, Papal States, Aquileia), 1850 (Europe; India:
+  British Empire, Nepal, residual Mughal Empire). No duplicated polity labels in any view.
+
+- **Final test count**: 220 passed across the suite (59 passed in `geography.test.ts`), 0 failing.
+- **Production build** (`SHELF_BASE=/shelf/ npx vite build`, with `tsc -b`): succeeds.

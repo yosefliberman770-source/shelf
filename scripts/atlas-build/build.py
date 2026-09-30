@@ -964,7 +964,8 @@ def polity_aliases():
     # Wikidata's entity API (50 items a request), paced and backing off: shared build machines are often rate-limited.
     wait = 90
     i = 0
-    while i < len(qids):
+    deadline = time.time() + 3600  # give up after an hour and use what is cached
+    while i < len(qids) and time.time() < deadline:
         chunk = qids[i:i + 50]
         url = 'https://www.wikidata.org/w/api.php?' + urllib.parse.urlencode({'action': 'wbgetentities', 'ids': '|'.join(chunk), 'props': 'aliases|claims', 'languages': 'en', 'format': 'json'})
         try:
@@ -987,6 +988,8 @@ def polity_aliases():
         wait = 90
         time.sleep(90)
     json.dump(cache, open(cache_path, 'w'))
+    if i < len(qids):
+        log(f'  Wikidata unavailable: {len(qids) - i} polities without aliases this time (kept for the next build)')
     n_al = n_dm = 0
     for r in rows:
         c = cache.get(r.get('q') or '')
