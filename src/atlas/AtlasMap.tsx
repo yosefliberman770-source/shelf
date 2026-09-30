@@ -27,6 +27,8 @@ let pmtilesReady = false;
 const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
+const SEA = '#cddde4';
+const LAND = '#efe7d4';
 /** Detailed water from OpenStreetMap, kept just above the political layers. */
 const WATER = 'water-detail';
 
@@ -63,11 +65,11 @@ function baseStyle(base: string): StyleSpecification {
       radius: { type: 'geojson', data: EMPTY },
     },
     layers: [
-      { id: 'sea', type: 'background', paint: { 'background-color': '#cddde4' } },
-      { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': '#efe7d4' } },
+      { id: 'sea', type: 'background', paint: { 'background-color': SEA } },
+      { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': LAND } },
       // Drawn above the reconstructed borders (moved into place in sync), so their simplified outlines don't
       // spill into the sea and coastal places sit on the true coast.
-      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': '#cddde4' } },
+      { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': SEA } },
       // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
       { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
       { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
@@ -187,7 +189,19 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
           setReady(true);
           onReadyRef.current?.(map!);
         });
-        map.on('error', (e) => { if (!map?.loaded()) console.warn('atlas', e.error?.message); });
+        // Base map: once the detailed water tiles arrive, land is the background and only real water is
+        // painted, so coastal places (Portsmouth on Portsea Island) sit on land. If they can't load
+        // (offline, service down), fall back to the coarse Natural Earth land shape on a sea background.
+        const detailedBase = (on: boolean) => {
+          if (!map?.getLayer('sea')) return;
+          map.setPaintProperty('sea', 'background-color', on ? LAND : SEA);
+          map.setLayoutProperty('land', 'visibility', on ? 'none' : 'visible');
+        };
+        map.on('sourcedata', (e) => { if (e.sourceId === 'ofm' && e.tile && e.isSourceLoaded) detailedBase(true); });
+        map.on('error', (e) => {
+          if ((e as { sourceId?: string }).sourceId === 'ofm') detailedBase(false);
+          else if (!map?.loaded()) console.warn('atlas', e.error?.message);
+        });
         map.on('click', (e) => onClickRef.current(e));
         mapRef.current = map;
         (window as unknown as { __shelfAtlas?: MLMap }).__shelfAtlas = map;
