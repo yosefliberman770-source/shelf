@@ -40,6 +40,12 @@ LICENSE.md files from the manifest.
   `scripts/atlas-build/england.py`.
 - **Not yet downloaded:** a few ADS documentation files (Gough Map guide, map image PDF and website image;
   Inland Navigation overview PNG) — not needed for the data.
+- **Added 2026-09-30 (Europe-wide, open licences):** a Wikidata snapshot of medieval sites (castles,
+  monasteries, cathedrals, dioceses, fortifications, bridges, universities, dated settlements; queries saved
+  beside results — re-run with `scripts/historical-data/wikidata_snapshot.py`), Germania Sacra (monasteries and
+  dioceses of the Empire), Buringh's European urban population 700–2000, the Historical Conflict Event Dataset
+  and PeriodO. Processed by `scripts/atlas-build/sites.py`; see docs/MEDIEVAL_EUROPE_DATA_AUDIT.md.
+- **Measured coverage:** `coverage-measured.json` (built by `scripts/historical-data/coverage.py`).
 - **Skipped:** GB1900 (owner's decision).
 - **Online-only:** KEPN and PASE (see their SOURCE.md). The World Historical Gazetteer is an external
   reconciliation source, queried per place name and cached on the device — never bulk-downloaded (see

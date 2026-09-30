@@ -7,7 +7,7 @@
 - **Geographic coverage:** Europe, the Mediterranean and the Near East (lon −32…62, lat 24…72).
 - **Historical date range:** Castles, monasteries, cathedrals and dioceses of any date (with Wikidata's founding / dissolution dates where recorded); battles and sieges before 1600; fortifications founded before 1500; universities and bridges founded before 1600; settlements with a first written mention or founding date 400–1600.
 - **Download date:** 2026-09-30
-- **Total size:** 27.3 MB in 21 files
+- **Total size:** 44.7 MB in 25 files
 
 ## What it contains
 
@@ -35,17 +35,21 @@ Saved unchanged in `original/` (or `nightly-export/`). Files over 25 MB are not 
 | `original/castle.tsv` | 5.2 MB | yes | https://qlever.dev/api/wikidata (POST queries/castle.rq) | `6596f24db7791acdf7f41907f3d8a31d81303936e7e1e05a5a0a1c06371a75a9` |
 | `original/cathedral.names.tsv` | 477.0 KB | yes | https://qlever.dev/api/wikidata (POST queries/cathedral.names.rq) | `ef304f54af55abca773a35d27fba679267af4ff70eca20c979d1106dca05e92a` |
 | `original/cathedral.tsv` | 478.7 KB | yes | https://qlever.dev/api/wikidata (POST queries/cathedral.rq) | `2edcb632536c8064a7df250bd053e6e9acd383d7e58325cd9e178a3e5cfffa27` |
+| `original/city.names.tsv` | 4.4 MB | yes | https://qlever.dev/api/wikidata (POST queries/city.names.rq) | `6095571aa9552d66e4507a14c7b5d1846b16ef0bdee8eb0335bbb1862b06ff40` |
+| `original/city.tsv` | 3.9 MB | yes | https://qlever.dev/api/wikidata (POST queries/city.rq) | `60ec1c60a4abd06b787147492cc856a56e9ee1e6c286adac43bf6fdd81e3c259` |
 | `original/diocese.names.tsv` | 210.5 KB | yes | https://qlever.dev/api/wikidata (POST queries/diocese.names.rq) | `e2d99c7d1695202986b9844dafd54a7e31a4b54bb9a2eb9d5855cf5adc620ed6` |
 | `original/diocese.tsv` | 146.6 KB | yes | https://qlever.dev/api/wikidata (POST queries/diocese.rq) | `e37183083e58187a15eade98cde9d827f88f76ae25cca154630d54bca51a9107` |
 | `original/fortification.names.tsv` | 551.7 KB | yes | https://qlever.dev/api/wikidata (POST queries/fortification.names.rq) | `9b044a0b7e65366391abeb5456f913da1a4bb6d310854787a279992162250850` |
 | `original/fortification.tsv` | 1015.0 KB | yes | https://qlever.dev/api/wikidata (POST queries/fortification.rq) | `535520379c1c8bd397b2b758996d6cfa728ef121d3b2dc13359eb822490209ad` |
-| `original/labels.tsv` | 476.7 KB | yes | https://qlever.dev/api/wikidata (labels of referenced items) | `130ac84c25fdef53db0ea6e61a8d15ad077e0f5b8c703a6b7d3d3bb69b1d28cc` |
+| `original/labels.tsv` | 604.2 KB | yes | https://qlever.dev/api/wikidata (labels of referenced items) | `06a24abcd9c66797176c9793936b0e78fc3554eae4e05094bc8382c752aec53b` |
 | `original/monastery.names.tsv` | 1.8 MB | yes | https://qlever.dev/api/wikidata (POST queries/monastery.names.rq) | `d45c59f9f7aa67488fbd926ca7acbcbcf4788770450e50b981e20df75a6fa05f` |
 | `original/monastery.tsv` | 3.8 MB | yes | https://qlever.dev/api/wikidata (POST queries/monastery.rq) | `83dbdef5bb8a9267352a43c35ee88c872a0f475325e24578c461ca8b54137c16` |
 | `original/settlement.names.tsv` | 3.6 MB | yes | https://qlever.dev/api/wikidata (POST queries/settlement.names.rq) | `9aee76c806cfd0f569cfa97a4374f2fbfaf68cbfae7b15a3decaf9c38bd3e1cc` |
 | `original/settlement.tsv` | 5.5 MB | yes | https://qlever.dev/api/wikidata (POST queries/settlement.rq) | `93cdea750dfa508c9d08ff157a892f8b5916be5f8676257855171a47b9d732e9` |
 | `original/siege.names.tsv` | 189.6 KB | yes | https://qlever.dev/api/wikidata (POST queries/siege.names.rq) | `1d515ab109526db866fdf19d5c053d0f1418b3559914a89a81563f006a1d5597` |
 | `original/siege.tsv` | 253.3 KB | yes | https://qlever.dev/api/wikidata (POST queries/siege.rq) | `50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84` |
+| `original/town.names.tsv` | 4.8 MB | yes | https://qlever.dev/api/wikidata (POST queries/town.names.rq) | `987bec65c6d3dfef8511b3b7c761d51b27162109be6040c7759ebf3647581c54` |
+| `original/town.tsv` | 4.2 MB | yes | https://qlever.dev/api/wikidata (POST queries/town.rq) | `a72801bc1853ad35b880c46d4a5fe59f288b845357016442fbd404b460c9697c` |
 | `original/university.names.tsv` | 68.5 KB | yes | https://qlever.dev/api/wikidata (POST queries/university.names.rq) | `912f77a97dd4f43bdad7bd8b8cff5d429e5d181b3fc409d2cd5927e16656b637` |
 | `original/university.tsv` | 34.3 KB | yes | https://qlever.dev/api/wikidata (POST queries/university.rq) | `191ea22ccbeac4dccae30cc919e8d09dde1c73e9747e8470cac4defb2245787c` |
 

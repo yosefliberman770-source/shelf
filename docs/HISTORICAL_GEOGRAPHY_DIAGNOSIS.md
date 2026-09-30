@@ -196,3 +196,17 @@ in a Byzantine-set book —
 
 - **Final test count**: 230 passed across the suite (69 passed in `geography.test.ts`), 0 failing.
 - **Production build** (`SHELF_BASE=/shelf/ npx vite build`, with `tsc -b`): succeeds.
+
+## 5. Medieval Europe beyond England (2026-09-30)
+
+| # | Problem | How it showed | Fix |
+| --- | --- | --- | --- |
+| R22 | **Medieval data only for England and the Hanseatic north.** Outside Viabundus's area (1350–1650) and the England-only layers, the map had no dated medieval settlements, no castles, no religious houses and no town sizes; Pleiades's late-antique tail was the only settlement evidence for France, Italy, Iberia and the Balkans. | Empty medieval maps of France, Italy, Iberia, Hungary, the Balkans | Europe-wide layers from Wikidata (CC0), Germania Sacra (CC BY-SA), Buringh towns (CC0) and HCED battles (CC0) — see MEDIEVAL_EUROPE_DATA_AUDIT.md |
+| R23 | **No importance signal for medieval towns except documentation.** | Small and large towns drawn alike | Buringh's estimated population per century sizes towns; sitelinks are never used as importance |
+| R24 | **Source errors passed through.** Some Buringh coordinates lost their decimal point or are hundreds of km off. | Riga in the Baltic Sea, Minsk in Russia | Repaired only when an independent record (a same-named Wikidata town) confirms it; otherwise the town is left off and listed |
+| R25 | **Borrowed titles counted as a dataset's own name.** Once Buringh towns carried Wikidata's English name, "Rome" became the only *titled* match and hid the Mecklenburg village. | Rome chosen without asking when the book's date and place were unknown | A title the build borrowed is indexed as an alternative name; a record with its own dates leads its group |
+
+Verification: 268 tests pass (38 in `src/atlas/medieval-europe.test.ts`, across eight European regions); map
+checks at 3000 BCE, 430 BCE Greece, 117 Rome, 883 Europe, 1100 France and Rus', 1300 central Europe, Balkans,
+Scandinavia, Wales and the Rhine, 1450 Iberia and Italy, 1850 Europe. Production build succeeds.
+

@@ -56,7 +56,10 @@ Rebuild the data packs with `pip install shapely pyshp` and then
 | [Ancient World Mapping Center](https://awmc.unc.edu/) geodata | ODbL |
 | [Cliopatria](https://github.com/Seshat-Global-History-Databank/cliopatria) (Seshat) | CC BY 4.0 |
 | Coastlines and water: [OpenStreetMap](https://www.openstreetmap.org/copyright) via [OpenFreeMap](https://openfreemap.org) / OpenMapTiles (live tiles, water shapes only; no key) | ODbL |
-| [Wikidata](https://www.wikidata.org/) | CC0 |
+| [Wikidata](https://www.wikidata.org/) (events; medieval sites snapshot) | CC0 |
+| [Germania Sacra](https://klosterdatenbank.germania-sacra.de/), Klöster und Stifte des Alten Reiches (monastery and diocese tiles are shared under the same licence) | CC BY-SA 3.0 |
+| [Buringh, European urban population 700–2000](https://doi.org/10.17026/dans-xzy-u62q) (DANS) | CC0 |
+| [Historical Conflict Event Dataset](https://doi.org/10.7910/DVN/6ZFC0V) (Miller et al. 2022) | CC0 |
 | [Natural Earth](https://www.naturalearthdata.com/) | Public domain |
 | [OpenHistoricalMap](https://www.openhistoricalmap.org/) (tiles and fonts) | CC0 |
 | [Terrain Tiles](https://github.com/tilezen/joerd/blob/master/docs/attribution.md) | Various; see the linked page |

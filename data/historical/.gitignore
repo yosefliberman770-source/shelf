@@ -98,6 +98,8 @@ raw/*/nightly-export/**
 !raw/wikidata-medieval/original/castle.tsv
 !raw/wikidata-medieval/original/cathedral.names.tsv
 !raw/wikidata-medieval/original/cathedral.tsv
+!raw/wikidata-medieval/original/city.names.tsv
+!raw/wikidata-medieval/original/city.tsv
 !raw/wikidata-medieval/original/diocese.names.tsv
 !raw/wikidata-medieval/original/diocese.tsv
 !raw/wikidata-medieval/original/fortification.names.tsv
@@ -109,5 +111,7 @@ raw/*/nightly-export/**
 !raw/wikidata-medieval/original/settlement.tsv
 !raw/wikidata-medieval/original/siege.names.tsv
 !raw/wikidata-medieval/original/siege.tsv
+!raw/wikidata-medieval/original/town.names.tsv
+!raw/wikidata-medieval/original/town.tsv
 !raw/wikidata-medieval/original/university.names.tsv
 !raw/wikidata-medieval/original/university.tsv

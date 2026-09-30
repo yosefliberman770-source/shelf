@@ -1,6 +1,9 @@
 # Historical data sources: audit
 
-Audited on 2026-09-29.
+Audited on 2026-09-29. **Medieval Europe beyond England** was audited again on 2026-09-30 — inventory, quality
+records, measured coverage, licence classes, English-name coverage and next acquisitions are in
+[MEDIEVAL_EUROPE_DATA_AUDIT.md](MEDIEVAL_EUROPE_DATA_AUDIT.md); the measured region × theme × period matrix is in
+[HISTORICAL_COVERAGE_MEASURED.md](HISTORICAL_COVERAGE_MEASURED.md).
 
 **Verified** means the endpoint was requested from Shelf's build environment on that date. The check recorded:
 
