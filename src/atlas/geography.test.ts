@@ -182,6 +182,20 @@ describe('GENERALISATION — same mechanisms, different cases', () => {
       expect(m?.polity.n).toMatch(re);
       expect(m?.fit).toBe('within');
     });
+    it.each([
+      ['Venetian', 1500, /Venice/], // irregular: from Wikidata's recorded alias/demonym, not spelling
+      ['Danish', 1000, /Denmark/],
+      ['Hungarian', 1400, /Kingdom of Hungary/], // the date decides before how the words matched
+    ])('%s (%i) → the polity existing then, from recorded data', async (w, y, re) => {
+      const [m] = await matchPolity(w, y);
+      expect(m?.polity.n).toMatch(re);
+      expect(m?.fit).toBe('within');
+    });
+    it('a demonym match the book’s own places contradict is only "likely" ("Roman" in 1100 in a book set in Constantinople)', async () => {
+      const demonym = { strength: 'none' as const, multiword: false, demonym: true };
+      const r = await offline('Roman', 1100, { mention: demonym, nearby: ['Constantinople', 'Nicaea'] });
+      expect(r.status).not.toBe('HIGH');
+    });
     it('the same adjective depends on the date: "Roman" in 1100 is not the Roman Republic, and never the city of Rome', async () => {
       const r = await offline('Roman', 1100, { mention: { strength: 'none', multiword: false, demonym: true } });
       expect(r.place?.title ?? '').not.toMatch(/Roman Republic|^Rome$|^Roma$/);

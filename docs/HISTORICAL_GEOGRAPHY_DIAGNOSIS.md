@@ -104,7 +104,7 @@ half-fixed by the first round of corrections:
 | R10 | IIIF deep zoom to the scan's own resolution (and it says so); relevance by place, catalogued country, coverage scale, date, overlay ability; sheets grouped. | `components/history/DeepZoom.tsx`, `world/maps.ts` |
 | R11 | Unavailable layers and empty areas give the actual reason. | `atlas/catalog.ts`, `world/evidence.ts` |
 | R12 | Non-Latin names isolated (FSI…PDI, `<bdi>`), never reversed. | `atlas/names.ts` |
-| R14 | Polity names, **Wikidata aliases and demonyms** (P1549, fetched per Cliopatria polity at build time, cached) and — only when nothing recorded matches — spelling-derived adjectives. Detection covers -an/-ic/-ch adjectives; adjectives followed by language/artefact words ("English translation", "Roman numerals") or after "in"/"into" are not places. A spelling-only match is at most MEDIUM. | `build.py` (`polity_aliases`), `atlas/mention.ts`, `lib/history/placeDetect.ts` |
+| R14 | Polity names, **Wikidata aliases and demonyms** (P1549; fetched per Cliopatria polity at build time from QLever's copy of Wikidata, falling back to Wikidata's own API; cached — 1,053 polities with aliases, 260 with demonyms) and spelling-derived adjectives. All routes are collected and **the date decides first**, then how strongly the words match ("Hungarian" in 1400 → Kingdom of Hungary by spelling, not the later Hungarian Republic by name). Detection covers -an/-ic/-ch adjectives; adjectives followed by language/artefact words ("English translation", "Roman numerals") or after "in"/"into" are not places. A match is confident only when it comes from a recorded name/alias/demonym **and** the book's places don't lie outside that polity at the date; otherwise it is "likely". | `build.py` (`polity_aliases`), `atlas/mention.ts`, `atlas/resolve.ts`, `lib/history/placeDetect.ts` |
 | R16 | Chapter places are resolved once the date context exists, and again if the reader changes the date. | `components/history/AtlasPanel.tsx` |
 
 Answers cached on a phone under earlier rules are recomputed (versioned cache keys and book-analysis version).
@@ -140,9 +140,11 @@ Answers cached on a phone under earlier rules are recomputed (versioned cache ke
   recorded relationship remain unexplained by the source, and are shown as such.
 - **Prominence** for ancient places comes from recorded role; no source used here records population. Places
   whose role Pleiades doesn't record (e.g. Byzantion's) rank lower than their history deserves.
-- **Demonyms** depend on Wikidata having an alias or demonym for the polity item; where it has none, only the
-  spelling rule applies (at most "likely"). The build step keeps what it fetched in a cache; Wikimedia rate
-  limits can make a fresh fetch slow.
+- **Demonyms** come from what Wikidata records. Where it records none for the polity of the period and the
+  spelling differs (e.g. "French" for the Kingdom of France, "Polish" for the Polish–Lithuanian Commonwealth),
+  the adjective is not linked to a polity — it isn't guessed. Where Wikidata records a demonym for a
+  polity some readers wouldn't expect ("Roman" → Holy Roman Empire in 1100), the book's places temper it:
+  in a book set in Constantinople it is only "likely", with the reason shown.
 - **Map relevance by country** uses the Library of Congress's catalogue field; other collections don't give one.
 
 ### 4.5 What Shelf intentionally does NOT infer
@@ -169,7 +171,8 @@ Answers cached on a phone under earlier rules are recomputed (versioned cache ke
 
 - **Tests**: see the final count below. `src/atlas/geography.test.ts` has a **REGRESSION** section (the reported
   problems) and a **GENERALISATION** section (other ordinary words, other shared names — Alexandria, Tripolis,
-  Heraclea, Rome/Mecklenburg — other adjectives — Castilian, Frankish, Norman, Byzantine, Roman at two dates —
+  Heraclea, Rome/Mecklenburg — other adjectives — Castilian, Frankish, Norman, Byzantine, Venetian, Danish, Hungarian, Roman at two dates and
+in a Byzantine-set book —
   undated records from four datasets and four evidence types, other periods' polities — York 900, Baghdad 900,
   Capua 218 BCE, Paris 1850 — Greek and Cyrillic scripts, label behaviour at several map scales). The map layer
   filters and label sizes are evaluated with MapLibre's own expression engine.
@@ -179,5 +182,5 @@ Answers cached on a phone under earlier rules are recomputed (versioned cache ke
   piece, unlabelled), 1300 (Iberia; north Italy z6: Florence, Papal States, Aquileia), 1850 (Europe; India:
   British Empire, Nepal, residual Mughal Empire). No duplicated polity labels in any view.
 
-- **Final test count**: 220 passed across the suite (59 passed in `geography.test.ts`), 0 failing.
+- **Final test count**: 224 passed across the suite (63 passed in `geography.test.ts`), 0 failing.
 - **Production build** (`SHELF_BASE=/shelf/ npx vite build`, with `tsc -b`): succeeds.

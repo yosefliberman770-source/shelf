@@ -271,7 +271,9 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     return { status: 'AMBIGUOUS', candidates: cands, reason: `“${written}” could refer to ${cands.map((c) => c.title).join(' or ')} at this date, and the places already in this book don’t say which.` };
   }
   if (livePolity && (expected === 'polity' || expected === 'region' || mention?.demonym)) {
-    const place = polityPlace(livePolity, livePolity.via === 'stem' ? 'MEDIUM' : 'HIGH');
+    // Confident only when the words match a recorded name/alias/demonym and the book's own places don't
+    // lie outside that polity at the date; a spelling-only match, or one the book's places contradict, is "likely".
+    const place = polityPlace(livePolity, livePolity.via === 'stem' || livePolity.holdsBook === false ? 'MEDIUM' : 'HIGH');
     if (place) return { place, status: place.status, candidates: polities.filter((x) => x !== livePolity).slice(0, 4).map((x) => polityPlace(x, 'LOW')).filter((x): x is ReaderPlace => !!x), reason: place.why.reason };
   }
   // A demonym never becomes a town or an online lookup.

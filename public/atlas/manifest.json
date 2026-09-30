@@ -67,8 +67,10 @@
    "counts": {
     "polities": 43252,
     "classified": 12211,
-    "names": {
-     "names": 1585
+    "names": null,
+    "aliases": {
+     "aliases": 1053,
+     "demonyms": 260
     }
    }
   },

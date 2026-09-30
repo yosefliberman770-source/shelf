@@ -230,13 +230,17 @@ export async function matchPolity(written: string, year?: HistYear, opts: { cont
     if (p.dm?.some((d) => normName(d) === w)) return 'demonym';
     return undefined;
   };
-  let hits = idx.map((p) => ({ p, via: via(p) })).filter((h): h is { p: PolityName & { core: string }; via: PolityVia } => !!h.via);
-  if (!hits.length && DEMONYM.test(written.trim())) hits = idx.filter((p) => stemMatches(written.trim(), p.core)).map((p) => ({ p, via: 'stem' as const }));
+  // Every route is collected, so the date decides first: "Hungarian" in 1400 is the Kingdom of Hungary
+  // (by spelling) rather than the later Hungarian Republic (by name).
+  const isAdj = DEMONYM.test(written.trim());
+  const hits = idx.map((p) => ({ p, via: via(p) ?? (isAdj && stemMatches(written.trim(), p.core) ? 'stem' as const : undefined) }))
+    .filter((h): h is { p: PolityName & { core: string }; via: PolityVia } => !!h.via);
   const fit = (p: PolityName): PolityMatch['fit'] => (year === undefined ? 'undated-year' : p.f <= year && year <= p.t ? 'within' : p.f - 50 <= year && year <= p.t + 50 ? 'near' : 'outside');
   const gap = (p: PolityName) => (year === undefined ? 0 : year < p.f ? p.f - year : year > p.t ? year - p.t : 0);
   // Which polities' territory holds the book's places at this date (from the Cliopatria outlines).
   const pts = year !== undefined ? (opts.context?.points ?? []).slice(0, 12) : [];
-  const holding = new Set((await Promise.all(pts.map((pt) => politiesAt(pt, year!, 0).catch(() => [])))).flat().flatMap((p) => [p.n, ...(p.m ? p.m.split(';') : [])]));
+  // With the usual 20 km edge allowance: simplified outlines put coastal cities (Constantinople) just outside their own state.
+  const holding = new Set((await Promise.all(pts.map((pt) => politiesAt(pt, year!).catch(() => [])))).flat().flatMap((p) => [p.n, ...(p.m ? p.m.split(';') : [])]));
   const rank = { within: 0, near: 1, 'undated-year': 2, outside: 3 } as const;
   const vrank = { name: 0, alias: 1, demonym: 2, stem: 3 } as const;
   return hits.map(({ p, via: v }) => ({ polity: p, via: v, fit: fit(p), holdsBook: holding.size ? holding.has(p.n) : undefined }))

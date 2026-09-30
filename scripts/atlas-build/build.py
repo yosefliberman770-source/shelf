@@ -961,32 +961,65 @@ def polity_aliases():
     cache_path = os.path.join(CACHE, 'cliopatria-aliases.json')
     cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
     qids = sorted({r['q'] for r in rows if r.get('q')} - set(cache))
-    # Wikidata's entity API (50 items a request), paced and backing off: shared build machines are often rate-limited.
-    wait = 90
+    # QLever's copy of Wikidata (University of Freiburg) first: same data, not subject to the
+    # query-service rate limits shared build machines hit. Wikidata's own entity API is the fallback.
+    def store(q, al, dm):
+        cache[q] = {'al': sorted(set(al))[:20], 'dm': sorted(set(x for x in dm if x))[:6]}
+
+    def qlever(chunk):
+        query = ('PREFIX wd: <http://www.wikidata.org/entity/> PREFIX wdt: <http://www.wikidata.org/prop/direct/> '
+                 'PREFIX skos: <http://www.w3.org/2004/02/skos/core#> '
+                 f'SELECT ?p ?alias ?dem WHERE {{ VALUES ?p {{ {" ".join("wd:" + q for q in chunk)} }} '
+                 'OPTIONAL { ?p skos:altLabel ?alias FILTER(LANG(?alias) = "en") } '
+                 'OPTIONAL { ?p wdt:P1549 ?dem FILTER(LANG(?dem) = "en") } }')
+        req = urllib.request.Request('https://qlever.dev/api/wikidata', data=urllib.parse.urlencode({'query': query}).encode(),
+                                     headers={'User-Agent': UA, 'Accept': 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded'})
+        with urllib.request.urlopen(req, timeout=180) as r:
+            rows = json.load(r)['results']['bindings']
+        got = {q: ([], []) for q in chunk}
+        for r in rows:
+            q = r['p']['value'].rsplit('/', 1)[1]
+            if 'alias' in r:
+                got[q][0].append(r['alias']['value'])
+            if 'dem' in r:
+                got[q][1].append(r['dem']['value'])
+        return got
+
+    def entity_api(chunk):
+        url = 'https://www.wikidata.org/w/api.php?' + urllib.parse.urlencode({'action': 'wbgetentities', 'ids': '|'.join(chunk), 'props': 'aliases|claims', 'languages': 'en', 'format': 'json'})
+        with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': UA}), timeout=120) as r:
+            ents = json.load(r).get('entities', {})
+        got = {}
+        for q in chunk:
+            e = ents.get(q, {})
+            got[q] = ([a['value'] for a in e.get('aliases', {}).get('en', [])],
+                      [c['mainsnak'].get('datavalue', {}).get('value', {}).get('text') for c in e.get('claims', {}).get('P1549', [])
+                       if c['mainsnak'].get('datavalue', {}).get('value', {}).get('language') == 'en'])
+        return got
+
+    wait = 60
     i = 0
     deadline = time.time() + 3600  # give up after an hour and use what is cached
     while i < len(qids) and time.time() < deadline:
-        chunk = qids[i:i + 50]
-        url = 'https://www.wikidata.org/w/api.php?' + urllib.parse.urlencode({'action': 'wbgetentities', 'ids': '|'.join(chunk), 'props': 'aliases|claims', 'languages': 'en', 'format': 'json'})
-        try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': UA}), timeout=120) as r:
-                ents = json.load(r).get('entities', {})
-        except Exception as e:  # noqa: BLE001 — rate limited or offline: wait longer and try again
-            log('   wikidata', str(e)[:80], f'— waiting {wait}s')
+        chunk = qids[i:i + 200]
+        got = None
+        for source in (qlever, entity_api):
+            try:
+                got = source(chunk if source is qlever else chunk[:50])
+                break
+            except Exception as e:  # noqa: BLE001 — try the other source
+                log('   ', source.__name__, str(e)[:80])
+        if got is None:
             time.sleep(wait)
             wait = min(wait * 2, 900)
             continue
-        for q in chunk:
-            e = ents.get(q, {})
-            al = [a['value'] for a in e.get('aliases', {}).get('en', [])]
-            dm = [c['mainsnak'].get('datavalue', {}).get('value', {}).get('text') for c in e.get('claims', {}).get('P1549', [])
-                  if c['mainsnak'].get('datavalue', {}).get('value', {}).get('language') == 'en']
-            cache[q] = {'al': sorted(set(al))[:20], 'dm': sorted(set(x for x in dm if x))[:6]}
+        for q, (al, dm) in got.items():
+            store(q, al, dm)
         json.dump(cache, open(cache_path, 'w'))  # keep progress
         log(f'   {len(cache)} polities fetched')
-        i += 50
-        wait = 90
-        time.sleep(90)
+        i += len(got)
+        wait = 60
+        time.sleep(2)
     json.dump(cache, open(cache_path, 'w'))
     if i < len(qids):
         log(f'  Wikidata unavailable: {len(qids) - i} polities without aliases this time (kept for the next build)')
