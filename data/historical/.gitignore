@@ -25,6 +25,7 @@ raw/*/nightly-export/**
 !raw/historic-england/original/Protected_Wreck_Sites.gpkg
 !raw/historic-england/original/World_Heritage_Sites.gpkg
 !raw/inland-navigation/original/gis/heads_of_navigation.zip
+!raw/inland-navigation/original/gis/pn_river_traffic.zip
 !raw/itinere/original/Data field description.docx
 !raw/itinere/original/Itiner-e bibliography.bib
 !raw/itinere/original/itinere_roads.cpg

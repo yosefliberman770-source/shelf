@@ -149,6 +149,12 @@
   "sha256": "16bc17f27bf0c6fa27efabd01eaf5e60af5ef84cfdfabd24100e3deab89dc303",
   "downloaded": "2026-09-29"
  },
+ "inland-navigation/original/gis/pn_river_traffic.zip": {
+  "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/pn_river_traffic.zip",
+  "bytes": 22841,
+  "sha256": "66b01e2db6b37a8e03370158868e6a01a0567ee4a765fc60e16e919cba16797a",
+  "downloaded": "2026-09-30"
+ },
  "itinere/nightly-export/route-segments.ndjson": {
   "url": "https://itiner-e.org/route-segments/download",
   "bytes": 39094440,
