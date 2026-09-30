@@ -775,7 +775,7 @@ function PrivateDataControl() {
   const mb = (n: number) => `${(n / 1e6).toFixed(1)} MB`;
   // Parts can be picked all at once or one at a time; each pick is added to what is already chosen.
   const add = async (list: FileList | null) => {
-    if (!list?.length) return;
+    if (!list?.length) { setMsg('No file came back from the phone’s file picker. Try again, and pick the file from “Downloads” or “Files”.'); return; }
     const all = [...picked];
     for (const f of list) if (!all.some((x) => x.name === f.name && x.size === f.size)) all.push(f);
     setPicked(all);
