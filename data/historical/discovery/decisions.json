@@ -1677,6 +1677,26 @@
    "state": "insufficient-temporal",
    "region": "Maghreb",
    "note": "224 records, CC BY 4.0. Every explicit date field is empty; the only dating is EAMENA cultural period names (e.g. 'Roman Imperial (North Africa)', 'Byzantine (Maghreb)'). EAMENA's own date ranges for these periods are not in the download, and 121 records are Unknown/blank, so not integrated rather than assigning invented ranges. Candidate if EAMENA's period chronology table is obtained."
+  },
+  {
+   "title": "Evliya Çelebi's Istanbul (ArcGIS layers)",
+   "match": [
+    "Evliya"
+   ],
+   "status": "candidate",
+   "state": "promising",
+   "region": "Turkey",
+   "note": "218 building entries for Istanbul from the 17th-century travel account; no licence stated on the items. Small and Istanbul-only: left as a candidate for the private pack."
+  },
+  {
+   "title": "A lost campaign (Zenodo 10.5281/zenodo.11067209)",
+   "match": [
+    "11067209",
+    "11067210"
+   ],
+   "status": "deferred",
+   "state": "metadata-inspected",
+   "note": "CC BY 4.0, EAMENA-format export; too few records to change any cell. Not integrated this round."
   }
  ]
 }
