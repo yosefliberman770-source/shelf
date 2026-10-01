@@ -1,5 +1,30 @@
 [
- {"cycle": 1, "date": "2026-10-01", "universe": 379246, "investigated": 6300, "integratedSources": 18, "newSources": 18, "rejected": 8, "blocked": 8,
-  "awaiting": 99740, "weakBefore": 5321, "weakAfter": 5130,
-  "notes": "Universe built (1.9 M records, 11 channels + chains); AMCR Czechia, Zbiva, VIA-TARIQ, HALC, NMRW, CEANS, Scoto, Lorsch, Woodlands and others via the spec loader"}
+ {
+  "cycle": 1,
+  "date": "2026-10-01",
+  "universe": 379246,
+  "investigated": 6300,
+  "integratedSources": 18,
+  "newSources": 18,
+  "rejected": 8,
+  "blocked": 8,
+  "awaiting": 99740,
+  "weakBefore": 5321,
+  "weakAfter": 5130,
+  "notes": "Universe built (1.9 M records, 11 channels + chains); AMCR Czechia, Zbiva, VIA-TARIQ, HALC, NMRW, CEANS, Scoto, Lorsch, Woodlands and others via the spec loader"
+ },
+ {
+  "cycle": 2,
+  "date": "2026-10-01",
+  "universe": 380807,
+  "investigated": 11144,
+  "integratedSources": 35,
+  "newSources": 17,
+  "rejected": 4,
+  "blocked": 3,
+  "awaiting": 97808,
+  "weakBefore": 5130,
+  "weakAfter": 5092,
+  "notes": "Unweighted metric 5,130 → 5,092; with the new footprint weighting (a local study no longer counts for a whole country) 5,622 cells are below 70 — the stricter baseline for cycle 3. Added: NI SMR, Welsh cantrefs/commotes and parishes, French mining concessions, PORTIC ports, Irish wrecks and stations, Fields on Fire, Ottoman Plovdiv, 1532 campaign, Scanian roads, Hierokles, Hajj forts, EMDigIt, Roman agglomerations, Piemonte, Daugava hillforts"
+ }
 ]

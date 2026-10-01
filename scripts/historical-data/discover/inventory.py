@@ -19,6 +19,7 @@ import json
 import os
 import re
 import sys
+import zlib
 from collections import Counter, defaultdict
 
 HERE = os.path.dirname(__file__)
@@ -385,7 +386,7 @@ def from_universe():
                     if r.get(k) not in (None, '', []):
                         c[k] = r[k]
                 yield c
-        except (EOFError, OSError):
+        except (EOFError, OSError, zlib.error):
             continue  # a file still being written ends mid-block: what was read is kept
 
 
