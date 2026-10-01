@@ -1054,5 +1054,23 @@
     "path": "original/1_Najdisca_2023-Apr-12_0708.csv"
    }
   ]
+ },
+ {
+  "id": "latin-church-1772",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip?download=1",
+    "path": "original/latin_church_1772-v1.zip"
+   }
+  ]
+ },
+ {
+  "id": "historical-urban-population-reba",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/11815396?format=original",
+    "path": "original/urbanspatial-hist-urban-pop-3700bc-ad2000-xlsx.xlsx"
+   }
+  ]
  }
 ]

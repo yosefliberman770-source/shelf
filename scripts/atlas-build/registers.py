@@ -1161,3 +1161,31 @@ def arkas():
                     'per': f"{r['Datacija']} (Arkas dating)",
                     'ty': f"{r['Vrsta_najdisca']} · {r['Opredelitev']}"[:120], 'ctx': [c for c in (r['Ime_naselja'], r['Regija']) if c], 'names': []})
     return out, dict(skipped)
+
+
+# ── Poland-Lithuania: Atlas of the Latin Church c. 1772 (IHGK Lublin, after Litak; Zenodo 10912495), CC BY-NC 4.0 ──
+# The atlas reconstructs the Church's structure around 1772: each church and religious house is a 1772 snapshot.
+def latin_church_1772():
+    z = zipfile.ZipFile(raw('latin-church-1772', 'latin_church_1772-v1.zip'))
+    base = next(n for n in z.namelist() if n.endswith('/'))
+    out = []
+    for f, kind in (('churches.geojson', 'church'), ('monasteries.geojson', 'monastery')):
+        for ft in json.loads(z.read(base + f))['features']:
+            g = ft.get('geometry') or {}
+            pts = g.get('coordinates') or []
+            if not pts:
+                continue
+            x, y = pts[0] if g.get('type') == 'MultiPoint' else pts
+            # Coordinates are Web Mercator metres (the file's EPSG:3857), not degrees.
+            lon, lat = math.degrees(x / 6378137.0), math.degrees(2 * math.atan(math.exp(y / 6378137.0)) - math.pi / 2)
+            p = ft['properties']
+            if kind == 'church':
+                name = f"{p.get('title') or 'Church'}, {p.get('pl_name')}" if p.get('title') else f"Church, {p.get('pl_name')}"
+                ty = f"{'parish church' if p.get('type') == 'świątynia główna' else 'auxiliary church'} · deanery {p.get('deanery')}, diocese {p.get('diocese')}"
+            else:
+                name = p.get('name') or f"Religious house, {p.get('pl_name')}"
+                ty = f"{'nunnery' if p.get('category') == 'z' else 'monastery'} at {p.get('pl_name')}, diocese {p.get('diocese')}"
+            out.append({'src': 'latin1772', 'id': f"{kind[0]}{p.get('ob_id')}", 'name': name[:80], 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5),
+                        'precise': True, 'snap': 1772, 'per': 'Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (Litak atlas)', 'ty': ty[:120],
+                        'ctx': [c for c in (p.get('pl_name'), p.get('diocese')) if c], 'names': []})
+    return out

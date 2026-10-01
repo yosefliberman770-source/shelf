@@ -950,6 +950,12 @@
   "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
   "downloaded": "2026-09-29"
  },
+ "latin-church-1772/original/latin_church_1772-v1.zip": {
+  "url": "https://zenodo.org/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip?download=1",
+  "bytes": 4039020,
+  "sha256": "9f7e4d88e7d7daa82eae4784118c6bb6b869babdfaf8607c9292dda06ab02fa4",
+  "downloaded": "2026-10-01"
+ },
  "latvia-monuments/original/geonames-LV.zip": {
   "url": "https://download.geonames.org/export/dump/LV.zip",
   "bytes": 1068796,

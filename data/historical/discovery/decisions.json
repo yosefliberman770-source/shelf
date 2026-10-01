@@ -367,6 +367,61 @@
    "dataset": "ariadne",
    "region": "Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others",
    "note": "Harvested per country (API: 50/page, 10,000/query; Hungary per municipality). Each phase keeps its own period; records without a point placed at their municipality. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack."
+  },
+  {
+   "title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (IHGK Lublin)",
+   "match": [
+    "10.5281/zenodo.10912495"
+   ],
+   "status": "integrated",
+   "dataset": "latin-church-1772",
+   "region": "Poland, Lithuania, Belarus, Ukraine, Latvia",
+   "note": "7,715 churches and 1,327 religious houses as a 1772 snapshot; EPSG:3857 coordinates converted; CC BY-NC → private pack."
+  },
+  {
+   "title": "Archaeological sites of wine and olive oil production in Hispania (CSUC Dataverse)",
+   "match": [
+    "10.34810/data2461"
+   ],
+   "status": "blocked",
+   "region": "Spain, Portugal",
+   "note": "CSUC Dataverse answers with an Anubis bot wall from this machine. Retry from a browser."
+  },
+  {
+   "title": "Historical Urban Population 3700 BC – AD 2000 (Reba, Reitsma & Seto; Harvard Dataverse copy)",
+   "match": [
+    "10.7910/dvn/lmcqgx"
+   ],
+   "status": "blocked",
+   "region": "Global (incl. Egypt, Maghreb, Levant)",
+   "note": "CC BY, but the download requires a guestbook response (name, email); not submitted without the user's consent. SEDAC copy needs an Earthdata login."
+  },
+  {
+   "title": "Stadestér 1.0 — global database of 41,000+ cities",
+   "match": [
+    "10.5281/zenodo.17180328"
+   ],
+   "status": "evaluated",
+   "region": "Global",
+   "note": "Rejected: populations cubic-spline interpolated to annual values — manufactured precision, not source estimates."
+  },
+  {
+   "title": "Mid-19th-century building structures in Galicia and Austrian Silesia (Second Military Survey)",
+   "match": [
+    "10.17632/md8jp9ny9z"
+   ],
+   "status": "evaluated",
+   "region": "Poland, Ukraine, Czechia",
+   "note": "1.3 M individual building points (c. 1850s survey), not named places — queued for a building-density layer."
+  },
+  {
+   "title": "Archaeological sites in the Trajan's Gate Pass, Bulgaria",
+   "match": [
+    "10.5281/zenodo.17579442"
+   ],
+   "status": "discovered",
+   "region": "Bulgaria",
+   "note": "Queued: small single-pass area; not yet inspected."
   }
  ]
 }

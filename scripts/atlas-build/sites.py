@@ -926,6 +926,8 @@ def regional_layers(recs, rows, sites_out):
     for x in ari:
         add('ariadne', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
     stats['ariadneSkipped'] = ari_skip
+    for x in REG2.latin_church_1772():
+        add('latin1772', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(1772, 1772), per=x['per'], ty=x['ty'], sn=1)
     for x in regional.sweden():
         add('raa', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(x['from'], x['to']), per=f"{x['period']} (register dating)", ty=x['type'])
     stats['private'] = dict(Counter(r[0] for r in prows))
