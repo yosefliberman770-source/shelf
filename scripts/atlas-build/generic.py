@@ -740,7 +740,11 @@ def area_features(spec):
                 groups.setdefault(v, []).append(shape(g).buffer(0))
                 labels.setdefault(v, str(p.get(lv.get('nameField', fields[-1]))).split(';')[0].strip())
                 if date is None:
-                    pd = parse_dating(p.get(dt['field']))
+                    if dt.get('from'):  # separate start / end fields ("0725/01/01", "1794/12/31")
+                        a_, b_ = parse_dating(p.get(dt['from'])), parse_dating(p.get(dt.get('to')))
+                        pd = (a_[0], b_[1] if b_ else a_[1], 'fields') if a_ and a_[0] is not None else None
+                    else:
+                        pd = parse_dating(p.get(dt['field']))
                     if pd and pd[0] is not None:
                         a_, b_ = spans.get(v, (pd[0], pd[1] or pd[0]))
                         spans[v] = (min(a_, pd[0]), max(b_, pd[1] or pd[0]))

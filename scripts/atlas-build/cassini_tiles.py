@@ -19,16 +19,22 @@ def build_cassini_roads(tiles_dir):
     return tiler.build(os.path.join(tiles_dir, 'cassini-roads.pmtiles'), 'roads', feats, 11, 'Roads in dated sources', '; '.join(credits))
 
 
-def build_spec_areas(tiles_dir):
-    """Dated historical territorial units read through spec files ("geometry": "polygons", public only)."""
+def build_spec_areas(tiles_dir, private_dir=None):
+    """Dated historical territorial units read through spec files ("geometry": "polygons"): the public ones into
+    historical-units.pmtiles; those whose licence keeps them off the public site into the private pack (private-units.pmtiles)."""
     import generic
-    feats, credits = [], []
-    for sp in generic.specs(public=True, geometry='polygons'):
-        feats += generic.area_features(sp)
-        credits.append(f"{sp['title']} ({sp['licence']})")
-    if not feats:
-        return {}
-    return tiler.build(os.path.join(tiles_dir, 'historical-units.pmtiles'), 'units', feats, 10, 'Historical territorial units in dated sources', '; '.join(credits))
+    out = {}
+    for public, d, name in ((True, tiles_dir, 'historical-units.pmtiles'), (False, private_dir, 'private-units.pmtiles')):
+        if d is None:
+            continue
+        feats, credits = [], []
+        for sp in generic.specs(public=public, geometry='polygons'):
+            feats += generic.area_features(sp)
+            credits.append(f"{sp['title']} ({sp['licence']})")
+        if feats:
+            os.makedirs(d, exist_ok=True)
+            out[name] = tiler.build(os.path.join(d, name), 'units', feats, 10, 'Historical territorial units in dated sources', '; '.join(credits))
+    return out
 
 
 def build_inscriptions(tiles_dir):

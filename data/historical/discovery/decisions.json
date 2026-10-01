@@ -212,7 +212,7 @@
    ],
    "status": "blocked",
    "region": "Estonia, Lithuania",
-   "note": "Bot wall (403) from this machine; no bulk dataset found on andmed.eesti.ee or data.gov.lt. Cycle 2 retry (2026-10-01): Estonia reached through the Land Board WFS (gsavalik.envir.ee muinsuskaitse:kpo_malestised_241, 12,494 monuments with positions) — but the service carries no dating; dates exist only on the bot-walled register pages. Lithuania: geoportal.lt CSW 404, data.gov.lt API and get.data.gov.lt behind the same block page. Both stay blocked for dates; queued for a Wikidata cross-link (Estonian monument ID P2948 / Lithuanian KVR ID) as an alternative route.",
+   "note": "Bot wall (403) from this machine; no bulk dataset found on andmed.eesti.ee or data.gov.lt. Cycle 2 retry (2026-10-01): Estonia reached through the Land Board WFS (gsavalik.envir.ee muinsuskaitse:kpo_malestised_241, 12,494 monuments with positions) — but the service carries no dating; dates exist only on the bot-walled register pages. Lithuania: geoportal.lt CSW 404, data.gov.lt API and get.data.gov.lt behind the same block page. Both stay blocked for dates; queued for a Wikidata cross-link (Estonian monument ID P2948 / Lithuanian KVR ID) as an alternative route. Cycle 3 retry: register.muinas.ee and kvr.kpd.lt both behind a Cloudflare challenge (403) on every path — a deliberate block, left to a browser check by the user (task 9).",
    "state": "blocked"
   },
   {
@@ -222,7 +222,7 @@
    ],
    "status": "blocked",
    "region": "Germany",
-   "note": "Public in the catalogue but Harvard returns 429 to this machine; licence is non-commercial academic → private pack once downloaded.",
+   "note": "Public in the catalogue but Harvard returns 429 to this machine; licence is non-commercial academic → private pack once downloaded. Cycle 3 retry: hgl.harvard.edu still answers 429 — user browser download (task 5).",
    "state": "blocked"
   },
   {
@@ -320,7 +320,7 @@
    ],
    "status": "blocked",
    "region": "various",
-   "note": "WHG now answers 'Bot access denied'; no WHG token in this environment.",
+   "note": "WHG now answers 'Bot access denied'; no WHG token in this environment. Cycle 3 retry: the public API lists 102 datasets but still answers \"Bot access denied\" to automated clients (it only answers requests that claim to be a browser). Not circumvented: the legitimate route is a WHG API token (user task 3, env WHG_API_TOKEN).",
    "state": "blocked"
   },
   {
@@ -423,7 +423,7 @@
    ],
    "status": "blocked",
    "region": "Spain, Portugal",
-   "note": "CSUC Dataverse answers with an Anubis bot wall from this machine. Retry from a browser.",
+   "note": "CSUC Dataverse answers with an Anubis bot wall from this machine. Retry from a browser. Cycle 3 retry: the Dataverse API path is behind the same bot challenge — user browser download (task 4).",
    "state": "blocked"
   },
   {
@@ -900,10 +900,10 @@
    "match": [
     "10.34894/pb9at3"
    ],
-   "status": "evaluated",
-   "state": "promising",
+   "status": "integrated",
+   "state": "integrated",
    "region": "Low Countries",
-   "note": "Dated polygons of coin-issuing authorities from the 12th c.; CC BY-NC-SA → needs a private polygon path (queued)."
+   "note": "121 dated territories (CC BY-NC-SA) → private area spec lc-mint-authorities, drawn from the private pack (new private-units.pmtiles) in the territorial-units layer, each for its own from/to dates."
   },
   {
    "title": "Hierokles places (ArcGIS) — Synekdemos (c. 527)",

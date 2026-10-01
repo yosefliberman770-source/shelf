@@ -193,6 +193,7 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
   'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas', 'wdextra'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   'spec-sites': (c) => ({ ...pmtiles(c, 'spec-sites.pmtiles', 'zbiva', 11), attribution: ((Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && !(SPEC_DATASETS[k].layers as string[]).every((l) => ['roads-cassini', 'historical-units'].includes(l))) as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'private-units': (c) => pmtiles(c, 'private-units.pmtiles', 'localonly', 10),
   'historical-units': (c) => ({ ...pmtiles(c, 'historical-units.pmtiles', 'halcareas' as DatasetId, 10), attribution: ((Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('historical-units')) as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch', ...(Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('roads-cassini'))] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
@@ -969,7 +970,7 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1860s–80s)', datasets: [], defaultOn: true, coverage: [1475, 1890],
     hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh hundreds and civil parishes as surveyed for the first-edition Ordnance Survey maps (1860s–80s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
-    sources: ['historical-units'],
+    get sources() { return privateTile('private-units.pmtiles') ? ['historical-units', 'private-units'] : ['historical-units']; },
     specs: (c) => {
       const y = c.year;
       const when = ['any',
@@ -988,6 +989,18 @@ export const LAYERS: AtlasLayerDef[] = [
           layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
         { id: 'hunits-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv(MAJOR), minzoom: 5,
           layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
+        ...(privateTile('private-units.pmtiles') ? [
+          { id: 'hunits-p-parish', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(['civil parish']), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
+          { id: 'hunits-p-district', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(MINOR), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
+          { id: 'hunits-p-county', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(MAJOR), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
+          { id: 'hunits-p-parish-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv(['civil parish', ...MINOR]), minzoom: 9,
+            layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
+          { id: 'hunits-p-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv(MAJOR), minzoom: 5,
+            layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
+          { id: 'hunits-p-mint', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(['mint authority']), minzoom: 5, paint: { 'line-color': C.market, 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': fade } },
+          { id: 'hunits-p-mint-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv(['mint authority']), minzoom: 7,
+            layout: { 'text-field': ['get', 'n'], 'text-size': 11, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.market, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
+        ] as LayerSpecification[] : []),
       ];
     },
   },

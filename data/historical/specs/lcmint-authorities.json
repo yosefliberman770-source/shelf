@@ -1,0 +1,11 @@
+{
+ "id": "lc-mint-authorities", "src": "lcmintauth", "public": false, "enabled": true, "geometry": "polygons",
+ "title": "Mint authorities of the Low Countries: territories of the coin-issuing lords, with their dates (IISH, DataverseNL)",
+ "licence": "CC BY-NC-SA 4.0 — private pack",
+ "url": "https://doi.org/10.34894/PB9AT3",
+ "describe": "The territories of the lords, cities and bishops who struck coins in the Low Countries, each drawn for the years the dataset gives for that authority's territory.",
+ "layers": ["historical-units"],
+ "read": {"path": "lc-mints/original/Mint authorities.geojson"},
+ "dissolve": [{"field": ["AUTHORITY", "DATEfrom", "DATEto"], "nameField": "AUTHORITY", "level": "mint authority", "minzoom": 5, "simplify": 0.002}],
+ "dating": {"mode": "fields", "from": "DATEfrom", "to": "DATEto", "label": "territory of the mint authority"}
+}
