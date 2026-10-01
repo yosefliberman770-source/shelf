@@ -27,7 +27,8 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 ];
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
-  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels';
+  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels'
+  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lirelist';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -39,6 +40,16 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
   terrain: { name: 'Mapterhorn terrain (Copernicus GLO-30 and national elevation models; fallback: Mapzen/AWS Terrain Tiles)', url: 'https://mapterhorn.com/attribution', license: 'open data, see sources' },
   hydrosheds: { name: 'HydroRIVERS v1.0 (Lehner & Grill 2013, HydroSHEDS)', url: 'https://www.hydrosheds.org/products/hydrorivers', license: 'CC BY 4.0' },
+  lirelist: { name: 'LIST — Latin Inscriptions in Space and Time v1.2 (SDAM, Aarhus; from EDH and EDCS)', url: 'https://doi.org/10.5281/zenodo.10473706', license: 'CC BY 4.0' },
+  canmore: { name: 'Canmore — National Record of the Historic Environment (Historic Environment Scotland)', url: 'https://www.trove.scot/', license: 'OGL v3' },
+  irlsmr: { name: 'Archaeological Survey of Ireland, Sites and Monuments Record (National Monuments Service)', url: 'https://www.archaeology.ie/', license: 'CC BY 4.0' },
+  nid: { name: 'Rejestr zabytków nieruchomych (Narodowy Instytut Dziedzictwa); places from GeoNames', url: 'https://dane.gov.pl/pl/dataset/1130', license: 'CC BY 4.0' },
+  ivillaris: { name: 'Index Villaris, 1680 (John Adams; ed. Gadd 2024)', url: 'https://doi.org/10.5281/zenodo.10660024', license: 'CC BY 4.0' },
+  ottomannfs: { name: 'Ottoman NFS gazetteer, 1830–1849 (Kabadayı, Boykov, Sefer, Gerrits)', url: 'https://doi.org/10.5281/zenodo.7351936', license: 'CC BY 4.0' },
+  generalkarte: { name: 'Gazetteer of the Generalkarte von Mitteleuropa, Balkans (Boykov)', url: 'https://doi.org/10.5281/zenodo.8409506', license: 'CC BY 4.0' },
+  cassini: { name: '18th-century Cassini roads and cities (Perret, Gribaudi & Barthelemy)', url: 'https://doi.org/10.7910/DVN/28674', license: 'CC0' },
+  sirkd: { name: 'Slovenian register of immovable cultural heritage (RKD)', url: 'https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine', license: 'CC BY 4.0 (OPSI open data)' },
+  lutsch: { name: 'Features of the Lutsch map of Transylvania, 1751', url: 'https://doi.org/10.7910/DVN/ETORPU', license: 'CC BY-NC-SA 4.0' },
   hydrolakes: { name: 'HydroLAKES v1.0 (Messager et al. 2016); dam dates from Wikidata', url: 'https://www.hydrosheds.org/products/hydrolakes', license: 'CC BY 4.0' },
   physlabels: { name: 'Natural Earth (ranges, plains); Wikidata (peaks)', url: 'https://www.naturalearthdata.com/', license: 'public domain / CC0' },
   osm: { name: 'OpenStreetMap contributors', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
@@ -71,7 +82,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
 const privateTile = (file: string) => privateHas(`tiles/${file}`);
 const PRIVATE_SITES = () => privateTile('private-sites.pmtiles');
 /** The site layers draw the public sites and, where the private pack is loaded, the private ones. */
-const siteSources = () => (PRIVATE_SITES() ? ['medieval-sites', 'private-sites'] : ['medieval-sites']);
+const siteSources = () => ['medieval-sites', 'register-sites', ...(PRIVATE_SITES() ? ['private-sites'] : [])];
 
 export interface LayerCtx {
   year: HistYear;
@@ -167,6 +178,9 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'hre-towns': (c) => pmtiles(c, 'hre-towns.pmtiles', 'hre', 10),
   // From the private data pack only (licence not verified, or no republishing): never on the public site.
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
+  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'cassini-roads': (c) => pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11),
+  inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),
   'gs-dioceses': (c) => pmtiles(c, 'gs-dioceses.pmtiles', 'germaniasacra', 9),
   'hced-battles': (c) => ({ type: 'geojson', data: c.base + 'hced-battles.json', attribution: credit('hced') }),
@@ -354,7 +368,10 @@ const SITES: [HistYear, HistYear] = [300, 1900];
 export const UNDATED_MINZOOM = 9;
 /** How long before its first record (or evidence period) a site is drawn, hollow, when the reader includes undated records. */
 export const BEFORE_RECORD_YEARS = 60;
-function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number }): LayerSpecification[] {
+/** Years either side of a snapshot listing within which the listed place is drawn (lighter); see sitePoints. */
+export const SNAPSHOT_YEARS = 25;
+
+function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number; sources?: string[] }): LayerSpecification[] {
   // Own dates only (founding / first mention → dissolution, as recorded), or an evidence period (a building-campaign
   // century, a register's period class, a style): shown inside them. Without own evidence at the year nothing is drawn,
   // unless the reader includes undated records — and then:
@@ -366,7 +383,10 @@ function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, o
   const y = ctx.year;
   const kind: ExpressionSpecification = ['in', ['get', 'k'], ['literal', kinds]];
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
-  const when: ExpressionSpecification = ['all', existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]];
+  // A snapshot (a gazetteer or register listing the place in one year: 'sn') says only that it existed then; it is drawn,
+  // lighter, within SNAPSHOT_YEARS of that year (a stated display tolerance — the record keeps its one year).
+  const snapshot: ExpressionSpecification = ['all', ['has', 'sn'], ['<=', ['abs', ['-', y, ['get', 'ef']]], SNAPSHOT_YEARS]];
+  const when: ExpressionSpecification = ['any', snapshot, ['all', ['!', ['has', 'sn']], existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]]];
   const soon = (field: string): ExpressionSpecification => ['all', ['>', ['get', field], y], ['<=', ['-', ['get', field], BEFORE_RECORD_YEARS], y]];
   const recordedSoon: ExpressionSpecification = ['any',
     ['all', ['has', 'f'], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'], soon('f'), ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]],
@@ -378,8 +398,8 @@ function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, o
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
   const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];
   const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']], ['<=', ['coalesce', ['get', 'ef'], -99999], y]];
-  return (PRIVATE_SITES() ? ['medieval-sites', 'private-sites'] : ['medieval-sites']).flatMap((source, i): LayerSpecification[] => {
-    const sfx = i ? '-private' : '';
+  return (opts.sources ?? siteSources()).flatMap((source): LayerSpecification[] => {
+    const sfx = source === 'medieval-sites' ? '' : source === 'private-sites' ? '-private' : `-${source}`;
     return [
       { id: `${id}-pt${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],
@@ -502,6 +522,28 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'dated-settlements', group: 'places', label: 'Settlements by first written mention', datasets: ['wikidata', 'wbohemia', 'finreg'], defaultOn: false, coverage: SITES,
     hint: 'Villages and towns shown from the year of their first written mention (or founding) as Wikidata records it — about 25,000 across Europe, but very unevenly: thousands in Czechia, Romania, Germany and Ukraine, few in France, Italy or Spain, because it depends on what has been entered, not on how many places there were. A first mention is not a founding date.', get sources() { return siteSources(); },
     specs: (c) => sitePoints('dated-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4 }),
+  },
+  {
+    id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd'], defaultOn: true, coverage: SITES,
+    hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date. A place listed in one year is drawn (lighter) within 25 years of it.',
+    sources: ['register-sites'],
+    specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites'] }),
+  },
+  {
+    id: 'inscriptions', group: 'places', alsoIn: ['economic'], label: 'Latin inscriptions (find-spots, 100–799)', datasets: ['lirelist'], defaultOn: true, coverage: [100, 799],
+    hint: 'Places where Latin inscriptions dated to the century shown were found (epitaphs, dedications, milestones, honorific and building inscriptions), from the LIST dataset (Epigraphic Database Heidelberg and Clauss–Slaby). A find-spot appears only in centuries with inscriptions dated there — only inscriptions dated to within 150 years are used — never across the gaps between them. Larger dots: more inscriptions of that century.',
+    sources: ['inscriptions'],
+    specs: (c) => {
+      const cent = Math.floor(Math.max(100, Math.min(799, c.year)) / 100) * 100;
+      const n: ExpressionSpecification = ['coalesce', ['get', `c${cent}`], 0];
+      const filter = ['all', inWindow(c.year, [100, 799]), ['>', n, 0]] as FilterSpecification;
+      return [
+        { id: 'inscriptions-pt', type: 'circle', source: 'inscriptions', 'source-layer': 'findspots', filter, paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, ['interpolate', ['linear'], n, 1, 1.2, 50, 3], 9, ['interpolate', ['linear'], n, 1, 2.5, 50, 6]] as ExpressionSpecification,
+          'circle-color': '#6d6875', 'circle-opacity': 0.75, 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.6 } },
+        { id: 'inscriptions-label', type: 'symbol', source: 'inscriptions', 'source-layer': 'findspots', filter, minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#55505c', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+      ];
+    },
   },
   {
     id: 'islamic-places', group: 'places', label: 'Early Islamic world places', datasets: ['althurayya'], defaultOn: true, coverage: THURAYYA,
@@ -671,6 +713,15 @@ export const LAYERS: AtlasLayerDef[] = [
         { id: 'roads-medieval-sure', type: 'line', source: 'viabundus-edges', 'source-layer': 'edges', filter: ['all', filter, ['<', ['get', 'c'], 3]] as FilterSpecification, paint: { 'line-color': ['case', water, '#2b6f95', ['==', ['get', 'c'], 1], '#5b2c0f', '#8d5524'], 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.6, 10, 2.2], 'line-opacity': 0.8 } },
         { id: 'roads-medieval-unsure', type: 'line', source: 'viabundus-edges', 'source-layer': 'edges', filter: ['all', filter, ['>=', ['get', 'c'], 3]] as FilterSpecification, paint: { 'line-color': ['case', water, '#7fa7bf', '#9e9e9e'], 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.5, 10, 1.6], 'line-opacity': 0.8, 'line-dasharray': [2, 2] } },
       ];
+    },
+  },
+  {
+    id: 'roads-cassini', group: 'infrastructure', label: 'Roads on the Cassini map (France, c. 1756–1815)', datasets: ['cassini'], defaultOn: true, coverage: [1756, 1815],
+    hint: 'The road network of France as drawn on the Cassini map (sheets surveyed 1756–1789, published to 1815), digitised by Perret, Gribaudi & Barthelemy. Shown only within those years; the dataset does not give each sheet’s year. Fainter: marked uncertain in the source.', sources: ['cassini-roads'],
+    specs: (c) => {
+      const filter = inWindow(c.year, [1756, 1815]);
+      return [{ id: 'roads-cassini-line', type: 'line', source: 'cassini-roads', 'source-layer': 'roads', filter,
+        paint: { 'line-color': '#8d5524', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 10, 1.8], 'line-opacity': ['case', ['==', ['get', 'u'], 1], 0.45, 0.8] } }];
     },
   },
   {
@@ -933,9 +984,9 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'medieval-archaeology', group: 'places', label: 'Medieval archaeology: registers, bridges, hoards, wrecks', datasets: ['finreg', 'bridges1250', 'nokm'], defaultOn: false, coverage: [400, 1600],
-    hint: 'Sites national registers date to the Viking Age or Middle Ages — Finland and Norway (burial mounds, house sites, farm mounds, boat landings), each shown for its register period — and England’s bridges and fords attested before c. 1250. With your private data: Danish, Swedish and Romanian registers, coin hoards (Denmark; Carolingian hoards 751–987) and dated shipwrecks.', get sources() { return siteSources(); },
-    specs: (c) => sitePoints('medieval-archaeology', ['site', 'bridge', 'hoard', 'wreck', 'road'], C.arch, c, { labelZoom: 10, radius: 2.2 }),
+    id: 'medieval-archaeology', group: 'places', label: 'Archaeology & monuments: registers, bridges, mills, wrecks', datasets: ['finreg', 'bridges1250', 'nokm', 'canmore', 'irlsmr', 'nid'], defaultOn: false, coverage: SITES,
+    hint: 'Sites national registers date to the Viking Age or Middle Ages — Finland and Norway (burial mounds, house sites, farm mounds, boat landings), each shown for its register period — and England’s bridges and fords attested before c. 1250; Scotland’s monument record (Canmore), each site for the period it names; Ireland’s monuments record (dated only where the monument class names a date — the rest only with “Include undated records”); Poland’s register of monuments, from the century it records for construction (placed at their village or town). With your private data: Danish, Swedish and Romanian registers, coin hoards (Denmark; Carolingian hoards 751–987) and dated shipwrecks.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('medieval-archaeology', ['site', 'bridge', 'hoard', 'wreck', 'road', 'mill', 'mine', 'harbour', 'building'], C.arch, c, { labelZoom: 10, radius: 2.2 }),
   },
   {
     id: 'empire-dioceses', group: 'political', alsoIn: ['economic'], label: 'Dioceses of the Empire (Germania Sacra)', datasets: ['germaniasacra'], defaultOn: false, coverage: [900, 1803],
@@ -980,7 +1031,7 @@ const LABEL_PRIORITY: Record<string, number> = {
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

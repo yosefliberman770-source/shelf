@@ -1,0 +1,560 @@
+"""National registers and historical gazetteers added in the 2026-10 discovery pass (docs/HISTORICAL_SOURCES_SEARCH.md).
+
+Each loader reads one dataset from data/historical/raw/<id>/original unchanged and returns records:
+  {'src', 'id', 'name', 'kind', 'lon', 'lat', 'precise', 'names': [(form, year, None, lang)], 'ctx': [context names],
+   'f', 'fb'            — a dated start and what it is (construction, first attestation…), or
+   'env', 'per', 'cw'   — a period the record's own field gives (cw: width of a construction window when the end is open),
+   'snap'               — a single year in which a source lists the place (it existed then; before/after unknown),
+   'ty'                 — the source's own type / class text}
+Nothing is dated from a dataset's overall period. Records without dates stay undated.
+"""
+from __future__ import annotations
+
+import csv
+import io
+import json
+import math
+import os
+import re
+import unicodedata
+import zipfile
+from collections import Counter, defaultdict
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+RAW = os.path.join(HERE, '..', '..', 'data', 'historical', 'raw')
+
+
+def raw(ds, *p):
+    return os.path.join(RAW, ds, 'original', *p)
+
+
+def norm(s):
+    s = unicodedata.normalize('NFKD', s or '').encode('ascii', 'ignore').decode().lower()
+    return re.sub(r'[^a-z0-9]+', ' ', s).strip()
+
+
+# ── Scotland: Canmore (National Record of the Historic Environment), OGL v3 ─────────────────────────────────
+# Period words are Canmore's own (the ScAPA period thesaurus HES uses). Years for the broad periods follow ScAPA's
+# definitions and are marked approximate; a named century or year is used as it stands.
+SCAPA = {'ROMAN': (79, 410), 'PICTISH': (300, 900), 'EARLY MEDIEVAL': (400, 1100), 'EARLY HISTORIC': (400, 1100), 'VIKING': (795, 1100),
+         'NORSE': (795, 1266), 'MEDIEVAL': (900, 1600), 'LATER MEDIEVAL': (1200, 1600), 'POST MEDIEVAL': (1560, 1900),
+         'IRON AGE': (-800, 400), 'LATER PREHISTORIC': (-2500, 400), 'FIRST WORLD WAR': (1914, 1918), 'SECOND WORLD WAR': (1939, 1945),
+         'JACOBITE': (1689, 1746), 'REFORMATION': (1560, 1600), 'IMPROVEMENT': (1750, 1850)}
+ORD = {'1ST': 1, '2ND': 2, '3RD': 3}
+
+
+def scapa_period(term):
+    t = term.strip().upper()
+    if t in SCAPA:
+        return SCAPA[t]
+    m = re.fullmatch(r'(EARLY |MID |LATE )?(\d{1,2})(?:ST|ND|RD|TH) CENTURY(?: AD)?', t)
+    if m:
+        c = int(m.group(2))
+        a = (c - 1) * 100
+        part = (m.group(1) or '').strip()
+        return {'EARLY': (a, a + 33), 'MID': (a + 33, a + 66), 'LATE': (a + 66, a + 99)}.get(part, (a, a + 99))
+    if re.fullmatch(r'1[0-9]{3}', t):
+        return int(t), int(t)
+    return None
+
+
+def canmore_kind(t):
+    t = t.upper()
+    for rx, k in ((r'\bCATHEDRAL\b', 'cathedral'), (r'\b(ABBEY|PRIORY|FRIARY|NUNNERY|MONASTERY|PRECEPTORY|COLLEGIATE CHURCH)\b', 'monastery'),
+                  (r'\b(CHURCH|CHAPEL|KIRK|CHURCHYARD|BURIAL GROUND)\b', 'church'), (r'\b(CASTLE|TOWER HOUSE|MOTTE|PEEL|BASTLE)\b', 'castle'),
+                  (r'\b(FORT|FORTLET|DUN|BROCH|HILLFORT|FORTIFICATION|BATTERY|RAMPART|ARTILLERY)\b', 'fortification'),
+                  (r'\b(WRECK|CRAFT|BOAT|SHIP|AIRCRAFT)\b', 'wreck'), (r'\b(HARBOUR|PIER|QUAY|DOCK|LIGHTHOUSE|JETTY|SLIPWAY)\b', 'harbour'),
+                  (r'\bBRIDGE\b|\bFORD\b', 'bridge'), (r'\b(ROAD|TRACK|CAUSEWAY|TURNPIKE)\b', 'road'), (r'\bMARKET\b', 'market'),
+                  (r'\b(MILL|KILN|FORGE|SALTPAN|BREWERY|DISTILLERY|TANNERY)\b', 'mill'), (r'\b(QUARRY|MINE|PIT|SHAFT|LEAD WORKS|BLOOMERY)\b', 'mine'),
+                  (r'\b(BURGH|TOWN|VILLAGE|TOWNSHIP|SETTLEMENT|FARMSTEAD|CROFT|HAMLET|CLACHAN)\b', 'settlement')):
+        if re.search(rx, t):
+            return k
+    return 'site'
+
+
+def canmore():
+    import shapefile
+    from pyproj import Transformer
+    tr = Transformer.from_crs(27700, 4326, always_xy=True)
+    z = zipfile.ZipFile(raw('canmore-scotland', 'Canmore_Points.zip'))
+    dbf = next(n for n in z.namelist() if n.endswith('.dbf'))
+    r = shapefile.Reader(dbf=io.BytesIO(z.read(dbf)), encoding='utf-8', encodingErrors='replace')
+    out, skipped = [], Counter()
+    for rec in r.iterRecords(fields=['CANMOREID', 'NMRSNAME', 'ALTNAME', 'SITETYPE', 'PARISH', 'COUNCIL', 'ACCURACY', 'XCOORD', 'YCOORD']):
+        if not rec['XCOORD'] or not rec['YCOORD']:
+            skipped['no position'] += 1
+            continue
+        st = rec['SITETYPE'] or ''
+        spans = [p for p in (scapa_period(x) for x in re.findall(r'\(([^()]*?)\)', st)) if p]
+        kind = canmore_kind(st)
+        if spans:
+            lo, hi = min(s[0] for s in spans), max(s[1] for s in spans)
+            if hi < 0 or lo > 1914:
+                skipped['outside 0–1914'] += 1
+                continue
+        elif kind in ('site', 'road', 'mine', 'mill', 'wreck', 'harbour'):
+            skipped['undated generic record (kept in the raw register)'] += 1
+            continue
+        lon, lat = tr.transform(rec['XCOORD'], rec['YCOORD'])
+        acc = rec['ACCURACY'] or ''
+        x = {'src': 'canmore', 'id': str(rec['CANMOREID']), 'name': (rec['NMRSNAME'] or '').title()[:80] or st.title()[:60], 'kind': kind,
+             'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': bool(re.search(r'nearest (1|10|100)m', acc)), 'ty': st[:120],
+             'ctx': [c for c in (rec['PARISH'], rec['COUNCIL']) if c], 'names': [(rec['ALTNAME'], None, None, '')] if rec['ALTNAME'] else []}
+        if spans:
+            x['env'] = (lo, hi)
+            x['per'] = ', '.join(sorted({p for p in re.findall(r'\(([^()]*?)\)', st) if scapa_period(p)}))[:80] + ' (Canmore period; ScAPA years)'
+        out.append(x)
+    return out, dict(skipped)
+
+
+# ── Ireland: Archaeological Survey of Ireland SMR, CC BY 4.0 ─────────────────────────────────────────────────
+# Only a class that names its own date is dated (e.g. "House - 17th century", "Settlement deserted - medieval").
+IRL_PERIOD = {'early medieval': (400, 1169), 'medieval': (1169, 1550), 'viking/hiberno-norse': (795, 1169), 'anglo-norman': (1169, 1400),
+              '16th century': (1500, 1599), '16th/17th century': (1500, 1699), '17th century': (1600, 1699), '17th/18th century': (1600, 1799),
+              '18th century': (1700, 1799), '18th/19th century': (1700, 1899), '19th century': (1800, 1899)}
+
+
+def irl_kind(c):
+    c = c.lower()
+    for rx, k in ((r'religious house|abbey|priory|friary|nunnery|monastery|preceptory', 'monastery'), (r'cathedral', 'cathedral'),
+                  (r'^church|ecclesiastical|chapel|graveyard|holy well', 'church'), (r'castle|tower house|bawn|fortified house', 'castle'),
+                  (r'^ringfort|promontory fort|hillfort|fort\b', 'fortification'), (r'settlement|town|village|borough', 'settlement'),
+                  (r'^bridge', 'bridge'), (r'^road|togher|trackway', 'road'), (r'^mill|kiln', 'mill'), (r'quarry|mine', 'mine'),
+                  (r'harbour|quay|pier', 'harbour'), (r'wreck', 'wreck'), (r'market', 'market')):
+        if re.search(rx, c):
+            return k
+    return 'site'
+
+
+def ireland_smr():
+    out, skipped = [], Counter()
+    with open(raw('ireland-smr', 'SMROpenData.csv'), encoding='utf-8-sig') as fh:
+        for r in csv.DictReader(fh):
+            c = r['MONUMENT_CLASS'] or ''
+            try:
+                lon, lat = float(r['LONGITUDE']), float(r['LATITUDE'])
+            except ValueError:
+                skipped['no coordinates'] += 1
+                continue
+            if not (-11 <= lon <= -5.3 and 51.2 <= lat <= 55.5):
+                # 103 records share one point in the Atlantic: the source's placeholder for a missing grid reference.
+                skipped['placeholder position outside Ireland (kept in the raw register)'] += 1
+                continue
+            kind = irl_kind(c)
+            m = re.search(r' - (.+)$', c)
+            per = IRL_PERIOD.get((m.group(1) if m else '').strip().lower())
+            if c.startswith('Castle - Anglo-Norman'):
+                per = IRL_PERIOD['anglo-norman']
+            if not per and kind in ('site', 'road', 'mill', 'mine'):
+                continue  # undated generic monument: kept in the raw register only
+            x = {'src': 'irlsmr', 'id': r['SMRS'].strip('-'), 'name': (r['TOWNLAND'] or '').title() + f' — {c}', 'kind': kind, 'lon': round(lon, 5),
+                 'lat': round(lat, 5), 'precise': True, 'ty': c, 'ctx': [r['TOWNLAND'].title(), r['COUNTY'].title()], 'names': []}
+            if per:
+                x['env'] = per
+                x['per'] = f'{c} (class named by the survey)'
+            out.append(x)
+    return out, dict(skipped)
+
+
+# ── Poland: register of immovable monuments (NID), CC BY 4.0; placed at their locality (GeoNames) ─────────────
+ROMAN_NUM = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12, 'XIII': 13,
+             'XIV': 14, 'XV': 15, 'XVI': 16, 'XVII': 17, 'XVIII': 18, 'XIX': 19, 'XX': 20, 'XXI': 21}
+
+
+def polish_dating(s):
+    """Earliest construction window in an NID 'chronologia' text, as (from, to), or None.
+    '2. poł. XIX w.' → (1850, 1899); 'XIV/XV w.' → (1300, 1499); '1820 - 1830' → (1820, 1830); 'ok. 1500' → (1490, 1510)."""
+    if not s:
+        return None
+    s = s.replace('–', '-').replace('—', '-')
+    cands = []
+    for m in re.finditer(r'(?:(pocz\.|pocz|kon\.|kon|ok\.|poł\.|po|przed)\s*)?(\d)?\s*\.?\s*(poł\.|ćw\.|ćw|tercja|poł)?\s*\b([IVX]{1,5})(?:\s*[/-]\s*([IVX]{1,5}))?\s*w\b', s):
+        c1 = ROMAN_NUM.get(m.group(4))
+        if not c1:
+            continue
+        c2 = ROMAN_NUM.get(m.group(5)) if m.group(5) else c1
+        a, b = (c1 - 1) * 100, c2 * 100 - 1
+        part, n, pre = m.group(3), m.group(2), (m.group(1) or '')
+        if part and n and part.startswith('poł'):
+            a = a + (int(n) - 1) * 50
+            b = a + 49 if c1 == c2 else b
+        elif part and n and part.startswith('ćw'):
+            a = a + (int(n) - 1) * 25
+            b = a + 24 if c1 == c2 else b
+        elif pre.startswith('pocz'):
+            b = a + 20
+        elif pre.startswith('kon'):
+            a = b - 20
+        cands.append((a, b))
+    for m in re.finditer(r'\b(1[0-9]{3})\s*(?:-\s*(1[0-9]{3}|[0-9]{2}))?\b', s):
+        a = int(m.group(1))
+        b = m.group(2)
+        b = (int(b) if len(b) == 4 else a // 100 * 100 + int(b)) if b else a
+        approx = re.search(r'ok\.\s*$', s[:m.start()])
+        cands.append((a - 10, a + 10) if approx and b == a else (a, max(a, b)))
+    return min(cands) if cands else None
+
+
+NID_KIND = [(r'katedr', 'cathedral'), (r'klasztor|opactw|zesp[oó]ł klasztorny|konwent|eremu', 'monastery'), (r'koś?ci[oó]ł|kaplic|cerkiew|synagog|meczet|zb[oó]r|dzwonnic|plebani', 'church'),
+           (r'zamek|zamk|grodzisk|fortyfik|twierdz|fort\b|mury obronne|baszt|bram', 'castle'), (r'układ urbanistyczny|układ przestrzenny|miasto|wieś|zesp[oó]ł dworsk|dw[oó]r|pałac|ratusz|kamienic|zagrod|chałup',
+                                                                                              'settlement'),
+           (r'most', 'bridge'), (r'młyn|wiatrak|kuźni|browar|gorzelni|spichlerz|huta', 'mill'), (r'kopalni|sztolni', 'mine'), (r'cmentarz', 'church')]
+
+
+def nid_kind(name, func):
+    t = f'{name} {func}'.lower()
+    for rx, k in NID_KIND:
+        if re.search(rx, t):
+            return k
+    return 'building'  # a house, granary, park, villa…: a standing building, not an archaeological site
+
+
+def geonames_pl():
+    """(normalised name, voivodeship) → [(lon, lat, population, feature code)] for populated places in Poland."""
+    adm1 = {'72': 'dolnośląskie', '73': 'kujawsko-pomorskie', '74': 'lubelskie', '75': 'lubuskie', '76': 'łódzkie', '77': 'małopolskie',
+            '78': 'mazowieckie', '79': 'opolskie', '80': 'podkarpackie', '81': 'podlaskie', '82': 'pomorskie', '83': 'śląskie',
+            '84': 'świętokrzyskie', '85': 'warmińsko-mazurskie', '86': 'wielkopolskie', '87': 'zachodniopomorskie'}
+    idx = defaultdict(list)
+    z = zipfile.ZipFile(raw('poland-nid-register', 'geonames-PL.zip'))
+    for line in io.TextIOWrapper(z.open('PL.txt'), encoding='utf-8'):
+        f = line.rstrip('\n').split('\t')
+        if f[6] != 'P':
+            continue
+        v = adm1.get(f[10])
+        for n in {f[1], f[2]}:
+            idx[(norm(n), v)].append((float(f[5]), float(f[4]), int(f[14] or 0), f[7]))
+    return idx
+
+
+def poland_nid():
+    idx = geonames_pl()
+    out, unplaced = [], Counter()
+    raw_bytes = open(raw('poland-nid-register', 'V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv'), 'rb').read()
+    try:
+        text = raw_bytes.decode('utf-8-sig')
+    except UnicodeDecodeError:
+        text = raw_bytes.decode('cp1250')  # the dane.gov.pl export is Windows-1250
+    for r in csv.DictReader(io.StringIO(text), delimiter=';' if text[:3000].count(';') > text[:3000].count(',') else ','):
+        place = r.get('MIEJSCOWOSC') or ''
+        hits = idx.get((norm(place), (r.get('WOJEWODZTWO') or '').strip().lower()))
+        if not hits:
+            unplaced['locality not found in GeoNames'] += 1
+            continue
+        lon0 = sum(h[0] for h in hits) / len(hits)
+        lat0 = sum(h[1] for h in hits) / len(hits)
+        if len(hits) > 1 and max(math.hypot(h[0] - lon0, h[1] - lat0) for h in hits) > 0.15:
+            unplaced['several places of that name in the voivodeship'] += 1
+            continue
+        when = polish_dating(r.get('CHRONOLOGIA'))
+        kind = nid_kind(r.get('NAZWA') or '', r.get('FUNKCJA') or '')
+        x = {'src': 'nid', 'id': r['INSPIRE_ID'].rsplit('.', 1)[-1] if r.get('INSPIRE_ID') else f"{place}:{r.get('NAZWA')}",
+             'name': f"{(r.get('NAZWA') or '').strip().capitalize()}, {place}"[:80], 'kind': kind, 'lon': round(lon0, 5), 'lat': round(lat0, 5),
+             'precise': False, 'ty': f"{r.get('FUNKCJA') or ''} · {r.get('CHRONOLOGIA') or 'date not recorded'}"[:120], 'ctx': [place, r.get('GMINA') or ''],
+             'names': [], 'loc': 'locality (village or town) from GeoNames; the register gives no coordinates'}
+        if when:
+            x['env'] = (when[0], None)
+            x['cw'] = when[1] - when[0] + 1
+            x['per'] = f"built {r['CHRONOLOGIA']} (NID register)"
+        out.append(x)
+    return out, dict(unplaced)
+
+
+# ── England & Wales: Index Villaris (John Adams, 1680), CC BY 4.0 ──────────────────────────────────────────
+def index_villaris():
+    z = zipfile.ZipFile(raw('index-villaris-1680', 'IndexVillaris1680-v2.0.4.zip'))
+    base = next(n for n in z.namelist() if n.endswith('docs/data/index_villaris.csv'))
+    tps_n = base.replace('index_villaris.csv', 'index_villaris_tps.csv')
+    osm_n = base.replace('index_villaris.csv', 'OSM_matched.csv')
+    # index_villaris_tps.csv has no header: uuid, classes, name, county, hundred, Adams's [lat, lon], corrected [lat, lon], WKT.
+    tps = {}
+    if tps_n in z.namelist():
+        for row in csv.reader(io.TextIOWrapper(z.open(tps_n), encoding='utf-8-sig')):
+            m = re.match(r'POINT\(([-\d.]+) ([-\d.]+)\)', row[-1]) if row else None
+            if m:
+                tps[row[0]] = (float(m.group(1)), float(m.group(2)))
+    osm = {r['uuid']: r for r in csv.DictReader(io.TextIOWrapper(z.open(osm_n), encoding='utf-8-sig'))}
+    out = []
+    for r in csv.DictReader(io.TextIOWrapper(z.open(base), encoding='utf-8-sig')):
+        u = r['uuid']
+        precise = False
+        if u in osm and osm[u].get('lng-OSM'):
+            lon, lat, precise = float(osm[u]['lng-OSM']), float(osm[u]['lat-OSM']), float(osm[u].get('distance (km)') or 99) < 5
+        elif u in tps:
+            lon, lat = tps[u]  # Adams's coordinates corrected by a thin-plate spline fitted on ~2,000 matched towns
+        else:
+            m = re.match(r'POINT\(([-\d.]+) ([-\d.]+)\)', r.get('WKT') or '')
+            if not m:
+                continue
+            lon, lat = float(m.group(1)), float(m.group(2))
+        cls = r.get('classes') or ''
+        kind = 'market' if 'market' in cls else 'settlement'
+        out.append({'src': 'ivillaris', 'id': u, 'name': r['place-name'], 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': precise,
+                    'snap': 1680, 'per': 'listed in Index Villaris (Adams, 1680)', 'ty': cls.replace('|', ', ') or 'place',
+                    'ctx': [c for c in (r.get('hundred'), r.get('county')) if c], 'names': [(r['place-name'], 1680, None, 'en-1680')]})
+    return out
+
+
+# ── Ottoman Empire: NFS population-register gazetteer (1830–1849), CC BY 4.0 ──────────────────────────────
+def hijri_to_ce(h):
+    """Gregorian year in which Hijri year h began (the year can run into the next)."""
+    return int(h * 0.970229 + 621.5643)
+
+
+def ottoman_nfs():
+    import openpyxl
+    wb = openpyxl.load_workbook(raw('ottoman-nfs-gazetteer', 'Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx'), read_only=True)
+    ws = wb.worksheets[0]
+    rows = ws.iter_rows(values_only=True)
+    head = list(next(rows))
+    out = []
+    for v in rows:
+        r = dict(zip(head, v))
+        if r.get('latitude') is None or r.get('longitude') is None:
+            continue
+        h = r.get('register_date_in_Hicri')
+        y = hijri_to_ce(int(h)) if isinstance(h, (int, float)) and 1200 < h < 1300 else None
+        name = r.get('toponym transcribed from NFS.d.') or r.get('toponym_modern') or '?'
+        names = [(n, y, None, lang) for n, lang in ((r.get('toponym Ottoman in NFS.d.'), 'ota'), (r.get('toponym_modern'), 'modern')) if n and n != name]
+        out.append({'src': 'ottomannfs', 'id': str(r['populated_place_id']), 'name': str(name), 'kind': 'settlement', 'lon': round(float(r['longitude']), 5),
+                    'lat': round(float(r['latitude']), 5), 'precise': True, **({'snap': y} if y else {}),
+                    'per': f"listed in Ottoman population register NFS.d. {r.get('NFS.d. register_number') or ''} ({int(h)} AH ≈ {y})" if y else None,
+                    'ty': f"populated place · kaza {r.get('kaza in NFS.d.') or r.get('kaza_1848_1264') or ''}", 'ctx': [c for c in (r.get('kaza_1848_1264'), r.get('liva_1848_1264')) if c],
+                    'names': names})
+    return out
+
+
+# ── Balkans: gazetteer of the Generalkarte von Mitteleuropa 1:200,000 (Boykov), CC BY 4.0 ───────────────────
+GK_KIND = {'settlement': 'settlement', 'settlement_chiftlik': 'settlement', 'settlement_huts': 'settlement', 'monastery': 'monastery', 'metochion': 'monastery',
+           'church': 'church', 'chapel': 'church', 'teke': 'church', 'fortress': 'castle', 'tower': 'castle', 'tabiya': 'fortification', 'karaul': 'fortification',
+           'barracks': 'fortification', 'arsenal': 'fortification', 'bridge': 'bridge', 'han': 'road', 'train station': 'road', 'customs office': 'road',
+           'port': 'harbour', 'mine': 'mine', 'ore deposits': 'mine', 'ruins': 'site', 'fishing weir': 'mill', 'fishery': 'mill', 'winery': 'mill'}
+GK_PERIOD = (1880, 1918)  # sheet editions of the Generalkarte covering the Balkans; the gazetteer does not say which edition
+
+
+def generalkarte():
+    out, swapped = [], 0
+    with open(raw('generalkarte-gazetteer', 'Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv'), encoding='utf-8-sig') as fh:
+        for r in csv.DictReader(fh):
+            try:
+                a, b = float(r['longitude']), float(r['latitude'])
+            except ValueError:
+                continue
+            # The two columns are exchanged throughout the source (its "longitude" runs 39.5–45.4, the latitudes of the
+            # Balkans; every row's country is a Balkan one): read as (lon, lat) = (latitude column, longitude column).
+            lon, lat = (b, a) if 35 <= a <= 48 and 13 <= b <= 30 else (a, b)
+            swapped += (lon, lat) == (b, a)
+            out.append({'src': 'generalkarte', 'id': f"{r['Country']}:{r['Name']}:{round(lat, 4)}", 'name': r['Name'], 'kind': GK_KIND.get(r['Type'], 'site'),
+                        'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': True, 'env': GK_PERIOD,
+                        'per': 'shown on the Generalkarte von Mitteleuropa 1:200,000 (Balkan sheets, editions c. 1880–1918)',
+                        'ty': r['Type'] + (f" · {r['Description']}" if r.get('Description') else ''), 'ctx': [r['Country']],
+                        'names': [(n.strip(), None, None, '') for n in (r.get('AltName') or '').split(';') if n.strip()]})
+    return out, swapped
+
+
+# ── France: towns, villages and abbeys of the Cassini map (Perret et al.), Harvard Dataverse ─────────────────
+CASSINI_PERIOD = (1756, 1815)  # sheets surveyed 1756–1789, last published 1815; the dataset does not give each sheet's year
+
+
+def cassini_places():
+    import shapefile
+    from shapely.geometry import shape
+    z = zipfile.ZipFile(raw('cassini-roads-cities', 'france_cassini_cities.zip'))
+    part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
+    prj = z.read(next(n for n in z.namelist() if n.endswith('.prj'))).decode()
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='utf-8', encodingErrors='replace')
+    tr = _transformer(prj)
+    out = []
+    for i, rec in enumerate(r.iterRecords()):
+        g = shape(r.shape(i).__geo_interface__)
+        c = g.centroid
+        lon, lat = tr(c.x, c.y)
+        t = (rec['city_type'] or '').lower()
+        kind = 'fortification' if t == 'fort' else 'settlement'  # city, town, or 'domain' (a seat or estate) on the map
+        out.append({'src': 'cassini', 'id': str(rec['id']), 'name': rec['city_name'] or t, 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': True,
+                    'env': CASSINI_PERIOD, 'per': 'shown on the Cassini map (sheets surveyed 1756–1789)', 'ty': t + (' · fortified' if rec['fortified'] else ''),
+                    'ctx': [], 'names': []})
+    return out
+
+
+def cassini_roads():
+    import shapefile
+    from shapely.geometry import mapping, shape
+    from shapely.ops import transform
+    z = zipfile.ZipFile(raw('cassini-roads-cities', 'france_cassini_roads.zip'))
+    part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
+    prj = z.read(next(n for n in z.namelist() if n.endswith('.prj'))).decode()
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='utf-8', encodingErrors='replace')
+    tr = _transformer(prj)
+    out = []
+    for i, rec in enumerate(r.iterRecords()):
+        g = transform(lambda x, y, z=None: tr(x, y), shape(r.shape(i).__geo_interface__))
+        out.append((mapping(g), {'i': f"cr{rec['id']}", 'k': rec['road_type'] or '', 'u': 1 if rec['uncertain'] else 0, 'ef': CASSINI_PERIOD[0], 'et': CASSINI_PERIOD[1],
+                                 **({'n': rec['road_name'][:60]} if rec['road_name'] else {})}, 5))
+    return out
+
+
+def _transformer(prj):
+    from pyproj import CRS, Transformer
+    t = Transformer.from_crs(CRS.from_wkt(prj), 4326, always_xy=True)
+    return lambda x, y: t.transform(x, y)
+
+
+# ── Transylvania: features on the Lutsch map (1751), Harvard Dataverse ──────────────────────────────────────
+def lutsch():
+    import shapefile
+    base = raw('lutsch-transylvania-1751', 'POINTS LUTSCH')
+    r = shapefile.Reader(base, encoding='utf-8', encodingErrors='replace')
+    prj = open(base + '.prj').read()
+    tr = _transformer(prj)
+    kinds = {'SETTLEMENT': 'settlement', 'MONASTERY': 'monastery', 'FORTIFICATION': 'fortification', 'POST STATION': 'road', 'BATTLEFIELD': 'site',
+             'MANUFACTORY': 'mill', 'NATURAL RESOURCE': 'mine'}
+    out = []
+    for i, rec in enumerate(r.iterRecords()):
+        pts = r.shape(i).points
+        if not pts:
+            continue  # a record without a point in the source
+        lon, lat = tr(*pts[0])
+        t = (rec['TYPE'] or '').upper()
+        out.append({'src': 'lutsch', 'id': f'l{i}', 'name': rec['NAME'], 'kind': next((v for k, v in kinds.items() if k in t), 'site'),
+                    'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': False, 'snap': 1751, 'per': 'shown on the Lutsch map of Transylvania (1751)',
+                    'ty': t.lower(), 'ctx': [], 'names': [(rec['NAME'], 1751, None, 'map form 1751')]})
+    return out
+
+
+# ── Latin inscriptions: LIST v1.2 (SDAM, Aarhus; EDH + EDCS), CC BY 4.0 ─────────────────────────────────────
+# One record per find-spot. 'cent' counts, per century (start year), the inscriptions found there whose own dating
+# (not_before–not_after) is at most INSCR_MAX_SPAN years wide and overlaps that century. A find-spot is shown only in
+# centuries with such inscriptions — never across the gaps between them.
+INSCR_MAX_SPAN = 150
+INSCR_CENTURIES = range(100, 800, 100)
+
+
+def list_inscriptions():
+    import pyarrow.parquet as pq
+    t = pq.ParquetFile(raw('list-latin-inscriptions', 'LIST_v1-2.parquet'))
+    cols = ['LIST-ID', 'Longitude', 'Latitude', 'not_before', 'not_after', 'findspot_ancient_clean', 'findspot_modern_clean', 'place',
+            'province_label_clean', 'type_of_inscription_auto', 'pleiades_id']
+    spots = {}
+    stats = Counter()
+    for batch in t.iter_batches(batch_size=50000, columns=cols):
+        for r in batch.to_pylist():
+            lon, lat, a, b = r['Longitude'], r['Latitude'], r['not_before'], r['not_after']
+            if lon is None or lat is None or a is None or b is None or (a != a) or (b != b):
+                stats['no position or no dating'] += 1
+                continue
+            a, b = int(a), int(b)
+            if b < a:
+                stats['ends before it starts (left out)'] += 1
+                continue
+            if b - a > INSCR_MAX_SPAN:
+                stats[f'dated more broadly than {INSCR_MAX_SPAN} years'] += 1
+                continue
+            cents = [c for c in INSCR_CENTURIES if a <= c + 99 and b >= c]
+            if not cents:
+                stats['dated outside 100–799'] += 1
+                continue
+            key = (round(lon, 4), round(lat, 4))
+            s = spots.get(key)
+            if not s:
+                name = r['findspot_ancient_clean'] or r['place'] or r['findspot_modern_clean'] or 'Find-spot'
+                s = spots[key] = {'src': 'lirelist', 'id': f'{key[0]}_{key[1]}', 'name': str(name)[:70], 'kind': 'inscription', 'lon': key[0], 'lat': key[1],
+                                  'precise': True, 'cent': Counter(), 'types': Counter(), 'n': 0, 'modern': r['findspot_modern_clean'],
+                                  'prov': r['province_label_clean'], 'pl': r['pleiades_id']}
+            s['n'] += 1
+            for c in cents:
+                s['cent'][c] += 1
+            if r['type_of_inscription_auto']:
+                s['types'][r['type_of_inscription_auto']] += 1
+            stats['used'] += 1
+    return list(spots.values()), dict(stats)
+
+
+# ── Slovenia: Register nepremične kulturne dediščine (RKD, Ministry of Culture), OPSI open data (CC BY 4.0) ───────
+# DATACIJA is the register's own dating, a comma list of terms: centuries with their parts ('druga polovica 19. stol.'),
+# years, and archaeological periods. For buildings it dates the fabric → an open construction window from the earliest
+# term; for archaeological sites it is the span of use → the union of the named periods. Years for the periods follow
+# the Slovenian archaeological convention and are approximate (shown as such). Prehistoric periods and anything
+# starting after 1914 are outside the map's range and dropped; undated records stay undated.
+SI_PERIOD = {'rimska doba': (-15, 600), 'antika': (-15, 600), 'zgodnja rimska doba': (-15, 250), 'pozna rimska doba': (250, 600),
+             'pozna antika': (250, 600), 'srednji vek': (568, 1500), 'zgodnji srednji vek': (568, 1000), 'visoki srednji vek': (1000, 1300),
+             'pozni srednji vek': (1300, 1500), 'novi vek': (1500, 1900), 'zgodnji novi vek': (1500, 1800), 'prva svetovna vojna': (1914, 1918)}
+SI_PART = {'prva četrtina': (0, 24), 'druga četrtina': (25, 49), 'tretja četrtina': (50, 74), 'zadnja četrtina': (75, 99), 'četrta četrtina': (75, 99),
+           'prva polovica': (0, 49), 'druga polovica': (50, 99), 'sredina': (40, 60), 'začetek': (0, 20), 'konec': (80, 99)}
+
+
+def si_term(t):
+    """One DATACIJA term → (from, to, exact_period_name_or_None) or None."""
+    t = re.sub(r'\s+', ' ', t.strip().lower())
+    if not t or 'pr. n. št' in t:
+        return None
+    if t in SI_PERIOD:
+        return (*SI_PERIOD[t], t)
+    m = re.fullmatch(r'prelom (\d{1,2})\. stol\. in (\d{1,2})\. stol\.', t)
+    if m:
+        a = int(m.group(1)) * 100
+        return a - 10, a + 10, None
+    m = re.fullmatch(r'(?:(.+?) )?(\d{1,2})\. stol\.', t)
+    if m:
+        a = (int(m.group(2)) - 1) * 100
+        part = SI_PART.get(m.group(1) or '')
+        if a == 0:  # the 1st century AD begins in year 1 (there is no year 0)
+            return (1 + part[0], max(1, part[1]), None) if part else (1, 99, None)
+        if m.group(1) and not part:
+            return None
+        return (a + part[0], a + part[1], None) if part else (a, a + 99, None)
+    m = re.fullmatch(r'(1[0-9]{3}|[1-9][0-9]{2})', t)
+    if m:
+        return int(t), int(t), None
+    return None
+
+
+def si_kind(zvrst, gesla, name):
+    t = f'{gesla} {name}'.lower()
+    for rx, k in ((r'samostan|kartuzij|opatij', 'monastery'), (r'stolnic', 'cathedral'), (r'cerkev|kapela\b|kapelica|sinagog', 'church'),
+                  (r'gradišče|tabor|obzidj|utrdb|trdnjav|\bgrad\b|grad,|gradu|stolp', 'castle'), (r'\bmost', 'bridge'),
+                  (r'mlin|žag|kovačij|fužin|plavž|steklarn|pivovarn', 'mill'), (r'rudnik', 'mine')):
+        if re.search(rx, t):
+            return k
+    if zvrst.startswith('naselja'):
+        return 'settlement'
+    if zvrst.startswith('arheolo'):
+        return 'settlement' if re.search(r'naselbin|naselje', t) else 'site'
+    return 'building'
+
+
+def slovenia_rkd():
+    out, skipped = [], Counter()
+    for r in csv.DictReader(open(raw('slovenia-rkd-register', 'rnpd.csv'), encoding='utf-8-sig')):
+        try:
+            lon, lat = float(r['X']), float(r['Y'])
+        except ValueError:
+            skipped['no coordinates'] += 1
+            continue
+        if not (12.5 <= lon <= 17 and 45 <= lat <= 47.2):
+            skipped['coordinates outside Slovenia'] += 1
+            continue
+        terms = [x for x in (si_term(s) for s in (r['DATACIJA'] or '').split(',')) if x]
+        arch = r['ZVRST'].startswith('arheolo')
+        kind = si_kind(r['ZVRST'], r['GESLA'], r['IME'])
+        x = {'src': 'sirkd', 'id': r['ESD'], 'name': r['IME'][:80], 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': True,
+             'ty': f"{r['GESLA'] or r['TIP']} · {r['DATACIJA'] or 'date not recorded'}"[:120], 'ctx': [r['OBCINA'].title()],
+             'names': [(s.strip(), None, None, 'register synonym') for s in (r['SINONIMI'] or '').split(',') if s.strip()][:4]}
+        if terms:
+            lo = min(a for a, _, _ in terms)
+            if lo > 1914:
+                skipped['dated after 1914'] += 1
+                continue
+            if arch:
+                hi = max(b for _, b, _ in terms)
+                x['env'] = (lo, hi)
+                x['per'] = f"{r['DATACIJA']} (register period, years approximate)"
+            else:
+                first = min(terms, key=lambda t: (t[0], t[1] - t[0]))
+                x['env'] = (first[0], None)
+                x['cw'] = first[1] - first[0] + 1
+                x['per'] = f"built {r['DATACIJA']} (RKD register)"
+        elif (r['DATACIJA'] or '').strip():
+            skipped['dating only prehistoric or unparsed'] += 1
+            continue
+        out.append(x)
+    return out, dict(skipped)

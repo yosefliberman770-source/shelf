@@ -48,6 +48,7 @@ ATLAS = os.path.join(ROOT, 'public', 'atlas')
 # Private data pack build output (git-ignored): tiles and place index for datasets that must not be republished.
 PRIVATE_BUILD = os.path.join(ROOT, 'data', 'private-pack', 'build')
 private_rows = []  # filled by build(); world.py writes them as the private place index
+register_feats = []  # national registers and historical gazetteers (registers.py) → registers.pmtiles
 
 # An item in several classes is filed under the first that applies.
 KINDS = ['cathedral', 'monastery', 'university', 'castle', 'fortification', 'bridge', 'diocese', 'settlement']
@@ -581,6 +582,20 @@ def build(rows_only=False):
         os.remove(stale)
     stats['sites'] = tiler.build(os.path.join(TILES, 'medieval-sites.pmtiles'), 'sites', feats, 11, 'Medieval sites of Europe',
                                  'Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)')
+    reg_zoom = {'cathedral': 6, 'monastery': 7, 'castle': 8, 'fortification': 9, 'settlement': 9, 'church': 9, 'market': 8, 'bridge': 10,
+                'harbour': 9, 'wreck': 10, 'mill': 10, 'mine': 10, 'road': 10, 'site': 11, 'building': 11}
+    rfeats = []
+    for p in register_feats:
+        ll = p.pop('_ll')
+        with_window(p, registry)
+        rfeats.append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
+    stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
+                                     'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
+                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0)')
+    from cassini_tiles import build_cassini_roads
+    stats['cassiniRoads'] = build_cassini_roads(TILES)
+    from cassini_tiles import build_inscriptions
+    stats['inscriptions'] = build_inscriptions(TILES)
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',
                                  'Buringh, European urban population 700–2000 (DANS, CC0)')
     d = json.load(open(os.path.join(RAW, 'germania-sacra', 'original', 'diocese-borders.geojson'), encoding='utf-8'))
@@ -817,6 +832,43 @@ def regional_layers(recs, rows, sites_out):
                      {'k': x['kind'], 'env': [lo, hi, 'source'], 'st': x['art'], 'per': label, 'nb': 'label'}])
         sites_out.append(_site_props('no' + x['id'], title, x['kind'], x['lon'], x['lat'], ef=lo, et=hi, st=x['art'], per=f'{label} (register dating)', src='nokm'))
     stats['nordic'] = {'nsh': sum(1 for r in rows if r[0] == 'nsh'), 'norway': len(no)}
+
+    # National registers and historical gazetteers (2026-10 discovery pass; see registers.py and
+    # docs/HISTORICAL_SOURCES_SEARCH.md). Every record keeps only the dating its own source gives: a construction window,
+    # a period the record names, or the single year in which a gazetteer or register lists it ('sn': a snapshot). Dated
+    # records go into the place index; undated ones only into the tiles (drawn when the reader includes undated records).
+    import registers as REG
+    COMMON_WORDS = {w.strip().lower() for w in open(os.path.join(ROOT, 'public', 'atlas', 'common-words.txt'), encoding='utf-8') if w.strip()}
+    register_feats[:] = []
+    reg_stats, reg_index = {}, Counter()
+    loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
+               ('ottomannfs', REG.ottoman_nfs), ('generalkarte', REG.generalkarte), ('cassini', REG.cassini_places), ('lutsch', REG.lutsch),
+               ('sirkd', REG.slovenia_rkd))
+    for name, fn in loaders:
+        res = fn()
+        recs, note = (res if isinstance(res, tuple) else (res, None))
+        reg_stats[name] = {'records': len(recs), **({'notes': note} if note else {})}
+        for x in recs:
+            lon, lat = x['lon'], x['lat']
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                continue
+            pr = {'src': x['src'], 'st': x['ty'][:80], 'per': x.get('per'), 'u': None if x['precise'] else 1}
+            env = None
+            if x.get('snap'):
+                env = [x['snap'], x['snap'], 'source']
+                pr.update(ef=x['snap'], et=x['snap'], sn=1)
+            elif x.get('env'):
+                env = [x['env'][0], x['env'][1], 'source']
+                pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
+            register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
+            # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
+            if env and x['kind'] not in ('site', 'building') and x['name'].strip().lower() not in COMMON_WORDS:
+                extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
+                         **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
+                rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
+                             [list(n) for n in x['names'] if n[0] and n[0].strip().lower() not in COMMON_WORDS][:6], x['ctx'][:2], [], extra])
+                reg_index[x['src']] += 1
+    stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'tileFeatures': len(register_feats)}
 
     # Private data pack (never published): datasets with no licence to republish, or terms that forbid it.
     private, prows = [], []

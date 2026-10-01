@@ -150,6 +150,42 @@
   "sha256": "d799dbeaafe7e00f897696cf828e55146394ae1bdd7618aee3d37d0364291a31",
   "downloaded": "2026-09-30"
  },
+ "canmore-scotland/original/Canmore_Points.zip": {
+  "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+  "bytes": 35950191,
+  "sha256": "5a30f1d15645b46927240949603746801048bf78c7d32dda19a3aac54fc6e437",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/edge.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685925?format=original",
+  "bytes": 2343040,
+  "sha256": "d9af6cfa908c49d066011069af34a6de914199f595abbd6ad5c3d4f269b941c7",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/france_cassini_cities.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685920?format=original",
+  "bytes": 1056572,
+  "sha256": "abd1dafe38f8505511e9c2ad5fc9b3a11d5f1d5602589de07572403e88cb7652",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/france_cassini_roads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685921?format=original",
+  "bytes": 5884182,
+  "sha256": "58b6f4b87d439b89dbe16941944d881bd70b20cca48f425fe08ba99d8934dadd",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/node.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685924?format=original",
+  "bytes": 2075239,
+  "sha256": "aaf45c496354e2732fc7b040a8daa70f4d44d9337b35db954bc9ed86d93db0de",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/version.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685923?format=original",
+  "bytes": 50,
+  "sha256": "8288991abf9a27aaaa795dbc103c653c044a174279c2732850fdfa300fb43124",
+  "downloaded": "2026-10-01"
+ },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
   "bytes": 44501172,
@@ -651,6 +687,12 @@
   "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
   "downloaded": "2026-09-30"
  },
+ "generalkarte-gazetteer/original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv": {
+  "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
+  "bytes": 1635015,
+  "sha256": "6b568e3d82b9680bb42e710be80de6038c1c65930084ca2a2decedf973c175b2",
+  "downloaded": "2026-10-01"
+ },
  "germania-sacra/original/diocese-borders.geojson": {
   "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
   "bytes": 3956104,
@@ -752,6 +794,12 @@
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
  },
+ "index-villaris-1680/original/IndexVillaris1680-v2.0.4.zip": {
+  "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
+  "bytes": 11461666,
+  "sha256": "4832d91c44b45871ff5fe09ae3a81b91eb0d17ed227d0037f6d6a12a68d4c4ac",
+  "downloaded": "2026-10-01"
+ },
  "inland-navigation/original/gis/direct_evidence.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
   "bytes": 1115556,
@@ -787,6 +835,12 @@
   "bytes": 250611,
   "sha256": "a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327",
   "downloaded": "2026-09-30"
+ },
+ "ireland-smr/original/SMROpenData.csv": {
+  "url": "https://heritagedata.maps.arcgis.com/sharing/rest/content/items/63841b2807504a24942e44955119c339/data",
+  "bytes": 169737101,
+  "sha256": "99f171b7b120eb7fbb04525f927d4ed8a8a77ccf6b063dd981e4d14024c23768",
+  "downloaded": "2026-10-01"
  },
  "itinere/nightly-export/route-segments.ndjson": {
   "url": "https://itiner-e.org/route-segments/download",
@@ -860,6 +914,18 @@
   "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
   "downloaded": "2026-09-29"
  },
+ "list-latin-inscriptions/original/LIST_v1-2.parquet": {
+  "url": "https://zenodo.org/api/records/10473706/files/LIST_v1-2.parquet/content",
+  "bytes": 109990225,
+  "sha256": "01331d6ed96d602b541ffec0e5fe9f4868950272614212dd6d3c3f3e521ac5de",
+  "downloaded": "2026-10-01"
+ },
+ "list-latin-inscriptions/original/LI_metadata.csv": {
+  "url": "https://zenodo.org/api/records/10473706/files/LI_metadata.csv/content",
+  "bytes": 19694,
+  "sha256": "fb0cf394e7ca4f88b5d74fa730d3de10a37f71dc606efbe4cfe3c7ea400ac465",
+  "downloaded": "2026-10-01"
+ },
  "living-with-machines/original/annotations-2024_zenodo-11241371/README.md": {
   "url": "https://zenodo.org/api/records/11241371/files/README.md/content",
   "bytes": 11073,
@@ -925,6 +991,42 @@
   "bytes": 143,
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
   "downloaded": "2026-09-29"
+ },
+ "lutsch-transylvania-1751/original/Appendix. Mountain and hill names in 1735 and 1751.doc": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226246?format=original",
+  "bytes": 125440,
+  "sha256": "2e3e0d9c4b5b86bf84f744271e31fe8fb72420e1d51b2f6314ecd61e6d991d53",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.cpg": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226247?format=original",
+  "bytes": 5,
+  "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.dbf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226249?format=original",
+  "bytes": 49485,
+  "sha256": "d290a0e41e50ec4a8e4f1aa25cdab63cdd4382c8fc2e43912ab7245b194a808c",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.prj": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226251?format=original",
+  "bytes": 419,
+  "sha256": "a1321e12a80058c45a08046b66c426d682a9f522c7a7f688591a6463028cf1cb",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.shp": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226250?format=original",
+  "bytes": 10624,
+  "sha256": "6bc8b4371e2a49d7eef9aae8710b6b29d4266e714020c8bd0a1d342537e9b26d",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.shx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226248?format=original",
+  "bytes": 3116,
+  "sha256": "01024cf76f3865b9cc91a027eaaaf9fadda3c129e0f22ec23905b7918ea0d73c",
+  "downloaded": "2026-10-01"
  },
  "markets-fairs/original/MFEngland.txt": {
   "url": "https://sas-space.sas.ac.uk/106/3/MFEngland.txt",
@@ -1004,6 +1106,12 @@
   "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
   "downloaded": "2026-09-30"
  },
+ "ottoman-nfs-gazetteer/original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx": {
+  "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",
+  "bytes": 1721742,
+  "sha256": "b3670e8258aa96f7705745a211064f84c5645e836c3862d1f881436dfb1a65ff",
+  "downloaded": "2026-10-01"
+ },
  "periodo/original/periodo-dataset.json": {
   "url": "https://data.perio.do/d.json",
   "bytes": 7806282,
@@ -1051,6 +1159,18 @@
   "bytes": 136020531,
   "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
   "downloaded": "2026-09-29"
+ },
+ "poland-nid-register/original/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv": {
+  "url": "https://api.dane.gov.pl/media/resources/20260603/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv",
+  "bytes": 29215044,
+  "sha256": "21a9bc12cb8ec6ebfb7104e04da72897d08d3b0cd7ed42e45e233a7579c82f32",
+  "downloaded": "2026-10-01"
+ },
+ "poland-nid-register/original/geonames-PL.zip": {
+  "url": "https://download.geonames.org/export/dump/PL.zip",
+  "bytes": 2017774,
+  "sha256": "9a6daf1d77ef2320e0d4d14e30666b3206d53d056b0d141b8918ea13c6489775",
+  "downloaded": "2026-10-01"
  },
  "princes-townspeople/original/cities_dynasties.tab": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/10047015",
@@ -1693,6 +1813,12 @@
   "bytes": 10471,
   "sha256": "8480146fa43519579403a54f9d3fbedb2a8827d2a23ca9536c9d2c0107620c3a",
   "downloaded": "2026-09-30"
+ },
+ "slovenia-rkd-register/original/rnpd.csv": {
+  "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
+  "bytes": 24015168,
+  "sha256": "b14c58cbc7de8b597294c4f0b3fd5aa00ecad52a88adef140d8e8f7e9395278e",
+  "downloaded": "2026-10-01"
  },
  "sweden-lamningar/original/lamningar_sverige.gpkg": {
   "url": "https://pub.raa.se/nedladdning/datauttag/lamningar_v1/l%c3%a4mningar_sverige.gpkg",

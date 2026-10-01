@@ -78,7 +78,7 @@ describe('private data pack', () => {
     const rural = LAYERS.find((l) => l.id === 'rural-settlement')!;
     const castles = LAYERS.find((l) => l.id === 'castles')!;
     expect(rural.unavailable).toBeTruthy();
-    expect(castles.sources).toEqual(['medieval-sites']);
+    expect(castles.sources).toEqual(['medieval-sites', 'register-sites']);
     await openPrivateData(pack({ 'tiles/rural-settlement.pmtiles': new Uint8Array(8), 'tiles/private-sites.pmtiles': new Uint8Array(8) }));
     expect(rural.unavailable).toBeUndefined();
     expect(castles.sources).toContain('private-sites');

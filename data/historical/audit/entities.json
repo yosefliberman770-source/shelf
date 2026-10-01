@@ -1,0 +1,292 @@
+{
+ "records": 379734,
+ "entities": 369759,
+ "recordsInMultiSourceEntities": 18350,
+ "multiSourceEntities": 8375,
+ "largestEntity": 31,
+ "sourcePairs": [
+  [
+   "generalkarte + ottomannfs",
+   1127
+  ],
+  [
+   "hre + viabundus",
+   947
+  ],
+  [
+   "cassini + dicotopo",
+   920
+  ],
+  [
+   "ivillaris + mfairs",
+   917
+  ],
+  [
+   "canmore + wikidata",
+   718
+  ],
+  [
+   "buringh + pleiades",
+   525
+  ],
+  [
+   "ebidat + wikidata",
+   460
+  ],
+  [
+   "ebidat + viabundus",
+   414
+  ],
+  [
+   "ebidat + hre",
+   334
+  ],
+  [
+   "viabundus + wikidata",
+   302
+  ],
+  [
+   "pleiades + wikidata",
+   301
+  ],
+  [
+   "buringh + viabundus",
+   297
+  ],
+  [
+   "germaniasacra + wikidata",
+   281
+  ],
+  [
+   "buringh + hre",
+   275
+  ],
+  [
+   "hre + wikidata",
+   235
+  ],
+  [
+   "buringh + cassini",
+   220
+  ],
+  [
+   "dicotopo + pleiades",
+   212
+  ],
+  [
+   "afontium + wikidata",
+   182
+  ],
+  [
+   "cassini + pleiades",
+   150
+  ],
+  [
+   "ottomannfs + pleiades",
+   147
+  ],
+  [
+   "buringh + dicotopo",
+   145
+  ],
+  [
+   "generalkarte + pleiades",
+   124
+  ],
+  [
+   "buringh + mfairs",
+   116
+  ],
+  [
+   "generalkarte + tib",
+   114
+  ],
+  [
+   "buringh + wikidata",
+   95
+  ],
+  [
+   "buringh + ivillaris",
+   91
+  ],
+  [
+   "ivillaris + wikidata",
+   82
+  ],
+  [
+   "althurayya + pleiades",
+   72
+  ],
+  [
+   "wbohemia + wikidata",
+   66
+  ],
+  [
+   "mfairs + wikidata",
+   62
+  ],
+  [
+   "pleiades + tib",
+   61
+  ],
+  [
+   "nsh + wikidata",
+   50
+  ],
+  [
+   "pleiades + viabundus",
+   45
+  ],
+  [
+   "hre + pleiades",
+   43
+  ],
+  [
+   "generalkarte + wikidata",
+   42
+  ],
+  [
+   "mfairs + pleiades",
+   42
+  ],
+  [
+   "dicotopo + wikidata",
+   39
+  ],
+  [
+   "buringh + ebidat",
+   38
+  ],
+  [
+   "buringh + generalkarte",
+   36
+  ],
+  [
+   "afontium + viabundus",
+   35
+  ]
+ ],
+ "sameDatasetNearDuplicates": {
+  "canmore": 6107,
+  "wikidata": 1545,
+  "afontium": 4352,
+  "generalkarte": 163,
+  "nid": 228452,
+  "pleiades": 269,
+  "nokm": 32022,
+  "merimee": 57,
+  "dicotopo": 355,
+  "viabundus": 117,
+  "buringh": 4,
+  "germaniasacra": 330,
+  "ivillaris": 346,
+  "dkff": 24746,
+  "tib": 21,
+  "ottomannfs": 295,
+  "sirkd": 82,
+  "finreg": 3,
+  "cassini": 30,
+  "nsh": 9,
+  "wbohemia": 32,
+  "hre": 2,
+  "irlsmr": 2,
+  "raa": 6393,
+  "bridges1250": 1,
+  "ran": 69,
+  "mfairs": 1,
+  "darmc": 5
+ },
+ "examples": {
+  "London": [
+   [
+    "buringh:London",
+    "ivillaris:LONDON",
+    "mfairs:London",
+    "pleiades:Londinium/Augusta"
+   ]
+  ],
+  "Paris": [
+   [
+    "buringh:Paris",
+    "cassini:Paris",
+    "pleiades:Lutetia"
+   ]
+  ],
+  "Roma": [
+   [
+    "buringh:Rome",
+    "pleiades:Roma"
+   ]
+  ],
+  "York": [
+   [
+    "buringh:York",
+    "ivillaris:YORK",
+    "mfairs:York",
+    "pleiades:Eburacum",
+    "tib:York"
+   ]
+  ],
+  "Köln": [
+   [
+    "buringh:Koeln",
+    "hre:Koeln",
+    "pleiades:Ara Ubiorum/Col. Claudia Ara Agrippinensium",
+    "viabundus:Köln"
+   ]
+  ],
+  "Constantinople": [
+   [
+    "buringh:Istanbul",
+    "generalkarte:Konstantinopel",
+    "pleiades:Byzantium",
+    "pleiades:Constantinopolis",
+    "pleiades:İstanbul",
+    "tib:Constantinople",
+    "tib:Istanbul",
+    "wikidata:Istanbul"
+   ]
+  ],
+  "Istanbul": [
+   [
+    "buringh:Istanbul",
+    "generalkarte:Konstantinopel",
+    "pleiades:Byzantium",
+    "pleiades:Constantinopolis",
+    "pleiades:İstanbul",
+    "tib:Constantinople",
+    "tib:Istanbul",
+    "wikidata:Istanbul"
+   ]
+  ],
+  "Kraków": [
+   [
+    "hre:Krakow",
+    "viabundus:Krakow am See"
+   ],
+   [
+    "afontium:Kraków",
+    "buringh:Kraków"
+   ]
+  ],
+  "Edinburgh": [],
+  "Dublin": [],
+  "Lübeck": [
+   [
+    "buringh:Lübeck",
+    "hre:Luebeck",
+    "viabundus:Lübeck",
+    "wikidata:Liubice"
+   ]
+  ],
+  "Sofia": [
+   [
+    "buringh:Sofia",
+    "generalkarte:Sofia",
+    "ottomannfs:Sofya",
+    "pleiades:Serdica"
+   ]
+  ]
+ },
+ "method": "Place identity across datasets: how often one historical place is several source records.\n\n  python3 scripts/historical-data/entity_report.py → data/historical/audit/entities.json\n\nGeneric rule (no hand-made pairs): two records from *different* datasets are the same place when they share a name —\nany of their recorded names, compared normalised (case, accents, punctuation, a leading article dropped) — and lie\nwithin a distance that depends on what they are (a town's centre and its castle can be a kilometre or two apart;\ntwo churches of the same dedication in one town are not one church), or when they carry the same Wikidata item.\nRecords of the same dataset are never merged (a dataset's own duplicates are reported separately)."
+}

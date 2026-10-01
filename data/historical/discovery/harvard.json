@@ -1,0 +1,3196 @@
+{
+ "harvardGeospatialLibrary": {
+  "records": 11080,
+  "inEuropeMediterranean": 2281,
+  "historicalMaps(year<=1950)": 1416,
+  "georeferencedRasters": 1107,
+  "publicGeoreferencedRasters": 1107,
+  "vectorLayersInEurope": 1063,
+  "publicVectorLayersInEurope": 399,
+  "mapYearByCentury": {
+   "0": 9,
+   "100": 7,
+   "200": 8,
+   "300": 9,
+   "400": 9,
+   "500": 8,
+   "600": 10,
+   "700": 8,
+   "800": 7,
+   "900": 7,
+   "1000": 10,
+   "1100": 11,
+   "1200": 9,
+   "1300": 9,
+   "1400": 10,
+   "1500": 21,
+   "1600": 213,
+   "1700": 446,
+   "1800": 438,
+   "1900": 167
+  },
+  "publishers": [
+   [
+    "Harvard Map Collection, Harvard College Library",
+    796
+   ],
+   [
+    "Harvard Map Collection, Harvard Library",
+    435
+   ],
+   [
+    "ESRI",
+    225
+   ],
+   [
+    "Harvard",
+    201
+   ],
+   [
+    "Euratlas-Nussli",
+    183
+   ],
+   [
+    "HGIS Germany",
+    96
+   ],
+   [
+    "East View Cartographic, Inc.",
+    64
+   ],
+   [
+    "Kadaster",
+    64
+   ],
+   [
+    "Environmental Systems Research Institute, Inc. (ESRI)",
+    46
+   ],
+   [
+    "American Geological Institute",
+    42
+   ],
+   [
+    "National Imagery and Mapping Agency",
+    28
+   ],
+   [
+    "Harvard Map Collection",
+    26
+   ],
+   [
+    "Esri",
+    24
+   ],
+   [
+    "Minnesota Population Center",
+    11
+   ],
+   [
+    "MaconUSA",
+    9
+   ]
+  ],
+  "oldestEuropeanMaps": [
+   {
+    "title": "Sovereign States, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Big Rivers, Europe, Years 1-500",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-big-rivers-0-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 1",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-0",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Small Rivers, Europe, Years 1-100",
+    "year": 1,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-small-river-0-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 100",
+    "year": 100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-100",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Small Rivers, Europe, Years 200-500",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-small-river-200-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 200",
+    "year": 200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-200",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-300",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Paris, France, ca. 4th Century (Time Series Map 1 of 8) (Raster Image)",
+    "year": 301,
+    "url": "https://hgl.harvard.edu/catalog/harvard-g5834-p3-1705-l3-sh1",
+    "formats": [
+     "GeoTIFF",
+     "wms"
+    ],
+    "access": "Public"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-400",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Paris, France, 5th-10th Century (Time Series Map 2 of 8) (Raster Image)",
+    "year": 401,
+    "url": "https://hgl.harvard.edu/catalog/harvard-g5834-p3-1705-l3-sh2",
+    "formats": [
+     "GeoTIFF",
+     "wms"
+    ],
+    "access": "Public"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-500",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Autonomous Peoples, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-autonomous-ppl-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign States, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-states-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Sovereign and Dependent States, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-svrgn-dep-states-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-2nd-level-div-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Uncertain Political Borders, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-uncertain-border-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Seas, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-seas-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Small Rivers, Europe, Years 600-900",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-small-river-600-900",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Big Rivers, Europe, Years 600-1800",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-big-rivers-600-1800",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   },
+   {
+    "title": "Cities, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-cities-600",
+    "formats": [
+     "Shapefile",
+     "wms"
+    ],
+    "access": "Restricted"
+   }
+  ],
+  "europeanVectorLayers": [
+   {
+    "title": "Global GIS : United States gazetteer, populated places",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gazusa",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1950",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1910",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop2000",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1930",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1960",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1940",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1970",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1980",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1990",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1900",
+    "access": "Public"
+   },
+   {
+    "title": "Historic County Boundaries and Total Population, United States, 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-nhgis-pop1920",
+    "access": "Public"
+   },
+   {
+    "title": "U.S. Geographic Names Information System Populated Places : ESRI Data & Maps 2010",
+    "year": 1981,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri10usgppl",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 400",
+    "year": 400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-400",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1600",
+    "year": 1600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1600",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1400",
+    "year": 1400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1400",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1800",
+    "year": 1800,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1800",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 700",
+    "year": 700,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-700",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 300",
+    "year": 300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-300",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1700",
+    "year": 1700,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1700",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1200",
+    "year": 1200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1200",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 600",
+    "year": 600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-600",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1900",
+    "year": 1900,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1900",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 500",
+    "year": 500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-500",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 2000",
+    "year": 2000,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-2000",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1100",
+    "year": 1100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1100",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1500",
+    "year": 1500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1500",
+    "access": "Restricted"
+   },
+   {
+    "title": "First-level Administrative Divisions, Europe, Year 1000",
+    "year": 1000,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-1st-level-div-1000",
+    "access": "Restricted"
+   },
+   {
+    "title": "Germany State Boundaries, 1830, German Historical GIS",
+    "year": 1830,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1830core",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Boundaries, 1834, German Historical GIS",
+    "year": 1834,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1834core",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Boundaries, 1820, German Historical GIS",
+    "year": 1820,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1820core",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Boundaries, 1826, German Historical GIS",
+    "year": 1826,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1826core",
+    "access": "Public"
+   },
+   {
+    "title": "ESRI Data & Maps 2005 : U.S. Geographic Names Information System Populated Places",
+    "year": 1981,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri05usgppl",
+    "access": "Restricted"
+   },
+   {
+    "title": "U.S. Geographic Names Information System Populated Places : ESRI Data & Maps 2009",
+    "year": 1981,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri09usgppl",
+    "access": "Restricted"
+   },
+   {
+    "title": "World Gazetteer : ESRI Data & Maps 2007",
+    "year": 1992,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri07wldgaz",
+    "access": "Restricted"
+   },
+   {
+    "title": "World Gazetteer : ESRI Data & Maps 2008",
+    "year": 1992,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri08wldgaz",
+    "access": "Restricted"
+   },
+   {
+    "title": "U.S. Geographic Names Information System Populated Places : ESRI Data & Maps 2008",
+    "year": 1981,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri08usgppl",
+    "access": "Restricted"
+   },
+   {
+    "title": "U.S. Geographic Names Information System Populated Places : ESRI Data & Maps 2007",
+    "year": 1981,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri07usgppl",
+    "access": "Restricted"
+   },
+   {
+    "title": "ESRI Data & Maps 2004 : World Gazetteer",
+    "year": 1992,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri04gaz",
+    "access": "Restricted"
+   },
+   {
+    "title": "VMap1 Ruins, Polygons",
+    "year": 1995,
+    "url": "https://hgl.harvard.edu/catalog/harvard-vmap1ruinsa",
+    "access": "Public"
+   },
+   {
+    "title": "VMap1 Ruins, Points",
+    "year": 1995,
+    "url": "https://hgl.harvard.edu/catalog/harvard-vmap1ruinsp",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Governmental District Boundaries, 1871, German Historical GIS",
+    "year": 1871,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1871districts",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Governmental District Boundaries, 1914, German Historical GIS",
+    "year": 1914,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1914districts",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : Gazetteer of populated places, Western Hemisphere (excluding U.S.)",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gazppw",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : Significant earthquakes (2150 B.C. until 1994 A.D.)",
+    "year": null,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-quksig",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : Gazetteer of populated places, Eastern Hemisphere",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gazppe",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : World gazetteer (major cities)",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gazcty",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : Gazetteer of non-populated places, Eastern Hemisphere",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gaznpe",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Governmental District Boundaries, 1890, German Historical GIS",
+    "year": 1890,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1890districts",
+    "access": "Public"
+   },
+   {
+    "title": "Global GIS : Gazetteer of non-populated places, Western Hemisphere (excluding U.S.)",
+    "year": 2003,
+    "url": "https://hgl.harvard.edu/catalog/harvard-glb-gaznpw",
+    "access": "Public"
+   },
+   {
+    "title": "Flora Observations Sites (lines), Odessa, Ukraine, 1890-1891",
+    "year": 1890,
+    "url": "https://hgl.harvard.edu/catalog/harvard-imperiia-odessa-flora-sites-lines",
+    "access": "Public"
+   },
+   {
+    "title": "Flora Observations Sites (polygons), Odessa, Ukraine, 1890-1891",
+    "year": 1890,
+    "url": "https://hgl.harvard.edu/catalog/harvard-imperiia-odessa-flora-sites-polygons",
+    "access": "Public"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1100",
+    "year": 1100,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1100",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1200",
+    "year": 1200,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1200",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1000",
+    "year": 1000,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1000",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1500",
+    "year": 1500,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1500",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 2000",
+    "year": 2000,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-2000",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1700",
+    "year": 1700,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1700",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1800",
+    "year": 1800,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1800",
+    "access": "Restricted"
+   },
+   {
+    "title": "ESRI Data & Maps 2004 : U.S. National Atlas Public Land Survey",
+    "year": 1972,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri04uspubldsur",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1300",
+    "year": 1300,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1300",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1600",
+    "year": 1600,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1600",
+    "access": "Restricted"
+   },
+   {
+    "title": "Supranational Entities, Europe, Year 1400",
+    "year": 1400,
+    "url": "https://hgl.harvard.edu/catalog/harvard-euratlas-supra-entities-1400",
+    "access": "Restricted"
+   },
+   {
+    "title": "ESRI Data & Maps 2005 : U.S. National Atlas Public Land Survey",
+    "year": null,
+    "url": "https://hgl.harvard.edu/catalog/harvard-esri05uspubldsur",
+    "access": "Restricted"
+   },
+   {
+    "title": "DCW Cultural Landmarks, Polygons",
+    "year": 1992,
+    "url": "https://hgl.harvard.edu/catalog/harvard-dcw-cl-poly",
+    "access": "Public"
+   },
+   {
+    "title": "UA Census Landmark Polygon Features, 2000 - Alaska",
+    "year": 2000,
+    "url": "https://hgl.harvard.edu/catalog/harvard-tg00aklpy",
+    "access": "Public"
+   },
+   {
+    "title": "VMap1 Firebreaks",
+    "year": 1995,
+    "url": "https://hgl.harvard.edu/catalog/harvard-vmap1firebrkl",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Capitals, 1830, German Historical GIS",
+    "year": 1830,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1830statecapitals",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1834, German Historical GIS",
+    "year": 1834,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1834provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Capitals, 1834, German Historical GIS",
+    "year": 1834,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1834statecapitals",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Capitals, 1863, German Historical GIS",
+    "year": 1863,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1863statecapitals",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Governmental District Capitals, 1834, German Historical GIS",
+    "year": 1834,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1834districtcaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1850, German Historical GIS",
+    "year": 1850,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1850provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1830, German Historical GIS",
+    "year": 1830,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1830provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1914, German Historical GIS",
+    "year": 1914,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1914provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Capitals, 1890, German Historical GIS",
+    "year": 1890,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1890statecapitals",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1863, German Historical GIS",
+    "year": 1863,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1867provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany State Capitals, 1853, German Historical GIS",
+    "year": 1853,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1853statecapitals",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Provincial Capitals, 1848, German Historical GIS",
+    "year": 1848,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1848provincecaps",
+    "access": "Public"
+   },
+   {
+    "title": "Germany Governmental District Capitals, 1890, German Historical GIS",
+    "year": 1890,
+    "url": "https://hgl.harvard.edu/catalog/harvard-ghgis1890districtcaps",
+    "access": "Public"
+   }
+  ]
+ },
+ "harvardDataverse": {
+  "candidates": 6618,
+  "relevance>=50": 197,
+  "top": [
+   {
+    "title": "[Ergänzungsmaterial zu: Die mittelalterliche Verwendung Osteifeler Tuffe im Kartenbild]",
+    "doi": "10.11588/data/mqzlva",
+    "dataverse": "heiDATA",
+    "relevance": 89,
+    "regions": [
+     "Germany",
+     "Low Countries",
+     "Scandinavia"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Ancient Rome, Italy (Raster Image)",
+    "doi": "hdl:1902.6/MHV99",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 89,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     700
+    ]
+   },
+   {
+    "title": "Necessary Reunions: Gazetteer of Place Names in Kerala (India) from Dutch Maps and Textual Archives of the Seventeenth and Eighteenth Centuries",
+    "doi": "10.34894/fn1dbl",
+    "dataverse": "DataverseNL",
+    "relevance": 82,
+    "regions": [
+     "Low Countries"
+    ],
+    "periods": [
+     1500,
+     1600,
+     1700,
+     1800
+    ]
+   },
+   {
+    "title": "Louisbourg and Louisbourg Harbour, Nova Scotia, Canada, 1745 (John Hinton ed.) (Raster Image)",
+    "doi": "hdl:1902.6/FLXHY",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 81,
+    "regions": [
+     "France",
+     "England"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Siege of Hamburg, Germany, 1686 (Raster Image)",
+    "doi": "hdl:1902.6/ZULTH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 81,
+    "regions": [
+     "Germany",
+     "Low Countries",
+     "Scandinavia"
+    ],
+    "periods": [
+     1600
+    ]
+   },
+   {
+    "title": "Palestine, 1876 (Raster Image)",
+    "doi": "hdl:1902.6/PJBIV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 79,
+    "regions": [
+     "France",
+     "Levant, Egypt & Maghreb"
+    ],
+    "periods": [
+     600,
+     1800
+    ]
+   },
+   {
+    "title": "Strasbourg, France, 1734 (Raster Image)",
+    "doi": "hdl:1902.6/TO9BZ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 78,
+    "regions": [
+     "France",
+     "Germany",
+     "Europe-wide"
+    ],
+    "periods": [
+     800,
+     1700
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1748 (Raster Image)",
+    "doi": "hdl:1902.6/ZBK9R",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 78,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     1700
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1832 (Raster Image)",
+    "doi": "hdl:1902.6/YHMVG",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 78,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Louisbourg and Louisbourg Harbour, Nova Scotia, Canada, 1745 (Thomas Jefferys ed.) (Raster Image)",
+    "doi": "hdl:1902.6/5VZD9",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "France",
+     "England"
+    ],
+    "periods": [
+     500,
+     1700
+    ]
+   },
+   {
+    "title": "Halifax Harbour, Nova Scotia, Canada, 1778 (Raster Image)",
+    "doi": "hdl:1902.6/VCBY7",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     300,
+     1700
+    ]
+   },
+   {
+    "title": "Havana and Harbor, Cuba, 1889 (Raster Image)",
+    "doi": "hdl:1902.6/NB6EU",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "Spain"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Boston Harbor Including Boston and Surroundings, Massachusetts, Nautical Chart, 1775 (Image 2 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/GTJYD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "England",
+     "Low Countries"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Boston Harbor Including Boston and Surroundings, Massachusetts, Nautical Chart, 1775 (Image 1 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/7MFSH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "England",
+     "Low Countries"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Bordeaux, France, ca. 1696 (Raster Image)",
+    "doi": "hdl:1902.6/5KD1B",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 76,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     1600
+    ]
+   },
+   {
+    "title": "Lyon, France, 1872 (Raster Image)",
+    "doi": "hdl:1902.6/IG9WW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Lyon Region, France, 1869 (Raster Image)",
+    "doi": "hdl:1902.6/N7VUM",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Newport, Rhode Island, 1782 (Raster Image)",
+    "doi": "hdl:1902.6/UUW0G",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "France",
+     "England",
+     "Finland & Iceland"
+    ],
+    "periods": [
+     200,
+     1700
+    ]
+   },
+   {
+    "title": "Annapolis Royal Region, Nova Scotia, Canada, 1744 (Raster Image)",
+    "doi": "hdl:1902.6/U7Y7N",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "France",
+     "England"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Florence, Italy, 1731 (Raster Image)",
+    "doi": "hdl:1902.6/3KIJP",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "Germany",
+     "Italy"
+    ],
+    "periods": [
+     300,
+     1700,
+     1900
+    ]
+   },
+   {
+    "title": "Havana, Cuba, 1785 (Raster Image)",
+    "doi": "hdl:1902.6/IK6UR",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "Spain"
+    ],
+    "periods": [
+     500,
+     1700,
+     1900
+    ]
+   },
+   {
+    "title": "Havana, Cuba, 1739 (Raster Image)",
+    "doi": "hdl:1902.6/GARRF",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "Finland & Iceland"
+    ],
+    "periods": [
+     200,
+     1700,
+     1900
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1823 (Raster Image)",
+    "doi": "hdl:1902.6/ZJCQJ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 73,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Photographic documentation and type determination of medieval and early modern potsherds from Vardø, northern Norway",
+    "doi": "10.18710/gtibfk",
+    "dataverse": "DataverseNO",
+    "relevance": 72,
+    "regions": [
+     "Scandinavia"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Hernan Cortes and the Conquest of the Aztec Empire",
+    "doi": "10.7910/dvn/ampgmw",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 71,
+    "regions": [
+     "Spain"
+    ],
+    "periods": [
+     1400,
+     1500
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 4",
+    "doi": "hdl:1902.6/DPMGW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 1",
+    "doi": "hdl:1902.6/XFJV4",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 6",
+    "doi": "hdl:1902.6/G4MQZ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 3",
+    "doi": "hdl:1902.6/YXCVD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 2",
+    "doi": "hdl:1902.6/XGLGD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 10",
+    "doi": "hdl:1902.6/2RTIM",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 9",
+    "doi": "hdl:1902.6/HHLXB",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 8",
+    "doi": "hdl:1902.6/I6OJY",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 5",
+    "doi": "hdl:1902.6/MYJBV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Rock map of the Yellow River (Huang He) expedition, China, 1925-1927 : Sheet 7",
+    "doi": "hdl:1902.6/9S4RR",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     200,
+     1900
+    ]
+   },
+   {
+    "title": "Balkan Peninsula, 1908 (Raster Image)",
+    "doi": "hdl:1902.6/DO78V",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 71,
+    "regions": [
+     "Germany",
+     "Balkans",
+     "Greece & Cyprus",
+     "Anatolia & Caucasus",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1900
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1846 (Raster Image)",
+    "doi": "hdl:1902.6/OKWFD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     1800
+    ]
+   },
+   {
+    "title": "Paris, France Region, 1870 (Raster Image)",
+    "doi": "hdl:1902.6/HEKCR",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Gibraltar, 1739 (Raster Image)",
+    "doi": "hdl:1902.6/4KZBA",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     700,
+     1700
+    ]
+   },
+   {
+    "title": "Strasbourg, France, 1823 (Raster Image)",
+    "doi": "hdl:1902.6/ANRZ6",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1881 (Raster Image)",
+    "doi": "hdl:1902.6/7SL9Q",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "New Orleans, Louisiana, 1810 (Raster Image)",
+    "doi": "hdl:1902.6/S6JRT",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     300,
+     1700,
+     1800
+    ]
+   },
+   {
+    "title": "Florence, Italy, 1851 (Raster Image)",
+    "doi": "hdl:1902.6/DUAHW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     400,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Vienna, Austria, 1856 (Raster Image)",
+    "doi": "hdl:1902.6/ROZE9",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Germany",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Paris, France, 1889 (Raster Image)",
+    "doi": "hdl:1902.6/VNKC3",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Copenhagen, Denmark, 1853 (Raster Image)",
+    "doi": "hdl:1902.6/Q5OA2",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "England",
+     "Scandinavia",
+     "Europe-wide"
+    ],
+    "periods": [
+     800,
+     1800
+    ]
+   },
+   {
+    "title": "Copenhagen, Denmark, 1789 (Raster Image)",
+    "doi": "hdl:1902.6/MKYCV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Scandinavia",
+     "Europe-wide"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Havana, Cuba, 1849 (Raster Image)",
+    "doi": "hdl:1902.6/04F0O",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Spain"
+    ],
+    "periods": [
+     900,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Florence, Italy, 1818 (Raster Image)",
+    "doi": "hdl:1902.6/VXPWY",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     200,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Florence, Italy, 1835 (Raster Image)",
+    "doi": "hdl:1902.6/9B2TW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     900,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Copenhagen, Denmark, 1728 (Raster Image)",
+    "doi": "hdl:1902.6/H2EV0",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Low Countries",
+     "Scandinavia",
+     "Europe-wide"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Rome, Italy, 1862 (Raster Image)",
+    "doi": "hdl:1902.6/KFJQO",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Italy"
+    ],
+    "periods": [
+     500,
+     1800
+    ]
+   },
+   {
+    "title": "Vienna, Austria, 1720 (Raster Image)",
+    "doi": "hdl:1902.6/GWMQV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Germany",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Vienna, Austria, 1819 (Raster Image)",
+    "doi": "hdl:1902.6/QVBTA",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Germany",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     300,
+     1800
+    ]
+   },
+   {
+    "title": "Paris, France, 1700 (Raster Image)",
+    "doi": "hdl:1902.6/ADEZT",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     200,
+     1700
+    ]
+   },
+   {
+    "title": "Dresden, Germany, 1740 (Raster Image)",
+    "doi": "hdl:1902.6/12XDD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Germany"
+    ],
+    "periods": [
+     300,
+     1700
+    ]
+   },
+   {
+    "title": "Bordeaux, France, 1755 (Image 1 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/4PFAO",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     300,
+     1700
+    ]
+   },
+   {
+    "title": "Bordeaux, France, 1755 (Image 2 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/H4V8O",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "France",
+     "Europe-wide"
+    ],
+    "periods": [
+     300,
+     1700
+    ]
+   },
+   {
+    "title": "Havana, Cuba, 1762 (Raster Image)",
+    "doi": "hdl:1902.6/FBLIW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     1700,
+     1900
+    ]
+   },
+   {
+    "title": "Edinburgh, Scotland, United Kingdom, 1853 (Raster Image)",
+    "doi": "hdl:1902.6/LBXA6",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "England"
+    ],
+    "periods": [
+     500,
+     1800
+    ]
+   },
+   {
+    "title": "Berlin, Germany, 1851 (Raster Image)",
+    "doi": "hdl:1902.6/OLETV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 70,
+    "regions": [
+     "Germany"
+    ],
+    "periods": [
+     400,
+     1800
+    ]
+   },
+   {
+    "title": "Tracing Footsteps: A HGIS Project Mapping Out Liturgical Processions in 9th and 10th Century Constantinople",
+    "doi": "hdl:1902.29/11766",
+    "dataverse": "ODUM Harvested  Dataverse",
+    "relevance": 69,
+    "regions": [
+     "England",
+     "Greece & Cyprus",
+     "Anatolia & Caucasus"
+    ],
+    "periods": [
+     300,
+     400,
+     500,
+     600,
+     700,
+     800
+    ]
+   },
+   {
+    "title": "The Tsar's Trans-Atlantic Voyagers",
+    "doi": "10.7910/DVN/OJLQNO",
+    "dataverse": "Veles: Data Catalog of the Imperiia Project",
+    "relevance": 68,
+    "regions": [
+     "East Slavic",
+     "Europe-wide"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Nantucket, Massachusetts, 1838 (Raster Image)",
+    "doi": "hdl:1902.6/ZIXBQ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 68,
+    "regions": [
+     "Finland & Iceland"
+    ],
+    "periods": [
+     1700,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "South America, 1838 (Raster Image)",
+    "doi": "hdl:1902.6/NAYXO",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 68,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Geodict: an integrated gazetteer",
+    "doi": "10.18167/DVN1/MWQQOQ",
+    "dataverse": "CIRAD Harvested Collection",
+    "relevance": 68,
+    "regions": [
+     "France"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Ottoman Empire, 1899 (Raster Image)",
+    "doi": "hdl:1902.6/MSSJN",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 68,
+    "regions": [
+     "France",
+     "Greece & Cyprus",
+     "Anatolia & Caucasus",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1300,
+     1400,
+     1500,
+     1600,
+     1700
+    ]
+   },
+   {
+    "title": "Duchy of Brabant GIS Collection",
+    "doi": "10.34894/uwmslx",
+    "dataverse": "DataverseNL",
+    "relevance": 67,
+    "regions": [
+     "Low Countries"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Replication Data for: Haemoglobin concentration data on School-aged children (5-14yrs) across Public Primary Schools in Western Kenya",
+    "doi": "10.7910/DVN/6GRZZM",
+    "dataverse": "Population Health Dataverse",
+    "relevance": 67,
+    "regions": [
+     "Scandinavia"
+    ],
+    "periods": []
+   },
+   {
+    "title": "World Map, 1725 (Image 1 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/HRCED",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 65,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     400,
+     1700
+    ]
+   },
+   {
+    "title": "World Map, 1725 (Image 2 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/VHJTD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 65,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     400,
+     1700
+    ]
+   },
+   {
+    "title": "Mexico, United States, and Surroundings, 1811 (Raster Image)",
+    "doi": "hdl:1902.6/5AZLS",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 65,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Ottoman Empire, ca. 1790 (Raster Image)",
+    "doi": "hdl:1902.6/C0HW4",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 65,
+    "regions": [
+     "France",
+     "Anatolia & Caucasus",
+     "Europe-wide"
+    ],
+    "periods": [
+     1300,
+     1400,
+     1500,
+     1600,
+     1700,
+     1800
+    ]
+   },
+   {
+    "title": "Official Tall Jawa Archaeological Project, Volume 5",
+    "doi": "10.5683/SP3/ECLGUU",
+    "dataverse": "Borealis Harvested Dataverse",
+    "relevance": 64,
+    "regions": [
+     "Greece & Cyprus",
+     "Anatolia & Caucasus",
+     "Levant, Egypt & Maghreb"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     500,
+     600,
+     700
+    ]
+   },
+   {
+    "title": "New England and Middle Atlantic States, ca. 1730 (Raster Image)",
+    "doi": "hdl:1902.6/LNFYH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 63,
+    "regions": [
+     "England",
+     "Low Countries"
+    ],
+    "periods": [
+     200,
+     1700
+    ]
+   },
+   {
+    "title": "A GIS reconstruction of the Cassini \"Carte de France\" sheet No. 52",
+    "doi": "10.7910/dvn/xp8j6p",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 62,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "World Atmospheric Temperature Isotherms (July), 1884 (Raster Image)",
+    "doi": "hdl:1902.6/XCOH0",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 62,
+    "regions": [
+     "Germany"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "World Atmospheric Temperature Isotherms (January), 1884 (Raster Image)",
+    "doi": "hdl:1902.6/R7AXD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 62,
+    "regions": [
+     "Germany"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "South America, 1739 (Image 2 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/DSOBD",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 62,
+    "regions": [
+     "France",
+     "Spain"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Settlements, oronyms, hydronyms, battlefield sites, post stations, natural resources, manufactories, fortifications and monasteries depicted on the Lutsch map of Transylvania within the Saxon seats and the District of Kronstadt/Brașov (1751)",
+    "doi": "10.7910/DVN/ETORPU",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 61,
+    "regions": [
+     "Germany",
+     "Romania & Moldova",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     700,
+     1700
+    ]
+   },
+   {
+    "title": "TRF-GIS Military Subdivisions (1874–1940)",
+    "doi": "10.7910/dvn/tamqag",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Military Regions (1874–1940)",
+    "doi": "10.7910/dvn/sqpeuw",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Dioceses (1870–1940)",
+    "doi": "10.7910/dvn/a66yjk",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Military Corps (1870–1873)",
+    "doi": "10.7910/dvn/2kmlse",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Military Divisions (1870–1873)",
+    "doi": "10.7910/dvn/2h2jvt",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Vladimir Lenin: life & activity",
+    "doi": "10.7910/dvn/xwwrur",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 60,
+    "regions": [
+     "East Slavic"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Replication Data for Brand in de Stad: Nederlandse stedelijke brandkeuren en ordonnanties 1300-1600",
+    "doi": "10.17026/ss/7bf0ej",
+    "dataverse": "DANS Data Station Social Sciences and Humanities",
+    "relevance": 60,
+    "regions": [
+     "Low Countries"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Map of General Sherman's March : Georgia, South Carolina, and North Carolina, 1865 (Raster Image)",
+    "doi": "hdl:1902.6/GQK2U",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 60,
+    "regions": [
+     "Anatolia & Caucasus"
+    ],
+    "periods": [
+     900,
+     1800
+    ]
+   },
+   {
+    "title": "Madrid, Spain, 1761 (Image 2 of 4) (Raster Image)",
+    "doi": "hdl:1902.6/VPVC3",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Spain",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1700
+    ]
+   },
+   {
+    "title": "Madrid, Spain, 1761 (Image 1 of 4) (Raster Image)",
+    "doi": "hdl:1902.6/1LDNW",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Spain",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1700
+    ]
+   },
+   {
+    "title": "Madrid, Spain, 1761 (Image 3 of 4) (Raster Image)",
+    "doi": "hdl:1902.6/O3DPJ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Spain",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1700
+    ]
+   },
+   {
+    "title": "Madrid, Spain, 1761 (Image 4 of 4) (Raster Image)",
+    "doi": "hdl:1902.6/0RRK7",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Spain",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     1700
+    ]
+   },
+   {
+    "title": "Germany State Boundaries, 1820, German Historical GIS",
+    "doi": "hdl:1902.6/5P2QT",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Germany",
+     "Low Countries",
+     "Scandinavia",
+     "Poland",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Paris, France Region, 1893 (Raster Image)",
+    "doi": "hdl:1902.6/H127L",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Arabian Peninsula, ca. 1747-1767 (Raster Image)",
+    "doi": "hdl:1902.6/2XFHX",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Low Countries"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "South America, 1739 (Image 1 of 2) (Raster Image)",
+    "doi": "hdl:1902.6/Z1IZG",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 59,
+    "regions": [
+     "France",
+     "Spain"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Spatiotemporal historical datasets on micro-level for geocoded individuals in five Swedish parishes, 1813-1914",
+    "doi": "10.7910/dvn/z0ahal",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 58,
+    "regions": [
+     "Scandinavia"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Dataset of Powerful Piety. Practices of Female Abbatial Authority in Medieval Europe (c. 1200-1450)",
+    "doi": "10.7910/dvn/kttsz2",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 58,
+    "regions": [
+     "France",
+     "Germany",
+     "Austria & Switzerland",
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Replication Data for: Trade and Political Fragmentation on the Silk Roads: The Economic Effects of Historical Exchange between China and the Muslim East",
+    "doi": "10.7910/dvn/8mv984",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 58,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "3D Model of Wilne Baptismal Font",
+    "doi": "10.7910/DVN/9SG69Q",
+    "dataverse": "Boston College Dataverse",
+    "relevance": 58,
+    "regions": [
+     "Germany",
+     "England"
+    ],
+    "periods": [
+     400,
+     500,
+     600,
+     700,
+     800,
+     900
+    ]
+   },
+   {
+    "title": "Journal Materials in Archaeology and History of Ancient and Medieval Crimea",
+    "doi": "10.5683/SP2/1OBYZG",
+    "dataverse": "Borealis Harvested Dataverse",
+    "relevance": 58,
+    "regions": [
+     "England",
+     "East Slavic"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Aerial Survey Data from Dmanisis Gora, Georgia",
+    "doi": "10.7910/DVN/JIUK5G",
+    "dataverse": "Project ARKK Dataverse",
+    "relevance": 58,
+    "regions": [
+     "Anatolia & Caucasus"
+    ],
+    "periods": []
+   },
+   {
+    "title": "TRF-GIS Penitentiary Constituencies (1870–1940)",
+    "doi": "10.7910/dvn/xquxbo",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Courts of First Instance (1870–1940)",
+    "doi": "10.7910/dvn/ve2ojs",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Départements (1870–1940)",
+    "doi": "10.7910/dvn/ulqym5",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Cantons (1870–1940)",
+    "doi": "10.7910/dvn/u85rsz",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Courts of Appeal (1870–1940)",
+    "doi": "10.7910/dvn/qv6zbs",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Academies (1870–1940)",
+    "doi": "10.7910/dvn/pmvtfu",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Labor Inspections (1892–1940)",
+    "doi": "10.7910/dvn/osofao",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Circonscriptions (1870–1940)",
+    "doi": "10.7910/dvn/l2lgdw",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "TRF-GIS Arrondissements (1870–1940)",
+    "doi": "10.7910/dvn/98erpb",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Hearth and Population Censuses for the Duchy of Brabant (1374-1800)",
+    "doi": "10.34894/4xhqay",
+    "dataverse": "DataverseNL",
+    "relevance": 57,
+    "regions": [
+     "Low Countries"
+    ],
+    "periods": [
+     500,
+     600,
+     700,
+     800,
+     900,
+     1000
+    ]
+   },
+   {
+    "title": "Grunnlagsdata for studier av littiske studier av funn fra Auravassdraget",
+    "doi": "10.18710/lmnlau",
+    "dataverse": "DataverseNO",
+    "relevance": 57,
+    "regions": [
+     "(bbox in Europe/Mediterranean)"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Germany State Boundaries, 1834, German Historical GIS",
+    "doi": "hdl:1902.6/QIF4P",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France",
+     "Germany",
+     "Low Countries",
+     "Scandinavia",
+     "Poland",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Germany State Boundaries, 1830, German Historical GIS",
+    "doi": "hdl:1902.6/ODIH4",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 57,
+    "regions": [
+     "France",
+     "Germany",
+     "Low Countries",
+     "Scandinavia",
+     "Poland",
+     "Austria & Switzerland"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Data: Territorial gazetteer for Spanish America, 1701-1808",
+    "doi": "10.7910/DVN/YPEU5E",
+    "dataverse": "HGIS de las Indias",
+    "relevance": 57,
+    "regions": [
+     "Spain",
+     "Europe-wide"
+    ],
+    "periods": [
+     1700,
+     1800
+    ]
+   },
+   {
+    "title": "Geodatabase of Historical Evidence on Precipitation in Central Europe AD 1013-1504",
+    "doi": "10.7910/DVN/ARUMGE",
+    "dataverse": "Digital Atlas of Roman and Medieval Civilization Dataverse",
+    "relevance": 56,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     500,
+     600,
+     700
+    ]
+   },
+   {
+    "title": "Georeferencing the \"Atlas du plan général de la ville de Paris par Edme Verniquet\"",
+    "doi": "10.7910/DVN/ZKRJFA",
+    "dataverse": "geohistoricaldata Dataverse",
+    "relevance": 56,
+    "regions": [
+     "France"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Data: Places gazetteer of Spanish America, 1701-1808",
+    "doi": "10.7910/DVN/FUSJD3",
+    "dataverse": "HGIS de las Indias",
+    "relevance": 56,
+    "regions": [
+     "Spain"
+    ],
+    "periods": [
+     1700,
+     1800
+    ]
+   },
+   {
+    "title": "Ergänzungsdaten zu: Rhenish glass – A chemical investigation",
+    "doi": "10.11588/DATA/QRQSSZ",
+    "dataverse": "heiDATA Harvested Dataverse",
+    "relevance": 56,
+    "regions": [
+     "Germany"
+    ],
+    "periods": [
+     200,
+     300,
+     400,
+     500,
+     600,
+     700
+    ]
+   },
+   {
+    "title": "Historical Urban Population: 3700 BC - AD 2000",
+    "doi": "10.7910/DVN/LMCQGX",
+    "dataverse": "Socioeconomic Data and Applications Center (SEDAC)",
+    "relevance": 56,
+    "regions": [],
+    "periods": []
+   },
+   {
+    "title": "West Springfield (including Agawam and part of Holyoke), Massachusetts, 1831 (Raster Image)",
+    "doi": "hdl:1902.6/QV2PK",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     600,
+     1800
+    ]
+   },
+   {
+    "title": "Andover (including North Andover), Massachusetts, 1852 (Raster Image)",
+    "doi": "hdl:1902.6/KNWO0",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Barnstable, Dukes, and Nantucket counties, Massachusetts, 1858 (Raster Image)",
+    "doi": "hdl:1902.6/QQWXU",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Louisbourg and Louisbourg Harbour, Nova Scotia, Canada, 1764 (Raster Image)",
+    "doi": "hdl:1902.6/MOECM",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Battle of Quebec, Canada, 1759 (Raster Image)",
+    "doi": "hdl:1902.6/QYDRO",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     700,
+     1700
+    ]
+   },
+   {
+    "title": "Quebec, Canada, 1776 (Raster Image)",
+    "doi": "hdl:1902.6/8WLKH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Harpers Ferry, West Virginia, and vicinity, 1862 (Raster Image)",
+    "doi": "hdl:1902.6/HNL53",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Battlefield of Antietam, Sharpsburg, Maryland and vicinity, ca. 1862 (Raster Image)",
+    "doi": "hdl:1902.6/UMEZV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 56,
+    "regions": [],
+    "periods": [
+     300,
+     1800,
+     1900
+    ]
+   },
+   {
+    "title": "Orthodox Monasteries of the Russian Empire (1820s)",
+    "doi": "10.7910/DVN/08RCDX",
+    "dataverse": "Veles: Data Catalog of the Imperiia Project",
+    "relevance": 55,
+    "regions": [
+     "East Slavic"
+    ],
+    "periods": [
+     600,
+     1800
+    ]
+   },
+   {
+    "title": "Settlements, oronyms, hydronyms, battlefield sites, post stations, natural resources, manufactories and fortifications depicted on the Weiss map of Transylvania within the Saxon seats and the District of Kronstadt/Brașov (1735)",
+    "doi": "10.7910/DVN/ZGWXQD",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 55,
+    "regions": [
+     "Germany",
+     "Romania & Moldova",
+     "Austria & Switzerland",
+     "Europe-wide"
+    ],
+    "periods": [
+     700,
+     1700
+    ]
+   },
+   {
+    "title": "Fortified and Unfortified Towns of the Russian Empire (1820s)",
+    "doi": "10.7910/DVN/XC0W4B",
+    "dataverse": "Veles: Data Catalog of the Imperiia Project",
+    "relevance": 55,
+    "regions": [
+     "East Slavic"
+    ],
+    "periods": [
+     600,
+     1800
+    ]
+   },
+   {
+    "title": "Official discovery of Atlantis v1",
+    "doi": "10.7910/DVN/S36IEQ",
+    "dataverse": "Harvard Dataverse",
+    "relevance": 55,
+    "regions": [
+     "Italy",
+     "Europe-wide"
+    ],
+    "periods": []
+   },
+   {
+    "title": "NLGis shapefiles",
+    "doi": "10.17026/DANS-XB9-T677",
+    "dataverse": "DANS Data Station Social Sciences and Humanities Collection",
+    "relevance": 54,
+    "regions": [
+     "Low Countries"
+    ],
+    "periods": [
+     1800
+    ]
+   },
+   {
+    "title": "Official French Communes Simplified Roads Network",
+    "doi": "10.7910/DVN/TLYPZR",
+    "dataverse": "ComplexCity Dataverse",
+    "relevance": 54,
+    "regions": [
+     "France"
+    ],
+    "periods": [
+     800
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1200",
+    "doi": "hdl:1902.6/LKEDA",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1200
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 300",
+    "doi": "hdl:1902.6/35HIY",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     300
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 2000",
+    "doi": "hdl:1902.6/HCULC",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 800",
+    "doi": "hdl:1902.6/TPJH0",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     800
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 400",
+    "doi": "hdl:1902.6/VT6XS",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     400
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1700",
+    "doi": "hdl:1902.6/CL1ET",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1700
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 100",
+    "doi": "hdl:1902.6/OCPAV",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1000",
+    "doi": "hdl:1902.6/WXMWI",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1000
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1400",
+    "doi": "hdl:1902.6/X2RB6",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1400
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 500",
+    "doi": "hdl:1902.6/FZBZZ",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     500
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 900",
+    "doi": "hdl:1902.6/MI488",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     900
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1",
+    "doi": "hdl:1902.6/TJFHH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": []
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 200",
+    "doi": "hdl:1902.6/MMTXT",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     200
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1300",
+    "doi": "hdl:1902.6/IWLQH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1300
+    ]
+   },
+   {
+    "title": "Second-level Administrative Divisions, Europe, Year 1100",
+    "doi": "hdl:1902.6/VJDFH",
+    "dataverse": "Harvard Geospatial Library Dataverse",
+    "relevance": 54,
+    "regions": [
+     "Europe-wide"
+    ],
+    "periods": [
+     1100
+    ]
+   }
+  ]
+ }
+}

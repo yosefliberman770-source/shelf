@@ -769,5 +769,139 @@
     "path": "original/source-data.zip"
    }
   ]
+ },
+ {
+  "id": "canmore-scotland",
+  "files": [
+   {
+    "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+    "path": "original/Canmore_Points.zip"
+   }
+  ]
+ },
+ {
+  "id": "ireland-smr",
+  "files": [
+   {
+    "url": "https://heritagedata.maps.arcgis.com/sharing/rest/content/items/63841b2807504a24942e44955119c339/data",
+    "path": "original/SMROpenData.csv"
+   }
+  ]
+ },
+ {
+  "id": "poland-nid-register",
+  "files": [
+   {
+    "url": "https://api.dane.gov.pl/media/resources/20260603/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv",
+    "path": "original/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/PL.zip",
+    "path": "original/geonames-PL.zip"
+   }
+  ]
+ },
+ {
+  "id": "index-villaris-1680",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
+    "path": "original/IndexVillaris1680-v2.0.4.zip"
+   }
+  ]
+ },
+ {
+  "id": "ottoman-nfs-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",
+    "path": "original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "generalkarte-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
+    "path": "original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv"
+   }
+  ]
+ },
+ {
+  "id": "cassini-roads-cities",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685925?format=original",
+    "path": "original/edge.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685920?format=original",
+    "path": "original/france_cassini_cities.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685921?format=original",
+    "path": "original/france_cassini_roads.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685924?format=original",
+    "path": "original/node.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685923?format=original",
+    "path": "original/version.csv"
+   }
+  ]
+ },
+ {
+  "id": "lutsch-transylvania-1751",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226246?format=original",
+    "path": "original/Appendix. Mountain and hill names in 1735 and 1751.doc"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226247?format=original",
+    "path": "original/POINTS LUTSCH.cpg"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226249?format=original",
+    "path": "original/POINTS LUTSCH.dbf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226251?format=original",
+    "path": "original/POINTS LUTSCH.prj"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226250?format=original",
+    "path": "original/POINTS LUTSCH.shp"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226248?format=original",
+    "path": "original/POINTS LUTSCH.shx"
+   }
+  ]
+ },
+ {
+  "id": "list-latin-inscriptions",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10473706/files/LIST_v1-2.parquet/content",
+    "path": "original/LIST_v1-2.parquet"
+   },
+   {
+    "url": "https://zenodo.org/api/records/10473706/files/LI_metadata.csv/content",
+    "path": "original/LI_metadata.csv"
+   }
+  ]
+ },
+ {
+  "id": "slovenia-rkd-register",
+  "files": [
+   {
+    "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
+    "path": "original/rnpd.csv"
+   }
+  ]
  }
 ]
