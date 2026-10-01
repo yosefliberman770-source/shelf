@@ -25,13 +25,16 @@ export interface AtlasPick { key: string; name: string; lat: number; lon: number
 
 const LAYERS_KEY = 'shelf.atlas.layers';
 let pmtilesReady = false;
-const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
+// Label fonts (OpenHistorical, CC0) are served by Shelf itself (public/fonts), so labels don't depend on another
+// site. Chinese, Japanese and Korean are drawn with the device's own fonts (MapLibre's default), so those ranges aren't shipped.
+const GLYPHS = `${typeof location === 'undefined' ? '' : location.origin}${import.meta.env.BASE_URL}fonts/{fontstack}/{range}.pbf`;
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 const TOP = 'focus-halo';
 const SEA = '#cddde4';
 const LAND = '#efe7d4';
 /** Detailed water from OpenStreetMap, kept just above the political layers. */
 const WATER = 'water-detail';
+const WATER_FALLBACK = 'water-osm';
 
 /** WebGL is needed for the atlas; without it the reader falls back to the simple map. */
 export function webglAvailable(): boolean {
@@ -57,6 +60,9 @@ function baseStyle(base: string): StyleSpecification {
     glyphs: GLYPHS,
     sources: {
       'ne-land': { type: 'geojson', data: base + 'ne-land.json', attribution: credit('naturalearth') },
+      // Europe's coast from OpenStreetMap (to zoom 8), drawn over the coarse world outline when the detailed tiles can't load.
+      'osm-land': SOURCE_SPECS['osm-land']({ base, year: 1, eventWindow: 0 }),
+      'osm-water': SOURCE_SPECS['osm-water']({ base, year: 1, eventWindow: 0 }),
       // Detailed coastlines and water (OpenStreetMap via OpenFreeMap: free, no key). Only water is used — shapes,
       // named rivers and water names (layers in catalog.ts); no modern roads, borders or places. Offline, the
       // coarse Natural Earth coast underneath remains.
@@ -69,9 +75,12 @@ function baseStyle(base: string): StyleSpecification {
     layers: [
       { id: 'sea', type: 'background', paint: { 'background-color': SEA } },
       { id: 'land', type: 'fill', source: 'ne-land', paint: { 'fill-color': LAND } },
+      { id: 'land-osm', type: 'fill', source: 'osm-land', 'source-layer': 'land', paint: { 'fill-color': LAND } },
       // Drawn above the reconstructed borders (moved into place in sync), so their simplified outlines don't
       // spill into the sea and coastal places sit on the true coast.
       { id: WATER, type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': SEA } },
+      // Europe's sea from OpenStreetMap (to zoom 8), only while the detailed tiles can't load; kept with WATER above politics.
+      { id: WATER_FALLBACK, type: 'fill', source: 'osm-water', 'source-layer': 'water', layout: { visibility: 'none' }, paint: { 'fill-color': SEA } },
       // Everything the atlas adds goes below this layer; the reader's own marks stay on top.
       { id: TOP, type: 'fill', source: 'radius', paint: { 'fill-color': '#d84315', 'fill-opacity': 0.05 } },
       { id: 'radius-line', type: 'line', source: 'radius', paint: { 'line-color': '#d84315', 'line-width': 1.2, 'line-dasharray': [3, 2], 'line-opacity': 0.7 } },
@@ -203,6 +212,8 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
           if (!map?.getLayer('sea')) return;
           map.setPaintProperty('sea', 'background-color', on ? LAND : SEA);
           map.setLayoutProperty('land', 'visibility', on ? 'none' : 'visible');
+          map.setLayoutProperty('land-osm', 'visibility', on ? 'none' : 'visible');
+          map.setLayoutProperty(WATER_FALLBACK, 'visibility', on ? 'none' : 'visible');
         };
         map.on('sourcedata', (e) => { if (e.sourceId === 'ofm' && e.tile && e.isSourceLoaded) detailedBase(true); });
         // Relief: if the primary terrain tiles keep failing, switch to the fallback tiles in the same place.
@@ -295,6 +306,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
       const isLabel = (id: string) => map.getLayer(id)?.type === 'symbol';
       const firstAfterPolitics = DRAW_ORDER.slice(DRAW_ORDER.indexOf('rural-settlement') + 1).map((id) => managed.current.get(id)?.find((l) => !isLabel(l))).find(Boolean);
       map.moveLayer(WATER, firstAfterPolitics ?? labelBandStart(map) ?? TOP);
+      map.moveLayer(WATER_FALLBACK, firstAfterPolitics ?? labelBandStart(map) ?? TOP);
     }
     // Borders come in time slices; load the slice that covers the year.
     if (map.getSource('cliopatria')) {

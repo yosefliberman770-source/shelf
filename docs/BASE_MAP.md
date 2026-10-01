@@ -562,7 +562,7 @@ Known limits after step 1:
 
 - Water shapes are still today's: the IJsselmeer and Flevoland in 1300, reservoirs at every date. That is the `change` layer in E (Dutch polders done in step 2).
 - From z8.6 to z11 only OpenStreetMap's named major rivers show, so the network thins out there until EU-Hydro or OSM tributaries are added (E, rivers z8–10).
-- No mountain range or peak names yet, and no modern reference places.
+- No mountain range or peak names yet, and no modern reference places. (Done in step 3.)
 
 ## Step 2: land that was water (1 October 2026)
 
@@ -598,3 +598,28 @@ Known limits:
 - **Reservoirs** (water that was land) are the next part of this layer.
 
 Pictures: `docs/basemap/step2/nl-<year>.jpg`, for 1300, 1700, 1900, 1950 and 1975.
+
+## Step 3: everything else that could be done without an account (1 October 2026)
+
+| Change | Where | Detail |
+|---|---|---|
+| Reservoirs by date | `build.py hydrolakes` → `public/world/tiles/reservoirs.pmtiles` (2.6 MB); layer `reservoirs-past` (on) | 1,411 HydroLAKES reservoirs in Europe. 276 have a Wikidata date: the earliest inception, opening or service date of a dam or reservoir item within 3 km of the outlet or inside the lake; 267 of those are 20th century. Before that year the reservoir is drawn as the land it flooded (with a faint dashed edge from zoom 8), and the rivers run through it. **The other 1,135 have no date and are drawn as land before 1800. This is an assumption**, stated in the layer's note: almost all European reservoirs are 19th–20th century. GRanD, which has every dam's year, needs a NASA Earthdata login. |
+| Mountain ranges, plains and peaks | `build.py physlabels` → `public/atlas/physical-labels.json` (0.5 MB); layer `mountain-names` (on) | 92 Natural Earth regions (ranges, plateaus, plains, deltas, peninsulas) in spaced capitals, each from its own zoom. 2,941 Wikidata peaks with a prominence of 300 m or more, shown as "▲ Name, height", from zoom 7 (≥ 2,000 m prominence) to zoom 10 (≥ 300 m). Label rank 22: every historical label wins. |
+| Today's place names and roads | new group "Modern reference (today)": `modern-names`, `modern-roads`, **both off by default** | Grey names with no dot (cities from zoom 4 by rank, towns from 8, villages from 11) at the lowest label rank (10), and thin grey motorways and main roads. The test checks that only this group reads `place` or `transportation`, and that nothing reads `boundary`. |
+| Sea depth | layer `sea-depth` (on) | Depth bands below 500 m from the AWS terrain tiles (they include the sea floor; Mapterhorn does not), to zoom 6, drawn above the water. |
+| Height tint | in `terrain` | Light green lowlands, light brown uplands and pale high mountains, fading out by zoom 10. |
+| Backup coast and sea | `build.py osmland osmwater` → `osm-land.pmtiles` (2.6 MB), `osm-water.pmtiles` (3.4 MB) | OpenStreetMap land and sea for Europe to zoom 8, shown only when OpenFreeMap can't load. The sea is kept above the political fills like the normal water, so the coast stays sharp offline (`step3/offline-*.jpg`). |
+| Own fonts | `public/fonts/` (23 MB) | The OpenHistorical glyphs (CC0) from OpenHistoricalMap's map-styles repository, without the Chinese, Japanese and Korean ranges, which MapLibre draws with the device's fonts. Labels no longer depend on openhistoricalmap.org. |
+| More reclaimed land | `POLDERS` in `build.py` | Purmer (1622) and Venice's Tronchetto (c. 1960) added. |
+
+Not done, and why:
+
+- **Denser rivers from zoom 9 to 11.** This needs EU-Hydro (a free Copernicus account, which only the owner can create) or the OpenStreetMap Europe extract (about 30 GB, more than this build machine's free space). With either one it is a build step like `hydrorivers`.
+- **Wieringermeer and Wormer.** OpenStreetMap has no outline under those names.
+- **Older Dutch coasts (Vos/Deltares).** These come as a WFS service. The `change` layer can take them, but they were not fetched in this pass.
+
+Pictures: `docs/basemap/step3/`. They show:
+
+- before and after for 11 views;
+- `modern-*`: today's names and roads switched on;
+- `offline-*`: the map service blocked.

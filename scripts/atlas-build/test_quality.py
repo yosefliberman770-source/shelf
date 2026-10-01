@@ -166,6 +166,20 @@ class BaseMapRivers(unittest.TestCase):
         self.assertGreater(len(out), len(line))
 
 
+class BaseMapDates(unittest.TestCase):
+    def test_reservoir_takes_the_earliest_dam_date_near_its_outlet(self):
+        import build
+        from shapely.geometry import box
+        lake = box(6.0, 44.0, 6.2, 44.1)
+        dams = [(6.21, 44.05, 1960, 'Q1'), (6.1, 44.05, 1975, 'Q2'), (7.5, 44.5, 1500, 'Q3')]  # Q3: far away
+        self.assertEqual(build.reservoir_year(lake, (6.2, 44.05), dams), (1960, 'Q1'))
+        self.assertIsNone(build.reservoir_year(lake, (6.2, 44.05), [(7.5, 44.5, 1500, 'Q3')]))
+
+    def test_peaks_are_named_by_prominence(self):
+        import build
+        self.assertEqual([build.peak_minzoom(p) for p in (4700, 1200, 700, 300)], [7, 8, 9, 10])
+
+
 class UndatedEvidence(unittest.TestCase):
     REG = quality.dataset_registry(os.path.join(os.path.dirname(__file__), '..', '..'))
 

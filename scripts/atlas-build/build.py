@@ -51,7 +51,11 @@ SOURCES = {
     'ne_land': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson',
     'ne_rivers': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson',
     'hydrorivers': 'https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_eu_shp.zip',
-    'polders': 'https://nominatim.openstreetmap.org/lookup?osm_ids=W975309515,W975311593,R13108203,R47436,R408114,R409806,R409828,R409764&format=geojson&polygon_geojson=1&polygon_threshold=0.0002',
+    'osm_land': 'https://osmdata.openstreetmap.de/download/simplified-land-polygons-complete-3857.zip',
+    'hydrolakes': 'https://data.hydrosheds.org/file/hydrolakes/HydroLAKES_polys_v10_shp.zip',
+    'ne_regions': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_geography_regions_polys.geojson',
+    'osm_water': 'https://osmdata.openstreetmap.de/download/simplified-water-polygons-split-3857.zip',
+    'polders': 'https://nominatim.openstreetmap.org/lookup?osm_ids=W975309515,W975311593,R302126,R1354537,W171875325,R13108203,R47436,R408114,R409806,R409828,R409764&format=geojson&polygon_geojson=1&polygon_threshold=0.0002',
     'awmc_roads': AWMC_RAW + 'Cultural-Data/roads/roads.geojson',
     'awmc_shoreline': AWMC_RAW + 'Physical Data/shoreline/shoreline.geojson',
     'awmc_inland': AWMC_RAW + 'Physical Data/inland_water/inland-water-OSM.geojson',
@@ -904,12 +908,190 @@ def hydrorivers():
     return stats
 
 
+# ── Coast for when the detailed map tiles can't load: OpenStreetMap land, simplified, for Europe ──
+LAND_BOX = (-30, 25, 65, 75)
+
+
+def osm_land():
+    return _osm_polygons('osm_land', 'land', 'osm-land.pmtiles', 'OSM land (Europe)')
+
+
+def osm_water():
+    return _osm_polygons('osm_water', 'water', 'osm-water.pmtiles', 'OSM sea (Europe)')
+
+
+def _osm_polygons(key, layer, file, title):
+    import math
+    import shapefile  # pyshp
+    import zipfile
+    import tiler
+    from shapely.geometry import box, mapping, shape
+    from shapely.ops import transform
+    log(title, '(for the offline coast)')
+    z = zipfile.ZipFile(fetch(key, SOURCES[key]))
+    part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'))
+    R = 6378137.0
+    to_lonlat = lambda x, y, zz=None: (math.degrees(x / R), math.degrees(2 * math.atan(math.exp(y / R)) - math.pi / 2))
+    clip = box(*LAND_BOX)
+    feats = []
+    for shp in r.iterShapes():
+        x0, y0, x1, y1 = shp.bbox
+        lo0, la0 = to_lonlat(x0, y0)
+        lo1, la1 = to_lonlat(x1, y1)
+        if lo1 < LAND_BOX[0] or lo0 > LAND_BOX[2] or la1 < LAND_BOX[1] or la0 > LAND_BOX[3]:
+            continue
+        g = transform(to_lonlat, shape(shp.__geo_interface__)).intersection(clip)
+        if g.is_empty:
+            continue
+        # Small islands appear as the map zooms in (area in square degrees, roughly: 0.5 ≈ 3,000 km² in Europe). The sea
+        # comes split into grid cells, so every piece is kept at every zoom (dropping small ones would leave holes).
+        a = g.area
+        mz = 0 if layer == 'water' or a > 0.5 else 3 if a > 0.02 else 5 if a > 0.001 else 7
+        feats.append((mapping(g), {}, mz))
+    out = os.path.join(OUT, '..', 'world', 'tiles', file)
+    stats = tiler.build(out, layer, feats, 8, title, '© OpenStreetMap contributors (ODbL), osmdata.openstreetmap.de')
+    stats = {'polygons': stats['features'], 'tiles': stats['tiles'], 'rejected': stats['rejected']}
+    log('  ', stats)
+    return stats
+
+
+# ── Water that was land: reservoirs, land before their dams ──────────────────
+# HydroLAKES marks reservoirs (Lake_type 2). The year comes from Wikidata: the earliest inception / opening / service
+# date of a dam or reservoir item within 3 km of the reservoir's outlet or inside it. Reservoirs with no such date are
+# almost all 19th–20th-century dams; they are drawn as land before 1800 and marked as assumed.
+RESERVOIR_DATE_KM = 3
+UNDATED_RESERVOIR_YEAR = 1800
+WD_RESERVOIRS = '''SELECT ?i ?l ?coord (MIN(YEAR(?d)) AS ?y) WHERE {
+  VALUES ?cls { wd:Q131681 wd:Q12323 wd:Q1244922 }
+  ?i wdt:P31 ?cls ; wdt:P625 ?coord .
+  { ?i wdt:P571 ?d } UNION { ?i wdt:P1619 ?d } UNION { ?i wdt:P729 ?d }
+  ?i rdfs:label ?l . FILTER(LANG(?l) = "en")
+  FILTER(geof:latitude(?coord) > 34 && geof:latitude(?coord) < 72 && geof:longitude(?coord) > -25 && geof:longitude(?coord) < 60)
+} GROUP BY ?i ?l ?coord'''
+
+
+def reservoir_year(lake, outlet, dated):
+    """(year, Wikidata item) of the earliest dated dam/reservoir inside the lake or within RESERVOIR_DATE_KM of its
+    outlet, or None. lake: shapely polygon (lon/lat); outlet: (lon, lat); dated: [(lon, lat, year, qid)]."""
+    import math
+    from shapely.geometry import Point
+    best = None
+    k = math.cos(math.radians(outlet[1]))
+    for lon, lat, y, q in dated:
+        near = math.hypot((lon - outlet[0]) * k, lat - outlet[1]) * 111.2 <= RESERVOIR_DATE_KM
+        if (near or lake.contains(Point(lon, lat))) and (best is None or y < best[0]):
+            best = (y, q)
+    return best
+
+
+def reservoirs():
+    import shapefile  # pyshp
+    import zipfile
+    import tiler
+    from shapely.geometry import mapping, shape
+    from shapely.strtree import STRtree
+    from shapely.geometry import Point
+    log('Reservoirs (HydroLAKES + Wikidata dates)')
+    cache = os.path.join(CACHE, 'wd-reservoirs.json')
+    if not os.path.exists(cache):
+        json.dump(sparql(WD_RESERVOIRS), open(cache, 'w'))
+    dated = []
+    for b in json.load(open(cache)):
+        y = int(b['y']['value']) if b.get('y') else None
+        if y is None or y < -1000 or y > 2030 or y == 0:
+            continue
+        lon, lat = (float(v) for v in b['coord']['value'].removeprefix('Point(').rstrip(')').split())
+        dated.append((lon, lat, y, b['i']['value'].rsplit('/', 1)[-1]))
+    pts = [Point(d[0], d[1]) for d in dated]
+    tree = STRtree(pts)
+    z = zipfile.ZipFile(fetch('hydrolakes', SOURCES['hydrolakes']))
+    part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='cp1252', encodingErrors='replace')
+    feats, n_dated = [], 0
+    for i, rec in enumerate(r.iterRecords(fields=['Hylak_id', 'Lake_name', 'Lake_type', 'Lake_area', 'Pour_long', 'Pour_lat'])):
+        if rec['Lake_type'] != 2 or not (-25 < rec['Pour_long'] < 60 and 34 < rec['Pour_lat'] < 72):
+            continue
+        lake = shape(r.shape(i).__geo_interface__)
+        near = [dated[j] for j in tree.query(lake.buffer(0.05))]
+        hit = reservoir_year(lake, (rec['Pour_long'], rec['Pour_lat']), near)
+        props = {'i': rec['Hylak_id'], 'k': 'became-water'}
+        if rec['Lake_name'].strip():
+            props['n'] = rec['Lake_name'].strip()
+        if hit:
+            props['y'], props['q'] = hit
+            n_dated += 1
+        else:
+            props['y'], props['u'] = UNDATED_RESERVOIR_YEAR, 1
+        a = rec['Lake_area']
+        mz = 3 if a >= 100 else 5 if a >= 10 else 7 if a >= 1 else 9
+        feats.append((mapping(lake.simplify(0.0003)), props, mz))
+    out = os.path.join(OUT, '..', 'world', 'tiles', 'reservoirs.pmtiles')
+    stats = tiler.build(out, 'reservoirs', feats, 10, 'Reservoirs (Europe)', 'HydroLAKES v1.0 (CC BY 4.0); dates from Wikidata (CC0)')
+    stats = {'reservoirs': stats['features'], 'dated': n_dated, 'tiles': stats['tiles'], 'rejected': stats['rejected']}
+    log('  ', stats)
+    return stats
+
+
+# ── Physical names: mountain ranges and plains (Natural Earth), peaks by prominence (Wikidata) ──
+LABEL_BOX = (-30, 25, 70, 78)
+REGION_CLASSES = {'Range/mtn': 'range', 'Plateau': 'plateau', 'Plain': 'plain', 'Lowland': 'plain', 'Basin': 'plain', 'Delta': 'delta',
+                  'Peninsula': 'peninsula', 'Valley': 'valley', 'Foothills': 'range', 'Depression': 'plain', 'Desert': 'desert', 'Wetlands': 'wetland'}
+WD_PEAKS = '''SELECT ?i ?l ?coord (MAX(?p) AS ?prom) (MAX(?e) AS ?ele) WHERE {
+  ?i wdt:P2660 ?p ; wdt:P625 ?coord . FILTER(?p >= 300)
+  OPTIONAL { ?i wdt:P2044 ?e }
+  ?i rdfs:label ?l . FILTER(LANG(?l) = "en")
+  FILTER(geof:latitude(?coord) > 34 && geof:latitude(?coord) < 72 && geof:longitude(?coord) > -25 && geof:longitude(?coord) < 60)
+} GROUP BY ?i ?l ?coord'''
+
+
+def peak_minzoom(prominence):
+    """Zoom from which a peak is named: the more it stands out from its surroundings, the earlier."""
+    return 7 if prominence >= 2000 else 8 if prominence >= 1000 else 9 if prominence >= 600 else 10
+
+
+def physical_labels():
+    from shapely.geometry import shape
+    from shapely.ops import polylabel
+    log('Physical names (Natural Earth regions, Wikidata peaks)')
+    out = []
+    for f in json.load(open(fetch('ne_regions', SOURCES['ne_regions']), encoding='utf-8'))['features']:
+        p = f['properties']
+        c = REGION_CLASSES.get(p.get('FEATURECLA'))
+        if not c:
+            continue
+        g = shape(f['geometry'])
+        g = max(g.geoms, key=lambda x: x.area) if g.geom_type == 'MultiPolygon' else g
+        pt = polylabel(g, tolerance=0.05)
+        if not (LABEL_BOX[0] <= pt.x <= LABEL_BOX[2] and LABEL_BOX[1] <= pt.y <= LABEL_BOX[3]):
+            continue
+        out.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(pt.x, 3), round(pt.y, 3)]},
+                    'properties': {'k': c, 'n': p.get('NAME_EN') or p['NAME'], 'z': max(3, int(p.get('MIN_LABEL') or 5)), 'src': 'Natural Earth ' + str(p.get('WIKIDATAID') or '')}})
+    cache = os.path.join(CACHE, 'wd-peaks.json')
+    if not os.path.exists(cache):
+        json.dump(sparql(WD_PEAKS), open(cache, 'w'))
+    peaks = 0
+    for b in json.load(open(cache)):
+        lon, lat = (float(v) for v in b['coord']['value'].removeprefix('Point(').rstrip(')').split())
+        prom = float(b['prom']['value'])
+        props = {'k': 'peak', 'n': b['l']['value'], 'p': round(prom), 'z': peak_minzoom(prom), 'q': b['i']['value'].rsplit('/', 1)[-1]}
+        if b.get('ele'):
+            props['e'] = round(float(b['ele']['value']))
+        out.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(lon, 4), round(lat, 4)]}, 'properties': props})
+        peaks += 1
+    write('physical-labels.json', fc(out))
+    return {'regions': len(out) - peaks, 'peaks': peaks}
+
+
 # ── Land that was water: polders drawn as water in the years they were water ──
 # OSM outlines (polders, or the municipalities that are the polder). Years: f = from when the water had about this
 # extent (approximate), y = the year it fell dry (from then on it is land). Outside f..y the map shows today's land.
 POLDERS = {
     'way/975309515': ('Beemster (lake)', 1500, 1612, 'Drained 1608–1612. Before c. 1500 the lake was smaller (peat erosion).'),
     'way/975311593': ('Schermer (lake)', 1500, 1635, 'Drained 1633–1635. Before c. 1500 the lake was smaller.'),
+    'relation/302126': ('Purmer (lake)', 1500, 1622, 'Drained 1618–1622 (outline: the Purmer localities of Edam-Volendam and Waterland; the part inside Purmerend is not included).'),
+    'relation/1354537': ('Purmer (lake)', 1500, 1622, 'Drained 1618–1622.'),
+    'way/171875325': ('Venetian lagoon (Tronchetto)', 500, 1960, 'Tronchetto is an artificial island, made from the late 1950s; the year is approximate.'),
     'relation/13108203': ('Haarlemmermeer', 1650, 1852, 'Drained 1849–1852. The lake grew from several smaller lakes; it had roughly this size from the 17th century.'),
     'relation/47436': ('Zuiderzee (Noordoostpolder)', 1250, 1942, 'Fell dry 1942. The Zuiderzee formed in the 12th–13th centuries; the islands of Urk and Schokland are not separated out.'),
     'relation/408114': ('Zuiderzee (Oostelijk Flevoland)', 1250, 1957, 'Fell dry 1957 (outline: Dronten municipality).'),
@@ -1320,6 +1502,21 @@ def manifest(stats):
              'attribution': '© OpenStreetMap contributors (ODbL)', 'files': ['physical-change.json'],
              'notes': 'Outlines of Dutch polders (or the municipalities that are the polder), fetched via Nominatim. The dates of draining and of the lakes’ extent are Shelf’s, from standard histories, and are approximate.',
              'retrieved': today, 'counts': stats.get('osm')},
+            {'id': 'osmland', 'name': 'OpenStreetMap land polygons (simplified)', 'url': 'https://osmdata.openstreetmap.de/data/land-polygons.html', 'license': 'ODbL 1.0',
+             'licenseUrl': 'https://opendatacommons.org/licenses/odbl/1-0/', 'commercial': True, 'shareAlike': True,
+             'attribution': '© OpenStreetMap contributors (ODbL)', 'files': ['../world/tiles/osm-land.pmtiles', '../world/tiles/osm-water.pmtiles'],
+             'notes': 'Today’s land and sea of Europe, simplified, to zoom 8. Drawn only when the detailed OpenFreeMap tiles cannot load.',
+             'retrieved': today, 'counts': {'land': stats.get('osmland'), 'sea': stats.get('osmwater')}},
+            {'id': 'hydrolakes', 'name': 'HydroLAKES v1.0 (HydroSHEDS) reservoirs, dated from Wikidata', 'url': 'https://www.hydrosheds.org/products/hydrolakes', 'license': 'CC BY 4.0',
+             'licenseUrl': 'https://creativecommons.org/licenses/by/4.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'HydroLAKES v1.0, Messager et al. 2016 (CC BY 4.0); dam dates from Wikidata (CC0)', 'files': ['../world/tiles/reservoirs.pmtiles'],
+             'notes': 'Reservoirs of Europe, drawn as land before their dam. The year is the earliest inception/opening date of a Wikidata dam or reservoir within 3 km of the outlet; reservoirs with none are drawn as land before 1800 (assumed).',
+             'retrieved': today, 'counts': stats.get('hydrolakes')},
+            {'id': 'physlabels', 'name': 'Mountain ranges and plains (Natural Earth); peaks (Wikidata)', 'url': 'https://www.naturalearthdata.com/', 'license': 'Public domain / CC0',
+             'licenseUrl': 'https://creativecommons.org/publicdomain/zero/1.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'Made with Natural Earth; peaks from Wikidata (CC0)', 'files': ['physical-labels.json'],
+             'notes': 'Today’s names of mountain ranges, plateaus, plains and deltas, and of peaks with a recorded prominence of at least 300 m (named from zoom 7 for 2,000 m to zoom 10 for 300 m).',
+             'retrieved': today, 'counts': stats.get('physlabels')},
         ],
     }
     with open(os.path.join(OUT, 'manifest.json'), 'w', encoding='utf-8') as fh:
@@ -1335,7 +1532,7 @@ def main():
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
     steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases), ('common', polity_common_names),
-             ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers), ('osm', physical_change)]
+             ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers), ('osm', physical_change), ('osmland', osm_land), ('osmwater', osm_water), ('hydrolakes', reservoirs), ('physlabels', physical_labels)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
     if not only or 'world' in only:
