@@ -1440,6 +1440,18 @@
    "region": "Russia, Ukraine, Belarus",
    "dataset": "orthodox-monasteries",
    "note": "512 monasteries and hermitages; no licence on the item → private spec orthodox-monasteries. 440 shown from their founding year to their closing year (open end when none); 56 founding years that are century midpoints (1350, 1450…) shown as the whole century; 46 without a founding year and 26 without coordinates left out."
+  },
+  {
+   "title": "Surveys of mills from 1794 to 1809 (Enquêtes sur les moulins de 1794 à 1809)",
+   "match": [
+    "62b6885593d5659857a1f84c",
+    "enquetes-sur-les-moulins"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "France",
+   "dataset": "france-mills-1794-1809",
+   "note": "20,313 records (Licence Ouverte) → public spec france-mills: 19,614 mill records as snapshots of their survey (an II → 1794, an X → 1801, 1809, as the dataset dates them), at commune centroids (approximate); 699 without coordinates left out; mill names not indexed as places."
   }
  ]
 }

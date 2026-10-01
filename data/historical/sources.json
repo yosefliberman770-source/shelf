@@ -1638,5 +1638,16 @@
     "note": "snapshot via fetch_arcgis.py (512 records)"
    }
   ]
+ },
+ {
+  "id": "france-mills-1794-1809",
+  "url": "https://www.data.gouv.fr/fr/datasets/enquetes-sur-les-moulins-de-1794-a-1809/",
+  "licence": "Licence Ouverte / Open Licence (Etalab)",
+  "files": [
+   {
+    "path": "original/moulins.csv",
+    "note": "data.gouv.fr resource 912c2c2f-9a5f-4316-8671-c2d995f55ca5 (20,313 records; GeoJSON resource failed to download, CSV used)"
+   }
+  ]
  }
 ]

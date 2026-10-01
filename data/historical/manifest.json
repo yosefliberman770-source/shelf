@@ -815,6 +815,13 @@
   "licence": "CC BY 3.0",
   "note": "Solitander (1882), lake-ore workings of eastern Finland supplying ironworks, per-lake extraction years"
  },
+ "france-mills-1794-1809/original/moulins.csv": {
+  "url": "https://www.data.gouv.fr/api/1/datasets/r/912c2c2f-9a5f-4316-8671-c2d995f55ca5",
+  "bytes": 5309381,
+  "sha256": "19f8ea19ec02f1b0497cc00471427da1c4d23507d6ce3cb410f6b1bf4be225d2",
+  "downloaded": "2026-10-01",
+  "licence": "Licence Ouverte"
+ },
  "france-mining-cadastre/original/camino-titres.csv": {
   "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
   "bytes": 7275368,

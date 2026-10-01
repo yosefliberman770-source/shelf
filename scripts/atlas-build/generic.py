@@ -351,6 +351,15 @@ def read_rows(spec):
                 p['__wgs'] = True
             except (KeyError, TypeError, ValueError):
                 pass
+    if read.get('latLonField') and rows:
+        # one "lat, lon" text field (e.g. a commune's centroid); "approx": the position is the place's, not the feature's
+        for p in rows:
+            m = re.fullmatch(r'\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*', str(p.get(read['latLonField']) or ''))
+            if m:
+                p['__pt'] = (float(m.group(2)), float(m.group(1)))
+                p['__wgs'] = True
+                if read.get('approx'):
+                    p['__approx'] = True
     if crs and not _is_wgs84_degrees(crs):
         from pyproj import CRS, Transformer
         tr = Transformer.from_crs(CRS.from_user_input(crs), CRS.from_epsg(4326), always_xy=True)

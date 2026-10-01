@@ -114,6 +114,16 @@ class NewOptions(unittest.TestCase):
         self.assertIn('century midpoint', out['a']['per'])
         self.assertEqual(out['b']['env'], (1467, 1764))  # an ordinary year stays as given
 
+    def test_lat_lon_text_field_and_approximate_positions(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            open(os.path.join(d, 'm.csv'), 'w', encoding='utf-8').write('id;geo\na;46.5775, 4.9611\nb;\n')
+            spec = {'src': 't', 'read': {'path': os.path.join(d, 'm.csv'), 'delimiter': ';', 'latLonField': 'geo', 'approx': True},
+                    'fields': {'id': 'id', 'kind': 'mill'}, 'dating': {'mode': 'snapshot', 'year': 1809}}
+            recs, skipped = generic.records(spec)
+        self.assertEqual([(r['lon'], r['lat'], r['precise']) for r in recs], [(4.9611, 46.5775, False)])
+        self.assertEqual(skipped['no usable position'], 1)
+
 
 class Areas(unittest.TestCase):
     def test_units_dated_by_their_own_survey_years(self):
