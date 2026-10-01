@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { credentialsFor, keyConfigAllowed, providerStatus, saveCredentials } from './config.ts';
 import { allowQueries, HistoricalError, placeGet, placeSearch, type SearchQuery, whgConfigured } from './historical.ts';
 import { type ChatMessage, getProvider, ProviderError } from './providers.ts';
+import { resolveStatic } from './static.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(here, '..', 'dist');
@@ -142,8 +143,10 @@ const MIME: Record<string, string> = {
 };
 
 async function serveStatic(res: ServerResponse, url: URL) {
-  let file = path.join(DIST, decodeURIComponent(url.pathname));
-  if (!file.startsWith(DIST)) return send(res, 403, { error: 'Forbidden' });
+  // Contained by real path, not string prefix: no "..", no sibling "dist-…" folder, no symbolic link out of dist.
+  const hit = await resolveStatic(DIST, url.pathname);
+  if (!hit) return send(res, 403, { error: 'Forbidden' });
+  let file = hit.file;
   try {
     const s = await stat(file);
     if (s.isDirectory()) file = path.join(file, 'index.html');

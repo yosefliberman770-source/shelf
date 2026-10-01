@@ -53,6 +53,8 @@ export interface GazPlace {
   population?: { year: number; thousands: number; estimate?: string }[];
   /** A correction the build made to the source, stated. */
   note?: string;
+  /** The record's id in its source (differs from `id` only when several records share one source id). */
+  sourceId?: number | string;
   url: string;
 }
 
@@ -69,11 +71,11 @@ export interface GazetteerInfo {
 
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
 export const GAZETTEERS: GazetteerInfo[] = [
-  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], core: [-750, 640], box: [-20, 5, 90, 60], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
+  { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], core: [-750, 640], box: [-20, -25, 120, 65], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
   { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], core: [1350, 1650], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
-  { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], core: [800, 1000], box: [-10, 10, 80, 45], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
+  { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], core: [800, 1000], box: [-10, 5, 85, 56], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
   { id: 'wikidata', name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', coverage: [300, 1900], core: [500, 1650], box: [-32, 24, 62, 72], describe: 'Castles, monasteries, cathedrals, dioceses, fortifications, bridges and settlements with a recorded founding date or first mention, across Europe and the Mediterranean (snapshot).', record: (id) => `https://www.wikidata.org/wiki/${id}` },
-  { id: 'germaniasacra', name: 'Germania Sacra', license: 'CC BY-SA 3.0', url: 'https://klosterdatenbank.germania-sacra.de/', coverage: [400, 1810], core: [700, 1803], box: [2, 43, 20, 56], describe: 'Monasteries and canonries of the Holy Roman Empire with the dated tenure of each religious order.', record: (id) => `https://klosterdatenbank.germania-sacra.de/gsn/${id}` },
+  { id: 'germaniasacra', name: 'Germania Sacra', license: 'CC BY-SA 3.0', url: 'https://klosterdatenbank.germania-sacra.de/', coverage: [400, 1810], core: [700, 1803], box: [-4, 41, 28, 60], describe: 'Monasteries and canonries of the Holy Roman Empire with the dated tenure of each religious order.', record: (id) => `https://klosterdatenbank.germania-sacra.de/gsn/${id}` },
   { id: 'hre', name: 'Princes and Townspeople (Deutsches Städtebuch)', license: 'CC0', url: 'https://doi.org/10.7910/DVN/ZGSJED', coverage: [700, 1806], core: [1100, 1806], box: [4, 45, 24, 56], describe: 'Towns of the Holy Roman Empire: first written mention, town charter, market grants and the ruling territory each year from 1300.', record: () => 'https://doi.org/10.7910/DVN/TYAGVO' },
   { id: 'merimee', name: 'Mérimée (French protected monuments)', license: 'Licence Ouverte 2.0', url: 'https://www.pop.culture.gouv.fr/', coverage: [400, 1900], core: [1000, 1500], box: [-5, 41, 10, 51.5], describe: 'Castles, religious buildings, bridges and market halls protected in France, dated by the century of their main building campaign.', record: (id) => `https://www.pop.culture.gouv.fr/notice/merimee/${id}` },
   { id: 'finreg', name: 'Finnish register of archaeological sites', license: 'CC BY 4.0', url: 'https://www.museovirasto.fi/', coverage: [-500, 1900], core: [1150, 1550], box: [19, 59, 32, 70.5], describe: 'Sites the Finnish Heritage Agency classes as medieval (churches, strongholds, village sites…), dated only by period classes.', record: () => 'https://www.kyppi.fi/' },
@@ -87,8 +89,8 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'ran', name: 'Romanian national archaeological register (private data)', license: 'OGL (not verified; private use)', url: 'https://ran.cimec.ro/', coverage: [300, 1800], core: [500, 1600], box: [20, 43.5, 30, 48.5], describe: 'Romanian sites the register dates to the migration period or Middle Ages, with their periods and components.', record: (id) => `https://ran.cimec.ro/sel.asp?codran=${id}` },
   { id: 'dicotopo', name: 'Dictionnaire topographique de la France (private data)', license: 'CC BY-NC-ND (private use)', url: 'https://dicotopo.cths.fr/', coverage: [500, 1900], core: [800, 1600], box: [-5, 41, 10, 51.5], describe: 'French communes with their old name forms, each dated and sourced; the earliest is the first attestation.', record: (id) => `https://dicotopo.cths.fr/places/${id}` },
   { id: 'raa', name: 'Swedish register of ancient remains (private data)', license: 'not verified (private use)', url: 'https://app.raa.se/open/fornsok/', coverage: [400, 1600], core: [800, 1550], box: [10.5, 55, 24.5, 69.5], describe: 'Swedish remains the register dates to the Iron Age or Middle Ages.', record: () => 'https://app.raa.se/open/fornsok/' },
-  { id: 'ebidat', name: 'EBIDAT castle database (private data)', license: 'not stated (private use)', url: 'https://www.ebidat.de/', coverage: [700, 1800], core: [900, 1600], box: [3, 45.5, 28, 60], describe: 'Castles of Germany and central Europe dated by the European Castle Institute (begin and end of use).', record: (id) => `https://www.ebidat.de/cgi-bin/ebidat.pl?id=${id}` },
-  { id: 'darmc', name: 'DARMC scholarly datasets (private data)', license: 'not stated (private use)', url: 'https://darmc.harvard.edu/', coverage: [1, 1500], core: [400, 1500], box: [-12, 25, 45, 65], describe: 'Dated shipwrecks, Carolingian coin hoards and rural Anglo-Saxon settlements.', record: () => 'https://darmc.harvard.edu/' },
+  { id: 'ebidat', name: 'EBIDAT castle database (private data)', license: 'not stated (private use)', url: 'https://www.ebidat.de/', coverage: [700, 1800], core: [900, 1600], box: [3, 45.5, 31, 63], describe: 'Castles of Germany and central Europe dated by the European Castle Institute (begin and end of use).', record: (id) => `https://www.ebidat.de/cgi-bin/ebidat.pl?id=${id}` },
+  { id: 'darmc', name: 'DARMC scholarly datasets (private data)', license: 'not stated (private use)', url: 'https://darmc.harvard.edu/', coverage: [1, 1500], core: [400, 1500], box: [-12, 12, 45, 65], describe: 'Dated shipwrecks, Carolingian coin hoards and rural Anglo-Saxon settlements.', record: () => 'https://darmc.harvard.edu/' },
   { id: 'dkff', name: 'Danish register of ancient monuments (private data)', license: 'not verified (private use)', url: 'https://www.kulturarv.dk/fundogfortidsminder/', coverage: [400, 1600], core: [800, 1536], box: [8, 54.5, 15.5, 58], describe: 'Danish monuments the register dates to the Viking Age or Middle Ages.', record: () => 'https://www.kulturarv.dk/fundogfortidsminder/' },
   { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
 ];
@@ -126,6 +128,10 @@ interface RowExtra {
   roles?: [string, number | null, number | null][]; period?: [number, number]; env?: [number | null, number | null, EnvelopeBasis]; z?: number;
   k?: string; st?: string; fb?: string; nl?: string; o?: string[]; gs?: string; q?: string; fix?: string;
   pop?: Record<string, number>; est?: Record<string, string>;
+  /** The source's own id when the record's key had to be made unique (one source id, several records). */
+  sid?: number | string;
+  /** Why the position is approximate although the source gives a point (too few decimals, shared by many records). */
+  pq?: string;
 }
 type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
@@ -159,13 +165,13 @@ function toPlace(r: Row): GazPlace {
     datasetPeriod: from === null && to === null && (!!extra?.period || extra?.env?.[2] === 'dataset'),
     uncertain: unc, names: names.map(([name, a, b, lang]) => ({ name, from: a ?? undefined, to: b ?? undefined, lang: lang || undefined })),
     partOf, related: related.map(([rid, type, t, rev]) => ({ title: t, key: `${src}:${rid}`, type, reverse: rev === 1 })),
-    roles: extra?.roles, url: extra?.q && src !== 'wikidata' ? `https://www.wikidata.org/wiki/${extra.q}` : info.record(id),
+    roles: extra?.roles, sourceId: extra?.sid ?? id, url: extra?.q && src !== 'wikidata' ? `https://www.wikidata.org/wiki/${extra.q}` : info.record(extra?.sid ?? id),
     dateBasis: extra?.fb,
     // Only an explicit founding / construction date means "did not exist before". Attestation periods
     // (Pleiades), first recorded roles (Viabundus), first mentions and tenure dates mean evidence begins then.
     startKind: extra?.fb === 'founded' ? 'founded' : 'attested',
     population: extra?.pop ? Object.entries(extra.pop).map(([y, v]) => ({ year: Number(y), thousands: v, estimate: extra.est?.[y] })) : undefined,
-    note: extra?.fix,
+    note: [extra?.fix, extra?.pq].filter(Boolean).join('; ') || undefined,
   };
 }
 
@@ -202,8 +208,20 @@ export function crc32(s: string): number {
   return (c ^ 0xffffffff) >>> 0;
 }
 
-/** One place by key ("pleiades:423025"). */
-export async function getPlace(key: string): Promise<GazPlace | undefined> {
+/**
+ * One place by key ("pleiades:423025"). With `near` (a map click's position), a source id that several records share
+ * (one institution with several seats, several finds at one locality) resolves to the record at that spot.
+ */
+export async function getPlace(key: string, near?: Pos): Promise<GazPlace | undefined> {
+  const p = await placeByKey(key);
+  if (!near || (p && km([p.lon, p.lat], near) < 1)) return p;
+  const i = key.indexOf(':');
+  const [src, id] = [key.slice(0, i), key.slice(i + 1)];
+  const here = (await placesInCell(cellOf(near[0], near[1]))).filter((x) => x.gazetteer === src && String(x.sourceId ?? x.id) === id)
+    .sort((a, b) => km([a.lon, a.lat], near) - km([b.lon, b.lat], near))[0];
+  return here && km([here.lon, here.lat], near) < 1 ? here : p;
+}
+async function placeByKey(key: string): Promise<GazPlace | undefined> {
   const i = key.indexOf(':');
   const src = key.slice(0, i);
   const id = key.slice(i + 1);
@@ -439,7 +457,10 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   // A record inside the region its dataset is about comes before an incidental one elsewhere (a Nordic dataset's
   // record of Lübeck never stands in for the Hanseatic gazetteer's), for every dataset by its documented box.
   const scope = (p: GazPlace) => (inDatasetScope(p) ? 0 : 1);
-  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
+  // Wikidata aggregates: it corroborates a specialist record of the same place, never replaces it as the record shown.
+  // Its dates still count — the place's temporal support is the best any of its records gives (see `dated` below).
+  const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' ? 1 : 0);
+  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || aggregator(a.place) - aggregator(b.place) || fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
   let why = '';

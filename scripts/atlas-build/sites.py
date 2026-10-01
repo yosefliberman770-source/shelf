@@ -663,7 +663,7 @@ def regional_layers(recs, rows, sites_out):
         # The town existed from its earliest dated evidence of any kind: the Städtebuch sometimes dates a charter or
         # foundation before the first "mention" (whose year can be an upper bound, e.g. "Middle Ages" = 1500 at the latest).
         dated = [(y, b) for y, b in ((t['founded'], 'founded'), (t['mention'], 'first mention'), (t['charter'], 'first mention'),
-                                     (t['character'], 'first mention')) if y is not None]
+                                     (t['character'], 'first mention')) if y is not None and y != 0]  # 0 = an empty field
         start, basis = min(dated, key=lambda d: (d[0], d[1] != 'founded')) if dated else (None, None)
         extra = {'k': 'town', **({'fb': basis} if basis else {}), **({'tn': 0} if title != t['name'] else {}),
                  **({'q': a['q']} if a.get('q') else {}), 'ch': t['charter'], 'lf': t['legal'], 'fm1': t['firstMarket'],
@@ -786,16 +786,20 @@ def regional_layers(recs, rows, sites_out):
             return
         extra = {'k': kind, 'nb': 'label', **({'fb': fb} if fb else {}), **({'env': [env[0], env[1], 'source']} if env else {}),
                  **({'st': ty[:60]} if ty else {}), **({'per': per} if per else {})}
-        prows.append([src, pid, name, lon, lat, 1 if precise else 0, kind, f, None, 0 if precise else 1, [list(n) for n in names], [], [], extra])
+        # The end the source records (EBIDAT's end of use) is the record's end in the gazetteer too, as on the map.
+        # rf: a start that is evidence for the place in the gazetteer (a market grant) but not the map's own date field.
+        rf = props.pop('rf', None)
+        prows.append([src, pid, name, lon, lat, 1 if precise else 0, kind, f if f is not None else rf, props.get('t'), 0 if precise else 1, [list(n) for n in names], [], [], extra])
         pr = {'i': f'{src}:{pid}', 'n': name[:70], 'k': kind, 'f': f, 'fb': fb, 'ef': env[0] if env else None, 'et': env[1] if env else None,
               'per': per, 'ty': ty[:120] if ty else None, 'src': src, 'u': None if precise else 1, **props}
         private.append(({'type': 'Point', 'coordinates': [lon, lat]}, {k: v for k, v in pr.items() if v is not None}, mz))
 
     for x in regional.tib():
         add('tib', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 6, f=x['first'], fb='first attestation (TIB)' if x['first'] is not None else None,
-            ty=', '.join(x['types']))
+            ty=', '.join(x['types']), precise=not x.get('area'))
     for x in regional.markets_fairs():
-        add('mfairs', x['id'], x['name'], 'market', x['lon'], x['lat'], 6, ty='borough' if x['borough'] else None, m=x['first'], mk=x['markets'], fr=x['fairs'])
+        add('mfairs', x['id'], x['name'], 'market', x['lon'], x['lat'], 6, ty='borough' if x['borough'] else None, m=x['first'], mk=x['markets'], fr=x['fairs'],
+            rf=x['first'], fb='first market or fair grant' if x['first'] is not None else None)
     for x in regional.atlas_fontium():
         per = f'{regional.AF_PERIOD[0]}–{regional.AF_PERIOD[1]} (Atlas historyczny Polski, 2nd half of the 16th c.)'
         ty = ' · '.join(v for v in (x['character'], x['owner'], x['size'], x['mills'], 'location approximate' if x['approx'] else None) if v)

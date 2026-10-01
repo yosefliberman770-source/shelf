@@ -86,7 +86,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   const setYear = useCallback((y: HistYear, approximate?: boolean) => { if (y) setDate({ year: y, approximate, source: 'yours' }); }, [setDate]);
 
   // ── The selected place ──
-  const [target, setTarget] = useState<{ written: string; passage?: string; detection: Detection; key?: string } | null>(
+  const [target, setTarget] = useState<{ written: string; passage?: string; detection: Detection; key?: string; at?: [number, number] } | null>(
     request.name || request.placeKey ? { written: request.name ?? '', passage: request.passage, detection: request.detection ?? 'selection', key: request.placeKey } : null,
   );
   useEffect(() => { if (request.name || request.placeKey) { setTarget({ written: request.name ?? '', passage: request.passage, detection: request.detection ?? 'selection', key: request.placeKey }); setTab('place'); } }, [request]);
@@ -103,7 +103,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
     (async () => {
       // Already identified (from the text popup, the map, a list): use that record.
       if (target.key) {
-        const p = await getPlace(target.key).catch(() => undefined);
+        const p = await getPlace(target.key, target.at).catch(() => undefined);
         const name = p ? gazetteerInfo(p.gazetteer).name : '';
         if (p) return { place: fromGaz(p, target.written || p.title, { detection: target.detection, reason: `Chosen directly from the ${name} record.`, method: `${name} record` }), status: 'HIGH', candidates: [], reason: '' } as Resolution;
       }
@@ -123,7 +123,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
     recordVisit({ bookId: book.bookId, placeKey: place.key, name: place.title, written: place.written, lat: place.lat, lon: place.lon, chapter: book.chapter, cfi: mentions[0]?.cfi }).catch(() => {});
   }, [place?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const openKey = (key: string, name: string, detection: Detection = 'map') => { setTarget({ written: name, detection, key }); setTab('place'); setEventQ(undefined); };
+  const openKey = (key: string, name: string, detection: Detection = 'map', at?: [number, number]) => { setTarget({ written: name, detection, key, at }); setTab('place'); setEventQ(undefined); };
   const openPlace = (p: ReaderPlace) => { setRes({ place: p, status: p.status, candidates: [], reason: p.why.reason }); setTarget(null); setTab('place'); setView({ lat: p.lat, lon: p.lon, zoom: focusZoom(p) }); };
 
   // ── Follow the book (off unless the reader turns it on) ──
@@ -265,7 +265,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
         <AtlasMap view={view} year={year} onYearChange={setYear} focus={focus} marks={marks} overlay={overlay} mapOverlays={overlayImages}
           war={war?.q} onWarChange={(q) => setWar(q ? { q, name: war?.q === q ? war.name : '' } : undefined)}
           onReady={(m) => { mapRef.current = m; }} onLayersChange={setLayers} layersRequest={layersRequest}
-          onPickPlace={(p) => openKey(p.key, p.name, 'map')}
+          onPickPlace={(p) => openKey(p.key, p.name, 'map', [p.lon, p.lat])}
           onPickEvent={(q) => { setEventQ(q); setTab('events'); }}
           onPickMarker={(key) => { const pin = [...chapterPins.pins, ...nearbyPins, ...worldPins].find((p) => p.key === key); if (pin) openKey(key, pin.name, tab === 'chapter' || tab === 'world' ? 'cue' : 'map'); }} />
 

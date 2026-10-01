@@ -8,7 +8,7 @@ import 'fake-indexeddb/auto';
 import { featureFilter } from '@maplibre/maplibre-gl-style-spec';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { LAYERS, type LayerCtx } from './catalog';
-import { cellOf, crc32, getPlace, matchName, nameShard, namesAround, normName, placeConfidence, recordFit, temporalSupport } from './gazetteer';
+import { cellOf, crc32, getPlace, matchName, nameShard, namesAround, normName, placeConfidence, placesByName, recordFit, temporalSupport } from './gazetteer';
 import { offlineUnique, resolvePlace } from './resolve';
 import { existedIn, timeFit } from './time';
 
@@ -32,6 +32,14 @@ const ROWS: Row[] = [
   row('wikidata', 'Q13', 'Moorgate', 13.01, 51.01, 1150, null, { fb: 'first mention' }),              // … and its later record
   row('pleiades', 14, 'Isca Testorum', 14.0, 51.0, -50, 400, null,                                     // names changing over time
     [['Exanceastre', 700, 1100, 'ang'], ['Nordtown', 1700, null, 'en']]),
+  // A specialist record and Wikidata's record of the same town (a few km apart), and a Nordic dataset's incidental
+  // record of a town far outside the region it is about.
+  row('viabundus', 777, 'Hansestadt', 13.40, 52.52, 1250, null),
+  row('wikidata', 'Q777', 'Hansestadt', 13.41, 52.53, 1143, null, { fb: 'first mention' }),
+  row('nsh', 'c777', 'Hansestadt', 13.405, 52.525, 1200, null, { fb: 'first mention' }),
+  // One source id, two seats (the build keeps both, the second under a unique key with its source id).
+  row('germaniasacra', 4068, 'Domstift Kurland', 21.59429, 56.72085, 1250, 1561),
+  row('germaniasacra', '4068~2', 'Domstift Kurland', 21.55851, 57.39623, 1290, 1561, { sid: 4068 }),
 ];
 
 // The index as the build writes it: map cells, name shards, id shards.
@@ -47,6 +55,8 @@ for (const r of ROWS) {
     FILES.set(f, [...((FILES.get(f) as unknown[]) ?? []), [k, r[0], r[1], c, i === 0 ? 1 : 0]]);
   });
 }
+// A stale name entry whose record is not in its cell (an index built from different data): it must be skipped.
+FILES.set(`n/${nameShard('ghostville')}.json`, [...((FILES.get(`n/${nameShard('ghostville')}.json`) as unknown[]) ?? []), ['ghostville', 'wikidata', 'Q404', cellOf(8, 50), 1]]);
 vi.stubGlobal('fetch', async (input: string) => {
   const m = String(input).match(/\/world\/places\/(.+)$/);
   const body = m && FILES.get(m[1]);
@@ -180,5 +190,35 @@ describe('the shared scale itself', () => {
     expect(run(existedIn(1100), {})).toBe(false);             // undated: hidden by default
     expect(run(existedIn(1100), { f: 1300 })).toBe(false);    // first recorded later: not drawn as existing
     expect(run(existedIn(1100), { f: 1000 })).toBe(true);
+  });
+});
+
+describe('the index: every key resolves, several records of one source id stay distinguishable', () => {
+  it('a map click on the second seat opens that seat, not the first record with the id', async () => {
+    const first = await getPlace('germaniasacra:4068');
+    expect(first?.lat).toBeCloseTo(56.72, 2);
+    const second = await getPlace('germaniasacra:4068', [21.55851, 57.39623]);
+    expect(second?.key).toBe('germaniasacra:4068~2');
+    expect(second?.sourceId).toBe(4068);
+    expect(second?.url).toMatch(/gsn\/4068$/); // the link goes to the source's own record
+    expect((await placesByName('Domstift Kurland')).map((h) => h.place.key).sort()).toEqual(['germaniasacra:4068', 'germaniasacra:4068~2']);
+  });
+  it('a name entry pointing to a missing record is skipped, not shown and not a crash', async () => {
+    expect(await placesByName('Ghostville')).toEqual([]);
+    expect((await matchName('Ghostville', 1200)).status).toBe('none');
+  });
+});
+
+describe('sources: specialist, aggregator and incidental records of one place', () => {
+  it('the specialist record leads; Wikidata and an out-of-region record corroborate, and are not dropped', async () => {
+    const m = await matchName('Hansestadt', 1400);
+    expect(m.place?.gazetteer).toBe('viabundus');
+    expect(m.corroborating.map((c) => c.gazetteer).sort()).toEqual(['nsh', 'wikidata']);
+    expect(m.confidence).toBe('certain');
+  });
+  it('Wikidata’s earlier first mention still counts as evidence for the place (weighed together, not overridden)', async () => {
+    const m = await matchName('Hansestadt', 1150);
+    expect(m.place?.gazetteer).toBe('viabundus'); // the specialist still leads…
+    expect(m.temporal).toBe('attested'); // …but the place is recorded in 1150, by Wikidata's first mention
   });
 });

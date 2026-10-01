@@ -58,18 +58,47 @@ class BuildRejectsBadRecords(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as d:
             stats = world.places_index(rows, base=d)
-            self.assertEqual(stats['rows'], 1)
+            # The impossible position is left out; the impossible dates are removed and the place kept, with a note.
+            self.assertEqual(stats['rows'], 2)
             self.assertEqual(sorted(r['reason'] for r in stats['rejected']), ['ends before it starts', 'longitude outside -180…180'])
-            kept = [r for f in os.listdir(os.path.join(d, 'c')) for r in json.load(open(os.path.join(d, 'c', f)))]
-            self.assertEqual([r[1] for r in kept], [1])
+            kept = {}
+            for f in os.listdir(os.path.join(d, 'c')):
+                with open(os.path.join(d, 'c', f), encoding='utf-8') as fh:
+                    kept.update({r[1]: r for r in json.load(fh)})
+            self.assertEqual(sorted(kept), [1, 3])
+            self.assertEqual(kept[3][7:9], [None, None])
+            self.assertIn('ends before it starts', kept[3][13]['fix'])
 
-    def test_duplicate_ids_are_reported_not_silently_overwritten(self):
-        rows = [['wikidata', 'Q1', 'A', 8.7, 50.1, 1, 'castle', None, None, 0, [], [], [], None],
-                ['wikidata', 'Q1', 'A again', 20.0, 40.0, 1, 'castle', None, None, 0, [], [], [], None]]
+    def test_duplicate_ids_are_kept_under_unique_keys_with_their_source_id(self):
+        # Germania Sacra: one institution, several seats; the id index could reach only one of them.
+        rows = [['germaniasacra', 4068, 'Domstift Kurland', 21.59429, 56.72085, 1, 'monastery', None, None, 0, [], [], [], None],
+                ['germaniasacra', 4068, 'Domstift Kurland', 21.55851, 57.39623, 1, 'monastery', None, None, 0, [], [], [], None]]
         with tempfile.TemporaryDirectory() as d:
             stats = world.places_index(rows, base=d)
-            self.assertEqual(stats['rows'], 1)
-            self.assertEqual([r['reason'] for r in stats['rejected']], ['duplicate id (first record kept)'])
+            self.assertEqual((stats['rows'], stats['duplicateIdsKeptUnderNewKeys'], stats['rejected']), (2, 1, []))
+            ids = {}
+            for f in os.listdir(os.path.join(d, 'i')):
+                with open(os.path.join(d, 'i', f), encoding='utf-8') as fh:
+                    ids.update(json.load(fh))
+            self.assertEqual(sorted(ids), ['4068', '4068~2'])
+            rows_out = [r for f in os.listdir(os.path.join(d, 'c')) for r in json.load(open(os.path.join(d, 'c', f), encoding='utf-8'))]
+            self.assertEqual([r[13]['sid'] for r in rows_out if r[1] == '4068~2'], [4068])
+
+    def test_coarse_or_shared_positions_are_marked_approximate(self):
+        rows = [['wikidata', 'Q1', 'A', 8.7, 50.1, 1, 'castle', None, None, 0, [], [], [], None],       # 1 decimal
+                ['dicotopo', 1, 'B', 2.34567, 48.12345, 1, 'castle', None, None, 0, [], [], [], None],
+                ['dicotopo', 2, 'C', 2.34567, 48.12345, 1, 'church', None, None, 0, [], [], [], None],
+                ['dicotopo', 3, 'D', 2.34567, 48.12345, 1, 'settlement', None, None, 0, [], [], [], None],
+                ['dicotopo', 4, 'E', 3.45678, 47.12345, 1, 'settlement', None, None, 0, [], [], [], None]]
+        with tempfile.TemporaryDirectory() as d:
+            world.places_index(rows, base=d)
+            out = {r[2]: r for f in os.listdir(os.path.join(d, 'c')) for r in json.load(open(os.path.join(d, 'c', f), encoding='utf-8'))}
+            self.assertEqual({k: v[5] for k, v in out.items()}, {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 1})
+            self.assertIn('decimal places', out['A'][13]['pq'])
+            self.assertIn('share this exact position', out['B'][13]['pq'])
+
+    def test_prehistoric_dates_are_not_impossible(self):
+        self.assertIsNone(quality.date_problem(-2600000, -3000))  # Pleiades: Franchthi Cave
 
     def test_tiler_leaves_out_impossible_geometries_and_counts_them(self):
         feats = [({'type': 'Point', 'coordinates': [8.7, 50.1]}, {'i': 'a'}, 0),
@@ -78,6 +107,27 @@ class BuildRejectsBadRecords(unittest.TestCase):
             n = tiler.build(os.path.join(d, 't.pmtiles'), 'x', feats, 3, 't', 't')
             self.assertEqual(n['features'], 1)
             self.assertEqual(n['rejected'], [{'id': 'b', 'reason': 'longitude outside -180…180'}])
+
+    def test_a_year_0_is_an_empty_field_and_only_that_date_goes(self):
+        # Itiner-e: (100, 0) = from 100, end unknown; (0, 0) = undated. The start must survive.
+        p = {'f': 100, 't': 0}
+        self.assertEqual(quality.clean_dates(p), 'year 0 (an empty date field)')
+        self.assertEqual(p, {'f': 100})
+        q = {'f': 0, 't': 0, 'fe': 0}
+        quality.clean_dates(q)
+        self.assertEqual(q, {'fe': 0})
+        rows = [['hre', 1, 'Herzberg', 13.23528, 51.69222, 1, 'town', 0, 1500, 0, [], [], [], None]]
+        with tempfile.TemporaryDirectory() as d:
+            world.places_index(rows, base=d)
+            out = [r for f in os.listdir(os.path.join(d, 'c')) for r in json.load(open(os.path.join(d, 'c', f), encoding='utf-8'))]
+            self.assertEqual(out[0][7:9], [None, 1500])
+
+    def test_tiler_removes_impossible_dates_but_keeps_the_feature(self):
+        feats = [({'type': 'Point', 'coordinates': [8.7, 50.1]}, {'i': 'a', 'f': 1300, 't': 1100}, 0)]
+        with tempfile.TemporaryDirectory() as d:
+            n = tiler.build(os.path.join(d, 't.pmtiles'), 'x', feats, 3, 't', 't')
+            self.assertEqual(n['features'], 1)
+            self.assertEqual(n['rejected'], [{'id': 'a', 'reason': 'ends before it starts', 'kept': 'without dates'}])
 
     def test_polygons_stay_valid_in_every_tile(self):
         # An hourglass whose neck (≈1.4 km) is narrower than one tile unit at low zooms: snapping to the tile grid

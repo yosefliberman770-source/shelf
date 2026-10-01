@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import math
 
-# Years in the atlas: -3400 (the earliest map year) to the present. Year 0 does not exist (1 BCE = -1).
-MIN_YEAR, MAX_YEAR = -3500, 2100
+# Impossible years: before the oldest archaeological sites (Pleiades dates Palaeolithic sites from 2.6 million years ago)
+# or in the future. Year 0 does not exist (1 BCE = -1).
+MIN_YEAR, MAX_YEAR = -3_000_000, 2100
 
 
 def position_problem(lon, lat) -> str | None:
@@ -78,3 +79,22 @@ def decimals(v: float) -> int:
     if 'e' in s or 'E' in s:
         return 10
     return len(s.split('.')[1].rstrip('0')) if '.' in s else 0
+
+
+def clean_dates(props: dict, pairs=(('f', 't'), ('ef', 'et'))) -> str | None:
+    """Remove impossible dates from feature properties in place; return the reason, or None.
+
+    A year 0 is an empty field (a shapefile integer cannot be null; there is no year 0), so only that field goes and the
+    other date stays. A pair that ends before it starts is contradictory as a whole, so both go."""
+    why = None
+    for a, b in pairs:
+        for k in (a, b):
+            if props.get(k) == 0 and not isinstance(props.get(k), bool):
+                props.pop(k)
+                why = why or 'year 0 (an empty date field)'
+        w = date_problem(props.get(a), props.get(b))
+        if w:
+            props.pop(a, None)
+            props.pop(b, None)
+            why = why or w
+    return why

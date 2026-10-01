@@ -9,7 +9,7 @@ data/private-pack/build/, plus the Atlas of Rural Settlement tiles built by engl
 
 Format (read by src/atlas/privateData.ts):
   "SHELFPK1" · uint32 LE header length · header JSON · file bytes
-  header = { version: 1, built, datasets: [{id, name, records, licence}], files: {path: [offset, length]} }
+  header = { version: 1, built, datasets: [{id, name, records, licence}], files: {path: [offset, length]}, crc32 }
 
   python3 scripts/atlas-build/private_pack.py
 """
@@ -17,6 +17,7 @@ import json
 import os
 import struct
 import sys
+import zlib
 from collections import Counter
 from datetime import date
 
@@ -62,12 +63,15 @@ def main():
         counts['ruralsettlement'] = counts.get('ruralsettlement', 0)
     datasets = [{'id': k, 'name': DATASETS.get(k, (k, ''))[0], 'records': counts[k], 'licence': DATASETS.get(k, ('', 'not stated'))[1]}
                 for k in DATASETS if k in counts]
-    index, offset = {}, 0
+    index, offset, crc = {}, 0, 0
     for rel, full in files:
         size = os.path.getsize(full)
         index[rel] = [offset, size]
         offset += size
-    header = json.dumps({'version': 1, 'built': date.today().isoformat(), 'datasets': datasets, 'files': index},
+        with open(full, 'rb') as f:
+            for b in iter(lambda: f.read(1 << 20), b''):
+                crc = zlib.crc32(b, crc)  # the app checks this while copying the pack, so a damaged part is refused
+    header = json.dumps({'version': 1, 'built': date.today().isoformat(), 'datasets': datasets, 'files': index, 'crc32': crc},
                         ensure_ascii=False, separators=(',', ':')).encode('utf-8')
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'wb') as out:

@@ -66,14 +66,21 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
         if why:
             rejected.append({'id': props.get('i'), 'reason': why})
             continue
+        dp = quality.clean_dates(props := dict(props))
+        if dp:
+            rejected.append({'id': props.get('i'), 'reason': dp, 'kept': 'without dates'})
         geo = transform(to_merc, src)
         if geo.geom_type != 'Point' and not geo.is_valid:
             geo = _same_dimension(make_valid(geo), geo.geom_type)  # a self-intersecting source ring, repaired
         if geo.is_empty:
             continue
         geoms.append((geo, props, max(min_zoom, mz)))
-    if rejected:
-        print(f'  {path}: {len(rejected)} geometries left out ({", ".join(sorted({r["reason"] for r in rejected}))})')
+    left_out = [r for r in rejected if not r.get('kept')]
+    undated = [r for r in rejected if r.get('kept')]
+    if left_out:
+        print(f'  {path}: {len(left_out)} geometries left out ({", ".join(sorted({r["reason"] for r in left_out}))})')
+    if undated:
+        print(f'  {path}: {len(undated)} features kept without their dates ({", ".join(sorted({r["reason"] for r in undated}))})')
     fields: dict[str, str] = {}
     for _, p, _ in geoms:
         for k, v in p.items():

@@ -163,17 +163,56 @@ def places_index(rows, base=None):
     cells = defaultdict(list)
     names = defaultdict(list)
     ids = defaultdict(dict)
-    rejected, seen_ids, kept = [], set(), 0
+    rejected, seen_ids, kept, renamed, approx = [], Counter(), 0, 0, 0
+    # Several records of one dataset at the very same position are placed by a locality or grid point, not each on its own.
+    shared = Counter((r[0], r[3], r[4]) for r in rows)
     for r in rows:
         src, pid, title, lon, lat = r[:5]
-        why = quality.position_problem(lon, lat) or quality.date_problem(r[7], r[8]) \
-            or ((r[13] or {}).get('env') and quality.date_problem((r[13]['env'][0]), r[13]['env'][1])) or None
-        if not why and (src, str(pid)) in seen_ids:
-            why = 'duplicate id (first record kept)'
+        why = quality.position_problem(lon, lat)
         if why:
             rejected.append({'src': src, 'id': pid, 'title': title, 'reason': why})
             continue
-        seen_ids.add((src, str(pid)))
+        n_same = seen_ids[(src, str(pid))]
+        seen_ids[(src, str(pid))] += 1
+        if n_same:
+            # One source id, several records (an institution with several seats, several finds at one locality): all are
+            # kept; later ones get a unique key, and the source id stays on the record for its link and provenance.
+            r = list(r)
+            r[13] = {**(r[13] or {}), 'sid': pid}
+            r[1] = pid = f'{pid}~{n_same + 1}'
+            renamed += 1
+        # A position given to under 2 decimals (±1 km or worse) or shared by 3+ records of the dataset is approximate.
+        if r[5] == 1:
+            coarse = min(quality.decimals(lon), quality.decimals(lat)) < 2
+            n_pos = shared[(src, lon, lat)]
+            if coarse or n_pos >= 3:
+                r = list(r)
+                r[5] = 0
+                r[13] = {**(r[13] or {}), 'pq': (f'position given only to {min(quality.decimals(lon), quality.decimals(lat))} decimal places' if coarse
+                                                 else f'{n_pos} records of this dataset share this exact position (a locality or grid point)')}
+                approx += 1
+        # Impossible dates: the place stays (its position is fine), the dates are removed and the removal stated —
+        # a missing date stays missing rather than becoming a guessed one.
+        if r[7] == 0 or r[8] == 0:
+            # A year 0 is an empty field (there is no year 0): that date goes, the other one stays.
+            r = list(r)
+            r[13] = {**(r[13] or {}), 'fix': f"a year 0 in the source is read as no date ({r[7]}–{r[8]} in the source)"}
+            r[7], r[8] = (None if r[7] == 0 else r[7]), (None if r[8] == 0 else r[8])
+            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': 'year 0 (an empty date field)', 'kept': 'without that date'})
+        dp = quality.date_problem(r[7], r[8])
+        env = (r[13] or {}).get('env')
+        ep = env and quality.date_problem(env[0], env[1])
+        if dp or ep:
+            r = list(r)
+            extra = dict(r[13] or {})
+            if dp:
+                extra['fix'] = f"dates removed: {dp} ({r[7]}–{r[8]} in the source)"
+                r[7] = r[8] = None
+            if ep:
+                extra.pop('env', None)
+                extra['fix'] = (extra.get('fix', '') + '; ' if extra.get('fix') else '') + f"evidence period removed: {ep} ({env[0]}–{env[1]} in the source)"
+            r[13] = extra
+            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': dp or ep, 'kept': 'without dates'})
         kept += 1
         c = cell_of(lon, lat)
         cells[c].append(r)
@@ -195,12 +234,13 @@ def places_index(rows, base=None):
     for c, rs in cells.items():
         write_json(os.path.join(base, 'c', f'{c}.json'), rs)
     for s, es in names.items():
-        write_json(os.path.join(base, 'n', f'{s}.json'), sorted(es))
+        write_json(os.path.join(base, 'n', f'{s}.json'), sorted(es, key=lambda e: (e[0], e[1], str(e[2]), e[3], e[4])))
     for k, m in ids.items():
         write_json(os.path.join(base, 'i', f'{k}.json'), m)
     if rejected:
-        log(f'  place index: {len(rejected)} rows left out ({", ".join(sorted({r["reason"] for r in rejected}))})')
-    return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected}
+        log(f'  place index: {len(rejected)} rows with problems ({", ".join(sorted({r["reason"] for r in rejected}))})')
+    return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected, 'duplicateIdsKeptUnderNewKeys': renamed,
+            'positionsMarkedApproximate': approx}
 
 
 # ── Vector tiles ──
@@ -334,7 +374,9 @@ def tiles_itinere():
         p = f['properties']
         props = {'i': f.get('id'), 'n': (p.get('name') or '')[:80], 'k': p.get('type') or '', 'c': p.get('segmentCertainty') or ''}
         for k_in, k_out in (('lowerDate', 'f'), ('upperDate', 't'), ('lowerDateError', 'fe'), ('upperDateError', 'te')):
-            if p.get(k_in) is not None:
+            # The shapefile stores an unknown date as 0 (an integer field cannot be empty; there is no year 0): read it as
+            # no date. Written as 0, it drew 14,500 undated roads as "existing only in year 0", i.e. never.
+            if p.get(k_in) is not None and not (k_out in ('f', 't') and int(p[k_in]) == 0):
                 props[k_out] = int(p[k_in])
         if p.get('constructionPeriod'):
             props['cp'] = p['constructionPeriod'][:60]
