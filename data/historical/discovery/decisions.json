@@ -1156,10 +1156,10 @@
     "10.5281/zenodo.13220585",
     "10.5281/zenodo.13220611"
    ],
-   "status": "evaluated",
-   "state": "promising",
+   "status": "integrated",
+   "state": "integrated",
    "region": "Anatolia",
-   "note": "Village-level agricultural production 1840s (temettuat) in xlsx; needs village coordinates join — queued."
+   "note": "6-region sample (CC BY): 39,002 holdings → 270 villages with coordinates (Ankara, Bursa, Edirne, Manisa, Plovdiv, Ruse) → public spec temettuat; dated 1840–1849 because the source dates the registers only to \"the 1840s\"; counted as Settlements and Economic. The Bursa-only geosample (12610779) is a subset and not used separately."
   },
   {
    "title": "MobileGIS in archaeological prospection in Tunisia (Mustis region survey)",

@@ -1274,6 +1274,12 @@
   "sha256": "e90ea2b8fde84ca1d9ac91fba9480c40bae46423e03b7c324c630ce5ca3ab962",
   "downloaded": "2026-10-01"
  },
+ "oetr-temettuat/original/temettuat_cultivation_6_region_rural_geosample.xlsx": {
+  "url": "https://zenodo.org/api/records/13220585/files/UrbanOccupationsOETR_temettuat_cultivation_CLC_6_region_rural_geosample.xlsx/content",
+  "bytes": 3320568,
+  "sha256": "91b981925c6672e9029fc88443839216507ca8961d16a20544d073a13bc60879",
+  "downloaded": "2026-10-01"
+ },
  "orkney-saga-names/original/saga_place_names_2025.geojson": {
   "url": "https://services6.arcgis.com/VgBELOF6mvRyDvT0/arcgis/rest/services/Place_Names_in_the_Saga_of_the_Earls_of_Orkney_2025_WFL1/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 125208,

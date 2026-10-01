@@ -1490,5 +1490,15 @@
     "path": "original/najdisca-koordinate.json"
    }
   ]
+ },
+ {
+  "id": "oetr-temettuat",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/13220585/files/UrbanOccupationsOETR_temettuat_cultivation_CLC_6_region_rural_geosample.xlsx/content",
+    "path": "original/temettuat_cultivation_6_region_rural_geosample.xlsx"
+   }
+  ],
+  "derived": "scripts/historical-data/temettuat_villages.py → derived/villages.csv"
  }
 ]

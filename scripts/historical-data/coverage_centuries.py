@@ -364,6 +364,8 @@ def measure(at, place_dirs):
                 continue  # undated: not evidence for any checkpoint
             region = at(lon, lat)
             precise = not p.get('u')
+            if p.get('src') == 'tmt1840':
+                cells.add(region, 'Economic', a, b, cls, p.get('src'), precise, pt=(lon, lat))  # each village's recorded land uses
             if p.get('src') == 'camp1532':
                 cat = 'Events'  # dated halts of an army on campaign
             if p.get('src') == 'plovdiv' and k == 'settlement':
