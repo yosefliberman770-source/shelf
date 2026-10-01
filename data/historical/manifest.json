@@ -2618,6 +2618,30 @@
   "sha256": "e6dd829f08e74198809ba7daaccd15d00f108af0babd6baed1afb0f1a945a9bb",
   "downloaded": "2026-10-01"
  },
+ "wales-units/original/counties_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 48468347,
+  "sha256": "1f7e9aa8a24ed4c23efd207e4fc6adb164c936648cf1477a3f06a471a110938c",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/counties_os2.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_2nd_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 46455067,
+  "sha256": "5ffa58c4cb4c439dc50d5cbcec25d53bf85a1c075a7a473525fbf48a6c4e2437",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/municipal.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Municipal_Boundaries_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4300290,
+  "sha256": "81ef3b58d6f6962d2b13f0080e2f90d81b0d98ecaf0f4082497fd94781d9e02e",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/parliamentary_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Parliamentary_Boundaries_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 55166107,
+  "sha256": "227f03a6bc70ab478ee2c30296b36a7bda3b4c18dafad4b7ed1ae566afb41cbe",
+  "downloaded": "2026-10-01"
+ },
  "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {
   "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",
   "bytes": 458894,

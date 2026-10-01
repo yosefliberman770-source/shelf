@@ -968,7 +968,7 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1860s–80s)', datasets: [], defaultOn: true, coverage: [1475, 1890],
+    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1860s–1910s)', datasets: [], defaultOn: true, coverage: [1475, 1915],
     hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh hundreds and civil parishes as surveyed for the first-edition Ordnance Survey maps (1860s–80s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
     get sources() { return privateTile('private-units.pmtiles') ? ['historical-units', 'private-units'] : ['historical-units']; },
     specs: (c) => {
@@ -977,8 +977,8 @@ export const LAYERS: AtlasLayerDef[] = [
         ['all', ['!', ['has', 'sn']], ['<=', ['get', 'ef'], y], ['>=', ['get', 'et'], y]],
         ['all', ['has', 'sn'], ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS]]] as FilterSpecification;
       // levels of the sources, from the largest unit down (each source names its own levels)
-      const MAJOR = ['county / duchy / prince-bishopric', 'cantref', 'hundred'];
-      const MINOR = ['district', 'commote'];
+      const MAJOR = ['county / duchy / prince-bishopric', 'county', 'cantref'];
+      const MINOR = ['district', 'commote', 'hundred', 'borough', 'parliamentary constituency'];
       const lv = (vs: string[]) => ['all', when, ['in', ['get', 'lv'], ['literal', vs]]] as FilterSpecification;
       const fade = ['case', ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.55, 0.9] as ExpressionSpecification;
       return [

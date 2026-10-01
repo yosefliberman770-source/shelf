@@ -1264,6 +1264,19 @@
    "state": "blocked",
    "region": "East Slavic",
    "note": "950 towns with 1897 census population and 1904/1910 estimates (CC BY) — but every version lists no files (restricted or metadata-only on 2026-10-01); no coordinates either (would need linking by name to the Russian 3-verst gazetteer). Retry next cycle."
+  },
+  {
+   "title": "Welsh historic boundaries: counties (OS 1st/2nd ed.), municipal boroughs, parliamentary constituencies, civil parishes (2nd ed.) — RCAHMW ArcGIS",
+   "match": [
+    "Historic_Counties_of_Wales",
+    "Historic_Municipal_Boundaries_of_Wales",
+    "Historic_Parliamentary_Boundaries_of_Wales",
+    "Historic_Civil_Parishes_of_Wales_2nd_Edition"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "Found by the cycle-3 weak-region investigation (same publisher as the integrated parishes and cantrefs). OGL v3 → public area spec wales-counties (counties 1st and 2nd edition, 47 boroughs, 74 constituency parts), each unit dated by its own survey years (1867–1913). Also found: tiled 1835–1857 coastal charts (MapServer tiles only) — queued for a tile-overlay feature."
   }
  ]
 }

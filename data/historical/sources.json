@@ -1500,5 +1500,31 @@
    }
   ],
   "derived": "scripts/historical-data/temettuat_villages.py → derived/villages.csv"
+ },
+ {
+  "id": "wales-units",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services",
+  "files": [
+   {
+    "path": "original/counties_os1.geojson",
+    "note": "snapshot of Historic_Counties_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/counties_os2.geojson",
+    "note": "snapshot of Historic_Counties_of_Wales_2nd_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/municipal.geojson",
+    "note": "snapshot of Historic_Municipal_Boundaries_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/parliamentary_os1.geojson",
+    "note": "snapshot of Historic_Parliamentary_Boundaries_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/parishes_os2.geojson",
+    "note": "snapshot of Historic_Civil_Parishes_of_Wales_2nd_Edition/FeatureServer/0 via fetch_arcgis.py"
+   }
+  ]
  }
 ]

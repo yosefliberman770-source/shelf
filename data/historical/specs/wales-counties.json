@@ -1,0 +1,100 @@
+{
+ "id": "wales-counties",
+ "src": "walescounty",
+ "public": true,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Counties, municipal boroughs and parliamentary constituencies of Wales on the first- and second-edition Ordnance Survey maps (Welsh historic boundaries, RCAHMW / ArcGIS)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_1st_Edition/FeatureServer/0",
+ "describe": "Welsh counties as drawn on the first-edition (surveyed 1860s–80s) and second-edition (1888–1913) OS County Series, and municipal boroughs and parliamentary constituencies on the first edition; each unit is shown over the years its sheets were surveyed.",
+ "layers": [
+  "historical-units"
+ ],
+ "parts": [
+  {
+   "read": {
+    "path": "wales-units/original/counties_os1.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "County"
+     ],
+     "level": "county",
+     "minzoom": 4,
+     "simplify": 0.003
+    }
+   ],
+   "dating": {
+    "mode": "fields",
+    "field": "SurveyDate",
+    "label": "first-edition OS survey"
+   }
+  },
+  {
+   "read": {
+    "path": "wales-units/original/counties_os2.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "County"
+     ],
+     "level": "county",
+     "minzoom": 4,
+     "simplify": 0.003
+    }
+   ],
+   "dating": {
+    "mode": "fields",
+    "field": "SurveyDate",
+    "label": "second-edition OS survey"
+   }
+  },
+  {
+   "read": {
+    "path": "wales-units/original/municipal.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "County",
+      "Municipal"
+     ],
+     "nameField": "Municipal",
+     "level": "borough",
+     "minzoom": 8,
+     "simplify": 0.0004
+    }
+   ],
+   "dating": {
+    "mode": "fields",
+    "field": "SurveyDate",
+    "label": "first-edition OS survey"
+   }
+  },
+  {
+   "read": {
+    "path": "wales-units/original/parliamentary_os1.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "County",
+      "Parliament"
+     ],
+     "nameField": "Parliament",
+     "level": "parliamentary constituency",
+     "minzoom": 7,
+     "simplify": 0.001
+    }
+   ],
+   "dating": {
+    "mode": "fields",
+    "field": "SurveyDate",
+    "label": "first-edition OS survey"
+   }
+  }
+ ]
+}

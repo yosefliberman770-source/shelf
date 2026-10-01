@@ -758,6 +758,6 @@ def area_features(spec):
                 key = '|'.join(fields)
                 lab = labels[v] if len(fields) > 1 or lv.get('nameField') else v
                 per = dt.get('label', '') if date else f"{dt.get('label', 'surveyed')} {d_['ef']}–{d_['et']}" if d_['ef'] != d_['et'] else f"{dt.get('label', 'surveyed')} {d_['ef']}"
-                out.append((mapping(u), {'i': f"{spec['src']}:{key}:{v}" + (f':{k}' if k else ''), 'n': names.get(lv['field'] if len(fields) == 1 else key, {}).get(lab, lab)[:60],
+                out.append((mapping(u), {'i': f"{spec['src']}:{key}:{v}" + (f':{k}' if k else ''), 'n': names.get(fields[0] if len(fields) == 1 else key, {}).get(lab, lab)[:60],
                                          'lv': lv['level'], 'src': spec['src'], 'per': per[:80], **d_}, lv.get('minzoom', 4)))
     return out
