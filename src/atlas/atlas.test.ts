@@ -99,6 +99,17 @@ describe('base map', () => {
     expect(ids(1300)).toEqual(['water-names-sea']);
     expect(ids(1950)).toEqual(['water-names-sea', 'water-names-lake']);
   });
+  it('draws reclaimed land as water only in the years it was water', () => {
+    const f = (year: number) => (LAYERS.find((l) => l.id === 'water-change')!.specs({ ...ctx, year })[0] as { filter: unknown }).filter;
+    const flevoland = { k: 'became-land', f: 1250, y: 1957 };
+    expect(matches(f(1300), flevoland, 'Polygon')).toBe(true);
+    expect(matches(f(1956), flevoland, 'Polygon')).toBe(true);
+    expect(matches(f(1957), flevoland, 'Polygon')).toBe(false);
+    expect(matches(f(800), flevoland, 'Polygon')).toBe(false); // before the Zuiderzee: no claim either way
+    const built = pack<{ features: { properties: { n: string; f: number; y: number } }[] }>('physical-change.json').features.map((x) => x.properties);
+    expect(built.find((p) => p.n === 'Haarlemmermeer')).toMatchObject({ y: 1852 });
+    for (const p of built) expect(p.f, p.n).toBeLessThan(p.y);
+  });
   it('draws the large rivers zoomed out and hands over to the exact rivers closer in', () => {
     const net = all.find((l) => l.id === 'rivers-modern') as unknown as { source: string; maxzoom: number };
     const osm = all.find((l) => l.id === 'rivers-osm') as unknown as { minzoom: number };

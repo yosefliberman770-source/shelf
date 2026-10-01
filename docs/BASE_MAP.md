@@ -560,6 +560,41 @@ Tests added:
 
 Known limits after step 1:
 
-- Water shapes are still today's: the IJsselmeer and Flevoland in 1300, reservoirs at every date. That is the `change` layer in E.
+- Water shapes are still today's: the IJsselmeer and Flevoland in 1300, reservoirs at every date. That is the `change` layer in E (Dutch polders done in step 2).
 - From z8.6 to z11 only OpenStreetMap's named major rivers show, so the network thins out there until EU-Hydro or OSM tributaries are added (E, rivers z8–10).
 - No mountain range or peak names yet, and no modern reference places.
+
+## Step 2: land that was water (1 October 2026)
+
+A first, Dutch slice of the `change` layer from E. Reclaimed land is drawn as water in the years it was water, and
+today's land shows at every other date. The years and polders:
+
+| Area | Water from (approx.) | Land from | Outline |
+|---|---|---|---|
+| Beemster | 1500 | 1612 | OSM polder `way/975309515` |
+| Schermer | 1500 | 1635 | OSM polder `way/975311593` |
+| Haarlemmermeer | 1650 | 1852 | OSM polder `relation/13108203` |
+| Noordoostpolder | 1250 | 1942 | municipality `relation/47436` |
+| Oostelijk Flevoland | 1250 | 1957 | Dronten and Lelystad municipalities |
+| Zuidelijk Flevoland | 1250 | 1968 | Zeewolde and Almere municipalities |
+
+How it works:
+
+- **Build:** `build.py osm` fetches the outlines from Nominatim and writes `public/atlas/physical-change.json`
+  (17 KB). The years are in `POLDERS`, with a note for each.
+- **Map:** the layer `water-change` (group Physical, on by default) fills them in the sea colour. A faint dashed
+  edge from zoom 7 marks them as reconstructed. They sit above the political fills and the rivers, and below
+  historical roads and places.
+- **No claim before the "from" year.** Before c. 1250 the Zuiderzee had not formed, and before c. 1500 the Beemster
+  and Schermer lakes were smaller. In those years the map shows today's land and claims nothing either way.
+
+Known limits:
+
+- **Rough outlines in places.** Lelystad's municipality is partly in Zuidelijk Flevoland, so that part turns to land
+  in 1957 instead of 1968. The old islands of Urk and Schokland are not separated out.
+- **Missing polders.** Wieringermeer (1930), Purmer (1622) and Wormer (1626) are not included yet: OSM has no clean
+  outline for them under these names.
+- **Coasts are today's.** Older coasts, such as the Vos/Deltares maps of the Netherlands, come later.
+- **Reservoirs** (water that was land) are the next part of this layer.
+
+Pictures: `docs/basemap/step2/nl-<year>.jpg`, for 1300, 1700, 1900, 1950 and 1975.

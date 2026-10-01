@@ -131,6 +131,24 @@
     "tiles": 1827,
     "rejected": []
    }
+  },
+  {
+   "id": "osm",
+   "name": "OpenStreetMap",
+   "url": "https://www.openstreetmap.org/copyright",
+   "license": "ODbL 1.0",
+   "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+   "commercial": true,
+   "shareAlike": true,
+   "attribution": "© OpenStreetMap contributors (ODbL)",
+   "files": [
+    "physical-change.json"
+   ],
+   "notes": "Outlines of Dutch polders (or the municipalities that are the polder), fetched via Nominatim. The dates of draining and of the lakes’ extent are Shelf’s, from standard histories, and are approximate.",
+   "retrieved": "2026-10-01",
+   "counts": {
+    "features": 8
+   }
   }
  ]
 }

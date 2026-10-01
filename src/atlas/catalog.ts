@@ -26,7 +26,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 ];
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
-  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap';
+  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -38,6 +38,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
   terrain: { name: 'Mapterhorn terrain (Copernicus GLO-30 and national elevation models; fallback: Mapzen/AWS Terrain Tiles)', url: 'https://mapterhorn.com/attribution', license: 'open data, see sources' },
   hydrosheds: { name: 'HydroRIVERS v1.0 (Lehner & Grill 2013, HydroSHEDS)', url: 'https://www.hydrosheds.org/products/hydrorivers', license: 'CC BY 4.0' },
+  osm: { name: 'OpenStreetMap contributors', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
   openfreemap: { name: 'OpenFreeMap © OpenMapTiles, data from OpenStreetMap', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
   itinere: { name: 'Itiner-e (Brughmans et al. 2024)', url: 'https://itiner-e.org/', license: 'CC BY 4.0' },
   viabundus: { name: 'Viabundus 2', url: 'https://www.viabundus.eu/', license: 'CC BY 4.0' },
@@ -110,7 +111,7 @@ export interface AtlasLayerDef {
 // ── Palette (muted, map-like; works on the parchment base) ────────────────
 const C = {
   settlement: '#7a4a1e', city: '#5b2c0f', town: '#7a4a1e', village: '#9c7a57', port: '#1f6f8b', fort: '#8b2e2e', arch: '#8a7d5a',
-  river: '#4f8fb3', riverNet: '#3b7ca6', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
+  river: '#4f8fb3', riverNet: '#3b7ca6', sea: '#cddde4', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
   road: '#9b2226', roadOhm: '#bb6a2b', bridge: '#444444',
   empire: '#b03a2e', kingdom: '#2e7d32', republic: '#1565c0', otherState: '#7b6a58', province: '#6d4c41', territory: '#8e44ad', border: '#5d4037',
   battle: '#c62828', siege: '#6a1b9a', campaign: '#ef6c00', war: '#000000',
@@ -173,6 +174,7 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'awmc-inland-water': (c) => ({ type: 'geojson', data: c.base + 'awmc-inland-water.json', attribution: credit('awmc') }),
   'awmc-snapshots': (c) => ({ type: 'geojson', data: c.base + 'awmc-snapshots.json', attribution: credit('awmc') }),
   'wikidata-events': (c) => ({ type: 'geojson', data: c.base + 'wikidata-events.json', attribution: credit('wikidata') }),
+  'physical-change': (c) => ({ type: 'geojson', data: c.base + 'physical-change.json', attribution: credit('osm') }),
   'ne-rivers': (c) => ({ type: 'geojson', data: c.base + 'ne-rivers.json', attribution: credit('naturalearth') }),
   // Borders are split into time slices; the map swaps the file as the year moves.
   cliopatria: () => ({ type: 'geojson', data: { type: 'FeatureCollection', features: [] }, attribution: credit('cliopatria') }),
@@ -545,6 +547,18 @@ export const LAYERS: AtlasLayerDef[] = [
     ],
   },
   {
+    id: 'water-change', group: 'physical', label: 'Reclaimed land (as water before)', datasets: ['osm'], defaultOn: true,
+    hint: 'Land made from sea or lakes — the Zuiderzee polders (Flevoland, 1942–1968), the Haarlemmermeer (1852), the Beemster and Schermer (17th century) — is drawn as water in the years it was water. Outlines and early extents are approximate; before the dates given, today’s land is shown.',
+    sources: ['physical-change'],
+    specs: (c) => {
+      const filter = ['all', ['==', ['get', 'k'], 'became-land'], ['<=', ['get', 'f'], c.year], ['<', c.year, ['get', 'y']]] as FilterSpecification;
+      return [
+        { id: 'water-change-fill', type: 'fill', source: 'physical-change', filter, paint: { 'fill-color': C.sea, 'fill-antialias': false } },
+        { id: 'water-change-line', type: 'line', source: 'physical-change', minzoom: 7, filter, paint: { 'line-color': C.coast, 'line-width': 0.8, 'line-dasharray': [3, 3], 'line-opacity': 0.45 } },
+      ];
+    },
+  },
+  {
     id: 'water-names', group: 'physical', label: 'Seas & lakes (names)', datasets: ['openfreemap'], defaultOn: true,
     hint: 'Today’s names of seas, gulfs and straits, for orientation (OpenStreetMap); lake names only from 1900, as many lakes and their names are modern (the IJsselmeer dates from 1932). Historical names come from the historical layers.', sources: ['ofm'],
     specs: (c) => [
@@ -907,7 +921,7 @@ const LABEL_PRIORITY: Record<string, number> = {
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-names', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;
