@@ -147,6 +147,23 @@ class NewOptions(unittest.TestCase):
         self.assertEqual(sorted(r['env'] for r in recs), [(1, 550), (1050, 1520)])  # two phases; the unflagged Viking Age is not filled in
         self.assertEqual(skipped['no period in the atlas range'], 1)
 
+    def test_untrusted_own_dating_falls_back_to_the_class(self):
+        import json
+        import tempfile
+        pt = {'type': 'Point', 'coordinates': [10.7, 59.9]}
+        rows = [('a', '1904', '1900-tallet'), ('b', 'før 1350', 'Middelalder'), ('c', '1800-tallet', '1800 tallet, fjerde kvartal '), ('d', None, 'Eldre enn 100 år')]
+        fc = {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'geometry': pt, 'properties': {'id': i, 'E': e, 'D': c}} for i, e, c in rows]}
+        with tempfile.TemporaryDirectory() as d:
+            json.dump(fc, open(os.path.join(d, 'n.geojson'), 'w'))
+            spec = {'src': 't', 'read': {'path': os.path.join(d, 'n.geojson')}, 'fields': {'id': 'id', 'kind': 'site'},
+                    'dating': {'mode': 'textOrPeriods', 'field': 'E', 'periodField': 'D', 'ownPattern': r'\d{4}',
+                               'table': {'1800 tallet, fjerde kvartal': [1875, 1899], 'middelalder': None, 'eldre enn 100 år': None, '1900-tallet': [1900, 1999]}}}
+            recs, skipped = generic.records(spec)
+        got = {r['id'].split(':')[0]: r['env'] for r in recs}
+        self.assertEqual(got, {'a': (1904, 1904), 'c': (1875, 1899)})  # "1800-tallet" is not read as the year 1800; "før 1350" not as 1350
+        self.assertEqual(skipped['period not drawn: middelalder'], 1)
+        self.assertEqual(skipped['period not drawn: eldre enn 100 år'], 1)
+
     def test_lithuanian_register_datings(self):
         cases = {'XIX a. pab.': (1867, 1900), 'XX a. 4 d-metis': (1930, 1939), 'I t-metis – II t-mečio pr.': (1, 1200),
                  'XIX – XX a. I p.': (1801, 1950), 'I t-metis pr. Kr.': (-1000, -1), '1895 – 1899 m.': (1895, 1899)}

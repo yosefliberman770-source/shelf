@@ -1733,6 +1733,13 @@
   "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
   "downloaded": "2026-09-30"
  },
+ "norway-kulturminner/original/kulturminner_dated.geojson": {
+  "url": "https://api.ra.no/kulturminner/collections/kulturminner/items?f=json&limit=1000&filter=datering<>'Uviss tid' AND minnetype<>'ENK'",
+  "bytes": 116206544,
+  "sha256": "4c927a5ec60aec9da457ed386e5bcbf4b2578298c323500f8dceeeee1b190ae0",
+  "downloaded": "2026-10-01",
+  "note": "paged OGC API harvest (offset 0\u2013201,000, 1,000 per page), centre points and 14 fields kept, de-duplicated by lokalitetid"
+ },
  "oetr-1532-campaign/original/settlements.gpkg": {
   "url": "https://zenodo.org/api/records/7079747/files/UrbanOccupationsOETR_1532_Ottoman_campaign_1840s_settlements_dataset.gpkg/content",
   "bytes": 16683008,

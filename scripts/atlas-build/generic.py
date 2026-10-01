@@ -590,6 +590,8 @@ def records(spec):
         if dt['mode'] == 'textOrPeriods':
             own = str(p.get(dt['field']) or '')
             pr = parse_dating(own) if not re.fullmatch(r'[A-Za-z\-]+', own.strip()) else None
+            if pr and dt.get('ownPattern') and not re.fullmatch(dt['ownPattern'], own.strip(), re.I):
+                pr = None  # free text the spec does not trust ("før 1350", "1800-tallet"): the record's period class is used instead
             if pr and pr[0] is not None:
                 rec['env'] = (pr[0], pr[1])
                 rec['per'] = f"{own} ({dt.get('ownLabel', 'record dating')})"[:120]
@@ -621,6 +623,9 @@ def records(spec):
                     skipped[f'text not in the spec period table: {rest}'] += 1
                 for key in found:
                     rng = dt['table'][key]
+                    if rng is None:  # a class the spec names but does not draw (too broad, or shown by another dataset)
+                        skipped[f'period not drawn: {key}'] += 1
+                        continue
                     if rng[1] < dt.get('min', 1) or rng[0] > dt.get('max', 1914):
                         continue
                     spans.append((rng[0], rng[1], key.capitalize() + (' (uncertain)' if unc else '')))

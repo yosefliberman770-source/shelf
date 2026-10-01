@@ -758,7 +758,13 @@
  },
  {
   "id": "norway-kulturminner",
-  "files": [],
+  "files": [
+   {
+    "url": "https://api.ra.no/kulturminner/collections/kulturminner/items?f=json&limit=1000&filter=datering<>'Uviss tid' AND minnetype<>'ENK'",
+    "path": "original/kulturminner_dated.geojson",
+    "note": "paged OGC API harvest (offset 0–201,000, 1,000 per page), centre points and 14 fields kept, de-duplicated by lokalitetid"
+   }
+  ],
   "note": "Geonorge download order (whole country, GML, EPSG:4258) of dataset c72906a0-2bc2-41d7-bea2-c92d368e3c49; code lists from register.geonorge.no"
  },
  {

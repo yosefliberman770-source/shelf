@@ -1,0 +1,228 @@
+{
+ "id": "norway-kulturminner",
+ "src": "nokm2",
+ "public": true,
+ "enabled": true,
+ "title": "Cultural heritage register of Norway (Riksantikvaren, Askeladden/Kulturminnesøk; OGC API), dated sites",
+ "licence": "NLOD 1.0 (Norwegian licence for open government data)",
+ "url": "https://api.ra.no/kulturminner/collections/kulturminner",
+ "describe": "Graves, settlements, church sites, defences, trapping pits, charcoal pits, buildings and other registered cultural heritage sites (lokaliteter) of Norway. A site is shown over its own exact dating where that is a plain year or range, else over its register class, with the years of the official code list (KulturminneDatering, Ordnøkkelen): quarter-centuries and centuries as listed there (e.g. '1800s, fourth quarter' = 1875–1899), Iron Age 500 BC–1050, Roman Iron Age 0–400, Early Iron Age 500 BC–570 (to the end of the code list's Migration Period). Migration Period to Middle Ages classes are already on the map from the register's individual monuments (nokm) and are not repeated. Bronze Age–Iron Age, Iron Age–Middle Ages and Viking Age–Middle Ages classes (each over 700 years), 'post-Reformation', 'pre-Reformation', 'older than 100 years', the Svalbard before/after 1945 classes and undated records are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "norway-kulturminner/original/kulturminner_dated.geojson"
+ },
+ "fields": {
+  "id": "lokalitetid",
+  "name": "navn",
+  "type": [
+   "lokalitetsart",
+   "enkeltminneart"
+  ],
+  "context": [
+   "kommune",
+   "fylke"
+  ],
+  "kind": {
+   "field": "lokalitetsart",
+   "map": {
+    "bosetning-aktivitetsområde": "settlement",
+    "kirkested": "church",
+    "kirke": "church",
+    "klosteranlegg": "monastery",
+    "borg": "castle",
+    "forsvarsanlegg": "castle",
+    "befestning": "castle",
+    "bygning": "building",
+    "bygningsmiljø": "building",
+    "bru": "bridge",
+    "veg": "road",
+    "ferdselsminne": "road",
+    "havn": "harbour",
+    "skipsfunn": "wreck",
+    "kullfremstillingsanlegg": "mill",
+    "jernvinneanlegg": "mine",
+    "bergverk": "mine",
+    "gruve": "mine",
+    "tingsted": "site"
+   },
+   "default": "site"
+  }
+ },
+ "dating": {
+  "mode": "textOrPeriods",
+  "field": "eksaktDatering",
+  "periodField": "datering",
+  "sep": ";",
+  "ownLabel": "register dating",
+  "ownPattern": "(ca\\.?\\s*)?\\d{3,4}(\\s*[-–]\\s*\\d{2,4})?|\\d{4}\\s*-\\s*tidligst,\\s*\\d{4}\\s*-\\s*senest",
+  "label": "register period; years from the official code list",
+  "table": {
+   "jernalder": [
+    -500,
+    1050
+   ],
+   "eldre jernalder": [
+    -500,
+    570
+   ],
+   "romertid": [
+    1,
+    400
+   ],
+   "bronsealder - jernalder": null,
+   "steinalder": [
+    -10000,
+    -1800
+   ],
+   "eldre steinalder": null,
+   "yngre steinalder": [
+    -4000,
+    -1800
+   ],
+   "senneolitikum": null,
+   "bronsealder": [
+    -1800,
+    -500
+   ],
+   "eldre bronsealder": null,
+   "yngre bronsealder": null,
+   "førromersk jernalder": null,
+   "steinalder - bronsealder": null,
+   "senneolitikum - bronsealder": null,
+   "folkevandringstid": null,
+   "yngre jernalder": null,
+   "merovingertid": null,
+   "vikingtid": null,
+   "middelalder": null,
+   "tidlig middelalder": null,
+   "høymiddelalder": null,
+   "senmiddelalder": null,
+   "jernalder - middelalder": null,
+   "yngre jernalder - middelalder": null,
+   "vikingtid - middelalder": null,
+   "førreformatorisk tid": null,
+   "etterreformatorisk tid": null,
+   "eldre enn 100 år": null,
+   "samisk jernalder": null,
+   "tidlig metalltid": null,
+   "sein steinbrukende tid": null,
+   "fra før 1946 (svalbard)": null,
+   "fra etter 1945 (svalbard)": null,
+   "1500 tallet, etterreformatorisk tid": [
+    1537,
+    1599
+   ],
+   "1537-1649": [
+    1537,
+    1649
+   ],
+   "1600-tallet": [
+    1600,
+    1699
+   ],
+   "1600 tallet, første kvartal": [
+    1600,
+    1624
+   ],
+   "1600 tallet, andre kvartal": [
+    1625,
+    1649
+   ],
+   "1600 tallet, tredje kvartal": [
+    1650,
+    1674
+   ],
+   "1600 tallet, fjerde kvartal": [
+    1675,
+    1699
+   ],
+   "16-1700-tallet": [
+    1600,
+    1799
+   ],
+   "1700-tallet": [
+    1700,
+    1799
+   ],
+   "1700 tallet, første kvartal": [
+    1700,
+    1724
+   ],
+   "1700 tallet, andre kvartal": [
+    1725,
+    1749
+   ],
+   "1700 tallet, tredje kvartal": [
+    1750,
+    1774
+   ],
+   "1700 tallet, fjerde kvartal": [
+    1775,
+    1799
+   ],
+   "17-1800-tallet": [
+    1700,
+    1899
+   ],
+   "1800-tallet": [
+    1800,
+    1899
+   ],
+   "1800 tallet, første kvartal": [
+    1800,
+    1824
+   ],
+   "1800 tallet, andre kvartal": [
+    1825,
+    1849
+   ],
+   "1800 tallet, tredje kvartal": [
+    1850,
+    1874
+   ],
+   "1800 tallet, fjerde kvartal": [
+    1875,
+    1899
+   ],
+   "18-1900-tallet": [
+    1800,
+    1999
+   ],
+   "1900-tallet": [
+    1900,
+    1999
+   ],
+   "1900 tallet, første kvartal": [
+    1900,
+    1924
+   ],
+   "1900 tallet, andre kvartal": [
+    1925,
+    1949
+   ],
+   "1900 tallet, tredje kvartal": [
+    1950,
+    1974
+   ],
+   "1900 tallet, fjerde kvartal": [
+    1975,
+    1999
+   ],
+   "1940 - 1945": [
+    1940,
+    1945
+   ],
+   "2000-tallet": [
+    2000,
+    2099
+   ],
+   "2000 tallet, første kvartal": [
+    2000,
+    2025
+   ]
+  }
+ },
+ "datingLabel": "register dating"
+}

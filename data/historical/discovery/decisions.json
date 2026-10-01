@@ -1697,6 +1697,17 @@
    "status": "deferred",
    "state": "metadata-inspected",
    "note": "CC BY 4.0, EAMENA-format export; too few records to change any cell. Not integrated this round."
+  },
+  {
+   "title": "Norway cultural heritage register, dated sites (Riksantikvaren OGC API, lokaliteter)",
+   "match": [
+    "api.ra.no/kulturminner"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Norway",
+   "dataset": "norway-kulturminner",
+   "note": "196,743 dated sites harvested (NLOD 1.0); 59,456 drawn. Exact datings used only when a plain year or range; free text like 'før 1350' or '1800-tallet' falls back to the register class, whose years come from the official KulturminneDatering code list. Not drawn: Migration Period–Middle Ages classes (already shown via nokm), classes over 700 years (Bronze–Iron Age, Iron Age–Middle Ages, Viking Age–Middle Ages: 53,833), pre/post-Reformation (30,930), 'older than 100 years' (6,874), Svalbard before/after 1945, Sámi classes."
   }
  ]
 }
