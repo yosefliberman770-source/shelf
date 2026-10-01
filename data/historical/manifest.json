@@ -645,6 +645,12 @@
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
   "downloaded": "2026-09-30"
  },
+ "early-modern-weather/original/events.geojson": {
+  "url": "https://services.arcgis.com/rGKxabTU9mcXMw7k/arcgis/rest/services/Early_Modern_Weather_Database_Updated/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 5800045,
+  "sha256": "c1f7b9c876a91572bc1583a482c1c59fafde551807b30dd578115c42ac874ecc",
+  "downloaded": "2026-10-01"
+ },
  "ebidat/original/pages-00.jsonl.gz": {
   "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1..1000",
   "bytes": 729621,
@@ -2636,10 +2642,28 @@
   "sha256": "81ef3b58d6f6962d2b13f0080e2f90d81b0d98ecaf0f4082497fd94781d9e02e",
   "downloaded": "2026-10-01"
  },
+ "wales-units/original/parishes_os2.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales_2nd_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 174641250,
+  "sha256": "6c5e78672944be6a6c1c9a487c615aad93bfff22018eecc57d294c071f7400fc",
+  "downloaded": "2026-10-01"
+ },
  "wales-units/original/parliamentary_os1.geojson": {
   "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Parliamentary_Boundaries_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 55166107,
   "sha256": "227f03a6bc70ab478ee2c30296b36a7bda3b4c18dafad4b7ed1ae566afb41cbe",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/poorlaw_unions.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Poor_Law_Unions_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 66019224,
+  "sha256": "b3991081ba4e6188d88fb6b7032fb809bca00f85ee8ca073a428ed581dccaadb",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/townships_pre1840.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_pre_1840/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 86331494,
+  "sha256": "806266f352e9704ccc8750d1f04694505bb2aaeb28f6658f649aa45a57ce61c3",
   "downloaded": "2026-10-01"
  },
  "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {

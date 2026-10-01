@@ -968,8 +968,8 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1860s–1910s)', datasets: [], defaultOn: true, coverage: [1475, 1915],
-    hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh hundreds and civil parishes as surveyed for the first-edition Ordnance Survey maps (1860s–80s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
+    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1800s–1910s)', datasets: [], defaultOn: true, coverage: [1475, 1915],
+    hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh counties, hundreds, boroughs, constituencies, poor law unions and civil parishes as surveyed for the first- and second-edition Ordnance Survey maps (1860s–1913), and Welsh townships as recorded on tithe maps, in censuses and on the first OS maps (1800s–1880s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
     get sources() { return privateTile('private-units.pmtiles') ? ['historical-units', 'private-units'] : ['historical-units']; },
     specs: (c) => {
       const y = c.year;
@@ -978,22 +978,23 @@ export const LAYERS: AtlasLayerDef[] = [
         ['all', ['has', 'sn'], ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS]]] as FilterSpecification;
       // levels of the sources, from the largest unit down (each source names its own levels)
       const MAJOR = ['county / duchy / prince-bishopric', 'county', 'cantref'];
-      const MINOR = ['district', 'commote', 'hundred', 'borough', 'parliamentary constituency'];
+      const MINOR = ['district', 'commote', 'hundred', 'borough', 'parliamentary constituency', 'poor law union'];
+      const FINE = ['civil parish', 'township'];
       const lv = (vs: string[]) => ['all', when, ['in', ['get', 'lv'], ['literal', vs]]] as FilterSpecification;
       const fade = ['case', ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.55, 0.9] as ExpressionSpecification;
       return [
-        { id: 'hunits-parish', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(['civil parish']), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
+        { id: 'hunits-parish', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(FINE), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
         { id: 'hunits-district', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(MINOR), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
         { id: 'hunits-county', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(MAJOR), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
-        { id: 'hunits-parish-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv(['civil parish', ...MINOR]), minzoom: 9,
+        { id: 'hunits-parish-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv([...FINE, ...MINOR]), minzoom: 9,
           layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
         { id: 'hunits-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv(MAJOR), minzoom: 5,
           layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
         ...(privateTile('private-units.pmtiles') ? [
-          { id: 'hunits-p-parish', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(['civil parish']), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
+          { id: 'hunits-p-parish', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(FINE), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
           { id: 'hunits-p-district', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(MINOR), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
           { id: 'hunits-p-county', type: 'line', source: 'private-units', 'source-layer': 'units', filter: lv(MAJOR), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
-          { id: 'hunits-p-parish-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv(['civil parish', ...MINOR]), minzoom: 9,
+          { id: 'hunits-p-parish-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv([...FINE, ...MINOR]), minzoom: 9,
             layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
           { id: 'hunits-p-label', type: 'symbol', source: 'private-units', 'source-layer': 'units', filter: lv(MAJOR), minzoom: 5,
             layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
@@ -1046,6 +1047,11 @@ export const LAYERS: AtlasLayerDef[] = [
     specs: (c) => sitePoints('medieval-archaeology', ['site', 'bridge', 'hoard', 'wreck', 'road', 'mill', 'mine', 'harbour', 'building', 'lighthouse', 'canal', 'station'], C.arch, c, { labelZoom: 10, radius: 2.2 }),
   },
   {
+    id: 'dated-events', group: 'places', label: 'Dated events in sources: battles, earthquakes, storms, floods', datasets: ['nismr' as DatasetId], defaultOn: false, coverage: [400, 1914],
+    hint: 'Events a source places and dates: battle sites in national monument records, and weather and earthquake reports in early modern chronicles and diaries (from your private data file, where its licence keeps it). Each is shown at the date the source gives it, nothing before or after.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('dated-events', ['battle', 'event'], C.cultural, c, { labelZoom: 9, radius: 2.6 }),
+  },
+  {
     id: 'empire-dioceses', group: 'political', alsoIn: ['economic'], label: 'Dioceses of the Empire (Germania Sacra)', datasets: ['germaniasacra'], defaultOn: false, coverage: [900, 1803],
     hint: 'Diocese borders of the Holy Roman Empire as reconstructed by Germania Sacra. The reconstruction is for no single stated date, so it is shown for the whole period 900–1803 — dioceses were founded, divided and changed within it.', sources: ['gs-dioceses'],
     specs: (c) => [
@@ -1086,7 +1092,7 @@ export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable
 const LABEL_PRIORITY: Record<string, number> = {
   empires: 100, kingdoms: 99, republics: 98, 'other-states': 97, territories: 90, provinces: 85,
   cities: 80, 'urban-population': 78, ports: 75, settlements: 72, towns: 70, 'islamic-places': 68, 'medieval-places': 66,
-  'religious-houses': 45, castles: 44, 'hre-towns': 64, 'medieval-markets': 42, 'medieval-archaeology': 37, 'dated-settlements': 38, 'empire-dioceses': 36,
+  'religious-houses': 45, castles: 44, 'hre-towns': 64, 'medieval-markets': 42, 'medieval-archaeology': 37, 'dated-events': 41, 'dated-settlements': 38, 'empire-dioceses': 36,
   domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
   // Modern base-map names: river names keep the middle rank they always had (below towns, kingdoms and battles);
   // sea and lake names give way to every historical label.
@@ -1096,6 +1102,6 @@ const LABEL_PRIORITY: Record<string, number> = {
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'historical-units', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

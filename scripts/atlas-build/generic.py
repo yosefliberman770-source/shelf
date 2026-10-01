@@ -64,6 +64,18 @@ def _signed_range(text):
     return a, b, 'years' if a != b else 'year'
 
 
+def kept(p, keeps) -> bool:
+    """Whether a record passes a spec's "keep" filter(s): one dict or a list, each with "values" (exact allow-list),
+    "notValues" (exact deny-list) or "notContaining" (deny any value containing one of these substrings)."""
+    for k in ([keeps] if isinstance(keeps, dict) else keeps or []):
+        v = str(p.get(k['field']))
+        if 'values' in k and v not in k['values']:
+            return False
+        if v in k.get('notValues', []) or any(x in v for x in k.get('notContaining', [])):
+            return False
+    return True
+
+
 def parse_dating(text) -> tuple[int | None, int | None, str] | None:
     """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
     if text is None:
@@ -402,9 +414,7 @@ def records(spec):
         if excl and str(p.get(spec['fields'].get('id'))).strip() in excl:
             skipped['already shown by ' + spec['excludeIdsFrom'].get('label', 'another dataset')] += 1
             continue
-        keeps = spec.get('keep') or []
-        if any(str(p.get(k['field'])) not in k['values'] if 'values' in k else (str(p.get(k['field'])) in k.get('notValues', []) or any(v in str(p.get(k['field'])) for v in k.get('notContaining', [])))
-               for k in ([keeps] if isinstance(keeps, dict) else keeps)):
+        if not kept(p, spec.get('keep')):
             skipped['outside the spec filter'] += 1
             continue
         pt = p.get('__pt')
@@ -430,7 +440,7 @@ def records(spec):
         kind = (kf.get('map') or {}).get(kv, kf.get('default', 'site')) if isinstance(kf, dict) else kf
         tmap = f.get('typeMap') or {}
         tparts = [str(tmap.get(k, {}).get(str(p.get(k)), p.get(k))) for k in ([f['type']] if isinstance(f.get('type'), str) else f.get('type') or []) + (f.get('typeExtra') or [])
-                  if p.get(k) not in (None, '')]
+                  if _val(p.get(k)) is not None]
         rec = {'src': spec['src'], 'id': str(p.get(f.get('id')) if f.get('id') else i), 'name': (name or spec.get('unnamed', 'Unnamed site'))[:80],
                'kind': kind, 'lon': round(pt[0], 5), 'lat': round(pt[1], 5), 'ty': (' · '.join(tparts) or kind)[:120],
                'ctx': [str(_field(p, c)) for c in f.get('context', []) if _field(p, c)][:2], 'names': []}
@@ -439,7 +449,7 @@ def records(spec):
             an = f['altNames']
             alts = re.split(an.get('sep', r'\|'), str(p.get(an['field']) or ''))
             rec['names'] = [(a, None, None, '') for a in sorted({a.strip() for a in alts if a.strip() and a.strip().lower() != name.lower()})[:12]]
-        if generic_name or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
+        if f.get('generic') or generic_name or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
             rec['generic'] = 1  # the name is only the monument type ("Rath"): drawn and searchable by type, not a place name
         ap = f.get('approx')
         rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')
@@ -680,10 +690,8 @@ def line_features(spec):
             KEEP_GEOM = False
         f, dt = sp.get('fields', {}), sp['dating']
         unc = f.get('uncertain') or {}
-        keeps = sp.get('keep') or []
         for i, p in enumerate(rows):
-            if any(str(p.get(kf['field'])) not in kf['values'] if 'values' in kf else str(p.get(kf['field'])) in kf.get('notValues', [])
-                   for kf in ([keeps] if isinstance(keeps, dict) else keeps)):
+            if not kept(p, sp.get('keep')):
                 continue
             g = p.get('__geom')
             if not g or g.get('type') not in ('LineString', 'MultiLineString'):
@@ -721,9 +729,7 @@ def area_features(spec):
             rows = read_rows(sp)
         finally:
             KEEP_GEOM = False
-        keep = sp.get('keep')
-        if keep:
-            rows = [p for p in rows if str(p.get(keep['field'])) in keep['values']]
+        rows = [p for p in rows if kept(p, sp.get('keep'))]
         dt = sp['dating']
         date = {'ef': dt['year'], 'et': dt['year'], 'sn': 1} if dt['mode'] == 'snapshot' else \
             {'ef': dt['from'], 'et': dt['to']} if dt['mode'] == 'envelope' else None  # 'fields': each unit's own dates, below

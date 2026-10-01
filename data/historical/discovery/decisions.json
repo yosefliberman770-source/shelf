@@ -953,7 +953,7 @@
    "status": "integrated",
    "state": "integrated",
    "region": "Wales",
-   "note": "1,174 parishes (OGL v3) → public area spec wales-parishes; each parish and hundred dated by its own first-edition OS survey years (1860s–1880s)."
+   "note": "1,174 first-edition parishes and 1,320 second-edition parishes (OGL v3) → public area spec wales-parishes; each parish and hundred dated by its own OS survey years (first edition 1860s–1880s, second edition 1888–1913)."
   },
   {
    "title": "Agglomérations, vestiges du VIIIe s AEC au XVe s EC dans le monde romain (Nakala)",
@@ -1277,6 +1277,37 @@
    "state": "integrated",
    "region": "Wales",
    "note": "Found by the cycle-3 weak-region investigation (same publisher as the integrated parishes and cantrefs). OGL v3 → public area spec wales-counties (counties 1st and 2nd edition, 47 boroughs, 74 constituency parts), each unit dated by its own survey years (1867–1913). Also found: tiled 1835–1857 coastal charts (MapServer tiles only) — queued for a tile-overlay feature."
+  },
+  {
+   "title": "Historic Townships of Wales pre-1840 (ArcGIS)",
+   "match": [
+    "Historic_Townships_of_Wales_pre_1840"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "1,063 township polygons, each with its own source and date (tithe maps, 1841/1851 censuses, estate maps, first-edition OS; 1806–1888, one 1939). Licence is per record: 698 units marked OGL v3 → public spec wales-townships; 332 marked Non-Commercial Government Licence or blank → private spec wales-townships-nc. 'c.1800' and '-' dates are not drawn."
+  },
+  {
+   "title": "Historic Poor Law Unions of Wales (OS 2nd edition, ArcGIS)",
+   "match": [
+    "Historic_Poor_Law_Unions_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "64 unions (OGL v3) → part of public spec wales-counties, level 'poor law union', dated by the source's own second-edition OS survey window 1888–1913 (not by the 1834 Act)."
+  },
+  {
+   "title": "Early Modern Weather Database (ArcGIS)",
+   "match": [
+    "Early_Modern_Weather_Database"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "England",
+   "note": "3,456 dated weather records (1500s–1700s; diaries of Josselin, Pepys, Evelyn, chronicles, agricultural records). No licence on the layer → private spec earlymodernweather, kind 'event', each record at its own start/end years; imprecise locations drawn as approximate; type-only names not indexed as places.",
+   "dataset": "early-modern-weather"
   }
  ]
 }

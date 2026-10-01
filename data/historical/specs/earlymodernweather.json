@@ -1,0 +1,43 @@
+{
+ "id": "earlymodernweather",
+ "src": "emweather",
+ "public": false,
+ "enabled": true,
+ "title": "Early Modern Weather Database: dated weather events in England and Wales from diaries, chronicles and agricultural records (ArcGIS layer)",
+ "licence": "none stated on the ArcGIS layer — private pack",
+ "url": "https://services.arcgis.com/rGKxabTU9mcXMw7k/arcgis/rest/services/Early_Modern_Weather_Database_Updated/FeatureServer/0",
+ "describe": "Rain, cold, storms, floods, droughts, earthquakes and other weather recorded by contemporaries (Josselin, Pepys, Evelyn, Holinshed, Stow and others), each at the place and in the year(s) the record gives; records the database marks as imprecisely located are drawn as approximate.",
+ "layers": [
+  "dated-events"
+ ],
+ "read": {
+  "path": "early-modern-weather/original/events.geojson"
+ },
+ "fields": {
+  "id": "ObjectId",
+  "name": "Primary_Event_Type",
+  "generic": true,
+  "type": [
+   "Primary_Event_Type",
+   "Secondary_Event_Type",
+   "Extremity"
+  ],
+  "context": [
+   "City_Town__Historical_",
+   "County__Historical_"
+  ],
+  "kind": "event",
+  "approx": {
+   "field": "Precise_Location__Y_N",
+   "values": [
+    "N"
+   ]
+  }
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "Start_Date__Year_",
+  "to": "End_Date__Year_"
+ },
+ "datingLabel": "year(s) of the weather record"
+}

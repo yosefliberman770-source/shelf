@@ -1,0 +1,44 @@
+{
+ "id": "wales-townships",
+ "src": "walestwp",
+ "public": true,
+ "enabled": true,
+ "title": "Townships of north-east and mid Wales before c. 1840, from tithe maps, the 1841/1851 censuses and the first-edition OS (Welsh historic boundaries, RCAHMW / ArcGIS 2025) — rows released under the Open Government Licence",
+ "licence": "Open Government Licence v3.0 (per record)",
+ "describe": "Townships (trefgorddau), the old subdivisions of Welsh parishes, each shown over the year(s) of the source its boundary was taken from (a tithe map, a census, an estate map or the first-edition OS); records whose own source date is missing or only 'c. 1800' are left out. Only records the dataset itself marks as Open Government Licence are public.",
+ "keep": [
+  {
+   "field": "Copyright",
+   "values": [
+    "Open Government Licence v.3.0",
+    "Open Government License v.3.0"
+   ]
+  }
+ ],
+ "geometry": "polygons",
+ "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_pre_1840/FeatureServer/0",
+ "layers": [
+  "historical-units"
+ ],
+ "read": {
+  "path": "wales-units/original/townships_pre1840.geojson"
+ },
+ "dissolve": [
+  {
+   "field": [
+    "County",
+    "Parish",
+    "Township"
+   ],
+   "nameField": "Township",
+   "level": "township",
+   "minzoom": 9,
+   "simplify": 0.0003
+  }
+ ],
+ "dating": {
+  "mode": "fields",
+  "field": "SurveyDate",
+  "label": "township boundary as recorded in its source"
+ }
+}

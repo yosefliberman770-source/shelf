@@ -1524,6 +1524,25 @@
    {
     "path": "original/parishes_os2.geojson",
     "note": "snapshot of Historic_Civil_Parishes_of_Wales_2nd_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/townships_pre1840.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales_pre_1840/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/poorlaw_unions.geojson",
+    "note": "snapshot of Historic_Poor_Law_Unions_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "early-modern-weather",
+  "arcgis": "https://services.arcgis.com/rGKxabTU9mcXMw7k/arcgis/rest/services/Early_Modern_Weather_Database_Updated/FeatureServer/0",
+  "licence": "none stated on the layer (empty copyrightText) — private pack",
+  "files": [
+   {
+    "path": "original/events.geojson",
+    "note": "snapshot of Early_Modern_Weather_Database_Updated/FeatureServer/0 via fetch_arcgis.py (3,456 records)"
    }
   ]
  }
