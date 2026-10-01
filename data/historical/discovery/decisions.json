@@ -328,6 +328,45 @@
    "dataset": "public/world/maps/georef-index.json",
    "region": "Europe",
    "note": "1,052 public georeferenced scans indexed (year, extent, WMS) and offered as overlays in the map archive."
+  },
+  {
+   "title": "Arkas 2.0 — archaeological sites of Slovenia (ZRC SAZU)",
+   "match": [
+    "10.5281/zenodo.7820725"
+   ],
+   "status": "integrated",
+   "dataset": "arkas-slovenia",
+   "region": "Slovenia",
+   "note": "Each site's own dating in years (Leto_od/Leto_do); 3,684 sites in 1–1914."
+  },
+  {
+   "title": "Database of northeastern African archaeological and heritage sites (Marmarica)",
+   "match": [
+    "10.5281/zenodo.7678852"
+   ],
+   "status": "evaluated",
+   "region": "Egypt, Libya",
+   "note": "3,355 sites but 3,214 'Undetermined'; the ~190 dated ones carry only named periods without years."
+  },
+  {
+   "title": "Slovakia: Atlas of the Landscape monuments layers (SAŽP WFS)",
+   "match": [
+    "geos.sazp.sk"
+   ],
+   "status": "evaluated",
+   "region": "Slovakia",
+   "note": "Points with category only — no names, no dates."
+  },
+  {
+   "title": "ARIADNE portal — European archaeology catalogue (records with PeriodO-linked periods)",
+   "url": "https://portal.ariadne-infrastructure.eu/",
+   "match": [
+    "portal.ariadne-infrastructure.eu"
+   ],
+   "status": "integrated",
+   "dataset": "ariadne",
+   "region": "Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others",
+   "note": "Harvested per country (API: 50/page, 10,000/query; Hungary per municipality). Each phase keeps its own period; records without a point placed at their municipality. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack."
   }
  ]
 }

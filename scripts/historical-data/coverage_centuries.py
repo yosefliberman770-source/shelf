@@ -209,7 +209,7 @@ def representative(g):
         return (c[0], c[1]) if c else (None, None)
 
 
-REGISTER_SRCS = {'canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'}
+REGISTER_SRCS = {'canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas'}
 
 
 def measure(at, place_dirs):

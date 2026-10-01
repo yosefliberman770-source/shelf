@@ -28,7 +28,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
   | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels'
-  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'lirelist';
+  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'lirelist';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -57,6 +57,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   dissiloc: { name: 'DISSILOC: places named in medieval inquisition registers (DISSINET, Masaryk University)', url: 'https://doi.org/10.5281/zenodo.21031406', license: 'CC BY-SA 4.0' },
   swegeo: { name: 'Sweden: the older geometrical maps, 1630–1655 (Vitterhetsakademien, Riksarkivet)', url: 'https://doi.org/10.5281/zenodo.15121019', license: 'CC BY 4.0' },
   tyrolmine: { name: 'Places in Tyrolean mining documents, 15th–16th c. (Univ. Innsbruck)', url: 'https://doi.org/10.5281/zenodo.6368451', license: 'CC BY 4.0' },
+  arkas: { name: 'Arkas 2.0: archaeological sites of Slovenia (ZRC SAZU)', url: 'https://doi.org/10.5281/zenodo.7820725', license: 'CC BY-SA 4.0' },
   lutsch: { name: 'Features of the Lutsch map of Transylvania, 1751', url: 'https://doi.org/10.7910/DVN/ETORPU', license: 'CC BY-NC-SA 4.0' },
   hydrolakes: { name: 'HydroLAKES v1.0 (Messager et al. 2016); dam dates from Wikidata', url: 'https://www.hydrosheds.org/products/hydrolakes', license: 'CC BY 4.0' },
   physlabels: { name: 'Natural Earth (ranges, plains); Wikidata (peaks)', url: 'https://www.naturalearthdata.com/', license: 'public domain / CC0' },
@@ -186,7 +187,7 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'hre-towns': (c) => pmtiles(c, 'hre-towns.pmtiles', 'hre', 10),
   // From the private data pack only (licence not verified, or no republishing): never on the public site.
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
-  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),

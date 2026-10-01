@@ -59,6 +59,12 @@
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
  },
+ "arkas-slovenia/original/1_Najdisca_2023-Apr-12_0708.csv": {
+  "url": "https://zenodo.org/api/records/7820725/files/1_Najdisca_2023-Apr-12_0708.csv/content",
+  "bytes": 15813012,
+  "sha256": "71a19dc17f19abd3ae1a332048006eaf3a6b2093bbf1c64a4c35c98ddf2fae90",
+  "downloaded": "2026-10-01"
+ },
  "atlas-fontium-poland/original/akweny.geojson": {
   "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:akweny&outputFormat=application/json&srsName=EPSG:4326",
   "bytes": 14577201,

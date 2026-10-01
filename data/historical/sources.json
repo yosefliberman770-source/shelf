@@ -1045,5 +1045,14 @@
     "path": "original/historical_place_gazetteer_tyrol_links_202203.csv"
    }
   ]
+ },
+ {
+  "id": "arkas-slovenia",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7820725/files/1_Najdisca_2023-Apr-12_0708.csv/content",
+    "path": "original/1_Najdisca_2023-Apr-12_0708.csv"
+   }
+  ]
  }
 ]

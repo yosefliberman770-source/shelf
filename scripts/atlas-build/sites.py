@@ -591,7 +591,7 @@ def build(rows_only=False):
         rfeats.append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
     stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
                                      'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
-                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0)')
+                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0); Arkas 2.0 Slovenia (CC BY-SA 4.0)')
     from cassini_tiles import build_cassini_roads
     stats['cassiniRoads'] = build_cassini_roads(TILES)
     from cassini_tiles import build_inscriptions
@@ -847,7 +847,8 @@ def regional_layers(recs, rows, sites_out):
                ('hrreg', REG.croatia_goods),
                ('r3verst', REG.russian_3verst), ('rohgis', REG.rohgis_settlements),
                ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
-               ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining))
+               ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining),
+               ('arkas', REG.arkas))
     for name, fn in loaders:
         res = fn()
         recs, note = (res if isinstance(res, tuple) else (res, None))
@@ -919,6 +920,12 @@ def regional_layers(recs, rows, sites_out):
         add('ebidat', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 7, f=x['from'], fb='founded' if x['from'] is not None else None,
             env=None if x['from'] is not None else (x['envFrom'], x['envTo']) if x.get('envFrom') is not None else None,
             ty=x['type'], dt=x['dating'], t=x['to'])
+    # ARIADNE catalogue records (archaeology, Europe-wide): each phase of a record with its own period; provider licences vary.
+    import registers as REG2
+    ari, ari_skip = REG2.ariadne()
+    for x in ari:
+        add('ariadne', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
+    stats['ariadneSkipped'] = ari_skip
     for x in regional.sweden():
         add('raa', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(x['from'], x['to']), per=f"{x['period']} (register dating)", ty=x['type'])
     stats['private'] = dict(Counter(r[0] for r in prows))

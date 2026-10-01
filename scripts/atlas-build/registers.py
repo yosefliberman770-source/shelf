@@ -11,6 +11,7 @@ Nothing is dated from a dataset's overall period. Records without dates stay und
 from __future__ import annotations
 
 import csv
+import gzip
 import io
 import json
 import math
@@ -1040,4 +1041,111 @@ def tyrol_mining():
         if env:
             x.update(env=env, per=f"named in the Tyrolean mining document {r['document']} ({y})")
         out.append(x)
+    return out, dict(skipped)
+
+
+# ── ARIADNE portal (European archaeology catalogue): records harvested by scripts/historical-data/fetch_ariadne.py ──
+# Each record keeps its own periods (from/until, linked to PeriodO). Separate periods of one site (Late Roman and
+# Árpád-age, say) stay separate phases — never one span across the gap. Records without a point of their own are
+# placed at the municipality their title names (GeoNames, approximate) where that name is unique in the country.
+# Licences differ per provider (accessRights): private pack only.
+ARIADNE_KIND = [(r'castle|vár\b|burg|fort|hillfort|földvár|kastély|virki', 'castle'), (r'monaster|kolostor|abbey|kloster|klaustur', 'monastery'),
+                (r'church|templom|kirche|kirkja|chapel|kápolna', 'church'), (r'settlement|település|village|falu|bær|farm|town|város', 'settlement'),
+                (r'mill|malom|mine|bánya|kiln|smiðja|workshop', 'mill'), (r'road|út\b|bridge|híd', 'road'), (r'wreck|ship', 'wreck')]
+
+
+def ariadne_phases(temporal):
+    """Periods of a record → merged phases (overlapping or within 50 years), each (from, to, names)."""
+    ps = []
+    for t in temporal or []:
+        try:
+            a, b = int(t.get('from')), int(t.get('until'))
+        except (TypeError, ValueError):
+            continue
+        if b < 1 or a > 1914 or b < a:
+            continue
+        ps.append((a, b, t.get('periodName') or ''))
+    ps.sort()
+    out = []
+    for a, b, n in ps:
+        if out and a <= out[-1][1] + 50:
+            out[-1] = (out[-1][0], max(out[-1][1], b), out[-1][2] + ([n] if n not in out[-1][2] else []))
+        else:
+            out.append((a, b, [n]))
+    return out
+
+
+def ariadne():
+    base = raw('ariadne', '')
+    out, skipped = [], Counter()
+    gn = {}
+    for f in sorted(os.listdir(base)) if os.path.isdir(base) else []:
+        if not f.endswith('.jsonl.gz'):
+            continue
+        country = f[:-9].replace('_', ' ')
+        cc = {'Hungary': 'HU'}.get(country)
+        if cc and cc not in gn:
+            idx = defaultdict(list)
+            with zipfile.ZipFile(os.path.join(base, f'geonames-{cc}.zip')) as z:
+                for line in io.TextIOWrapper(z.open(f'{cc}.txt'), encoding='utf-8'):
+                    g = line.split('\t')
+                    if g[6] == 'P':
+                        for n in {g[1], g[2]}:
+                            idx[norm(n)].append((float(g[5]), float(g[4])))
+            gn[cc] = idx
+        with gzip.open(os.path.join(base, f), 'rt', encoding='utf-8') as fh:
+            for line in fh:
+                h = json.loads(line)
+                d = h['data']
+                phases = ariadne_phases(d.get('temporal'))
+                if not phases:
+                    skipped['no period between 1 and 1914'] += 1
+                    continue
+                pt = next((s.get('geopoint') for s in d.get('spatial') or [] if s.get('geopoint')), None)
+                precise, loc = True, None
+                if pt:
+                    lon, lat = float(pt['lon']), float(pt['lat'])
+                else:
+                    town = (d.get('title') or {}).get('text', '').split(',')[0].strip()
+                    hits = gn.get(cc, {}).get(norm(town)) if cc else None
+                    if not hits or (len(hits) > 1 and max(math.hypot(x[0] - hits[0][0], x[1] - hits[0][1]) for x in hits) > 0.1):
+                        skipped['no point, municipality not found or ambiguous'] += 1
+                        continue
+                    (lon, lat), precise, loc = hits[0], False, f'placed at {town} (GeoNames); the record gives no point'
+                subj = ' '.join(s.get('prefLabel', '') for s in (d.get('derivedSubject') or []) + (d.get('nativeSubject') or [])).lower()
+                title = (d.get('title') or {}).get('text') or 'Site'
+                kind = next((k for rx, k in ARIADNE_KIND if re.search(rx, f'{subj} {title.lower()}')), 'site')
+                pub = ((d.get('publisher') or [{}])[0] or {}).get('name') or 'ARIADNE'
+                for i, (a, b, names) in enumerate(phases):
+                    out.append({'src': 'ariadne', 'id': h['id'][:16] + (f'-{i}' if len(phases) > 1 else ''), 'name': title[:80], 'kind': kind,
+                                'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': precise, 'env': (a, b),
+                                'per': f"{', '.join(n for n in names if n)} ({pub}, via ARIADNE)", 'ty': (subj[:80] or 'archaeological record'),
+                                'ctx': [country], 'names': [], 'loc': loc, 'rights': d.get('accessRights')})
+    return out, dict(skipped)
+
+
+# ── Slovenia: Arkas 2.0 archaeological sites (ZRC SAZU; Zenodo 7820725), CC BY-SA 4.0 ─────────────────────────
+# Each site has its own dating in years (Leto_od, Leto_do) and the period it names; used as given.
+ARKAS_KIND = {'naselje': 'settlement', 'grobišče': 'site', 'nepremične ostaline': 'site', 'posamična najdba': 'site', 'depo': 'site', 'bivališče': 'settlement'}
+
+
+def arkas():
+    out, skipped = [], Counter()
+    for r in csv.DictReader(open(raw('arkas-slovenia', '1_Najdisca_2023-Apr-12_0708.csv'), encoding='utf-8-sig')):
+        try:
+            a, b = int(float(r['Leto_od'])), int(float(r['Leto_do']))
+            lon, lat = float(r['LongX']), float(r['LatY'])
+        except ValueError:
+            skipped['no years or no position'] += 1
+            continue
+        if b < 1 or a > 1914:
+            skipped['dated outside 1–1914'] += 1
+            continue
+        kind = ARKAS_KIND.get(r['Vrsta_najdisca'], 'site')
+        if re.search(r'grad|utrdb|gradišče', (r['Ime_najdisca'] + ' ' + r['Opredelitev']).lower()):
+            kind = 'castle' if kind == 'site' else kind
+        out.append({'src': 'arkas', 'id': r['ID_Najdisce'], 'name': r['Ime_najdisca'][:80] or r['Ime_naselja'], 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5),
+                    'precise': r['Natancnost_Lokacije'] in ('1', '2'), 'env': (max(a, -800), b),
+                    'per': f"{r['Datacija']} (Arkas dating)",
+                    'ty': f"{r['Vrsta_najdisca']} · {r['Opredelitev']}"[:120], 'ctx': [c for c in (r['Ime_naselja'], r['Regija']) if c], 'names': []})
     return out, dict(skipped)
