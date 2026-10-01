@@ -51,6 +51,7 @@ SOURCES = {
     'ne_land': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson',
     'ne_rivers': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson',
     'hydrorivers': 'https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_eu_shp.zip',
+    'polders': 'https://nominatim.openstreetmap.org/lookup?osm_ids=W975309515,W975311593,R13108203,R47436,R408114,R409806,R409828,R409764&format=geojson&polygon_geojson=1&polygon_threshold=0.0002',
     'awmc_roads': AWMC_RAW + 'Cultural-Data/roads/roads.geojson',
     'awmc_shoreline': AWMC_RAW + 'Physical Data/shoreline/shoreline.geojson',
     'awmc_inland': AWMC_RAW + 'Physical Data/inland_water/inland-water-OSM.geojson',
@@ -903,6 +904,40 @@ def hydrorivers():
     return stats
 
 
+# ── Land that was water: polders drawn as water in the years they were water ──
+# OSM outlines (polders, or the municipalities that are the polder). Years: f = from when the water had about this
+# extent (approximate), y = the year it fell dry (from then on it is land). Outside f..y the map shows today's land.
+POLDERS = {
+    'way/975309515': ('Beemster (lake)', 1500, 1612, 'Drained 1608–1612. Before c. 1500 the lake was smaller (peat erosion).'),
+    'way/975311593': ('Schermer (lake)', 1500, 1635, 'Drained 1633–1635. Before c. 1500 the lake was smaller.'),
+    'relation/13108203': ('Haarlemmermeer', 1650, 1852, 'Drained 1849–1852. The lake grew from several smaller lakes; it had roughly this size from the 17th century.'),
+    'relation/47436': ('Zuiderzee (Noordoostpolder)', 1250, 1942, 'Fell dry 1942. The Zuiderzee formed in the 12th–13th centuries; the islands of Urk and Schokland are not separated out.'),
+    'relation/408114': ('Zuiderzee (Oostelijk Flevoland)', 1250, 1957, 'Fell dry 1957 (outline: Dronten municipality).'),
+    'relation/409806': ('Zuiderzee (Oostelijk Flevoland)', 1250, 1957, 'Fell dry 1957 (outline: Lelystad municipality, partly in Zuidelijk Flevoland, dry 1968).'),
+    'relation/409828': ('Zuiderzee (Zuidelijk Flevoland)', 1250, 1968, 'Fell dry 1968 (outline: Zeewolde municipality).'),
+    'relation/409764': ('Zuiderzee (Zuidelijk Flevoland)', 1250, 1968, 'Fell dry 1968 (outline: Almere municipality).'),
+}
+
+
+def physical_change():
+    log('Land that was water (polders)')
+    d = json.load(open(fetch('polders', SOURCES['polders']), encoding='utf-8'))
+    out = []
+    for f in d['features']:
+        key = f"{f['properties']['osm_type']}/{f['properties']['osm_id']}"
+        if key not in POLDERS:
+            continue
+        name, start, dry, note = POLDERS[key]
+        g = simplify(f['geometry'], 0.0002, 5)
+        if g:
+            out.append({'type': 'Feature', 'geometry': g, 'properties': {'k': 'became-land', 'n': name, 'f': start, 'y': dry, 'b': note, 'src': 'OpenStreetMap ' + key, 'u': 1}})
+    missing = sorted(set(POLDERS) - {f"{x['properties']['osm_type']}/{x['properties']['osm_id']}" for x in d['features']})
+    if missing:
+        raise SystemExit(f'polder outlines missing from the download: {missing}')
+    write('physical-change.json', fc(out))
+    return {'features': len(out)}
+
+
 # ── Gazetteer: every Pleiades place with all its names, for name lookup ──────
 
 # Pleiades connection types that say one place is part of / inside another.
@@ -1280,6 +1315,11 @@ def manifest(stats):
              'attribution': 'HydroRIVERS v1.0, Lehner & Grill 2013 (CC BY 4.0)', 'files': ['../world/tiles/hydrorivers.pmtiles'],
              'notes': 'Modern river network of Europe with upstream area and discharge, used for the zoomed-out base map (to zoom 8). Lines are derived from a 500 m elevation model; rivers have moved since antiquity.',
              'retrieved': today, 'counts': stats.get('hydrosheds')},
+            {'id': 'osm', 'name': 'OpenStreetMap', 'url': 'https://www.openstreetmap.org/copyright', 'license': 'ODbL 1.0',
+             'licenseUrl': 'https://opendatacommons.org/licenses/odbl/1-0/', 'commercial': True, 'shareAlike': True,
+             'attribution': '© OpenStreetMap contributors (ODbL)', 'files': ['physical-change.json'],
+             'notes': 'Outlines of Dutch polders (or the municipalities that are the polder), fetched via Nominatim. The dates of draining and of the lakes’ extent are Shelf’s, from standard histories, and are approximate.',
+             'retrieved': today, 'counts': stats.get('osm')},
         ],
     }
     with open(os.path.join(OUT, 'manifest.json'), 'w', encoding='utf-8') as fh:
@@ -1295,7 +1335,7 @@ def main():
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
     steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases), ('common', polity_common_names),
-             ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers)]
+             ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers), ('osm', physical_change)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
     if not only or 'world' in only:
