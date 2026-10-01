@@ -848,7 +848,7 @@ def regional_layers(recs, rows, sites_out):
                ('r3verst', REG.russian_3verst), ('rohgis', REG.rohgis_settlements),
                ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
                ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining),
-               ('arkas', REG.arkas))
+               ('arkas', REG.arkas), ('wdextra', REG.wikidata_extra))
     for name, fn in loaders:
         res = fn()
         recs, note = (res if isinstance(res, tuple) else (res, None))

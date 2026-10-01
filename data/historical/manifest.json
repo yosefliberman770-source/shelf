@@ -2522,6 +2522,24 @@
   "sha256": "098f7a10ef7800bf28baff20b307cd0272a1c4b8cc3ee6edfa5f8015cb0848ea",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/caravanserai.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.names.rq)",
+  "bytes": 18615,
+  "sha256": "5a5929e31f332156910eed65f9dc535642617984381e075c545e8b57f2106642",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/caravanserai.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.precision.rq)",
+  "bytes": 10551,
+  "sha256": "3d335536233f2e47ae5bfa8ae1ca434f6c643f692150601e258300c5064f658d",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/caravanserai.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.rq)",
+  "bytes": 26446,
+  "sha256": "8e6057ad81e09fab7bd3d24f6471e3e39fc8393d8cbf788d12e75f9343e4120c",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/castle.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/castle.names.rq)",
   "bytes": 3286357,
@@ -2545,6 +2563,24 @@
   "bytes": 490145,
   "sha256": "2edcb632536c8064a7df250bd053e6e9acd383d7e58325cd9e178a3e5cfffa27",
   "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/church.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.names.rq)",
+  "bytes": 6256845,
+  "sha256": "c8103e656fc99a579476a818e8829380b833352d82dccf38f9c5991a81e49416",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/church.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.precision.rq)",
+  "bytes": 4264391,
+  "sha256": "8b8365c6e9dc577a56b0a897df0fc23a8a0575e52543eedb40744bec67a31612",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/church.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.rq)",
+  "bytes": 11307022,
+  "sha256": "812fee8894e18ca7d1a135607a675f5dcaf6b667e1c8655a991fbd54b75b53d3",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/city.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/city.names.rq)",
@@ -2588,11 +2624,47 @@
   "sha256": "535520379c1c8bd397b2b758996d6cfa728ef121d3b2dc13359eb822490209ad",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/hillfort.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.names.rq)",
+  "bytes": 19993,
+  "sha256": "3d75b8a5b41ea17d477c74bcfae672c06aee341f5527885d5f6cfbc1bf60d9cd",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/hillfort.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.precision.rq)",
+  "bytes": 11761,
+  "sha256": "950470241ab19010ec29e4396f264c579319235db0bf4dd49d06be5883989f35",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/hillfort.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.rq)",
+  "bytes": 31062,
+  "sha256": "ad25528da583ec59e47938cd688564898e891ef50fe57d8056589b8a1fefd795",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/labels.tsv": {
   "url": "https://qlever.dev/api/wikidata (labels of referenced items)",
-  "bytes": 618688,
-  "sha256": "06a24abcd9c66797176c9793936b0e78fc3554eae4e05094bc8382c752aec53b",
-  "downloaded": "2026-09-30"
+  "bytes": 905179,
+  "sha256": "6087cc259f3968f25baa623d5a0c556774fec729376c3b8ebed3110192367735",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.names.rq)",
+  "bytes": 546777,
+  "sha256": "9721e9bd55a4148bf6dd092886b5b5a229989c39e387d2d1e02d12d4972afe9a",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.precision.rq)",
+  "bytes": 409205,
+  "sha256": "f427ec61010a7cbafa1eeb58fa3a9b16030b2fcea72c516c5be21fbfbd875b7e",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.rq)",
+  "bytes": 970243,
+  "sha256": "66a6fefde9e8f2dc84c9ed03d58bb0e06edda64f6db6c8b89db7f9d49863b9e2",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/monastery.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/monastery.names.rq)",
@@ -2606,6 +2678,24 @@
   "sha256": "83dbdef5bb8a9267352a43c35ee88c872a0f475325e24578c461ca8b54137c16",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/mosque.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.names.rq)",
+  "bytes": 187165,
+  "sha256": "ad98bf8bf3a5bdb956a13e02c3b306576881dd67f1c8398917e0e5ee8c608634",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mosque.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.precision.rq)",
+  "bytes": 68147,
+  "sha256": "21ee8560d7f03ce7b82bf406558bf6baf15029fd863983a68df85079a8d806ea",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mosque.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.rq)",
+  "bytes": 167694,
+  "sha256": "ddd9feaff965e3b8b77c6d889728b6033be87fee2a33310c7359a3972613aa81",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/settlement.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/settlement.names.rq)",
   "bytes": 5461892,
@@ -2618,6 +2708,24 @@
   "sha256": "93cdea750dfa508c9d08ff157a892f8b5916be5f8676257855171a47b9d732e9",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/settlement_late.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.names.rq)",
+  "bytes": 5037616,
+  "sha256": "3c4081e5ae3e47952d64246fabe62cb1ab5933e09ceb27eb53894821c4e8cf8b",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/settlement_late.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.precision.rq)",
+  "bytes": 2067842,
+  "sha256": "86a2f4df655dd21a15b3a409a81092436d91bd926afc6a4e7faa586db2014ae5",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/settlement_late.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.rq)",
+  "bytes": 4926971,
+  "sha256": "0a8e8d8fac95f9c376f256f70762281ca66fd97f78b9acffeb6a4bc211bbc741",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/siege.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/siege.names.rq)",
   "bytes": 276962,
@@ -2629,6 +2737,24 @@
   "bytes": 259403,
   "sha256": "50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84",
   "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/synagogue.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.names.rq)",
+  "bytes": 149556,
+  "sha256": "67060de8b59999bf12095276c384271bd7c624e98447853e6c522b57bed7558d",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/synagogue.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.precision.rq)",
+  "bytes": 85649,
+  "sha256": "38ff910d574f03e575e838cc72d0b44547400abe15db329502e505dc698b4bb7",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/synagogue.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.rq)",
+  "bytes": 195673,
+  "sha256": "398229bad60e883096b95fc3edcf9d1477b28e428a4b59ba0e728d15946bed5e",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/temporal-evidence.json": {
   "url": "https://query.wikidata.org/sparql (queries/temporal-evidence.rq)",

@@ -1189,3 +1189,136 @@ def latin_church_1772():
                         'precise': True, 'snap': 1772, 'per': 'Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (Litak atlas)', 'ty': ty[:120],
                         'ctx': [c for c in (p.get('pl_name'), p.get('diocese')) if c], 'names': []})
     return out
+
+
+# ── Wikidata (CC0): dated churches, mosques, synagogues, manors, hillforts, caravanserais, and settlements first ──
+# recorded 1600–1914 (wikidata_snapshot.py, 2026-10 classes). Items already in the medieval snapshot are left to it.
+# Dates are Wikidata's own statements read at their recorded precision: an inception entered as "17th century" is a
+# 1601–1700 window, never the year 1600. A first written mention (P1249) is labelled as such, never as a founding.
+WD_EXTRA = (('church', 'church'), ('mosque', 'church'), ('synagogue', 'church'), ('hillfort', 'castle'),
+            ('caravanserai', 'building'), ('manor', 'building'), ('settlement_late', 'settlement'))
+WD_EXTRA_TYPE = {'church': 'church', 'mosque': 'mosque', 'synagogue': 'synagogue', 'hillfort': 'hillfort',
+                 'caravanserai': 'caravanserai', 'manor': 'manor house', 'settlement_late': 'settlement'}
+WD_OLD_KINDS = ('castle', 'monastery', 'cathedral', 'diocese', 'battle', 'siege', 'fortification', 'university', 'bridge', 'settlement')
+# Administrative units filed under "settlement" whose inception is the unit's creation (Sweden's and Finland's 1863
+# rural municipalities, Czech cadastral areas, Russian administrative divisions), not a settlement's beginning.
+WD_ADMIN = re.compile(r'municipality|administrative|cadastral|district|neighbo(u)?rhood|city block|former settlement')
+WD_LANGS = 'mul de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt lv et ga cy eu gl sq tr sr-el sh lb rm fy se hsb'.split()
+
+
+def _wd_q(cell):
+    return cell.strip('<>"').rsplit('/', 1)[-1]
+
+
+def _wd_year(t):
+    m = re.match(r'"?([+-]?\d+)-', t or '')
+    return int(m.group(1)) if m else None
+
+
+def wd_window(y, prec):
+    """The years a Wikidata time value covers at its precision: (from, to)."""
+    if prec is None or prec >= 9:
+        return y, y
+    if prec == 8:
+        d = y - y % 10
+        return d, d + 9
+    if prec == 7:
+        c = -((-y) // 100) if y > 0 else y // 100  # Wikibase: year Y at century precision is century ceil(Y/100)
+        return (c - 1) * 100 + 1, c * 100
+    return None  # millennium or coarser: too vague to place in time
+
+
+def wikidata_extra():
+    import translit
+    d = os.path.join(RAW, 'wikidata-medieval', 'original')
+    labels = {}
+    for r in csv.reader(open(os.path.join(d, 'labels.tsv'), encoding='utf-8'), delimiter='\t'):
+        if len(r) > 1 and '/entity/' in r[0]:
+            labels[_wd_q(r[0])] = r[1].rsplit('@', 1)[0].strip('"')
+    seen = set()
+    for k in WD_OLD_KINDS:
+        p = os.path.join(d, f'{k}.tsv')
+        if os.path.exists(p):
+            seen.update(_wd_q(line.split('\t', 1)[0]) for line in open(p, encoding='utf-8') if line.startswith('<'))
+    out, skipped = [], Counter()
+    for src_kind, kind in WD_EXTRA:
+        path = os.path.join(d, f'{src_kind}.tsv')
+        if not os.path.exists(path):
+            continue
+        prec = {}
+        pp = os.path.join(d, f'{src_kind}.precision.tsv')
+        if os.path.exists(pp):
+            for r in csv.reader(open(pp, encoding='utf-8'), delimiter='\t', quoting=csv.QUOTE_NONE):
+                if len(r) >= 4 and r[0].startswith('<'):
+                    y = _wd_year(r[2])
+                    if y is not None and r[3].strip('"').isdigit():
+                        key = (_wd_q(r[0]), r[1].strip('"'), y)
+                        prec[key] = min(prec.get(key, 99), int(r[3].strip('"')))
+        names = {}
+        for r in csv.reader(open(os.path.join(d, f'{src_kind}.names.tsv'), encoding='utf-8'), delimiter='\t', quoting=csv.QUOTE_NONE):
+            if len(r) > 1 and r[0].startswith('<'):
+                nm = {}
+                for part in r[1].strip('"').split('|'):
+                    lang, _, lab = part.partition(':')
+                    if lab and lang not in nm:
+                        nm[lang] = lab.replace('\\"', '"')
+                names[_wd_q(r[0])] = nm
+        for r in csv.reader(open(path, encoding='utf-8'), delimiter='\t', quoting=csv.QUOTE_NONE):
+            if not r[0].startswith('<'):
+                continue
+            q = _wd_q(r[0])
+            if q in seen:
+                skipped['already in the medieval snapshot or an earlier class'] += 1
+                continue
+            seen.add(q)
+            m = re.match(r'POINT\(([-\d.eE]+) ([-\d.eE]+)\)', r[1])
+            if not m:
+                continue
+            types = [labels.get(_wd_q(x), '') for x in r[13].strip('"').split('|') if x]
+            if src_kind == 'settlement_late' and any(WD_ADMIN.search(t.lower()) for t in types):
+                skipped['administrative unit, not a settlement'] += 1
+                continue
+            nm = names.get(q, {})
+            en = r[2].rsplit('@', 1)[0].strip('"').replace('\\"', '"') if r[2] else ''
+            title = en or next((nm[lg] for lg in WD_LANGS if nm.get(lg)), '')
+            name_note = None
+            if not title:
+                rz = translit.romanize(nm)  # a published standard scheme (Cyrillic, Greek, Georgian), as the Wikidata layer does
+                if not rz:
+                    skipped['no label in a Latin script or a romanizable one'] += 1
+                    continue
+                title, name_note = rz[0], f'name romanized from {rz[1]} ({rz[2]})'
+            # The earliest dated statement, at its own precision.
+            cands = []
+            for prop, cell in (('P571', r[3]), ('P1249', r[4])):
+                y = _wd_year(cell)
+                if y is None:
+                    continue
+                w = wd_window(y, prec.get((q, prop, y)))
+                if w is None:
+                    skipped['date only to the millennium'] += 1
+                    continue
+                cands.append((w, prop))
+            if not cands:
+                skipped['no usable date'] += 1
+                continue
+            (lo, hi), prop = min(cands)
+            end = _wd_year(r[5])
+            if end is not None and end < hi:
+                end = None  # an end before the start: the source's dates disagree; the end is not used
+            if prop == 'P1249':
+                basis = 'first written mention (Wikidata)'
+            elif kind == 'settlement':
+                basis = 'recorded start (Wikidata inception — may be a first record, not a founding)'
+            else:
+                basis = 'founded or built (Wikidata inception)'
+            if hi > lo:
+                basis += f', known only to {lo}–{hi}'
+            rec = {'src': 'wdextra', 'id': q, 'name': title[:80], 'kind': kind, 'lon': round(float(m.group(1)), 5), 'lat': round(float(m.group(2)), 5),
+                   'precise': True, 'env': (lo, end), 'per': basis,
+                   'ty': ' · '.join([WD_EXTRA_TYPE[src_kind]] + [t for t in types[:2] if t and t != WD_EXTRA_TYPE[src_kind]] + ([name_note] if name_note else []))[:120],
+                   'ctx': [], 'names': [(v, None, None, lg) for lg, v in sorted(nm.items()) if v != title][:6]}
+            if hi > lo:
+                rec['cw'] = hi - lo + 1
+            out.append(rec)
+    return out, dict(skipped)

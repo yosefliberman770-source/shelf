@@ -672,7 +672,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return {
         title: str('n') ?? 'Site', lines,
         pick: pt && src ? { key: `${src}:${(str('i') ?? '').split(':').slice(1).join(':')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined,
-        link: src === 'sirkd' ? { href: `https://eid.gov.si/S/${(str('i') ?? '').split(':')[1]}`, label: 'Register record ↗' }
+        link: src === 'sirkd' ? { href: `https://eid.gov.si/S/${(str('i') ?? '').split(':')[1]}`, label: 'Register record ↗' } : src === 'wdextra' ? { href: `https://www.wikidata.org/wiki/${(str('i') ?? '').split(':')[1]}`, label: 'Wikidata ↗' }
           : src ? { href: DATASET_CREDIT[src].url, label: 'Dataset ↗' } : undefined,
         source: src ? credit(src) : '',
         caution: snap ? `A source that lists a place in one year is shown (lighter) within 25 years of it — a display allowance, not a claim about those years.`

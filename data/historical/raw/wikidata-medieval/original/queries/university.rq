@@ -1,0 +1,26 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+SELECT ?i (SAMPLE(?c) AS ?coord) (SAMPLE(?en) AS ?label)
+  (MIN(?inc) AS ?inception) (MIN(?fm) AS ?firstMention) (MIN(?dis) AS ?dissolved) (MIN(?pt) AS ?when) (MIN(?st) AS ?start) (MAX(?e2) AS ?end)
+  (GROUP_CONCAT(DISTINCT STR(?ord); separator="|") AS ?orders) (SAMPLE(?dio) AS ?diocese) (GROUP_CONCAT(DISTINCT STR(?part); separator="|") AS ?partOf)
+  (SAMPLE(?sl) AS ?sitelinks) (GROUP_CONCAT(DISTINCT STR(?typ); separator="|") AS ?types)
+WHERE {
+  { SELECT DISTINCT ?i ?c WHERE { ?i wdt:P31/wdt:P279* wd:Q3918 . ?i wdt:P625 ?c .
+    BIND(geof:longitude(?c) AS ?lon) BIND(geof:latitude(?c) AS ?lat)
+    FILTER(?lon > -32 && ?lon < 62 && ?lat > 24 && ?lat < 72) ?i wdt:P571 ?d0 . FILTER(YEAR(?d0) < 1600) } }
+  OPTIONAL { ?i rdfs:label ?en . FILTER(LANG(?en) = "en") }
+  OPTIONAL { ?i wdt:P571 ?inc }
+  OPTIONAL { ?i wdt:P1249 ?fm }
+  OPTIONAL { ?i wdt:P576 ?dis }
+  OPTIONAL { ?i wdt:P585 ?pt }
+  OPTIONAL { ?i wdt:P580 ?st }
+  OPTIONAL { ?i wdt:P582 ?e2 }
+  OPTIONAL { ?i wdt:P611 ?ord }
+  OPTIONAL { ?i wdt:P708 ?dio }
+  OPTIONAL { ?i wdt:P361 ?part }
+  OPTIONAL { ?i wikibase:sitelinks ?sl }
+  OPTIONAL { ?i wdt:P31 ?typ }
+} GROUP BY ?i

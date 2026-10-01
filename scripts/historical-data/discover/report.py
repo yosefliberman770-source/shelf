@@ -302,6 +302,8 @@ def main():
         ('Tyrol mining documents', "Attested in the document's years", '226 places not localised by the source'),
         ('Lutsch roads', 'Snapshot 1751', '—'),
         ('Arkas (Slovenia)', "Each site's own years (Leto_od–Leto_do)", 'Prehistoric-only sites left out'),
+        ('Latin Church c. 1772 (private pack)', 'Snapshot 1772 (the atlas reconstruction year)', 'No founding or end'),
+        ('Wikidata: churches, mosques, synagogues, manors, caravanserais, hillforts; settlements first recorded 1600–1914', "Earliest inception (P571) or first written mention (P1249) at Wikidata's recorded precision: a century- or decade-precision date is a window (marked), never a single year; first mention labelled as such", 'Millennium-precision dates not used; administrative units (e.g. the 1863 Swedish/Finnish rural municipalities, cadastral areas) excluded from settlements; items already in the medieval snapshot left to it'),
         ('ARIADNE catalogue (private pack)', "Each provider period (PeriodO-linked from/until); separate periods stay separate phases", 'No join across gaps; records without a point placed at their municipality only when the name is unique'),
     ]))
     w('')

@@ -48,6 +48,14 @@ KINDS = {
     'university': ('wd:Q3918', DATED(1600)),
     'bridge': ('wd:Q12280', DATED(1600)),
     'settlement': ('wd:Q486972', DATED(1600, 400)),    # with a first written mention (P1249) or founding date, 400–1600
+    # 2026-10: classes the medieval snapshot left out, with a founding date or first written mention before 1900.
+    'church': ('wd:Q16970', DATED(1900, -3000)),        # church buildings (parish and other)
+    'mosque': ('wd:Q32815', DATED(1900, -3000)),
+    'synagogue': ('wd:Q34627', DATED(1900, -3000)),
+    'manor': ('wd:Q879050', DATED(1900, -3000)),        # manor houses
+    'hillfort': ('wd:Q744099', DATED(1900, -3000)),
+    'caravanserai': ('wd:Q190928', DATED(1900, -3000)),
+    'settlement_late': ('wd:Q486972', DATED(1915, 1600)),  # settlements first recorded or founded 1600–1914
     'city': ('wd:Q515 wd:Q3957', ''),                  # cities and towns of any date: used only to give English names to other sources' towns
     'town': ('wd:Q486972', '?i wdt:P1082 ?pp . FILTER(?pp >= 5000)'),  # any settlement of 5,000+ today (communes, boroughs…), same use
 }
@@ -61,6 +69,8 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
 '''
 
 
@@ -104,6 +114,21 @@ def names_query(cls, extra):
 '''
 
 
+def precision_query(cls, extra):
+    # Every inception (P571) and earliest-record (P1249) statement with its time precision
+    # (9 year, 8 decade, 7 century, 6 millennium), so a date entered as "17th century" is not read as a year.
+    return HEAD + f'''SELECT ?i ?prop ?t ?prec WHERE {{
+{inner(cls, extra)}
+  {{ ?i p:P571/psv:P571 ?v . BIND("P571" AS ?prop) }} UNION {{ ?i p:P1249/psv:P1249 ?v . BIND("P1249" AS ?prop) }}
+  ?v wikibase:timeValue ?t ; wikibase:timePrecision ?prec .
+}}
+'''
+
+
+# Kinds whose dating precision is fetched too (the 2026-10 classes).
+PRECISION_KINDS = {'church', 'mosque', 'synagogue', 'manor', 'hillfort', 'caravanserai', 'settlement_late'}
+
+
 def run(query, dest):
     for attempt in range(4):
         r = subprocess.run(['curl', '-sS', '-m', '600', '-X', 'POST', ENDPOINT, '-H', 'Accept: text/tab-separated-values',
@@ -117,13 +142,19 @@ def run(query, dest):
 
 
 def main():
-    only = sys.argv[1:]
+    only = [a for a in sys.argv[1:] if not a.startswith('--')]
+    precision_only = '--precision-only' in sys.argv
     os.makedirs(os.path.join(OUT, 'queries'), exist_ok=True)
     manifest = load(MANIFEST, {})
     for kind, (cls, extra) in KINDS.items():
         if only and kind not in only:
             continue
-        for suffix, q in (('', core_query(cls, extra)), ('.names', names_query(cls, extra))):
+        parts = [('', core_query(cls, extra)), ('.names', names_query(cls, extra))]
+        if kind in PRECISION_KINDS:
+            parts.append(('.precision', precision_query(cls, extra)))
+        if precision_only:
+            parts = parts[2:]
+        for suffix, q in parts:
             qpath = os.path.join(OUT, 'queries', f'{kind}{suffix}.rq')
             open(qpath, 'w').write(q)
             dest = os.path.join(OUT, f'{kind}{suffix}.tsv')
