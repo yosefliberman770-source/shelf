@@ -33,6 +33,14 @@ class Dating(unittest.TestCase):
         self.assertEqual(P('before 1600')[:2], (None, 1600))
         self.assertEqual(P('300 BC')[:2], (-300, -300))
 
+    def test_abbreviated_ranges_and_decades(self):
+        self.assertEqual(generic.parse_dating('1852-62')[:2], (1852, 1862))
+        self.assertEqual(generic.parse_dating('1863-4')[:2], (1863, 1864))
+        self.assertEqual(generic.parse_dating('1720/1')[:2], (1720, 1721))  # old-style double dating
+        self.assertEqual(generic.parse_dating('the 1850s')[:2], (1850, 1859))
+        self.assertEqual(generic.parse_dating('1801-12-05')[:2], (1801, 1801))  # a full date, not 1801–1812
+        self.assertEqual(generic.parse_dating('1810/12/31')[:2], (1810, 1810))
+
     def test_no_date_is_no_date(self):
         for t in (None, '', 'unknown', 'Roman', '?', 'nan'):
             self.assertIsNone(P(t))

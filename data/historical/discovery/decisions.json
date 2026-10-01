@@ -1497,6 +1497,27 @@
    "region": "France",
    "dataset": "rurland",
    "note": "Etalab 2.0. Nüsslein's per-century occupation files (2nd–5th c., zones 1–2; 152 sites, each with one occupation span) and the Moselle-valley site list (dated by century text) → public spec rurland, 202 records. Soil, geology and hydrography layers of the same series are environmental and not used; 1st-c. and High Empire files are before the atlas range or duplicate the century files."
+  },
+  {
+   "title": "Historical Oyster Habitat and Fisheries in English Coastal Waters (EA)",
+   "match": [
+    "HistoricalOysterHabitatAndFisheries"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "England",
+   "dataset": "oyster-fisheries",
+   "note": "227 oyster beds/fisheries (OGL) → public spec oyster-fisheries, kind fishery (Maritime), each in the year(s) of the historical account that mentions it (1154–1920s; mostly 1850s–1890s), with the reference; low-confidence locations marked uncertain."
+  },
+  {
+   "title": "NorfolkSuffolkChurches (ArcGIS)",
+   "match": [
+    "NorfolkSuffolkChurches"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "England",
+   "note": "1,479 churches with 'Founded: Medieval' only; no years. Churches already shown from Historic England / Wikidata."
   }
  ]
 }

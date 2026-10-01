@@ -1394,6 +1394,12 @@
   "sha256": "3e0fdaa74cea2ec248ada93d6127a8d5ecfec309f7b3b2600b5a4875bf643c51",
   "downloaded": "2026-10-01"
  },
+ "oyster-fisheries/original/oysters.geojson": {
+  "url": "https://environment.data.gov.uk/arcgis/rest/services/EA/HistoricalOysterHabitatAndFisheries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 153150,
+  "sha256": "1d91978ae39327a83df3a61395900e2c57afc4addda58e21dde41914d477a140",
+  "downloaded": "2026-10-01"
+ },
  "periodo/original/periodo-dataset.json": {
   "url": "https://data.perio.do/d.json",
   "bytes": 7806282,

@@ -1692,5 +1692,16 @@
     "note": "Nakala 10.34847/nkl.b7406gy1"
    }
   ]
+ },
+ {
+  "id": "oyster-fisheries",
+  "arcgis": "https://environment.data.gov.uk/arcgis/rest/services/EA/HistoricalOysterHabitatAndFisheries/FeatureServer/0",
+  "licence": "Open Government Licence v3.0 (© Environment Agency 2022)",
+  "files": [
+   {
+    "path": "original/oysters.geojson",
+    "note": "snapshot via fetch_arcgis.py (227 records)"
+   }
+  ]
  }
 ]

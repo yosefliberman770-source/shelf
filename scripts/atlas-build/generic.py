@@ -109,6 +109,15 @@ def parse_dating(text) -> tuple[int | None, int | None, str] | None:
         if n:
             cents.append(_century_window(n, bce))
     years = [int(y) for y in re.findall(r'(?<![\d.,])(\d{3,4})(?![\d.,])', t) if 100 <= int(y) <= 2100]
+    # an abbreviated end year ("1852-62", "1863-4") belongs to the same century as its start
+    for m in re.finditer(r'(?<![\d.,/-])(\d{4})\s*[-–/]\s*(\d{1,2})(?![\d.,])(?!\s*[-–/.]\s*\d)', t):  # not a full date (1801-12-05)
+        a_, b_ = int(m.group(1)), m.group(2)
+        end = int(str(a_)[:4 - len(b_)] + b_)
+        if a_ < end <= 2100:
+            years.append(end)
+    # a decade ("1850s", "the 1850's"): its ten years
+    for m in re.finditer(r'(?<![\d.,])(\d{3})0\'?s\b', t):
+        years += [int(m.group(1) + '0'), int(m.group(1) + '9')]
     if bce:
         years = [-y for y in years]
     if cents and not years:
