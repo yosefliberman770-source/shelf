@@ -56,6 +56,14 @@ KINDS = {
     'hillfort': ('wd:Q744099', DATED(1900, -3000)),
     'caravanserai': ('wd:Q190928', DATED(1900, -3000)),
     'settlement_late': ('wd:Q486972', DATED(1915, 1600)),  # settlements first recorded or founded 1600–1914
+    'lighthouse': ('wd:Q39715', DATED(1915, -3000)),
+    'port': ('wd:Q44782', DATED(1915, -3000)),
+    'canal': ('wd:Q12284', DATED(1915, -3000)),
+    'watermill': ('wd:Q185187', DATED(1915, -3000)),
+    'windmill': ('wd:Q38720', DATED(1915, -3000)),
+    'mine': ('wd:Q820477', DATED(1915, -3000)),
+    'station': ('wd:Q55488', DATED(1915, 1800)),         # railway stations opened before 1915
+    'bridge_late': ('wd:Q12280', DATED(1915, 1600)),     # bridges built 1600–1914 (earlier ones are in 'bridge')
     'city': ('wd:Q515 wd:Q3957', ''),                  # cities and towns of any date: used only to give English names to other sources' towns
     'town': ('wd:Q486972', '?i wdt:P1082 ?pp . FILTER(?pp >= 5000)'),  # any settlement of 5,000+ today (communes, boroughs…), same use
 }
@@ -126,7 +134,8 @@ def precision_query(cls, extra):
 
 
 # Kinds whose dating precision is fetched too (the 2026-10 classes).
-PRECISION_KINDS = {'church', 'mosque', 'synagogue', 'manor', 'hillfort', 'caravanserai', 'settlement_late'}
+PRECISION_KINDS = {'church', 'mosque', 'synagogue', 'manor', 'hillfort', 'caravanserai', 'settlement_late',
+                   'lighthouse', 'port', 'canal', 'watermill', 'windmill', 'mine', 'station', 'bridge_late'}
 
 
 def run(query, dest):

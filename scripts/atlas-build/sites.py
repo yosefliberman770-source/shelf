@@ -840,6 +840,12 @@ def regional_layers(recs, rows, sites_out):
     import registers as REG
     COMMON_WORDS = {w.strip().lower() for w in open(os.path.join(ROOT, 'public', 'atlas', 'common-words.txt'), encoding='utf-8') if w.strip()}
     register_feats[:] = []
+
+    def common(name):
+        # The name index drops a leading English article, so "The Mill" is the word "mill" there too.
+        n = name.strip().lower()
+        return n in COMMON_WORDS or (n.startswith('the ') and n[4:].strip() in COMMON_WORDS)
+
     reg_stats, reg_index = {}, Counter()
     loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
                ('ottomannfs', REG.ottoman_nfs), ('generalkarte', REG.generalkarte), ('cassini', REG.cassini_places), ('lutsch', REG.lutsch),
@@ -867,11 +873,11 @@ def regional_layers(recs, rows, sites_out):
                 pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
             register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
             # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
-            if env and x['kind'] not in ('site', 'building') and x['name'].strip().lower() not in COMMON_WORDS:
+            if env and x['kind'] not in ('site', 'building') and not common(x['name']):
                 extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
                          **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
                 rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
-                             [list(n) for n in x['names'] if n[0] and n[0].strip().lower() not in COMMON_WORDS][:6], x['ctx'][:2], [], extra])
+                             [list(n) for n in x['names'] if n[0] and not common(n[0])][:6], x['ctx'][:2], [], extra])
                 reg_index[x['src']] += 1
     stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'tileFeatures': len(register_feats)}
 

@@ -1,0 +1,14 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX psv: <http://www.wikidata.org/prop/statement/value/>
+SELECT ?i ?prop ?t ?prec WHERE {
+  { SELECT DISTINCT ?i ?c WHERE { VALUES ?cls { wd:Q44782 } ?i wdt:P31/wdt:P279* ?cls . ?i wdt:P625 ?c .
+    BIND(geof:longitude(?c) AS ?lon) BIND(geof:latitude(?c) AS ?lat)
+    FILTER(?lon > -32 && ?lon < 62 && ?lat > 24 && ?lat < 72) { ?i wdt:P1249 ?d0 } UNION { ?i wdt:P571 ?d0 } FILTER(YEAR(?d0) < 1915 && YEAR(?d0) >= -3000) } }
+  { ?i p:P571/psv:P571 ?v . BIND("P571" AS ?prop) } UNION { ?i p:P1249/psv:P1249 ?v . BIND("P1249" AS ?prop) }
+  ?v wikibase:timeValue ?t ; wikibase:timePrecision ?prec .
+}

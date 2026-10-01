@@ -303,7 +303,7 @@ def main():
         ('Lutsch roads', 'Snapshot 1751', '—'),
         ('Arkas (Slovenia)', "Each site's own years (Leto_od–Leto_do)", 'Prehistoric-only sites left out'),
         ('Latin Church c. 1772 (private pack)', 'Snapshot 1772 (the atlas reconstruction year)', 'No founding or end'),
-        ('Wikidata: churches, mosques, synagogues, manors, caravanserais, hillforts; settlements first recorded 1600–1914', "Earliest inception (P571) or first written mention (P1249) at Wikidata's recorded precision: a century- or decade-precision date is a window (marked), never a single year; first mention labelled as such", 'Millennium-precision dates not used; administrative units (e.g. the 1863 Swedish/Finnish rural municipalities, cadastral areas) excluded from settlements; items already in the medieval snapshot left to it'),
+        ('Wikidata: churches, mosques, synagogues, manors, caravanserais, hillforts, mills, mines, ports, lighthouses, canals, bridges 1600–1914, railway stations; settlements first recorded 1600–1914', "Earliest inception (P571) or first written mention (P1249) at Wikidata's recorded precision: a century- or decade-precision date is a window (marked), never a single year; first mention labelled as such", 'Millennium-precision dates not used; administrative units (e.g. the 1863 Swedish/Finnish rural municipalities, cadastral areas) excluded from settlements; items already in the medieval snapshot left to it'),
         ('ARIADNE catalogue (private pack)', "Each provider period (PeriodO-linked from/until); separate periods stay separate phases", 'No join across gaps; records without a point placed at their municipality only when the name is unique'),
     ]))
     w('')
@@ -380,7 +380,8 @@ def main():
     w('2. Estonia and Lithuania heritage registers: their sites block automated access — export them by hand in a browser (both offer CSV/Excel views) and drop the files into the raw vault.')
     w('3. World Historical Gazetteer datasets for weak regions (List of Russian towns, late 14th c.; Benjamin of Tudela; Heritage Gazetteer of Libya; Usaybia places): WHG now refuses bots; a free WHG account token would let the build read them.')
     w('4. The highest-ranked class-A leads in D for Egypt, the Maghreb, the Levant and Cyprus after 1000 — still the weakest areas.')
-    w('5. Re-run `coverage_centuries.py` and this report after each integration.')
+    w('5. Further dated Wikidata classes for the thinnest categories (Maritime, Economic, Transport, Events): done for churches, mosques, synagogues, manors, mills, mines, ports, lighthouses, canals, bridges and railway stations (read at their recorded date precision). Next candidates: dated shipyards, salt works, toll houses, post stations, and treaties/uprisings as dated events — each only with its own date statement.')
+    w('6. Re-run `coverage_centuries.py` and this report after each integration.')
     w('')
     w('## R. Medium-term plan (weeks)')
     w('')

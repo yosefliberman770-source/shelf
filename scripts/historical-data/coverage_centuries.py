@@ -65,7 +65,7 @@ DATING = {'exact': 1.0, 'attested': 0.8, 'period-narrow': 0.6, 'period-broad': 0
 
 KIND_CAT = {'settlement': 'Settlements', 'town': 'Settlements', 'church': 'Religious', 'monastery': 'Religious', 'cathedral': 'Religious', 'diocese': 'Religious',
             'university': 'Religious', 'castle': 'Military', 'fortification': 'Military', 'market': 'Economic', 'hoard': 'Economic', 'mine': 'Economic',
-            'mill': 'Economic', 'building': 'Settlements', 'wreck': 'Maritime', 'harbour': 'Maritime', 'port': 'Maritime', 'road': 'Transport', 'bridge': 'Transport', 'site': 'Archaeology'}
+            'mill': 'Economic', 'building': 'Settlements', 'wreck': 'Maritime', 'harbour': 'Maritime', 'port': 'Maritime', 'lighthouse': 'Maritime', 'road': 'Transport', 'bridge': 'Transport', 'canal': 'Transport', 'station': 'Transport', 'site': 'Archaeology'}
 
 
 def pleiades_cat(t):

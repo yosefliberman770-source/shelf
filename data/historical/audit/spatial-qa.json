@@ -4,7 +4,8 @@
   "althurayya": 2518,
   "wikidata": 77836,
   "buringh": 2237,
-  "canmore": 37260,
+  "wdextra": 87367,
+  "canmore": 37224,
   "germaniasacra": 2502,
   "nid": 28219,
   "irlsmr": 365,
@@ -16,7 +17,7 @@
   "cassini": 3334,
   "hre": 2390,
   "bridges1250": 258,
-  "ivillaris": 22838,
+  "ivillaris": 22837,
   "nsh": 764,
   "generalkarte": 21107,
   "r3verst": 6290,
@@ -24,6 +25,7 @@
   "swegeo": 14165,
   "sirkd": 9360,
   "tyrolmine": 232,
+  "arkas": 733,
   "rohgis": 10020,
   "ottomannfs": 16234,
   "transice": 1476,
@@ -34,6 +36,8 @@
   "afontium": 26204,
   "darmc": 843,
   "ebidat": 8263,
+  "ariadne": 63354,
+  "latin1772": 9042,
   "ran": 2865,
   "dicotopo": 29140,
   "mfairs": 2371,
@@ -46,6 +50,10 @@
    "outside-box": 41,
    "wreck-on-land": 90,
    "water-far": 1
+  },
+  "wdextra": {
+   "water-near": 764,
+   "water-far": 80
   },
   "wikidata": {
    "water-near": 267,
@@ -130,6 +138,9 @@
   "sirkd": {
    "water-near": 9
   },
+  "arkas": {
+   "water-near": 4
+  },
   "r3verst": {
    "water-near": 1
   },
@@ -157,12 +168,22 @@
    "water-near": 33,
    "water-far": 1
   },
+  "ariadne": {
+   "water-near": 295,
+   "water-far": 39,
+   "outside-box": 11,
+   "wreck-on-land": 1,
+   "stacked": 31649
+  },
   "afontium": {
    "water-near": 3
   },
   "dicotopo": {
    "water-near": 2,
    "stacked": 176
+  },
+  "latin1772": {
+   "outside-box": 2
   },
   "nid": {
    "stacked": 8369
@@ -176,6 +197,7 @@
  },
  "shareFlagged": {
   "canmore": 0.0035,
+  "wdextra": 0.0009,
   "wikidata": 0.0,
   "pleiades": 0.0438,
   "hrreg": 0.0985,
@@ -199,6 +221,7 @@
   "bridges1250": 0.0,
   "hre": 0.0,
   "sirkd": 0.0,
+  "arkas": 0.0,
   "r3verst": 0.0,
   "tib": 0.0021,
   "darmc": 0.1305,
@@ -206,8 +229,10 @@
   "dkff": 0.0037,
   "ebidat": 0.0,
   "raa": 0.0021,
+  "ariadne": 0.5004,
   "afontium": 0.0,
   "dicotopo": 0.006,
+  "latin1772": 0.0002,
   "nid": 0.2966,
   "lvmon": 0.0547,
   "ran": 0.015
@@ -543,6 +568,252 @@
      -4.57808,
      54.67228,
      4.0
+    ]
+   ]
+  },
+  "wdextra": {
+   "water-near": [
+    [
+     "Q4936404",
+     "Boddam",
+     "settlement",
+     -1.7775,
+     57.4702,
+     0.0
+    ],
+    [
+     "Q17777585",
+     "Rattray Head Lighthouse",
+     "lighthouse",
+     -1.81649,
+     57.6101,
+     0.3
+    ],
+    [
+     "Q15228693",
+     "Inishtrahull Lighthouse",
+     "lighthouse",
+     -7.2419,
+     55.4301,
+     0.0
+    ],
+    [
+     "Q17861631",
+     "Haulbowline Lighthouse",
+     "lighthouse",
+     -6.08014,
+     54.0141,
+     1.0
+    ],
+    [
+     "Q28465954",
+     "East Lighthouse, Rathlin Island",
+     "lighthouse",
+     -6.172,
+     55.302,
+     0.0
+    ],
+    [
+     "Q55049248",
+     "Inishtrahull Lighthouse (old)",
+     "lighthouse",
+     -7.22826,
+     55.4291,
+     0.2
+    ],
+    [
+     "Q126715413",
+     "Bridge, Benagh Rd, Kilkeel",
+     "bridge",
+     -6.08354,
+     54.0559,
+     0.0
+    ],
+    [
+     "Q17852685",
+     "Bound Skerry Lighthouse",
+     "lighthouse",
+     -0.72805,
+     60.4244,
+     0.3
+    ],
+    [
+     "Q97288485",
+     "Church of Our Lady of Mount Carmel, Trogir",
+     "church",
+     16.24894,
+     43.51672,
+     0.0
+    ],
+    [
+     "Q28375261",
+     "Sućuraj lighthouse",
+     "lighthouse",
+     17.19645,
+     43.12494,
+     0.0
+    ],
+    [
+     "Q28375443",
+     "Pokonji Dol Lighthouse",
+     "lighthouse",
+     16.45275,
+     43.1565,
+     0.5
+    ],
+    [
+     "Q28927299",
+     "Split breakwater lighthouse",
+     "lighthouse",
+     16.43592,
+     43.50106,
+     0.0
+    ],
+    [
+     "Q55499089",
+     "Murvica Lighthouse",
+     "lighthouse",
+     16.05659,
+     43.46693,
+     0.7
+    ],
+    [
+     "Q55518404",
+     "Ražanj Lighthouse",
+     "lighthouse",
+     16.40869,
+     43.31981,
+     0.1
+    ],
+    [
+     "Q55554330",
+     "Stončica Lighthouse",
+     "lighthouse",
+     16.25444,
+     43.07222,
+     0.0
+    ]
+   ],
+   "water-far": [
+    [
+     "Q55585321",
+     "Pločica Lighthouse",
+     "lighthouse",
+     16.81639,
+     43.03056,
+     5.1
+    ],
+    [
+     "Q55619168",
+     "Glavat Lighthouse",
+     "lighthouse",
+     17.14583,
+     42.76556,
+     11.6
+    ],
+    [
+     "Q16555234",
+     "Formiche di Grosseto lighthouse",
+     "lighthouse",
+     10.88186,
+     42.57726,
+     12.6
+    ],
+    [
+     "Q16555237",
+     "Vada Shoal lighthouse",
+     "lighthouse",
+     10.3637,
+     43.32016,
+     7.0
+    ],
+    [
+     "Q16555272",
+     "Palmaiola Lighthouse",
+     "lighthouse",
+     10.475,
+     42.865,
+     2.9
+    ],
+    [
+     "Q16555301",
+     "Meloria south end Lighthouse",
+     "lighthouse",
+     10.21893,
+     43.54624,
+     5.8
+    ],
+    [
+     "Q28375247",
+     "Torre della Meloria",
+     "lighthouse",
+     10.21875,
+     43.54804,
+     5.8
+    ],
+    [
+     "Q3739790",
+     "Longships Lighthouse",
+     "lighthouse",
+     -5.74677,
+     50.06686,
+     2.1
+    ],
+    [
+     "Q546122",
+     "Eddystone Lighthouse",
+     "lighthouse",
+     -4.265,
+     50.18,
+     9.8
+    ],
+    [
+     "Q7543693",
+     "Smalls Lighthouse",
+     "lighthouse",
+     -5.66985,
+     51.72122,
+     25.9
+    ],
+    [
+     "Q7566333",
+     "South Bishop Lighthouse",
+     "lighthouse",
+     -5.41193,
+     51.85267,
+     4.1
+    ],
+    [
+     "Q10432841",
+     "Bonden lighthouse",
+     "lighthouse",
+     20.03831,
+     63.43406,
+     6.0
+    ],
+    [
+     "Q18682659",
+     "Strömmingsbådan lighthouse",
+     "lighthouse",
+     20.73942,
+     62.97936,
+     3.6
+    ],
+    [
+     "Q26527913",
+     "Brownsman Lighthouse",
+     "lighthouse",
+     -1.62564,
+     55.63422,
+     3.5
+    ],
+    [
+     "Q2752899",
+     "Longstone Lighthouse",
+     "lighthouse",
+     -1.61087,
+     55.64378,
+     4.4
     ]
    ]
   },
@@ -3113,6 +3384,42 @@
     ]
    ]
   },
+  "arkas": {
+   "water-near": [
+    [
+     "040319.01",
+     "Jernejeva draga",
+     "settlement",
+     13.72063,
+     45.59179,
+     0.0
+    ],
+    [
+     "040302.04",
+     "Zaliv sv. Jerneja",
+     "settlement",
+     13.71633,
+     45.59233,
+     0.1
+    ],
+    [
+     "040503.06",
+     "Židovski kare",
+     "settlement",
+     13.56624,
+     45.52949,
+     0.0
+    ],
+    [
+     "040603.02",
+     "Fizine (brez imena)",
+     "settlement",
+     13.57902,
+     45.51516,
+     0.0
+    ]
+   ]
+  },
   "r3verst": {
    "water-near": [
     [
@@ -4048,6 +4355,401 @@
     ]
    ]
   },
+  "ariadne": {
+   "water-near": [
+    [
+     "36a85f957573d3c3",
+     "Minjar í landi Hvamms",
+     "site",
+     -18.18519,
+     65.80837,
+     0.2
+    ],
+    [
+     "708c17930dd172de",
+     "Dysnes",
+     "site",
+     -18.19062,
+     65.82067,
+     0.0
+    ],
+    [
+     "4e0662241a90c168",
+     "Minjar í landi Syðri-Bakka",
+     "castle",
+     -18.18977,
+     65.81445,
+     0.0
+    ],
+    [
+     "624e75fee29435d2",
+     "Minjar í landi Óss",
+     "site",
+     -18.18862,
+     65.80702,
+     0.0
+    ],
+    [
+     "d46119c53ce3b965",
+     "Minjar í landi Óss",
+     "site",
+     -18.18817,
+     65.80597,
+     0.0
+    ],
+    [
+     "06d8b6baa2e9af25",
+     "Minjar í landi Syðri-Bakka",
+     "site",
+     -18.19017,
+     65.81614,
+     0.0
+    ],
+    [
+     "b035a19692ea4c73",
+     "Minjar í landi Hvamms",
+     "site",
+     -18.18961,
+     65.81339,
+     0.0
+    ],
+    [
+     "48c92da97dcebc59",
+     "Minjar í landi Hanastaða",
+     "site",
+     -18.15618,
+     65.74883,
+     0.1
+    ],
+    [
+     "1b186d8781ba57f9",
+     "Port of Sines",
+     "site",
+     -8.88362,
+     37.94801,
+     0.2
+    ],
+    [
+     "bcf8715fefd48dc3",
+     "Fort of Nossa Senhora da Rocha",
+     "castle",
+     -8.38651,
+     37.09608,
+     0.0
+    ],
+    [
+     "7c4a4a58afd80db4",
+     "Búðarhöfuð",
+     "site",
+     -21.68692,
+     64.3394,
+     0.1
+    ],
+    [
+     "d5a4bf7ea7898e73",
+     "Naust",
+     "site",
+     -21.69937,
+     64.33674,
+     0.0
+    ],
+    [
+     "825a25c10ec293b8",
+     "Minjar í landi Ness við Seltjörn",
+     "site",
+     -21.99759,
+     64.1593,
+     0.0
+    ],
+    [
+     "0e9c1d190094a752",
+     "Minjar í landi Ness við Seltjörn",
+     "site",
+     -21.99742,
+     64.15922,
+     0.0
+    ],
+    [
+     "6e3a2ec69a34941c",
+     "Minjar í landi Ness við Seltjörn",
+     "site",
+     -21.99744,
+     64.15927,
+     0.0
+    ]
+   ],
+   "water-far": [
+    [
+     "8588b5eb3339cdfe",
+     "Minjar í landi Ytri Hóls",
+     "site",
+     -17.87057,
+     66.3375,
+     7.4
+    ],
+    [
+     "e03e51bfc90937be",
+     "Minjar í landi Bakka",
+     "site",
+     -17.34734,
+     66.33732,
+     8.2
+    ],
+    [
+     "ee276a2f8071d74e",
+     "Álagahóll, Þerrihóll",
+     "site",
+     -20.89116,
+     65.82982,
+     9.5
+    ],
+    [
+     "4ad6bef6b9d350a7",
+     "Prettir",
+     "site",
+     -20.75751,
+     65.75949,
+     4.1
+    ],
+    [
+     "997fbde900ca280f",
+     "Minjar í landi Keflavíkur",
+     "site",
+     -21.24639,
+     65.5116,
+     2.1
+    ],
+    [
+     "c6910edac2ace59d",
+     "Minjar í landi Brunnastaða",
+     "site",
+     -22.32181,
+     64.13597,
+     5.7
+    ],
+    [
+     "f7b07c3b9ef82c69",
+     "Minjar í landi Hvassahrauns",
+     "site",
+     -22.14379,
+     64.10427,
+     3.2
+    ],
+    [
+     "e7020a0eefa03d20",
+     "Minjar í landi Sarps",
+     "site",
+     -22.59756,
+     64.46525,
+     11.7
+    ],
+    [
+     "effedb45cd3ce225",
+     "Minjar í landi Flateyjar",
+     "site",
+     -22.91636,
+     65.49199,
+     2.8
+    ],
+    [
+     "220aada26bc8aae8",
+     "Hákonarhóll, Hákonarhólar",
+     "site",
+     -23.96077,
+     64.55174,
+     9.6
+    ],
+    [
+     "22c3bc6979d2f089",
+     "Minjar í landi Skriðu",
+     "road",
+     -18.60609,
+     66.19784,
+     2.9
+    ],
+    [
+     "8ab65856e0ff9f1b",
+     "Norðursnös",
+     "site",
+     -27.02462,
+     65.43417,
+     144.2
+    ],
+    [
+     "c98b7d406e8b26a4",
+     "Minjar í landi Hergilseyjar",
+     "site",
+     -26.02285,
+     65.43427,
+     151.9
+    ],
+    [
+     "89812bd6796d6849",
+     "Minjar í landi Lambastaða",
+     "site",
+     -20.94402,
+     63.37769,
+     20.8
+    ],
+    [
+     "01350328d0d3c2e2",
+     "Minjar í landi Lambastaða",
+     "site",
+     -20.94429,
+     63.37763,
+     20.8
+    ]
+   ],
+   "outside-box": [
+    [
+     "d17ed9607ef94e32",
+     "Photographs from the archive of the IUO Italian Archaeological Mission to Upper ",
+     32.73378,
+     25.9718
+    ],
+    [
+     "8ab65856e0ff9f1b",
+     "Norðursnös",
+     -27.02462,
+     65.43417
+    ],
+    [
+     "c98b7d406e8b26a4",
+     "Minjar í landi Hergilseyjar",
+     -26.02285,
+     65.43427
+    ],
+    [
+     "e916d1ddae7949be",
+     "St. Peter/Edling - Kazaze",
+     46.77594,
+     46.84506
+    ],
+    [
+     "46e5af0521966fc4",
+     "Padankahva KM42118:1",
+     24.00682,
+     68.44624
+    ],
+    [
+     "fd247ad624360b0f",
+     "Digital Archive from Sabratha Excavations: The Kathleen Kenyon and John Ward-Per",
+     12.4816,
+     32.80706
+    ],
+    [
+     "33424b672c75a0e9",
+     "Digital Archive from Ghirza: A Libyan Settlement in the Roman Period, 1953-1984",
+     14.55466,
+     30.94809
+    ],
+    [
+     "109cfb599a83c423",
+     "Roman and Late Antique Artefacts from Egypt: Understanding Society and Culture",
+     30.0,
+     27.0
+    ],
+    [
+     "14569cde33e55cab",
+     "Church of Divino Espirito Santo (Vila Nova)",
+     -27.15549,
+     38.7811
+    ],
+    [
+     "b8e35b565966e227",
+     "Nuolenkärki KM41811:1",
+     22.02251,
+     68.53421
+    ],
+    [
+     "bcd7b499e7296a6c",
+     "Sao Lourenco Palace",
+     -16.9102,
+     32.6472
+    ]
+   ],
+   "wreck-on-land": [
+    [
+     "109cfb599a83c423",
+     "Roman and Late Antique Artefacts from Egypt: Understanding Society and Culture",
+     30.0,
+     27.0,
+     323.3
+    ]
+   ],
+   "stacked": [
+    [
+     [
+      21.28333,
+      46.65
+     ],
+     681
+    ],
+    [
+     [
+      20.33333,
+      46.41667
+     ],
+     611
+    ],
+    [
+     [
+      20.2608,
+      46.65834
+     ],
+     586
+    ],
+    [
+     [
+      21.1,
+      46.68333
+     ],
+     575
+    ],
+    [
+     [
+      20.14824,
+      46.253
+     ],
+     362
+    ],
+    [
+     [
+      16.59049,
+      47.68501
+     ],
+     348
+    ],
+    [
+     [
+      18.74148,
+      47.7928
+     ],
+     348
+    ],
+    [
+     [
+      21.62444,
+      47.53167
+     ],
+     315
+    ],
+    [
+     [
+      21.38333,
+      46.75
+     ],
+     299
+    ],
+    [
+     [
+      20.48333,
+      46.21667
+     ],
+     273
+    ]
+   ]
+  },
   "afontium": {
    "water-near": [
     [
@@ -4137,6 +4839,22 @@
       49.15972
      ],
      20
+    ]
+   ]
+  },
+  "latin1772": {
+   "outside-box": [
+    [
+     "c17717",
+     "Mikołaj Bp, Galaţi",
+     28.05494,
+     45.43382
+    ],
+    [
+     "c20569",
+     "Church, Ismail",
+     28.83581,
+     45.3507
     ]
    ]
   },

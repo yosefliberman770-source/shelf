@@ -1196,9 +1196,13 @@ def latin_church_1772():
 # Dates are Wikidata's own statements read at their recorded precision: an inception entered as "17th century" is a
 # 1601–1700 window, never the year 1600. A first written mention (P1249) is labelled as such, never as a founding.
 WD_EXTRA = (('church', 'church'), ('mosque', 'church'), ('synagogue', 'church'), ('hillfort', 'castle'),
-            ('caravanserai', 'building'), ('manor', 'building'), ('settlement_late', 'settlement'))
+            ('caravanserai', 'building'), ('manor', 'building'), ('settlement_late', 'settlement'),
+            ('lighthouse', 'lighthouse'), ('port', 'harbour'), ('canal', 'canal'), ('watermill', 'mill'), ('windmill', 'mill'),
+            ('mine', 'mine'), ('station', 'station'), ('bridge_late', 'bridge'))
 WD_EXTRA_TYPE = {'church': 'church', 'mosque': 'mosque', 'synagogue': 'synagogue', 'hillfort': 'hillfort',
-                 'caravanserai': 'caravanserai', 'manor': 'manor house', 'settlement_late': 'settlement'}
+                 'caravanserai': 'caravanserai', 'manor': 'manor house', 'settlement_late': 'settlement',
+                 'lighthouse': 'lighthouse', 'port': 'port', 'canal': 'canal', 'watermill': 'watermill', 'windmill': 'windmill',
+                 'mine': 'mine', 'station': 'railway station', 'bridge_late': 'bridge'}
 WD_OLD_KINDS = ('castle', 'monastery', 'cathedral', 'diocese', 'battle', 'siege', 'fortification', 'university', 'bridge', 'settlement')
 # Administrative units filed under "settlement" whose inception is the unit's creation (Sweden's and Finland's 1863
 # rural municipalities, Czech cadastral areas, Russian administrative divisions), not a settlement's beginning.
@@ -1310,6 +1314,8 @@ def wikidata_extra():
                 basis = 'first written mention (Wikidata)'
             elif kind == 'settlement':
                 basis = 'recorded start (Wikidata inception — may be a first record, not a founding)'
+            elif kind == 'station':
+                basis = 'opened (Wikidata inception)'
             else:
                 basis = 'founded or built (Wikidata inception)'
             if hi > lo:

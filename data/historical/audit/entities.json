@@ -1,17 +1,21 @@
 {
- "records": 417892,
- "entities": 405346,
- "recordsInMultiSourceEntities": 23046,
- "multiSourceEntities": 10500,
+ "records": 578351,
+ "entities": 562706,
+ "recordsInMultiSourceEntities": 29056,
+ "multiSourceEntities": 13411,
  "largestEntity": 31,
  "sourcePairs": [
+  [
+   "rohgis + wdextra",
+   2010
+  ],
   [
    "rohgis + wikidata",
    1437
   ],
   [
    "generalkarte + ottomannfs",
-   1127
+   1128
   ],
   [
    "ivillaris + mfairs",
@@ -27,7 +31,7 @@
   ],
   [
    "canmore + wikidata",
-   718
+   717
   ],
   [
    "buringh + pleiades",
@@ -82,6 +86,10 @@
    212
   ],
   [
+   "ariadne + transice",
+   212
+  ],
+  [
    "buringh + dissiloc",
    183
   ],
@@ -126,6 +134,10 @@
    116
   ],
   [
+   "nokm + wdextra",
+   114
+  ],
+  [
    "generalkarte + tib",
    114
   ],
@@ -143,37 +155,30 @@
   ],
   [
    "ivillaris + wikidata",
-   92
+   91
   ],
   [
-   "althurayya + pleiades",
-   72
+   "canmore + wdextra",
+   84
   ],
   [
-   "wbohemia + wikidata",
-   66
-  ],
-  [
-   "mfairs + wikidata",
-   62
-  ],
-  [
-   "pleiades + tib",
-   61
-  ],
-  [
-   "nsh + wikidata",
-   50
+   "generalkarte + wdextra",
+   79
   ]
  ],
  "sameDatasetNearDuplicates": {
-  "canmore": 6107,
-  "wikidata": 1545,
+  "wdextra": 617,
   "afontium": 4352,
+  "canmore": 6099,
+  "wikidata": 1545,
   "generalkarte": 163,
   "nid": 228452,
+  "dkff": 24746,
+  "r3verst": 790,
+  "arkas": 113,
   "hrreg": 19,
   "pleiades": 269,
+  "ariadne": 59606,
   "nokm": 32022,
   "merimee": 57,
   "dicotopo": 355,
@@ -182,10 +187,8 @@
   "buringh": 4,
   "germaniasacra": 330,
   "ivillaris": 498,
-  "dkff": 24746,
   "tib": 21,
   "ottomannfs": 295,
-  "r3verst": 790,
   "sirkd": 82,
   "lvmon": 2,
   "tyrolmine": 16,
@@ -200,6 +203,7 @@
   "raa": 6393,
   "irlsmr": 2,
   "bridges1250": 1,
+  "latin1772": 43,
   "ran": 69,
   "mfairs": 1,
   "darmc": 5

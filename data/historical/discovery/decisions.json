@@ -366,7 +366,7 @@
    "status": "integrated",
    "dataset": "ariadne",
    "region": "Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others",
-   "note": "Harvested per country (API: 50/page, 10,000/query; Hungary per municipality). Each phase keeps its own period; records without a point placed at their municipality. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack."
+   "note": "Harvested per country (API: 50/page, 10,000/query). Hungary, above the window, harvested by one text query per GeoNames municipality/town name (8,855 names in 3 resumable slices; completed 2026-10-01). Each phase keeps its own period; records without a point placed at their municipality only when the name is unique (2,638 left out). 63,354 dated records in the pack. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack."
   },
   {
    "title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (IHGK Lublin)",
@@ -419,9 +419,9 @@
    "match": [
     "10.5281/zenodo.17579442"
    ],
-   "status": "discovered",
+   "status": "evaluated",
    "region": "Bulgaria",
-   "note": "Queued: small single-pass area; not yet inspected."
+   "note": "Inspected 2026-10-01 (tgp.zip, CC BY 4.0, kept in the raw vault): 15 sites (inns, villages, a fortress) dated by century, several marked uncertain (?), plus an undated Ottoman road trace Ihtiman–Plovdiv. Too small to change any coverage cell; not integrated for now."
   }
  ]
 }
