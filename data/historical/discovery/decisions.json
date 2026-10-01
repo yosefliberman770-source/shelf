@@ -1452,6 +1452,38 @@
    "region": "France",
    "dataset": "france-mills-1794-1809",
    "note": "20,313 records (Licence Ouverte) → public spec france-mills: 19,614 mill records as snapshots of their survey (an II → 1794, an X → 1801, 1809, as the dataset dates them), at commune centroids (approximate); 699 without coordinates left out; mill names not indexed as places."
+  },
+  {
+   "title": "İslam Tarih Atlası / Atlas of Islamic History (v6.5.2)",
+   "match": [
+    "zenodo.19183845",
+    "10.5281/zenodo.19183845"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Middle East",
+   "note": "CC BY 4.0 web-app bundle (dynasties after Bosworth, al-Aʿlām scholars, Yāqūt's Muʿjam al-Buldān places). Not integrated: no per-record sources, narrative text and round population 'estimates' (Baghdad 800 = 1,000,000), coordinates rounded or automatically geocoded with self-assigned confidence — not verifiable to the temporal and spatial standard; al-Thurayya already covers the early Islamic places from a sourced gazetteer. Archive kept in the vault."
+  },
+  {
+   "title": "Sites archéologiques de la Lorraine médiévale (Nakala, ArkeoGIS export)",
+   "match": [
+    "nkl.db53j42l"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "France",
+   "note": "6 records, CC BY-NC-ND; too small. Other ArkeoGIS exports on Nakala found are prehistoric (Bronze Age swords, Iron Age burials)."
+  },
+  {
+   "title": "Historic Coastal Towns (Ireland, NMPF heritage assets)",
+   "match": [
+    "d92327c5-6687-43c2-abff-45b95e902d31",
+    "NMPF_7_3_Heritage_Assets"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "Ireland",
+   "note": "28 towns dated only by an origin class ('12-15th century Anglo-Norman'); no start or end years; towns already shown from other sources."
   }
  ]
 }
