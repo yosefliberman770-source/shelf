@@ -29,7 +29,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
   | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels'
-  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'wdextra' | 'lirelist' | SpecDatasetId;
+  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'wdextra' | 'lirelist' | 'gasid' | SpecDatasetId;
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -41,6 +41,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
   terrain: { name: 'Mapterhorn terrain (Copernicus GLO-30 and national elevation models; fallback: Mapzen/AWS Terrain Tiles)', url: 'https://mapterhorn.com/attribution', license: 'open data, see sources' },
   hydrosheds: { name: 'HydroRIVERS v1.0 (Lehner & Grill 2013, HydroSHEDS)', url: 'https://www.hydrosheds.org/products/hydrorivers', license: 'CC BY 4.0' },
+  gasid: { name: 'Mid-19th-century building structure locations in Galicia and Austrian Silesia (Kaim et al., Jagiellonian University; Second Military Survey)', url: 'https://doi.org/10.17632/md8jp9ny9z.2', license: 'CC BY 4.0' },
   lirelist: { name: 'LIST — Latin Inscriptions in Space and Time v1.2 (SDAM, Aarhus; from EDH and EDCS)', url: 'https://doi.org/10.5281/zenodo.10473706', license: 'CC BY 4.0' },
   canmore: { name: 'Canmore — National Record of the Historic Environment (Historic Environment Scotland)', url: 'https://www.trove.scot/', license: 'OGL v3' },
   irlsmr: { name: 'Archaeological Survey of Ireland, Sites and Monuments Record (National Monuments Service)', url: 'https://www.archaeology.ie/', license: 'CC BY 4.0' },
@@ -197,6 +198,7 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'historical-units': (c) => ({ ...pmtiles(c, 'historical-units.pmtiles', 'halcareas' as DatasetId, 10), attribution: ((Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('historical-units')) as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch', ...(Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('roads-cassini'))] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
+  'building-density': (c) => pmtiles(c, 'building-density.pmtiles', 'gasid', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),
   'gs-dioceses': (c) => pmtiles(c, 'gs-dioceses.pmtiles', 'germaniasacra', 9),
   'hced-battles': (c) => ({ type: 'geojson', data: c.base + 'hced-battles.json', attribution: credit('hced') }),
@@ -558,6 +560,22 @@ export const LAYERS: AtlasLayerDef[] = [
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, ['interpolate', ['linear'], n, 1, 1.2, 50, 3], 9, ['interpolate', ['linear'], n, 1, 2.5, 50, 6]] as ExpressionSpecification,
           'circle-color': '#6d6875', 'circle-opacity': 0.75, 'circle-stroke-color': C.halo, 'circle-stroke-width': 0.6 } },
         { id: 'inscriptions-label', type: 'symbol', source: 'inscriptions', 'source-layer': 'findspots', filter, minzoom: 8, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': '#55505c', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+      ];
+    },
+  },
+  {
+    id: 'building-density', group: 'places', label: 'Buildings on dated survey maps (Galicia and Austrian Silesia, 1837–1864)', datasets: ['gasid'], defaultOn: true, coverage: [1837, 1864],
+    hint: 'How densely built the land was, from every house and farm building drawn on the Austrian Second Military Survey (1.3 million buildings, digitised by Kaim et al.), counted per square of about 1 km. Each square is shown only in the years its map sheet was surveyed (Austrian Silesia 1837–1841, Galicia 1861–1864); buildings on sheets without a date are left out.',
+    sources: ['building-density'],
+    specs: (c) => {
+      const filter = ['all', ['<=', ['get', 'ef'], c.year], ['>=', ['get', 'et'], c.year]] as FilterSpecification;
+      return [
+        { id: 'bdens-heat', type: 'heatmap', source: 'building-density', 'source-layer': 'cells', filter, maxzoom: 11, paint: {
+          'heatmap-weight': ['interpolate', ['linear'], ['get', 'c'], 0, 0, 200, 1] as ExpressionSpecification,
+          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 5, 0.6, 10, 1.6] as ExpressionSpecification,
+          'heatmap-radius': ['interpolate', ['exponential', 2], ['zoom'], 5, 3, 10, 40] as ExpressionSpecification,
+          'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(160,82,45,0)', 0.2, 'rgba(190,120,70,0.35)', 0.6, 'rgba(160,82,45,0.6)', 1, 'rgba(110,50,25,0.8)'] as ExpressionSpecification,
+          'heatmap-opacity': 0.8 } },
       ];
     },
   },
@@ -1102,6 +1120,6 @@ const LABEL_PRIORITY: Record<string, number> = {
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'historical-units', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'building-density', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

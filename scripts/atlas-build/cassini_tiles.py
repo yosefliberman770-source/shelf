@@ -52,3 +52,44 @@ def build_inscriptions(tiles_dir):
     t = tiler.build(os.path.join(tiles_dir, 'inscriptions.pmtiles'), 'findspots', feats, 10, 'Find-spots of dated Latin inscriptions',
                     'LIST v1.2 — Latin Inscriptions in Space and Time (Kaše, Heřmánková, Sobotková; SDAM Aarhus), from EDH and EDCS, CC BY 4.0')
     return {**t, 'inscriptions': stats}
+
+
+GALICIA = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'historical', 'raw', 'galicia-buildings')
+CELL = 0.01  # degrees (about 1.1 km north–south, 0.7 km east–west at 50° N)
+
+
+def build_building_density(tiles_dir):
+    """Buildings drawn on the Second Military Survey of Galicia and Austrian Silesia (Kaim et al., Mendeley Data, CC BY 4.0;
+    1.3 M points), counted per 0.01° cell and per survey-sheet years (each building carries the years of its map sheet,
+    1837–1864). A cell is shown over those survey years only; buildings whose sheet gives no date are left out."""
+    import shapefile
+    from collections import Counter
+    base = os.path.join(GALICIA, 'derived', 'buildings_GASID')
+    if not os.path.exists(base + '.shp'):  # the published 7z, unpacked once into derived/
+        import subprocess
+        import sys
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(__file__), '..', 'historical-data', 'galicia_extract.py')], check=True)
+    from pyproj import CRS, Transformer
+    r = shapefile.Reader(base)
+    tr = Transformer.from_crs(CRS.from_wkt(open(base + '.prj').read()), 'EPSG:4326', always_xy=True)
+    cells, homes, undated = Counter(), Counter(), 0
+    for i, rec in enumerate(r.iterRecords(fields=['type', 'Year1', 'Year2'])):
+        y1, y2 = int(rec[1] or 0), int(rec[2] or 0)
+        if not y1:
+            undated += 1
+            continue
+        x, y = r.shape(i).points[0]
+        lon, lat = tr.transform(x, y)
+        key = (round(lon / CELL), round(lat / CELL), y1, y2 or y1)
+        cells[key] += 1
+        if str(rec[0]) == '1':  # 1 = residential, 2 = outbuilding (map legend)
+            homes[key] += 1
+    feats = []
+    for (cx, cy, y1, y2), n in cells.items():
+        p = {'i': f'gasid:{cx}:{cy}:{y1}', 'src': 'gasid', 'c': n, 'h': homes[(cx, cy, y1, y2)], 'ef': y1, 'et': y2,
+             'per': f'Second Military Survey sheet, surveyed {y1}' + (f'–{y2}' if y2 != y1 else '')}
+        feats.append(({'type': 'Point', 'coordinates': [round(cx * CELL, 4), round(cy * CELL, 4)]}, p, 5))
+    t = tiler.build(os.path.join(tiles_dir, 'building-density.pmtiles'), 'cells', feats, 10, 'Buildings on dated survey maps',
+                    'Kaim et al., Mid-19th-century building structure locations in Galicia and Austrian Silesia (Mendeley Data, CC BY 4.0)')
+    t['undatedLeftOut'] = undated
+    return t

@@ -1583,5 +1583,20 @@
     "note": "Zenodo record 5849856 file"
    }
   ]
+ },
+ {
+  "id": "galicia-buildings",
+  "url": "https://doi.org/10.17632/md8jp9ny9z.2",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/Galicia_and_Austrian_Silesia_Buildings_v1.7z",
+    "note": "1,327,466 building points (type 1 residential / 2 outbuilding; Year1–Year2 = survey years of the map sheet)"
+   },
+   {
+    "path": "original/uncertainty_metadata.7z",
+    "note": "99 district polygons with census population (1857/1869) and map dates"
+   }
+  ]
  }
 ]

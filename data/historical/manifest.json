@@ -773,6 +773,20 @@
   "sha256": "ee40023a141f9721fbfab85bed429692a78bf661d10dc141c53399f8130ac73d",
   "downloaded": "2026-10-01"
  },
+ "galicia-buildings/original/Galicia_and_Austrian_Silesia_Buildings_v1.7z": {
+  "url": "https://data.mendeley.com/public-files/datasets/md8jp9ny9z/files/c398bd7c-958a-49bf-a20a-90293baf81fe/file_downloaded",
+  "bytes": 16833385,
+  "sha256": "d37f6016f06fc010da0cf727bb7791cce036953f5f00d98cf7860678628c6693",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "galicia-buildings/original/uncertainty_metadata.7z": {
+  "url": "https://data.mendeley.com/public-files/datasets/md8jp9ny9z/files/cd076b07-d952-4ffb-a997-d2a109f0e457/file_downloaded",
+  "bytes": 2722226,
+  "sha256": "50f6a5d705c2b7394e3acb6c21364c88951898a9511175ca342efadae618498e",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
  "generalkarte-gazetteer/original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv": {
   "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
   "bytes": 1635015,

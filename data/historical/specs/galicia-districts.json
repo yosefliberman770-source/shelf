@@ -1,0 +1,38 @@
+{
+ "id": "galicia-districts",
+ "src": "gasidd",
+ "public": true,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Districts of Galicia and Austrian Silesia with their census population, 1857 and 1869 (Kaim et al., uncertainty layer of the GASID building dataset; Mendeley Data)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.17632/md8jp9ny9z.2",
+ "describe": "The 99 districts (Bezirke) of Galicia and Austrian Silesia as delimited in the GASID dataset, each with the population of the Austrian census the dataset gives for it (1857 for Austrian Silesia, 1869 for Galicia), shown around that census year.",
+ "layers": [
+  "historical-units"
+ ],
+ "read": {
+  "path": "galicia-buildings/derived/uncertainy_metadata.shp",
+  "derive": "scripts/historical-data/galicia_extract.py"
+ },
+ "dissolve": [
+  {
+   "field": [
+    "District"
+   ],
+   "level": "district",
+   "minzoom": 6,
+   "simplify": 0.001,
+   "note": {
+    "field": "M_and_W",
+    "label": "inhabitants"
+   }
+  }
+ ],
+ "dating": {
+  "mode": "fields",
+  "field": "cens_date",
+  "snapshot": true,
+  "label": "Austrian census"
+ }
+}

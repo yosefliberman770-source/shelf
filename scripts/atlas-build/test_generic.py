@@ -120,6 +120,22 @@ class Areas(unittest.TestCase):
         self.assertNotIn(('parish', 'p3'), got)  # no date of its own: not drawn
         self.assertEqual(len([k for k in got if k[0] == 'hundred']), 1)  # same-named hundred in county B has no dated parish
 
+    def test_census_units_are_snapshots_with_their_figure(self):
+        import json
+        import tempfile
+        sq = lambda x0: {'type': 'Polygon', 'coordinates': [[[x0, 50], [x0 + 1, 50], [x0 + 1, 51], [x0, 51], [x0, 50]]]}  # noqa: E731
+        fc = {'type': 'FeatureCollection', 'features': [
+            {'type': 'Feature', 'geometry': sq(0), 'properties': {'D': 'Biala', 'Y': '1869', 'N': 81664.0}},
+            {'type': 'Feature', 'geometry': sq(1), 'properties': {'D': 'Teschen', 'Y': '1857', 'N': None}}]}
+        with tempfile.TemporaryDirectory() as d:
+            json.dump(fc, open(os.path.join(d, 'u.geojson'), 'w'))
+            spec = {'src': 't', 'read': {'path': os.path.join(d, 'u.geojson')}, 'dating': {'mode': 'fields', 'field': 'Y', 'snapshot': True, 'label': 'census'},
+                    'dissolve': [{'field': 'D', 'level': 'district', 'note': {'field': 'N', 'label': 'inhabitants'}}]}
+            out = {p['n']: p for _, p, _ in generic.area_features(spec)}
+        self.assertEqual((out['Biala']['ef'], out['Biala']['et'], out['Biala']['sn']), (1869, 1869, 1))
+        self.assertEqual(out['Biala']['per'], 'census 1869; 81,664 inhabitants')
+        self.assertEqual(out['Teschen']['per'], 'census 1857')  # no figure given: none invented
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -601,6 +601,8 @@ def build(rows_only=False):
     stats['cassiniRoads'] = build_cassini_roads(TILES)
     from cassini_tiles import build_spec_areas
     stats['specAreas'] = build_spec_areas(TILES, os.path.join(PRIVATE_BUILD, 'tiles'))
+    from cassini_tiles import build_building_density
+    stats['buildingDensity'] = build_building_density(TILES)
     from cassini_tiles import build_inscriptions
     stats['inscriptions'] = build_inscriptions(TILES)
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',

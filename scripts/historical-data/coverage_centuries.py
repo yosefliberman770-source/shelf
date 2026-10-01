@@ -400,6 +400,18 @@ def measure(at, place_dirs):
     if os.path.exists(hu):
         for p, lon, lat in tile_features(hu, 8):
             cells.add(at(lon, lat), 'Political', p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'), pt=(lon, lat))
+            if p.get('src') == 'gasidd':  # districts with their census population
+                cells.add(at(lon, lat), 'Population', p.get('ef'), p.get('et'), 'exact', 'gasidd', pt=(lon, lat))
+    # Buildings on dated survey sheets (density cells of ~1 km): one settlement-equivalent per 0.05° square (~20 km²) with
+    # mapped houses — about the density of villages there (Galicia: c. 6,000 communes on 80,000 km²), not one per building.
+    bd = os.path.join(PUB, 'world', 'tiles', 'building-density.pmtiles')
+    if os.path.exists(bd):
+        seen = set()
+        for p, lon, lat in tile_features(bd, 10):
+            key = (round(lon / 0.05), round(lat / 0.05), p.get('ef'), p.get('et'))
+            if p.get('h') and key not in seen:
+                seen.add(key)
+                cells.add(at(lon, lat), 'Settlements', p.get('ef'), p.get('et'), 'exact', 'gasid', pt=(lon, lat))
 
     for line in open(os.path.join(CACHE, 'itinere.ndjson'), encoding='utf-8'):
         f = json.loads(line)

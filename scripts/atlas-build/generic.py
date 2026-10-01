@@ -739,7 +739,7 @@ def area_features(spec):
         names = sp.get('names') or {}
         for lv in sp.get('dissolve') or []:
             fields = lv['field'] if isinstance(lv['field'], list) else [lv['field']]  # a list: units keyed by several fields (county + hundred)
-            groups, labels, spans = {}, {}, {}
+            groups, labels, spans, notes = {}, {}, {}, {}
             for p in rows:
                 g = p.get('__geom')
                 if not g or any(p.get(x) in (None, '') for x in fields):
@@ -748,6 +748,9 @@ def area_features(spec):
                 v = '|'.join(str(p.get(x)).split(';')[0].strip() for x in fields)
                 groups.setdefault(v, []).append(shape(g).buffer(0))
                 labels.setdefault(v, str(p.get(lv.get('nameField', fields[-1]))).split(';')[0].strip())
+                if lv.get('note') and _val(p.get(lv['note']['field'])) is not None:  # a figure the source gives for the unit ("81,664 inhabitants")
+                    nv = p[lv['note']['field']]
+                    notes.setdefault(v, f"{int(float(nv)):,}" if re.fullmatch(r'\d+(\.0+)?', str(nv).strip()) else str(nv).strip())
                 if date is None:
                     if dt.get('from'):  # separate start / end fields ("0725/01/01", "1794/12/31")
                         a_, b_ = parse_dating(p.get(dt['from'])), parse_dating(p.get(dt.get('to')))
@@ -763,10 +766,12 @@ def area_features(spec):
                 u = unary_union(geoms).simplify(lv.get('simplify', 0.0005), preserve_topology=True)
                 if u.is_empty:
                     continue
-                d_ = date or {'ef': spans[v][0], 'et': spans[v][1]}
+                d_ = date or {'ef': spans[v][0], 'et': spans[v][1], **({'sn': 1} if dt.get('snapshot') and spans[v][0] == spans[v][1] else {})}
                 key = '|'.join(fields)
                 lab = labels[v] if len(fields) > 1 or lv.get('nameField') else v
                 per = dt.get('label', '') if date else f"{dt.get('label', 'surveyed')} {d_['ef']}–{d_['et']}" if d_['ef'] != d_['et'] else f"{dt.get('label', 'surveyed')} {d_['ef']}"
+                if v in notes:
+                    per = f"{per}; {notes[v]} {lv['note'].get('label', '')}".strip()
                 out.append((mapping(u), {'i': f"{spec['src']}:{key}:{v}" + (f':{k}' if k else ''), 'n': names.get(fields[0] if len(fields) == 1 else key, {}).get(lab, lab)[:60],
                                          'lv': lv['level'], 'src': spec['src'], 'per': per[:80], **d_}, lv.get('minzoom', 4)))
     return out
