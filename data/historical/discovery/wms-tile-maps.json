@@ -1,0 +1,11 @@
+{
+ "_comment": "Georeferenced historical maps served by a WMS that draws only when zoomed in: added to public/world/maps/georef-index.json as tiled layers by scripts/historical-data/discover/wms_tile_maps.py. Years are the publisher's own dating of each layer.",
+ "maps": [
+  {"id": "vlaanderen-lgbrk1778", "title": "Land use of Flanders on the Ferraris map (digitised land-use classes, layer dated 1778)", "year": 1778, "yearTo": 1778,
+   "bbox": [2.54, 50.68, 5.92, 51.51], "wms": "https://geo.api.vlaanderen.be/INBO/wms", "layer": "Lgbrk1778", "style": "default", "minzoom": 14,
+   "holder": "Digitaal Vlaanderen / INBO (Modellicentie gratis hergebruik)", "page": "https://metadata.vlaanderen.be/srv/dut/catalog.search#/metadata/0de23940-8af2-4014-aa9a-6a3d207d7038"},
+  {"id": "vlaanderen-lgbrk1873", "title": "Land use of Flanders on the Dépôt de la Guerre topographic map (digitised land-use classes, 1873)", "year": 1873, "yearTo": 1873,
+   "bbox": [2.54, 50.68, 5.92, 51.51], "wms": "https://geo.api.vlaanderen.be/INBO/wms", "layer": "Lgbrk1873", "style": "default", "minzoom": 14,
+   "holder": "Digitaal Vlaanderen / INBO (Modellicentie gratis hergebruik)", "page": "https://metadata.vlaanderen.be/srv/dut/catalog.search#/metadata/0de23940-8af2-4014-aa9a-6a3d207d7038"}
+ ]
+}

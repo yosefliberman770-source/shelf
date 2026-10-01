@@ -48,7 +48,7 @@ export interface HistMap {
   /** A georeferenced layer served by its library's WMS (already placed on the earth by the library). */
   wms?: { url: string; layer: string; bbox: [number, number, number, number] };
   /** A georeferenced scan served as Web Mercator tiles by its publisher ({z}/{y}/{x} template), streamed from there. */
-  xyz?: { url: string; bbox: [number, number, number, number] };
+  xyz?: { url: string; bbox: [number, number, number, number]; /** The server draws it only from this zoom in. */ minzoom?: number };
 }
 
 /** What the image server says about the scan itself (IIIF info.json). */
@@ -177,18 +177,21 @@ export function xyzTile(x: NonNullable<HistMap['xyz']>, extraZoom = 0): string {
   const [x0, y0] = merc([west, south]);
   const [x1, y1] = merc([east, north]);
   const world = 2 * Math.PI * 6378137;
-  const z = Math.max(0, Math.min(19, Math.floor(Math.log2(world / Math.max(x1 - x0, y1 - y0, 1))) + extraZoom));
+  const z = Math.max(x.minzoom ?? 0, Math.min(19, Math.floor(Math.log2(world / Math.max(x1 - x0, y1 - y0, 1))) + extraZoom));
   const n = 2 ** z;
   // the box's centre in Web Mercator metres → tile column and row (rows count down from the top)
   const tx = Math.floor(((x0 + x1) / 2 / world + 0.5) * n);
   const ty = Math.floor((0.5 - (y0 + y1) / 2 / world) * n);
-  return x.url.replace('{z}', String(z)).replace('{y}', String(ty)).replace('{x}', String(tx));
+  // a WMS served tile by tile ({bbox-epsg-3857}, as MapLibre fills it in)
+  const size = world / n;
+  const tb = [tx * size - world / 2, world / 2 - (ty + 1) * size, (tx + 1) * size - world / 2, world / 2 - ty * size].map((v) => v.toFixed(2)).join(',');
+  return x.url.replace('{z}', String(z)).replace('{y}', String(ty)).replace('{x}', String(tx)).replace('{bbox-epsg-3857}', tb);
 }
 export function wmsOverlay(m: HistMap): Overlay | undefined {
   if (m.xyz) {
     const [west, south, east, north] = m.xyz.bbox;
-    return { url: xyzTile(m.xyz), tiles: m.xyz.url, coordinates: [[west, north], [east, north], [east, south], [west, south]], errorKm: NaN, extentKm: bboxKm(m.xyz.bbox), points: 0,
-      note: `Georeferenced by ${m.holder || 'its publisher'} and streamed from the publisher’s tile server within the map’s stated extent. The publisher does not state its error, so check it against coastlines, roads and field boundaries.` };
+    return { url: xyzTile(m.xyz), tiles: m.xyz.url, minzoom: m.xyz.minzoom, coordinates: [[west, north], [east, north], [east, south], [west, south]], errorKm: NaN, extentKm: bboxKm(m.xyz.bbox), points: 0,
+      note: `Georeferenced by ${m.holder || 'its publisher'} and streamed from the publisher’s tile server within the map’s stated extent.${m.xyz.minzoom ? ` Its server draws it only close up: zoom in to street level (zoom ${m.xyz.minzoom}) to see it.` : ''} The publisher does not state its error, so check it against coastlines, roads and field boundaries.` };
   }
   if (!m.wms) return undefined;
   const { url, coordinates } = wmsImage(m.wms);
@@ -207,9 +210,9 @@ export async function searchGisIndex(bbox: [number, number, number, number], fro
     .sort((a, b) => a.km - b.km)
     .slice(0, 20)
     .map(({ r: [id, title, y0, y1, b, url, layer, holder, page] }) => {
-      if (layer === 'xyz') {
-        // a tiled scan (Web Mercator tiles from its publisher)
-        const xyz = { url, bbox: b };
+      if (layer === 'xyz' || layer.startsWith('xyz:')) {
+        // a tiled scan (Web Mercator tiles from its publisher); 'xyz:12' = drawn by the server only from zoom 12
+        const xyz = { url, bbox: b, ...(layer.startsWith('xyz:') ? { minzoom: Number(layer.slice(4)) } : {}) };
         return {
           id: `gis:${id}`, title, date: yearFrom(y0 === y1 ? String(y0) : `${y0}–${y1}`), subjects: [], collection: 'gis' as const, holder: holder || COLLECTION.gis.name,
           thumb: xyzTile(xyz), page, rights: `Image © ${holder || 'its publisher'}; streamed from the publisher’s public tile service`, xyz,
@@ -271,7 +274,7 @@ function solve(A: number[][], b: number[]): number[] | undefined {
   return M.map((row, i) => row[n] / row[i]);
 }
 
-export interface Overlay { url: string; /** Tile URL template: drawn as a tiled layer within `coordinates` instead of one image. */ tiles?: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; extentKm: number; points: number; note: string }
+export interface Overlay { url: string; /** Tile URL template: drawn as a tiled layer within `coordinates` instead of one image. */ tiles?: string; minzoom?: number; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; extentKm: number; points: number; note: string }
 /** Why a georeferenced map can't be laid over the map (too few points, or too distorted for a simple fit). */
 export type OverlayResult = { ok: true; overlay: Overlay } | { ok: false; reason: string };
 

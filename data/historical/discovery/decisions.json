@@ -1518,6 +1518,18 @@
    "state": "insufficient-temporal",
    "region": "England",
    "note": "1,479 churches with 'Founded: Medieval' only; no years. Churches already shown from Historic England / Wikidata."
+  },
+  {
+   "title": "Digitisation of historical land use and land use changes in Flanders (1778-2022)",
+   "match": [
+    "d81789eb-f1ee-421d-ba60-92bc6247c016",
+    "0de23940-8af2-4014-aa9a-6a3d207d7038",
+    "HistLandgebruik"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "Free-reuse licence (Modellicentie gratis hergebruik). The 1778 (Ferraris) and 1873 land-use layers added to the original-maps index as tiled WMS overlays (the INBO WMS draws only from about zoom 14); the vector data (WFS/OGC API) is not downloaded this cycle — a land-cover polygon layer is a candidate for later."
   }
  ]
 }
