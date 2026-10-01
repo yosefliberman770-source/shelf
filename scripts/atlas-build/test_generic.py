@@ -99,6 +99,21 @@ class NewOptions(unittest.TestCase):
         self.assertFalse(generic._is_wgs84_degrees('EPSG:32635'))
         self.assertFalse(generic._is_wgs84_degrees('EPSG:3857'))
 
+    def test_century_midpoint_years_become_the_century(self):
+        import json
+        import tempfile
+        fc = {'type': 'FeatureCollection', 'features': [
+            {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [39.7, 54.6]}, 'properties': {'id': 'a', 'n': 'A', 's': 1350, 'e': ' '}},
+            {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [39.7, 54.6]}, 'properties': {'id': 'b', 'n': 'B', 's': 1467, 'e': 1764}}]}
+        with tempfile.TemporaryDirectory() as d:
+            json.dump(fc, open(os.path.join(d, 'm.geojson'), 'w'))
+            spec = {'src': 't', 'read': {'path': os.path.join(d, 'm.geojson')}, 'fields': {'id': 'id', 'name': 'n', 'kind': 'monastery'},
+                    'dating': {'mode': 'fields', 'from': 's', 'to': 'e', 'openValues': [' '], 'midCenturyAsCentury': True}}
+            out = {r['id']: r for r in generic.records(spec)[0]}
+        self.assertEqual(out['a']['env'], (1301, None))  # the 14th century, end left open
+        self.assertIn('century midpoint', out['a']['per'])
+        self.assertEqual(out['b']['env'], (1467, 1764))  # an ordinary year stays as given
+
 
 class Areas(unittest.TestCase):
     def test_units_dated_by_their_own_survey_years(self):

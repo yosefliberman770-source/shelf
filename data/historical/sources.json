@@ -1627,5 +1627,16 @@
     "note": "snapshot of layer 7 (provincemax) via fetch_arcgis.py"
    }
   ]
+ },
+ {
+  "id": "orthodox-monasteries",
+  "arcgis": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Orthodox_monasteries/FeatureServer/0",
+  "licence": "none stated (ArcGIS item has no licence text) — private pack",
+  "files": [
+   {
+    "path": "original/monasteries.geojson",
+    "note": "snapshot via fetch_arcgis.py (512 records)"
+   }
+  ]
  }
 ]

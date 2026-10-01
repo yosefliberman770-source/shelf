@@ -1,0 +1,50 @@
+{
+ "id": "orthodox-monasteries",
+ "src": "orthmon",
+ "public": false,
+ "enabled": true,
+ "title": "Orthodox monasteries and hermitages of Russia, Ukraine and Belarus with founding and closing years (Harvard CGA ArcGIS layer)",
+ "licence": "none stated on the ArcGIS layer — private pack",
+ "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Orthodox_monasteries/FeatureServer/0",
+ "describe": "Monasteries and hermitages (pustyni) with the founding year the dataset gives and, where it gives one, the year of closure (e.g. the 1764 secularisation); without a closing year the end is left open. Years given as a century midpoint (1350, 1450…) are shown as that whole century; records without a founding year are left out.",
+ "layers": [
+  "religious-houses"
+ ],
+ "read": {
+  "path": "orthodox-monasteries/original/monasteries.geojson",
+  "pointFields": [
+   "long",
+   "lat"
+  ]
+ },
+ "fields": {
+  "id": "mntrID",
+  "name": "name_eng",
+  "type": [
+   "type",
+   "gender",
+   "status_mdr"
+  ],
+  "context": [
+   "near_town",
+   "province"
+  ],
+  "kind": "monastery",
+  "altNames": {
+   "field": "name_src",
+   "sep": "\\|"
+  }
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "yr_start",
+  "to": "yr_end",
+  "openValues": [
+   " ",
+   ""
+  ],
+  "midCenturyAsCentury": true,
+  "dropUndated": true
+ },
+ "datingLabel": "founding (and closing) year in the dataset"
+}

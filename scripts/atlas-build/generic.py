@@ -561,6 +561,10 @@ def records(spec):
                     if 1 <= n <= 20:
                         pa = (*_century_window(n, False), 'century')
                         a = f'{n}th century'
+                if dt.get('midCenturyAsCentury') and pa and pa[0] == pa[1] and pa[0] % 100 == 50:
+                    # "1350" in a source that encodes "14th century" as its midpoint: the century, not that year
+                    pa = (*_century_window(pa[0] // 100 + 1, False), 'century')
+                    a = f'{a} (a century midpoint: {pa[0]}–{pa[1]})'
                 raw_label = ' – '.join([str(a)] if a not in (None, '') else []) + (' – (end unknown or continuing)' if b_open else f' – {b}' if b not in (None, '') else '')
                 uncertain = '?' in raw_label
                 lo = pa[0] if pa else None

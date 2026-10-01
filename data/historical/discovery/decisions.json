@@ -1429,6 +1429,17 @@
    "region": "Europe",
    "dataset": "dioceses-dorin",
    "note": "R. Dorin (gen. ed.), CC BY 3.0. The atlas' own time slices (c. 1250, 1350, 1450; 665–705 dioceses and 77–84 provinces each) → public spec dioceses-dorin, layer medieval-dioceses, each a snapshot of its year. The 'max' layers' StartDate/EndDate use 999/1501 as markers for 'before/after the atlas period', so they are kept in the vault but not used for dating."
+  },
+  {
+   "title": "Orthodox monasteries (Harvard CGA ArcGIS)",
+   "match": [
+    "Orthodox_monasteries"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Russia, Ukraine, Belarus",
+   "dataset": "orthodox-monasteries",
+   "note": "512 monasteries and hermitages; no licence on the item → private spec orthodox-monasteries. 440 shown from their founding year to their closing year (open end when none); 56 founding years that are century midpoints (1350, 1450…) shown as the whole century; 46 without a founding year and 26 without coordinates left out."
   }
  ]
 }

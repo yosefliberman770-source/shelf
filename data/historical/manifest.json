@@ -1369,6 +1369,12 @@
   "sha256": "0a27bf4ddb364bab1f0a3dc6acac6995b715e6ecc44ce6b38fac8c8feafd2e65",
   "downloaded": "2026-10-01"
  },
+ "orthodox-monasteries/original/monasteries.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Orthodox_monasteries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 578750,
+  "sha256": "68ec7bbe836e2865fd46a3ea2606ed26bd309cdb6061cdc33078ef956d3e365c",
+  "downloaded": "2026-10-01"
+ },
  "ottoman-nfs-gazetteer/original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx": {
   "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",
   "bytes": 1721742,
