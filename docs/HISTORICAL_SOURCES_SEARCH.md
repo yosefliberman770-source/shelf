@@ -880,30 +880,30 @@ the same dataset is about as close under the same name. Nothing is hand-paired; 
 
 Built by `scripts/atlas-build/entities.py` into `public/world/entities/` (and, when the private pack is built, a full build into it); read by `src/atlas/entities.ts`, shown in the place panel ("Same place in other datasets"), audit in `data/historical/audit/entities.json`.
 
-**Public.** 330,065 records; 7,260 places described by more than one dataset (15,299 records, the largest joining 5). Claims: 9,030 joined, 485 held back as ambiguous, 136 refused (would have made two records of one dataset one place).
+**Public.** 339,530 records; 7,346 places described by more than one dataset (15,520 records, the largest joining 5). Claims: 9,179 joined, 514 held back as ambiguous, 143 refused (would have made two records of one dataset one place).
 
 | Claim basis and outcome | Claims |
 | --- | --- |
 | id joined | 354 |
 | id refused | 1 |
-| name ambiguous | 485 |
-| name joined | 8676 |
-| name refused | 135 |
+| name ambiguous | 514 |
+| name joined | 8825 |
+| name refused | 142 |
 
 | Dataset pair | Shared places |
 | --- | --- |
 | rohgis + wikidata | 1390 |
 | generalkarte + ottomannfs | 1116 |
-| hre + viabundus | 926 |
+| hre + viabundus | 925 |
 | canmore + wikidata | 707 |
 | buringh + pleiades | 512 |
 | pleiades + wikidata | 304 |
 | viabundus + wikidata | 294 |
-| buringh + viabundus | 280 |
 | germaniasacra + wikidata | 280 |
+| buringh + viabundus | 279 |
 | buringh + hre | 272 |
 | generalkarte + rohgis | 253 |
-| hre + wikidata | 230 |
+| hre + wikidata | 231 |
 | buringh + cassini | 212 |
 | buringh + dissiloc | 175 |
 | cassini + dissiloc | 168 |
@@ -914,9 +914,9 @@ Built by `scripts/atlas-build/entities.py` into `public/world/entities/` (and, w
 | generalkarte + pleiades | 121 |
 | ivillaris + wikidata | 88 |
 | buringh + ivillaris | 88 |
+| althurayya + pleiades | 78 |
 | buringh + wikidata | 77 |
-| althurayya + pleiades | 71 |
-| nsh + wikidata | 50 |
+| pleiades + viatariq | 54 |
 
 Label chosen for a year (rule in `label_at()` / `labelAt()`):
 

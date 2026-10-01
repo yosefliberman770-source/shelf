@@ -1,21 +1,21 @@
 {
  "label": "public",
- "records": 330065,
- "entitiesWithFiles": 7866,
- "multiSourceEntities": 7260,
- "recordsInMultiSourceEntities": 15299,
+ "records": 339530,
+ "entitiesWithFiles": 7979,
+ "multiSourceEntities": 7346,
+ "recordsInMultiSourceEntities": 15520,
  "largestEntity": 5,
  "claims": {
-  "joined": 9030,
-  "refused": 136,
-  "ambiguous": 485
+  "joined": 9179,
+  "refused": 143,
+  "ambiguous": 514
  },
  "claimsByBasis": {
   "id joined": 354,
   "id refused": 1,
-  "name ambiguous": 485,
-  "name joined": 8676,
-  "name refused": 135
+  "name ambiguous": 514,
+  "name joined": 8825,
+  "name refused": 142
  },
  "sourcePairs": [
   [
@@ -28,7 +28,7 @@
   ],
   [
    "hre + viabundus",
-   926
+   925
   ],
   [
    "canmore + wikidata",
@@ -47,12 +47,12 @@
    294
   ],
   [
-   "buringh + viabundus",
+   "germaniasacra + wikidata",
    280
   ],
   [
-   "germaniasacra + wikidata",
-   280
+   "buringh + viabundus",
+   279
   ],
   [
    "buringh + hre",
@@ -64,7 +64,7 @@
   ],
   [
    "hre + wikidata",
-   230
+   231
   ],
   [
    "buringh + cassini",
@@ -107,12 +107,16 @@
    88
   ],
   [
+   "althurayya + pleiades",
+   78
+  ],
+  [
    "buringh + wikidata",
    77
   ],
   [
-   "althurayya + pleiades",
-   71
+   "pleiades + viatariq",
+   54
   ],
   [
    "nsh + wikidata",
@@ -129,6 +133,14 @@
   [
    "hre + pleiades",
    42
+  ],
+  [
+   "althurayya + viatariq",
+   41
+  ],
+  [
+   "hre + latinchurch",
+   39
   ],
   [
    "generalkarte + wikidata",
@@ -165,18 +177,6 @@
   [
    "sirkd + wikidata",
    24
-  ],
-  [
-   "nsh + transice",
-   23
-  ],
-  [
-   "nsh + swegeo",
-   22
-  ],
-  [
-   "ottomannfs + wikidata",
-   20
   ]
  ],
  "refusedBetween": [
@@ -202,7 +202,7 @@
   ],
   [
    "hre, viabundus",
-   6
+   7
   ],
   [
    "dissiloc, pleiades",
@@ -233,6 +233,10 @@
    3
   ],
   [
+   "pleiades, viatariq",
+   2
+  ],
+  [
    "nsh, swegeo",
    2
   ],
@@ -254,10 +258,6 @@
   ],
   [
    "hre, wikidata",
-   2
-  ],
-  [
-   "buringh, wikidata",
    2
   ]
  ],
