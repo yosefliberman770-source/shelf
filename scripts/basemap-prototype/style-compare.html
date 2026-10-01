@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="maplibre-gl.css"><script src="maplibre-gl.js"></script><script src="pmtiles.js"></script>
+<style>html,body,#m{margin:0;height:100%}</style></head><body><div id="m"></div><script>
+const q = new URLSearchParams(location.search), mode = q.get('style') || 'proposed';
+const proto = new pmtiles.Protocol(); maplibregl.addProtocol('pmtiles', proto.tile);
+const GLYPHS = 'https://www.openhistoricalmap.org/map-styles/fonts/{fontstack}/{range}.pbf';
+const ofm = { type: 'vector', url: 'https://tiles.openfreemap.org/planet' };
+const I = ['OpenHistorical Italic'], R = ['OpenHistorical'], B = ['OpenHistorical Bold'];
+const current = { version: 8, glyphs: GLYPHS, sources: {
+    land: { type: 'geojson', data: 'ne-land.json' }, ofm,
+    terrain: { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 12 },
+    rivers: { type: 'geojson', data: 'ne-rivers.json' } },
+  layers: [
+    { id: 'sea', type: 'background', paint: { 'background-color': '#efe7d4' } },
+    { id: 'water', type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': '#cddde4' } },
+    { id: 'hs', type: 'hillshade', source: 'terrain', paint: { 'hillshade-exaggeration': 0.45, 'hillshade-shadow-color': '#5a4a3a', 'hillshade-highlight-color': '#fffaf0', 'hillshade-accent-color': '#6d5a44' } },
+    { id: 'rivers', type: 'line', source: 'rivers', filter: ['<=', ['get', 'sr'], ['step', ['zoom'], 5, 4, 7, 6, 10]], paint: { 'line-color': '#4f8fb3', 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.6], 'line-opacity': 0.55 } },
+    { id: 'rl', type: 'symbol', source: 'rivers', minzoom: 5, filter: ['has', 'n'], layout: { 'symbol-placement': 'line', 'text-field': ['get', 'n'], 'text-font': I, 'text-size': 11 }, paint: { 'text-color': '#2b6f95', 'text-halo-color': '#fbf7ee', 'text-halo-width': 1.2 } },
+  ] };
+const SEA = '#bcd5e1', LAND = '#f3f0e8', RIVER = '#4a87ad', WLAB = '#3f7396', MOD = '#77727e';
+const q_ = ['coalesce', ['get', 'q'], 0];
+const proposed = { version: 8, glyphs: GLYPHS, sources: {
+    ofm, rivers: { type: 'vector', url: 'pmtiles://' + location.origin + '/hydrorivers-eu.pmtiles' },
+    ne: { type: 'geojson', data: 'ne-rivers.json' },
+    dem: { type: 'raster-dem', tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'], encoding: 'terrarium', tileSize: 512, maxzoom: 12 } },
+  layers: [
+    { id: 'land', type: 'background', paint: { 'background-color': LAND } },
+    { id: 'ice', type: 'fill', source: 'ofm', 'source-layer': 'landcover', filter: ['==', ['get', 'class'], 'ice'], paint: { 'fill-color': '#fafdff' } },
+    { id: 'wet', type: 'fill', source: 'ofm', 'source-layer': 'landcover', minzoom: 7, filter: ['==', ['get', 'class'], 'wetland'], paint: { 'fill-color': '#d5e3d6', 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.3, 11, 0.7] } },
+    { id: 'hs', type: 'hillshade', source: 'dem', paint: { 'hillshade-method': 'igor', 'hillshade-exaggeration': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 8, 0.4, 12, 0.3], 'hillshade-shadow-color': '#3e4652', 'hillshade-highlight-color': 'rgba(255,255,255,0.6)', 'hillshade-accent-color': '#3e4652' } },
+    { id: 'water', type: 'fill', source: 'ofm', 'source-layer': 'water', filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'fill-color': SEA } },
+    { id: 'shore', type: 'line', source: 'ofm', 'source-layer': 'water', minzoom: 5, filter: ['!=', ['get', 'class'], 'swimming_pool'], paint: { 'line-color': '#8fb2c4', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.3, 12, 0.8] } },
+    { id: 'hr', type: 'line', source: 'rivers', 'source-layer': 'rivers', maxzoom: 12, layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': RIVER, 'line-opacity': ['interpolate', ['linear'], ['zoom'], 10, 1, 12, 0.4],
+        'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 3, ['interpolate', ['linear'], q_, 0, 0.3, 1000, 0.8, 6000, 1.6], 8, ['interpolate', ['linear'], q_, 0, 0.5, 50, 0.9, 1000, 2.2, 6000, 3.5], 12, ['interpolate', ['linear'], q_, 0, 0.8, 50, 1.5, 1000, 4, 6000, 7]] } },
+    { id: 'ww', type: 'line', source: 'ofm', 'source-layer': 'waterway', minzoom: 11, filter: ['in', ['get', 'class'], ['literal', ['river', 'canal', 'stream']]],
+      paint: { 'line-color': RIVER, 'line-width': ['match', ['get', 'class'], 'stream', 0.6, 1.3], 'line-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0, 12, 1] } },
+    { id: 'sea-l', type: 'symbol', source: 'ofm', 'source-layer': 'water_name', filter: ['in', ['get', 'class'], ['literal', ['ocean', 'sea', 'bay', 'strait', 'gulf']]],
+      layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': I, 'text-size': ['interpolate', ['linear'], ['zoom'], 3, 10, 8, 14], 'text-letter-spacing': 0.18, 'text-max-width': 6, 'symbol-placement': ['step', ['zoom'], 'point', 5, 'point'] }, paint: { 'text-color': WLAB, 'text-halo-color': 'rgba(255,255,255,0.5)', 'text-halo-width': 1 } },
+    { id: 'lake-l', type: 'symbol', source: 'ofm', 'source-layer': 'water_name', minzoom: 7, filter: ['==', ['get', 'class'], 'lake'],
+      layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': I, 'text-size': 11, 'text-max-width': 6 }, paint: { 'text-color': WLAB, 'text-halo-color': SEA, 'text-halo-width': 1 } },
+    { id: 'riv-l', type: 'symbol', source: 'ne', minzoom: 5, maxzoom: 11, filter: ['has', 'n'], layout: { 'symbol-placement': 'line', 'symbol-spacing': 400, 'text-field': ['get', 'n'], 'text-font': I, 'text-size': 11, 'text-letter-spacing': 0.08 }, paint: { 'text-color': WLAB, 'text-halo-color': LAND, 'text-halo-width': 1.4 } },
+    { id: 'ww-l', type: 'symbol', source: 'ofm', 'source-layer': 'waterway', minzoom: 11, filter: ['in', ['get', 'class'], ['literal', ['river', 'canal']]], layout: { 'symbol-placement': 'line', 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': I, 'text-size': 11 }, paint: { 'text-color': WLAB, 'text-halo-color': LAND, 'text-halo-width': 1.4 } },
+    { id: 'peak', type: 'symbol', source: 'ofm', 'source-layer': 'mountain_peak', minzoom: 9, filter: ['<=', ['coalesce', ['get', 'rank'], 99], ['step', ['zoom'], 1, 11, 3, 13, 99]],
+      layout: { 'text-field': ['concat', '▲ ', ['coalesce', ['get', 'name:en'], ['get', 'name']]], 'text-font': R, 'text-size': 10, 'text-anchor': 'top' }, paint: { 'text-color': '#6b5d4f', 'text-halo-color': LAND, 'text-halo-width': 1.2 } },
+    { id: 'place', type: 'symbol', source: 'ofm', 'source-layer': 'place', filter: ['step', ['zoom'], ['all', ['==', ['get', 'class'], 'city'], ['<=', ['coalesce', ['get', 'rank'], 99], 3]], 6, ['==', ['get', 'class'], 'city'], 9, ['in', ['get', 'class'], ['literal', ['city', 'town']]], 12, ['in', ['get', 'class'], ['literal', ['city', 'town', 'village']]]], minzoom: 4,
+      layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': R, 'text-size': ['match', ['get', 'class'], 'city', 11, 'town', 10, 9], 'symbol-sort-key': ['coalesce', ['get', 'rank'], 99], 'text-padding': 6 },
+      paint: { 'text-color': MOD, 'text-halo-color': LAND, 'text-halo-width': 1.2} },
+  ] };
+// Prototype only, see docs/BASE_MAP.md. Serve this folder with range requests and open ?style=current or ?style=proposed.
+const map = new maplibregl.Map({ container: 'm', style: mode === 'current' ? current : proposed, center: [+q.get('lon') || 12, +q.get('lat') || 50], zoom: +q.get('z') || 4, attributionControl: false });
+window.__m = map;
+</script></body></html>
