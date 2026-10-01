@@ -2120,6 +2120,69 @@
   "sha256": "04b20401c9f33f6ecfca3597fcefa325a94721f7bd30cd9cb4c705a1311a9311",
   "downloaded": "2026-10-01"
  },
+ "rurland/original/rurland-nuss-z1-xyab-2e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.ebfd81l4/db7bebd861b65458621fea00b9c177779bf580ed",
+  "bytes": 106496,
+  "sha256": "91daf5c6e5c0d72f00b5343abcb22a9567a48213491c75268902ea0a2f25a722",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-3e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.042c52n7/829ddfb67398533254e8d99b4f783f711f7d1f9c",
+  "bytes": 106496,
+  "sha256": "089264fa6cfb9f97e4fdb2478b5bda8b0ed5d2701dcc947e796db30854275023",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-4e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.113fgof6/1711004ded12fa7485b3b40b3417b0d8287e39d8",
+  "bytes": 98304,
+  "sha256": "f948994b114f1c639f5137ec76a82dcd899e8b8b3cc86e38ed0866e2fc71ef59",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-5e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.8abbmf9q/0da53d4100d5b202027fc11ea6d4a92afcaa6f4d",
+  "bytes": 98304,
+  "sha256": "028e1b19058e9feaa684fa4f2f30b2cdf2b9d078575b68ab0ec2d554e6e8ff11",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-2e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.9f4e7s84/b13d2b945fb461ea1c02c8ecfa7b62c46f7eebc8",
+  "bytes": 110592,
+  "sha256": "130747e2223ae43fda7155bc512612793d2e502fb351080bf04cdbd5fd770786",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-3e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.8e09hs7r/b7a60c86febb53173b3f030d4abbce1c15723c94",
+  "bytes": 110592,
+  "sha256": "a3552a3ab38dc07e57d9f91292c16ebccf8044f39c2a2583b4b819104d627988",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-4e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.21c56055/0264723896ebc78b84175ce17b03a66b5c53cfc2",
+  "bytes": 106496,
+  "sha256": "95ae81ea5564071e2618ccc0dc972ef8426e4677b9408ae6070bf3145fbe5fda",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-5e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.a81fb7id/1e31559e9b0f35b01db868b73a9be65d4d5ef6f2",
+  "bytes": 98304,
+  "sha256": "760c16d1a7b580e16f945de85519b24c6dbecd284a97262afcdb9ca5415813c5",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurlandprogramme-vm-sites-archeologiques_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.b7406gy1/9a65c605a6f60923f7fa00ea307678417773d0ac",
+  "bytes": 172032,
+  "sha256": "909da59e8374cc8d9fa074ce22762d5f05dc66f053be2a8bb157fe10223f90ba",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
  "russian-3verst-gazetteer/original/Russian_3verst.csv": {
   "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
   "bytes": 506311,

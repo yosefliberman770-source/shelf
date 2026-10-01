@@ -1649,5 +1649,48 @@
     "note": "data.gouv.fr resource 912c2c2f-9a5f-4316-8671-c2d995f55ca5 (20,313 records; GeoJSON resource failed to download, CSV used)"
    }
   ]
+ },
+ {
+  "id": "rurland",
+  "url": "https://nakala.fr/10.34847/nkl.ac829at9",
+  "licence": "Etalab Open Licence 2.0",
+  "files": [
+   {
+    "path": "original/rurland-nuss-z1-xyab-2e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.ebfd81l4"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-2e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.9f4e7s84"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-3e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.042c52n7"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-3e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.8e09hs7r"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-4e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.113fgof6"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-4e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.21c56055"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-5e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.8abbmf9q"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-5e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.a81fb7id"
+   },
+   {
+    "path": "original/rurlandprogramme-vm-sites-archeologiques_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.b7406gy1"
+   }
+  ]
  }
 ]

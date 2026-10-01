@@ -351,6 +351,15 @@ def read_rows(spec):
                 p['__wgs'] = True
             except (KeyError, TypeError, ValueError):
                 pass
+    if read.get('fixMojibake') and rows:
+        # UTF-8 text that was decoded as Latin-1 once ("maÃ§onnées" → "maçonnées"); left as is when it does not round-trip
+        for p in rows:
+            for k, v in p.items():
+                if isinstance(v, str) and ('Ã' in v or 'Â' in v):
+                    try:
+                        p[k] = v.encode('latin-1').decode('utf-8')
+                    except (UnicodeEncodeError, UnicodeDecodeError):
+                        pass
     if read.get('latLonField') and rows:
         # one "lat, lon" text field (e.g. a commune's centroid); "approx": the position is the place's, not the feature's
         for p in rows:

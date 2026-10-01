@@ -1484,6 +1484,19 @@
    "state": "insufficient-temporal",
    "region": "Ireland",
    "note": "28 towns dated only by an origin class ('12-15th century Anglo-Norman'); no start or end years; towns already shown from other sources."
+  },
+  {
+   "title": "Rurland – The rural lands of north-eastern Gaul, from the late La Tène period to late antiquity (Nakala series)",
+   "match": [
+    "Rurland",
+    "nkl.ac829at9",
+    "nkl.8abbmf9q"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "France",
+   "dataset": "rurland",
+   "note": "Etalab 2.0. Nüsslein's per-century occupation files (2nd–5th c., zones 1–2; 152 sites, each with one occupation span) and the Moselle-valley site list (dated by century text) → public spec rurland, 202 records. Soil, geology and hydrography layers of the same series are environmental and not used; 1st-c. and High Empire files are before the atlas range or duplicate the century files."
   }
  ]
 }

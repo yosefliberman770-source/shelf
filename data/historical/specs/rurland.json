@@ -1,0 +1,145 @@
+{
+ "id": "rurland",
+ "src": "rurland",
+ "public": true,
+ "enabled": true,
+ "title": "Rural settlements of north-eastern Gaul (Lorraine, Moselle valley), 1st c. BC – 5th c. AD (RurLand programme, A. Nüsslein; Nakala)",
+ "licence": "Etalab Open Licence 2.0",
+ "url": "https://nakala.fr/10.34847/nkl.ac829at9",
+ "describe": "Rural sites of two Lorraine survey zones (A. Nüsslein), each over its own occupation span from the dataset, and Gallo-Roman sites of the Moselle valley by the centuries their record gives.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "fields": {
+  "id": "numbase",
+  "name": "nomgisemen",
+  "type": [
+   "classeok",
+   "zone"
+  ],
+  "context": [
+   "commune",
+   "zone"
+  ],
+  "kind": "site"
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z1-xyab-2e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z1-xyab-2e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z1-xyab-3e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z1-xyab-3e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z1-xyab-4e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z1-xyab-4e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z1-xyab-5e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z1-xyab-5e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z2-xysn-2e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z2-xysn-2e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z2-xysn-3e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z2-xysn-3e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z2-xysn-4e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z2-xysn-4e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurland-nuss-z2-xysn-5e-s-ap-jc_EPSG4326.gpkg",
+    "layer": "rurland-nuss-z2-xysn-5e-s-ap-jc"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "taq",
+    "to": "tpq"
+   }
+  },
+  {
+   "read": {
+    "path": "rurland/original/rurlandprogramme-vm-sites-archeologiques_EPSG4326.gpkg",
+    "layer": "rurlandprogramme-vm-sites-archeologiques",
+    "fixMojibake": true
+   },
+   "fields": {
+    "id": "objectid",
+    "name": "lieu_dit",
+    "type": [
+     "periode",
+     "descriptio"
+    ],
+    "context": [
+     "commune"
+    ]
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "chronologi"
+   }
+  }
+ ],
+ "dating": {
+  "mode": "fields",
+  "from": "taq",
+  "to": "tpq"
+ },
+ "datingLabel": "occupation span in the RurLand data",
+ "dedupe": true
+}
