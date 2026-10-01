@@ -986,6 +986,25 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
+    id: 'medieval-dioceses', group: 'political', alsoIn: ['economic'], label: 'Dioceses and church provinces of Latin Europe (c. 1250, 1350, 1450)', datasets: [], defaultOn: false, coverage: [1225, 1475],
+    hint: 'Catholic dioceses (thin lines) and ecclesiastical provinces (thick) as the Digital Atlas of Dioceses (R. Dorin, ed.) maps them for c. 1250, c. 1350 and c. 1450. Each map is drawn within 25 years of its date, lighter away from it. The atlas calls its boundaries illustrative rather than definitive; parts of eastern Europe and the Latin East are not covered.',
+    sources: ['historical-units'],
+    specs: (c) => {
+      const y = c.year;
+      const near = ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS] as FilterSpecification;
+      const lv = (v: string) => ['all', near, ['==', ['get', 'lv'], v]] as FilterSpecification;
+      const fade = ['case', ['!=', ['get', 'ef'], y], 0.55, 0.9] as ExpressionSpecification;
+      return [
+        { id: 'dioc-diocese', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('diocese'), minzoom: 5, paint: { 'line-color': C.religious, 'line-width': 0.7, 'line-dasharray': [3, 1.5], 'line-opacity': fade } },
+        { id: 'dioc-province', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('ecclesiastical province'), paint: { 'line-color': C.religious, 'line-width': 2, 'line-opacity': fade } },
+        { id: 'dioc-diocese-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv('diocese'), minzoom: 7,
+          layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.religious, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
+        { id: 'dioc-province-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv('ecclesiastical province'), minzoom: 4, maxzoom: 7,
+          layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.religious, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
+      ];
+    },
+  },
+  {
     id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1800s–1910s)', datasets: [], defaultOn: true, coverage: [1475, 1915],
     hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh counties, hundreds, boroughs, constituencies, poor law unions and civil parishes as surveyed for the first- and second-edition Ordnance Survey maps (1860s–1913), and Welsh townships as recorded on tithe maps, in censuses and on the first OS maps (1800s–1880s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
     get sources() { return privateTile('private-units.pmtiles') ? ['historical-units', 'private-units'] : ['historical-units']; },
@@ -1120,6 +1139,6 @@ const LABEL_PRIORITY: Record<string, number> = {
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'historical-units', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'building-density', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'building-density', 'inscriptions', 'religious-houses', 'castles', 'medieval-dioceses', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

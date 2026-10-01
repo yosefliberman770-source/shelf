@@ -1574,17 +1574,6 @@
   ]
  },
  {
-  "id": "gobolitide",
-  "url": "https://doi.org/10.5281/zenodo.5849856",
-  "licence": "CC BY 4.0",
-  "files": [
-   {
-    "path": "original/Dataset-Gobolitide.csv",
-    "note": "Zenodo record 5849856 file"
-   }
-  ]
- },
- {
   "id": "galicia-buildings",
   "url": "https://doi.org/10.17632/md8jp9ny9z.2",
   "licence": "CC BY 4.0",
@@ -1596,6 +1585,46 @@
    {
     "path": "original/uncertainty_metadata.7z",
     "note": "99 district polygons with census population (1857/1869) and map dates"
+   }
+  ]
+ },
+ {
+  "id": "dioceses-dorin",
+  "arcgis": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer",
+  "url": "https://doi.org/10.25740/rh195hm5975",
+  "licence": "CC BY 3.0",
+  "files": [
+   {
+    "path": "original/diocese1250.geojson",
+    "note": "snapshot of layer 0 (diocese1250) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocese1350.geojson",
+    "note": "snapshot of layer 1 (diocese1350) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocese1450.geojson",
+    "note": "snapshot of layer 2 (diocese1450) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocesemax.geojson",
+    "note": "snapshot of layer 3 (diocesemax) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1250.geojson",
+    "note": "snapshot of layer 4 (province1250) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1350.geojson",
+    "note": "snapshot of layer 5 (province1350) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1450.geojson",
+    "note": "snapshot of layer 6 (province1450) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/provincemax.geojson",
+    "note": "snapshot of layer 7 (provincemax) via fetch_arcgis.py"
    }
   ]
  }

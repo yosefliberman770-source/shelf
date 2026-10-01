@@ -600,6 +600,54 @@
   "sha256": "e33f1823350650fb8369abb38ce46585ddc60b442daada0e7cd41e9465364dd4",
   "downloaded": "2026-09-30"
  },
+ "dioceses-dorin/original/diocese1250.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 24178790,
+  "sha256": "b2cd6ff96a2c56387ed1b89ec434b03c1f4e7cb94830ff524e70f0925adb776a",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocese1350.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/1/query (all features, outSR=4326)",
+  "bytes": 24455832,
+  "sha256": "aaa236f305fd5413f5e15b867b14caa10d1f999b4fdb82ef25b5718fafe7fa91",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocese1450.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/2/query (all features, outSR=4326)",
+  "bytes": 26170330,
+  "sha256": "fb2aa4caf188e3b4efa39d834fd0637962b5a0b6798e4c9563da2b6b1c3f49e4",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocesemax.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/3/query (all features, outSR=4326)",
+  "bytes": 26182731,
+  "sha256": "dbe1b29c77184f93ee490f0d91906eab10c1d0a002b0cbd39475290c79ad81ab",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1250.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/4/query (all features, outSR=4326)",
+  "bytes": 16761550,
+  "sha256": "261f496c6ca6a58752abe7970ad8f5c57cdf16d0062c4db3e3a89128edd0ecf6",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1350.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/5/query (all features, outSR=4326)",
+  "bytes": 16843765,
+  "sha256": "6eefad9e8ed8e7739fe43d03b6fb61b8e76a025487d9c80f4bbeacffd62fcb2f",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1450.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/6/query (all features, outSR=4326)",
+  "bytes": 18733461,
+  "sha256": "c6a5fe0a7058ee264bccc939d03c2e92cdafe1592185fff3e0d9882417e1157d",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/provincemax.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/7/query (all features, outSR=4326)",
+  "bytes": 17940470,
+  "sha256": "956d62e61ea4a39bac03f86fb88f948c6111b130bc6db7d194e3c8f0261f3833",
+  "downloaded": "2026-10-01"
+ },
  "dissiloc-inquisition-places/original/README.md": {
   "url": "https://zenodo.org/api/records/21031406/files/README.md/content",
   "bytes": 12548,

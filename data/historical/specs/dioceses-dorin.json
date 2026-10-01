@@ -1,0 +1,142 @@
+{
+ "id": "dioceses-dorin",
+ "src": "dioceses",
+ "public": true,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Digital Atlas of Dioceses and Ecclesiastical Provinces in Late Medieval Europe, 1200–1500 (R. Dorin, gen. ed.; Stanford Digital Repository / Harvard CGA ArcGIS)",
+ "licence": "CC BY 3.0",
+ "url": "https://doi.org/10.25740/rh195hm5975",
+ "describe": "Catholic dioceses and ecclesiastical provinces of Latin Christendom as the atlas maps them for c. 1250, c. 1350 and c. 1450, each shown as a snapshot of its year; the atlas calls its boundaries illustrative rather than definitive, and leaves out parts of eastern Europe and the Latin East.",
+ "layers": [
+  "medieval-dioceses"
+ ],
+ "parts": [
+  {
+   "read": {
+    "path": "dioceses-dorin/original/diocese1250.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "diocese",
+     "minzoom": 5,
+     "simplify": 0.002
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1250,
+    "label": "dioceses as mapped for c. 1250 (Digital Atlas of Dioceses)"
+   }
+  },
+  {
+   "read": {
+    "path": "dioceses-dorin/original/diocese1350.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "diocese",
+     "minzoom": 5,
+     "simplify": 0.002
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1350,
+    "label": "dioceses as mapped for c. 1350 (Digital Atlas of Dioceses)"
+   }
+  },
+  {
+   "read": {
+    "path": "dioceses-dorin/original/diocese1450.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "diocese",
+     "minzoom": 5,
+     "simplify": 0.002
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1450,
+    "label": "dioceses as mapped for c. 1450 (Digital Atlas of Dioceses)"
+   }
+  },
+  {
+   "read": {
+    "path": "dioceses-dorin/original/province1250.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "ecclesiastical province",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1250,
+    "label": "provinces as mapped for c. 1250 (Digital Atlas of Dioceses)"
+   }
+  },
+  {
+   "read": {
+    "path": "dioceses-dorin/original/province1350.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "ecclesiastical province",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1350,
+    "label": "provinces as mapped for c. 1350 (Digital Atlas of Dioceses)"
+   }
+  },
+  {
+   "read": {
+    "path": "dioceses-dorin/original/province1450.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "DioceseID"
+     ],
+     "nameField": "Dioc_Prov_",
+     "level": "ecclesiastical province",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1450,
+    "label": "provinces as mapped for c. 1450 (Digital Atlas of Dioceses)"
+   }
+  }
+ ]
+}

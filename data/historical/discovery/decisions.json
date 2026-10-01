@@ -653,12 +653,14 @@
   {
    "title": "Gobolitide (al-Jibal) microregion settlement dataset",
    "match": [
-    "10.5281/zenodo.5849856"
+    "10.5281/zenodo.5849856",
+    "zenodo.5849855",
+    "zenodo.org/record/5849855"
    ],
    "status": "integrated",
    "state": "integrated",
    "region": "Levant",
-   "note": "900 dated site phases; periods → years by the standard Jordanian (MEGA-Jordan) scheme, stated in labels.",
+   "note": "900 dated site phases; periods → years by the standard Jordanian (MEGA-Jordan) scheme, stated in labels. Revised in cycle 3: bare 'Islamic' (636–1918) and Iron Age/Persian attributions no longer drawn (too broad / outside the atlas range); 514 survey-code names ('SGNAS SITE 018') drawn but not indexed as places; alternative names kept.",
    "dataset": "gobolitide"
   },
   {
@@ -1353,19 +1355,6 @@
    "note": "34 lake-ore workings (CC BY 3.0) → public spec finlandlakeore, kind mine; each over its own extraction years in the table (1871–1881, from Solitander 1882)."
   },
   {
-   "title": "Dataset for \"The Gobolitide (Al-Jibal) microregion: geography and settlement network evolution from Nabataean to Byzantine times\"",
-   "match": [
-    "zenodo.5849855",
-    "zenodo.5849856",
-    "zenodo.org/record/5849855"
-   ],
-   "status": "integrated",
-   "state": "integrated",
-   "region": "Levant",
-   "dataset": "gobolitide",
-   "note": "812 sites (CC BY 4.0) → public spec gobolitide; 861 dated phases from Nabataean/Roman/Byzantine period names via a stated MEGA-Jordan period table; Iron Age, Persian and bare 'Islamic' left out; 514 survey-code names not indexed as places."
-  },
-  {
    "title": "Strucke C14 Sweden",
    "match": [
     "zenodo.10966331"
@@ -1428,6 +1417,18 @@
    "state": "integrated",
    "region": "Wales",
    "note": "100 tiled services from the same publisher as the Welsh boundary layers; 94 whose own name gives the year the map was made are in the original-maps index (public/world/maps/georef-index.json) and can be laid over the atlas, streamed from the publisher's tile server and credited to the holder in each service's copyright line (National Library of Wales, North East Wales Archives, Bangor University, Grosvenor Estate). 6 without a year in the name (incl. the Barmouth–South Stack coastal chart) are left out rather than dated by guess."
+  },
+  {
+   "title": "Digital Atlas of Dioceses and Ecclesiastical Provinces in Late Medieval Europe 1200 to 1500",
+   "match": [
+    "Digital_Atlas_of_Dioceses",
+    "rh195hm5975"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Europe",
+   "dataset": "dioceses-dorin",
+   "note": "R. Dorin (gen. ed.), CC BY 3.0. The atlas' own time slices (c. 1250, 1350, 1450; 665–705 dioceses and 77–84 provinces each) → public spec dioceses-dorin, layer medieval-dioceses, each a snapshot of its year. The 'max' layers' StartDate/EndDate use 999/1501 as markers for 'before/after the atlas period', so they are kept in the vault but not used for dating."
   }
  ]
 }

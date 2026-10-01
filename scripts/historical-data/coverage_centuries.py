@@ -399,7 +399,8 @@ def measure(at, place_dirs):
     hu = os.path.join(PUB, 'world', 'tiles', 'historical-units.pmtiles')
     if os.path.exists(hu):
         for p, lon, lat in tile_features(hu, 8):
-            cells.add(at(lon, lat), 'Political', p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'), pt=(lon, lat))
+            cat = 'Religious' if p.get('src') == 'dioceses' else 'Political'  # church territories (dioceses, provinces)
+            cells.add(at(lon, lat), cat, p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'), pt=(lon, lat))
             if p.get('src') == 'gasidd':  # districts with their census population
                 cells.add(at(lon, lat), 'Population', p.get('ef'), p.get('et'), 'exact', 'gasidd', pt=(lon, lat))
     # Buildings on dated survey sheets (density cells of ~1 km): one settlement-equivalent per 0.05° square (~20 km²) with
