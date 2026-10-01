@@ -180,9 +180,16 @@
                "land": {
                 "land": {
                  "land": {
-                  "polygons": 16006,
-                  "tiles": 3775,
-                  "rejected": []
+                  "land": {
+                   "polygons": 16006,
+                   "tiles": 3775,
+                   "rejected": []
+                  },
+                  "sea": {
+                   "polygons": 1313,
+                   "tiles": 3896,
+                   "rejected": []
+                  }
                  },
                  "sea": {
                   "polygons": 1313,
@@ -190,11 +197,7 @@
                   "rejected": []
                  }
                 },
-                "sea": {
-                 "polygons": 1313,
-                 "tiles": 3896,
-                 "rejected": []
-                }
+                "sea": null
                },
                "sea": null
               },
