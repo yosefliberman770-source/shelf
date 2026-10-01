@@ -76,6 +76,59 @@ def kept(p, keeps) -> bool:
     return True
 
 
+_ROMAN_N = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12, 'XIII': 13,
+            'XIV': 14, 'XV': 15, 'XVI': 16, 'XVII': 17, 'XVIII': 18, 'XIX': 19, 'XX': 20, 'XXI': 21}
+
+
+def lt_dating(text):
+    """A Lithuanian heritage-register dating ("XIX a. pab.", "I t-metis – II t-mečio pr.", "XX a. 4 d-metis", "1895–1899 m.")
+    in the English forms parse_dating reads; the parts keep their own meaning (pr. = beginning, vid. = middle, pab. = end,
+    I/II p. = first/second half; t-metis = millennium). Returns the text unchanged where nothing matches."""
+    if text is None:
+        return None
+    t = str(text)
+    bc = bool(re.search(r'pr\.\s*Kr', t))
+    t = re.sub(r'\b(?:po|pr\.)\s*Kr\.?', ' ', t)
+    out = []
+    # decades: "XX a. 4 d-metis" → 1930–1939
+    for m in re.finditer(r'\b([IVX]+)\s*a\.\s*(\d)\s*d-?me(?:tis|čio)', t):
+        c = _ROMAN_N.get(m.group(1))
+        if c:
+            y = (c - 1) * 100 + (int(m.group(2)) - 1) * 10  # the 4th decade of the 20th century = 1930s
+            out.append(f'{y}-{y + 9}')
+    t = re.sub(r'\b([IVX]+)\s*a\.\s*(\d)\s*d-?me(?:tis|čio)', ' ', t)
+    part = {'pr.': 'early', 'pradž': 'early', 'pab.': 'late', 'pabaig': 'late', 'vid.': 'mid', 'I p.': 'first half', 'II p.': 'second half'}
+    # millennia: "I t-metis", "II t-mečio pr." (beginning of the 2nd millennium) → the first / last two centuries of it
+    for m in re.finditer(r'\b(I{1,3})\s*t-me(?:tis|čio|tyje)\s*(pr\.|pradž\w*|vid\.|pab\.|pabaig\w*|I p\.|II p\.)?', t):
+        n = len(m.group(1)); a0, a1 = (n - 1) * 1000 + 1, n * 1000
+        w = (m.group(2) or '').strip()
+        if w.startswith('pr'):
+            a1 = a0 + 199
+        elif w.startswith('pab'):
+            a0 = a1 - 199
+        elif w.startswith('vid'):
+            a0, a1 = a0 + 400, a0 + 599
+        elif w == 'I p.':
+            a1 = a0 + 499
+        elif w == 'II p.':
+            a0 = a0 + 500
+        out.append(f'{a0 // 100 + 1}th century - {a1 // 100}th century' + (' BC' if bc else ''))  # as centuries: years below 100 are not read as years
+    t = re.sub(r'\b(I{1,3})\s*t-me(?:tis|čio|tyje)\s*(pr\.|pradž\w*|vid\.|pab\.|pabaig\w*|I p\.|II p\.)?', ' ', t)
+    # centuries: "XIX a. pab.", "XVI-XVIII a.", "XIX – XX a. I p."
+    def cent(m):
+        c = _ROMAN_N.get(m.group(1))
+        if not c:
+            return m.group(0)
+        w = (m.group(2) or '').strip()
+        p = next((v for k, v in part.items() if w.startswith(k)), '')
+        return f' {p} {c}th century '.replace('  ', ' ')
+    t = re.sub(r'\b([IVX]+)\s*a\.\s*(pr\.|pradž\w*|vid\.|pab\.|pabaig\w*|I p\.|II p\.)?', cent, t)
+    t = re.sub(r'\b([IVX]+)\s*[-–]\s*(?=(?:early |late |mid |first half |second half )?\d+th century)', lambda m: f'{_ROMAN_N.get(m.group(1), 0)}th century - ', t)
+    t = re.sub(r'\bm\.', ' ', t)
+    return ' ; '.join(out + [t.strip()]) if out else t.strip()
+
+
+
 def parse_dating(text) -> tuple[int | None, int | None, str] | None:
     """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
     if text is None:
@@ -360,6 +413,11 @@ def read_rows(spec):
                 p['__wgs'] = True
             except (KeyError, TypeError, ValueError):
                 pass
+    if read.get('translateDating') and rows:
+        # a dating field in another language's conventions, translated into __dating (the original stays as it is)
+        tr = {'lt': lt_dating}[read['translateDating']['lang']]
+        for p in rows:
+            p['__dating'] = tr(p.get(read['translateDating']['field']))
     if read.get('fixMojibake') and rows:
         # UTF-8 text that was decoded as Latin-1 once ("maÃ§onnées" → "maçonnées"); left as is when it does not round-trip
         for p in rows:
@@ -479,7 +537,7 @@ def records(spec):
             alts = re.split(an.get('sep', r'\|'), str(p.get(an['field']) or ''))
             rec['names'] = [(a, None, None, '') for a in sorted({a.strip() for a in alts if a.strip() and a.strip().lower() != name.lower()})[:12]]
         # survey codes as names ("SGNAS SITE 018", genericPattern) and type-only names are drawn but not indexed as places
-        if f.get('generic') or generic_name or (f.get('genericPattern') and re.fullmatch(f['genericPattern'], name)) or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
+        if f.get('generic') or generic_name or (f.get('genericIfEquals') and name.strip().lower() == str(p.get(f['genericIfEquals']) or '').strip().lower()) or (f.get('genericPattern') and re.fullmatch(f['genericPattern'], name)) or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
             rec['generic'] = 1  # the name is only the monument type ("Rath"): drawn and searchable by type, not a place name
         ap = f.get('approx')
         rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')

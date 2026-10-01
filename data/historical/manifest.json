@@ -1486,6 +1486,18 @@
   "sha256": "fb0cf394e7ca4f88b5d74fa730d3de10a37f71dc606efbe4cfe3c7ea400ac465",
   "downloaded": "2026-10-01"
  },
+ "lithuania-kvr/original/points.geojson": {
+  "url": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD/kvr_taskai_enriched/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 9198862,
+  "sha256": "edb6b0c15bf591de70c69ef7525c82a9c0e36560fec1a1d2faa5f956d5771bd8",
+  "downloaded": "2026-10-01"
+ },
+ "lithuania-kvr/original/polygons.geojson": {
+  "url": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD/kvr_poligonai_enriched/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 21182781,
+  "sha256": "c3f31426d1b72d93e309fd037d8032076d9e06559038613945bfea6a6530ada0",
+  "downloaded": "2026-10-01"
+ },
  "living-with-machines/original/annotations-2024_zenodo-11241371/README.md": {
   "url": "https://zenodo.org/api/records/11241371/files/README.md/content",
   "bytes": 11073,

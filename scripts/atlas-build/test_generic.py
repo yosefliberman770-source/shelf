@@ -147,6 +147,12 @@ class NewOptions(unittest.TestCase):
         self.assertEqual(sorted(r['env'] for r in recs), [(1, 550), (1050, 1520)])  # two phases; the unflagged Viking Age is not filled in
         self.assertEqual(skipped['no period in the atlas range'], 1)
 
+    def test_lithuanian_register_datings(self):
+        cases = {'XIX a. pab.': (1867, 1900), 'XX a. 4 d-metis': (1930, 1939), 'I t-metis – II t-mečio pr.': (1, 1200),
+                 'XIX – XX a. I p.': (1801, 1950), 'I t-metis pr. Kr.': (-1000, -1), '1895 – 1899 m.': (1895, 1899)}
+        for text, span in cases.items():
+            self.assertEqual(generic.parse_dating(generic.lt_dating(text))[:2], span, text)
+
 
 class Areas(unittest.TestCase):
     def test_units_dated_by_their_own_survey_years(self):

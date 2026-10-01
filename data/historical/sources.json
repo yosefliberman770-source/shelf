@@ -1949,5 +1949,20 @@
     "note": "snapshot via fetch_arcgis.py"
    }
   ]
+ },
+ {
+  "id": "lithuania-kvr",
+  "arcgis": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/points.geojson",
+    "note": "kvr_taskai_enriched/FeatureServer/0 via fetch_arcgis.py (8,856)"
+   },
+   {
+    "path": "original/polygons.geojson",
+    "note": "kvr_poligonai_enriched/FeatureServer/0 via fetch_arcgis.py (12,378)"
+   }
+  ]
  }
 ]

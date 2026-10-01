@@ -1607,6 +1607,19 @@
    "region": "Western Russia, Ukraine, Belarus, Baltics, Caucasus",
    "dataset": "imperiia",
    "note": "Found by the cycle-4 targeted ArcGIS search. 56 layers snapshotted; no licence on the items → private specs imperiia-units (749 units: state extent at 14 dates as snapshots; Piadyshev-atlas provinces and uezdy over 1820–1827, the atlas's own years; provinces 1856; Pale of Settlement 1791 and 1825–1887; Cossack Hetmanate 1649–1657; Don Cossacks) and imperiia-sites (10,527: Piadyshev towns, villages, post stations, military and economic sites, monasteries; towns of 1727; town populations 1719, c. 1743, 1766, 1781 where a figure is given; unrest counts per 20-year period). Not used yet: partition and Jewish-restriction border lines, troop movements (lines), post roads (lines), small Crimean layers."
+  },
+  {
+   "title": "Register of Immovable Cultural Heritage of Lithuania (KVR) — Lithuanian statistics portal ArcGIS",
+   "match": [
+    "kvr_taskai_enriched",
+    "kvr_poligonai_enriched",
+    "kvr.kpd.lt"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Lithuania",
+   "dataset": "lithuania-kvr",
+   "note": "Found by the cycle-4 targeted ArcGIS search (kvr.kpd.lt itself blocks automated access). CC BY 4.0 → public spec lithuania-kvr: 15,800 objects dated by the register's own age text, translated from Lithuanian conventions (century parts, millennia, decades; tested); 5,433 without an age left out; type-only names not indexed as places."
   }
  ]
 }
