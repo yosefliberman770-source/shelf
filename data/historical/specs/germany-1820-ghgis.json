@@ -1,0 +1,62 @@
+{
+ "id": "germany-1820-ghgis",
+ "src": "ghgis1820",
+ "public": false,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "States of the German Confederation and provinces of Prussia in 1820, with their inhabitants (HGIS Germany, ed. A. Kunz et al., IEG Mainz; Harvard Geospatial Library)",
+ "licence": "non-commercial academic use only (G-HGIS end-user terms) — private pack",
+ "url": "https://hgl.harvard.edu/",
+ "describe": "The 41 states of the German Confederation (kingdoms, grand duchies, duchies, principalities, free cities) and the 10 provinces of Prussia as HGIS Germany maps them for 1820, each with the number of inhabitants the dataset gives, shown as a snapshot of 1820.",
+ "layers": [
+  "historical-units"
+ ],
+ "parts": [
+  {
+   "read": {
+    "path": "harvard-ghgis/original/GHGIS1820CORE.zip",
+    "member": "GHGIS1820CORE.shp"
+   },
+   "dissolve": [
+    {
+     "field": "STAAT_NAME",
+     "level": "state",
+     "minzoom": 3,
+     "simplify": 0.002,
+     "note": {
+      "field": "INFO_01",
+      "label": "inhabitants"
+     }
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1820,
+    "label": "HGIS Germany, 1820"
+   }
+  },
+  {
+   "read": {
+    "path": "harvard-ghgis/original/GHGIS1820PROVINCES.zip",
+    "member": "GHGIS1820PROVINCES.shp"
+   },
+   "dissolve": [
+    {
+     "field": "PROV_NAME",
+     "level": "province",
+     "minzoom": 4,
+     "simplify": 0.002,
+     "note": {
+      "field": "INFO_01",
+      "label": "inhabitants"
+     }
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1820,
+    "label": "HGIS Germany, 1820 (Prussian province)"
+   }
+  }
+ ]
+}

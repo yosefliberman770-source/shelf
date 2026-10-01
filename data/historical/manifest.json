@@ -198,6 +198,13 @@
   "sha256": "8288991abf9a27aaaa795dbc103c653c044a174279c2732850fdfa300fb43124",
   "downloaded": "2026-10-01"
  },
+ "cora-torcularia/original/doi-10.34810-data2461.zip": {
+  "url": "https://doi.org/10.34810/data2461",
+  "bytes": 96059490,
+  "sha256": "93485e89d516c2aba22d37c27959fea1102bf7f8021e6bd7f78dac326feea3f4",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
  "croatia-cultural-goods/original/data.json": {
   "url": "https://data.gov.hr/ckan/dataset/c0410787-33b1-4299-b92c-9bbf38dd8bbf/resource/c9a9bce6-1b70-45ec-b2cf-d3f93bca7a02/download/data.json",
   "bytes": 10227091,
@@ -915,6 +922,20 @@
   "sha256": "3aab90cf7840fb2432abe7a5a728b78cd8ea232a73275949a175516972dce847",
   "downloaded": "2026-10-01"
  },
+ "harvard-ghgis/original/GHGIS1820CORE.zip": {
+  "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820CORE)",
+  "bytes": 587090,
+  "sha256": "b0f9e0c6647c41e097dffda07ebad2dea9d12e3c5a443770b0c211863dd0e65a",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
+ "harvard-ghgis/original/GHGIS1820PROVINCES.zip": {
+  "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820PROVINCES)",
+  "bytes": 226260,
+  "sha256": "d0390551042b79fc7906b8330e71bf40f5729c5186a7f1456cdc5a3e174fde07",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
  "hced/original/HCED Data v3.csv": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
   "bytes": 2171518,
@@ -974,6 +995,13 @@
   "bytes": 3452928,
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
+ },
+ "historical-urban-population-reba/original/urbanspatial-hist-urban-pop-3700bc-ad2000-xlsx.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/11815396?format=original",
+  "bytes": 831726,
+  "sha256": "7355dd9d3ce162f98db90b4806cd0cb1f0209dca8e9108a34ee0a336f91f168e",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
  },
  "hus-och-gard/original/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg": {
   "url": "https://zenodo.org/api/records/18231456/files/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg/content",

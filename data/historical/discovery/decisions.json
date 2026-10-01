@@ -121,7 +121,7 @@
    "status": "blocked",
    "dataset": "engel-hungary",
    "region": "Hungary",
-   "note": "Database encrypted inside a Windows GIS program; needs the institute's cooperation.",
+   "note": "Database encrypted inside a Windows GIS program; needs the institute's cooperation. Cycle 4: the user's upload is the same Engel2020.zip already in the vault (same checksum).",
    "state": "blocked"
   },
   {
@@ -220,10 +220,11 @@
    "match": [
     "harvard-ghgis"
    ],
-   "status": "blocked",
+   "status": "integrated",
    "region": "Germany",
-   "note": "Public in the catalogue but Harvard returns 429 to this machine; licence is non-commercial academic → private pack once downloaded. Cycle 3 retry: hgl.harvard.edu still answers 429 — user browser download (task 5).",
-   "state": "blocked"
+   "note": "1820 states (41) and Prussian provinces (10) with inhabitants, downloaded by the user (2026-10-01); non-commercial academic → private pack. Other HGIS Germany years (1830–1914) still to fetch.",
+   "state": "integrated",
+   "dataset": "germany-1820-ghgis"
   },
   {
    "title": "Gazetteer_Russian-3verst_map (Boykov) — Balkans",
@@ -421,20 +422,21 @@
    "match": [
     "10.34810/data2461"
    ],
-   "status": "blocked",
+   "status": "acquired",
    "region": "Spain, Portugal",
-   "note": "CSUC Dataverse answers with an Anubis bot wall from this machine. Retry from a browser. Cycle 3 retry: the Dataverse API path is behind the same bot challenge — user browser download (task 4).",
-   "state": "blocked"
+   "note": "Downloaded by the user (2026-10-01), CC BY 4.0, now in the vault. 551 Roman wine/oil production sites of Hispania, but no coordinates (municipality only) and 373 with 'Indeterminada' chronology: not drawn yet; candidate for municipality-level placement, marked approximate.",
+   "state": "acquired"
   },
   {
    "title": "Historical Urban Population 3700 BC – AD 2000 (Reba, Reitsma & Seto; Harvard Dataverse copy)",
    "match": [
     "10.7910/dvn/lmcqgx"
    ],
-   "status": "blocked",
+   "status": "integrated",
    "region": "Global (incl. Egypt, Maghreb, Levant)",
-   "note": "CC BY, but the download requires a guestbook response (name, email); not submitted without the user's consent. SEDAC copy needs an Earthdata login.",
-   "state": "blocked"
+   "note": "Downloaded by the user through the guestbook (2026-10-01). CC BY 4.0. 8,377 population estimates for AD 1–1914 shown, each at its own year only (1,975 BC or post-1914 rows not drawn); geocoding rank 3 marked approximate; alternate-name column not used as names (it also holds US state names).",
+   "state": "integrated",
+   "dataset": "urban-population-reba"
   },
   {
    "title": "Stadestér 1.0 — global database of 41,000+ cities",
@@ -1266,7 +1268,7 @@
    "status": "blocked",
    "state": "blocked",
    "region": "East Slavic",
-   "note": "950 towns with 1897 census population and 1904/1910 estimates (CC BY) — but every version lists no files (restricted or metadata-only on 2026-10-01); no coordinates either (would need linking by name to the Russian 3-verst gazetteer). Retry next cycle."
+   "note": "950 towns with 1897 census population and 1904/1910 estimates (CC BY) — but every version lists no files (restricted or metadata-only on 2026-10-01); no coordinates either (would need linking by name to the Russian 3-verst gazetteer). Retry next cycle. Cycle 4: the user's copy (20932484.json) is the record metadata only — files still restricted."
   },
   {
    "title": "Welsh historic boundaries: counties (OS 1st/2nd ed.), municipal boroughs, parliamentary constituencies, civil parishes (2nd ed.) — RCAHMW ArcGIS",
