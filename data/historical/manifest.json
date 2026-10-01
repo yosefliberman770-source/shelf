@@ -815,6 +815,13 @@
   "licence": "CC BY 3.0",
   "note": "Solitander (1882), lake-ore workings of eastern Finland supplying ironworks, per-lake extraction years"
  },
+ "finland-relics/original/muinaisjaannos_piste.geojson": {
+  "url": "https://geoserver.museovirasto.fi/geoserver/rajapinta_suojellut/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=rajapinta_suojellut:muinaisjaannos_piste&outputFormat=application/json&srsName=EPSG:4326&sortBy=OBJECTID&count=10000 (paged by 10,000)",
+  "bytes": 38360965,
+  "sha256": "62a4facbed2a214705e09e8b77d4cee6171f4ec7c4d0b096e482980a1ef6a32a",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0 (Museovirasto)"
+ },
  "france-mills-1794-1809/original/moulins.csv": {
   "url": "https://www.data.gouv.fr/api/1/datasets/r/912c2c2f-9a5f-4316-8671-c2d995f55ca5",
   "bytes": 5309381,

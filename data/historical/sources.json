@@ -1975,5 +1975,16 @@
     "note": "snapshot via fetch_arcgis.py (8,370)"
    }
   ]
+ },
+ {
+  "id": "finland-relics",
+  "url": "https://geoserver.museovirasto.fi/geoserver/rajapinta_suojellut/wfs",
+  "licence": "CC BY 4.0 (Museovirasto)",
+  "files": [
+   {
+    "path": "original/muinaisjaannos_piste.geojson",
+    "note": "WFS muinaisjaannos_piste, 41,723 points, paged"
+   }
+  ]
  }
 ]

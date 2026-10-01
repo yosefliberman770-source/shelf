@@ -1643,6 +1643,18 @@
    "state": "insufficient-temporal",
    "region": "Estonia",
    "note": "Partial copies (48 objects) of the Estonian register with no dating fields; the full register (register.muinas.ee) still blocks automated access."
+  },
+  {
+   "title": "Finland ancient monuments register (Museovirasto WFS, muinaisjaannos_piste)",
+   "match": [
+    "rajapinta_suojellut",
+    "muinaisjaannos_piste"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Finland",
+   "dataset": "finland-relics",
+   "note": "41,723 points (CC BY 4.0). Medieval-classed sites were already integrated (finreg). Added: 2,983 Iron Age-classed sites (500 BC–1150). Not added: 18,325 'historiallinen' sites — the class spans 1150–1900 and would show e.g. 19th-century tar pits from the 12th century; candidates if a finer dating (alatyyppi, kyppi.fi records) can be obtained."
   }
  ]
 }
