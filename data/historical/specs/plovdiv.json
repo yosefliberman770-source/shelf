@@ -1,0 +1,18 @@
+{
+ "id": "plovdiv", "src": "plovdiv", "public": true, "enabled": true,
+ "title": "Ottoman Plovdiv: quarters in the tax registers 1472–1614 and dated buildings (G. Boykov, Austrian Academy of Sciences / Zenodo)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.10046836",
+ "describe": "The quarters (mahalles) of Ottoman Plovdiv in each tax register that counts households there (1472, 1489, 1516, 1525, 1530, 1570, 1596, 1614), with the households and the author's population estimate; and its mosques, churches, synagogue, baths, khans and schools with the century the author dates them to.",
+ "layers": ["gazetteer-settlements", "medieval-archaeology"],
+ "parts": [
+  {"read": {"path": "ottoman-plovdiv/derived/quarters.geojson", "derive": "scripts/historical-data/plovdiv_extract.py"},
+   "fields": {"id": "id", "name": "name", "type": ["households"], "context": [], "kind": "settlement"},
+   "dating": {"mode": "attestations", "field": "year", "label": "quarter counted in the Ottoman tax register of {year}"}},
+  {"read": {"path": "ottoman-plovdiv/derived/buildings.geojson", "derive": "scripts/historical-data/plovdiv_extract.py"},
+   "fields": {"id": "id", "name": "name", "type": ["type", "patron"], "context": [],
+              "kind": {"field": "type", "map": {"mosque": "church", "church": "church", "synagogue": "church", "türbe": "church", "tekke": "monastery", "medrese": "church", "mekteb": "building", "hamam": "building", "han": "station", "kervansaray": "station", "bedesten": "market", "imaret": "building", "sebil": "building", "clock tower": "building", "baruthane": "building", "konak": "building", "stables": "building"}, "default": "building"},
+              "approx": {"field": "location", "values": ["tentative"]}},
+   "dating": {"mode": "fields", "from": "century_text"}}
+ ],
+ "datingLabel": "the century the author dates the building to"
+}

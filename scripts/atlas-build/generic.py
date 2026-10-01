@@ -52,6 +52,18 @@ def _century_window(n, bce=False, part=None):
     return (-b, -a) if bce else (a, b)
 
 
+def _signed_range(text):
+    """ArkeoGIS-style signed years: "-27", "-27:13", "451:475" (negative = BCE; there is no year 0)."""
+    m = re.fullmatch(r'\s*(-?\d{1,4})\s*(?::\s*(-?\d{1,4}))?\s*', str(text or ''))
+    if not m:
+        return parse_dating(text)
+    a = int(m.group(1))
+    b = int(m.group(2)) if m.group(2) else a
+    if a == 0 or b == 0 or a > b:
+        return None
+    return a, b, 'years' if a != b else 'year'
+
+
 def parse_dating(text) -> tuple[int | None, int | None, str] | None:
     """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
     if text is None:
@@ -110,6 +122,12 @@ def _raw(path):
 
 def _open_bytes(read):
     p = _raw(read['path'])
+    if p is None and read.get('derive'):
+        # a file derived from originals in the vault (e.g. per-port attestation years): made by its script when missing
+        import subprocess
+        import sys as _sys
+        subprocess.run([_sys.executable, os.path.join(os.path.dirname(__file__), '..', '..', read['derive'])], check=True)
+        p = _raw(read['path'])
     if p is None:
         raise FileNotFoundError(read['path'])
     if read.get('member'):
@@ -128,11 +146,26 @@ def _rows_table(b, name, read):
         cols = [str(c or '') for c in rr[0]]
         return [dict(zip(cols, r)) for r in rr[1:]]
     t = b.decode(read.get('encoding', 'utf-8-sig'), 'replace')
+    csv.field_size_limit(1 << 30)  # geometry columns (GeoJSON text) can be large
     delim = read.get('delimiter') or csv.Sniffer().sniff(t[:20000], delimiters=',;\t|').delimiter
     return list(csv.DictReader(io.StringIO(t), delimiter=delim))
 
 
 KEEP_GEOM = False
+
+
+def _is_wgs84_degrees(crs):
+    """True for plain WGS84 longitude/latitude. A projected CRS on the WGS84 datum (UTM, conic…) is not, even though its
+    WKT names "WGS_1984" (a .prj may also carry a WGS84 vertical datum)."""
+    s = str(crs)
+    if re.fullmatch(r'\s*(EPSG:)?4326\s*', s, re.I):
+        return True
+    try:
+        from pyproj import CRS
+        c = CRS.from_user_input(s)
+        return c.is_geographic and abs((c.datum.ellipsoid.semi_major_metre if c.datum and c.datum.ellipsoid else 6378137.0) - 6378137.0) < 1
+    except Exception:  # noqa: BLE001
+        return bool(re.search(r'GEOGCS\["?GCS_WGS_1984', s)) and 'PROJCS' not in s
 
 
 def _geom_point(g):
@@ -188,9 +221,15 @@ def _shp_rows(read):
         prj = open(p[:-4] + '.prj').read() if os.path.exists(p[:-4] + '.prj') else None
     cols = [f[0] for f in r.fields[1:]]
     out = []
-    for sr in r.iterShapeRecords():
-        d = dict(zip(cols, sr.record))
-        d['__pt'] = _geom_point(sr.shape.__geo_interface__) if sr.shape.shapeType else None
+    for i, rec in enumerate(r.iterRecords()):
+        d = dict(zip(cols, rec))
+        try:
+            shp = r.shape(i)
+            d['__pt'] = _geom_point(shp.__geo_interface__) if shp.shapeType else None
+            if KEEP_GEOM and shp.shapeType:
+                d['__geom'] = shp.__geo_interface__
+        except Exception:  # noqa: BLE001 — an empty or broken shape: the record is kept without a position
+            d['__pt'] = None
         out.append(d)
     return out, read.get('crs') or prj
 
@@ -270,6 +309,17 @@ def read_rows(spec):
                     p['__pt'] = (float(str(p[lon_f]).replace(',', '.')), float(str(p[lat_f]).replace(',', '.')))
                 except (KeyError, TypeError, ValueError):
                     p['__pt'] = None
+                if p['__pt'] is None and read.get('geojsonCol') and p.get(read['geojsonCol']):
+                    # an area (a concession, a parish) given as GeoJSON text: its representative point, marked approximate
+                    try:
+                        g = json.loads(p[read['geojsonCol']])
+                        p['__pt'] = _geom_point(g) if isinstance(g, dict) and g.get('type') else None
+                        p['__approx'] = True
+                        if KEEP_GEOM:
+                            p['__geom'] = g
+                    except (ValueError, TypeError, KeyError, AttributeError):
+                        pass
+                    p.pop(read['geojsonCol'], None)  # large text, not needed after this
                 if p['__pt'] is None and read.get('wkbHex') and p.get(read['wkbHex']):
                     # an area (island, region) given as hex WKB: its representative point, marked approximate
                     try:
@@ -278,11 +328,20 @@ def read_rows(spec):
                         p['__approx'] = True
                     except Exception:  # noqa: BLE001
                         pass
-    if crs and not re.search(r'4326|WGS_?1984|WGS 84"?,\s*DATUM\["?D_WGS_1984"?,\s*SPHEROID[^]]*\]\],\s*PRIMEM[^]]*\],\s*UNIT\["?Degree', str(crs), re.I):
+    if read.get('pointFields') and rows:
+        # the source's own WGS84 coordinate fields win over its (projected) geometry
+        lon_k, lat_k = read['pointFields']
+        for p in rows:
+            try:
+                p['__pt'] = (float(str(p[lon_k]).replace(',', '.')), float(str(p[lat_k]).replace(',', '.')))
+                p['__wgs'] = True
+            except (KeyError, TypeError, ValueError):
+                pass
+    if crs and not _is_wgs84_degrees(crs):
         from pyproj import CRS, Transformer
         tr = Transformer.from_crs(CRS.from_user_input(crs), CRS.from_epsg(4326), always_xy=True)
         for p in rows:
-            if p.get('__pt'):
+            if p.get('__pt') and not p.get('__wgs'):
                 p['__pt'] = tr.transform(*p['__pt'])
             if p.get('__geom'):
                 from shapely.geometry import mapping, shape
@@ -335,8 +394,9 @@ def records(spec):
     f, dt = spec['fields'], spec['dating']
     out, skipped = [], Counter()
     for i, p in enumerate(read_rows(spec)):
-        keep = spec.get('keep')
-        if keep and str(p.get(keep['field'])) not in keep['values']:
+        keeps = spec.get('keep') or []
+        if any(str(p.get(k['field'])) not in k['values'] if 'values' in k else (str(p.get(k['field'])) in k.get('notValues', []) or any(v in str(p.get(k['field'])) for v in k.get('notContaining', [])))
+               for k in ([keeps] if isinstance(keeps, dict) else keeps)):
             skipped['outside the spec filter'] += 1
             continue
         pt = p.get('__pt')
@@ -344,6 +404,15 @@ def records(spec):
             skipped['no usable position'] += 1
             continue
         name = str(_field(p, f.get('name')) or '').strip()
+        if name and f.get('nameDropParens'):
+            name = re.sub(r'\s*\([^)]*\)?', '', name).strip() or name  # "ENCLOSURE (A.P. SITE: unlocated)" → "ENCLOSURE"
+        generic_name = bool(f.get('nameSplitRequired')) and f.get('nameSplit', '') not in name
+        if name and f.get('nameSplit'):
+            # "Abae, Achaea" → "Abae" (the rest is the source's context); index -1: "FORTIFIED OUTCROP: DUNSHAMMER" → "DUNSHAMMER"
+            name = name.split(f['nameSplit'])[f.get('nameSplitIndex', 0)].strip()
+        if name and f.get('nameTitleCase'):
+            # capitals-only words → capitalised ("GIANT'S SCONCE or DUNCEITHIRN" → "Giant's Sconce or Dunceithirn")
+            name = ' '.join(w[0] + w[1:].lower() if w.isupper() and len(w) > 1 else w for w in name.split())
         if not name and f.get('nameFallback'):
             name = str(_field(p, f['nameFallback']) or '').strip()
         kf = f.get('kind') or {}
@@ -357,6 +426,13 @@ def records(spec):
         rec = {'src': spec['src'], 'id': str(p.get(f.get('id')) if f.get('id') else i), 'name': (name or spec.get('unnamed', 'Unnamed site'))[:80],
                'kind': kind, 'lon': round(pt[0], 5), 'lat': round(pt[1], 5), 'ty': (' · '.join(tparts) or kind)[:120],
                'ctx': [str(_field(p, c)) for c in f.get('context', []) if _field(p, c)][:2], 'names': []}
+        if f.get('altNames'):
+            # variant spellings the source records for the same place ("a coruña|corvigna|la corugna")
+            an = f['altNames']
+            alts = re.split(an.get('sep', r'\|'), str(p.get(an['field']) or ''))
+            rec['names'] = [(a, None, None, '') for a in sorted({a.strip() for a in alts if a.strip() and a.strip().lower() != name.lower()})[:12]]
+        if generic_name or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
+            rec['generic'] = 1  # the name is only the monument type ("Rath"): drawn and searchable by type, not a place name
         ap = f.get('approx')
         rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')
         uncertain = False
@@ -381,7 +457,7 @@ def records(spec):
                 # every period name of the table found in the text, longest first, without overlaps
                 found, taken = [], []
                 for key in sorted(dt['table'], key=len, reverse=True):
-                    for m in re.finditer(rf'\b{re.escape(key)}\b', low):
+                    for m in re.finditer(rf'(?<!\w){re.escape(key)}(?!\w)', low):  # keys may end in '.' ("e.christ.")
                         if not any(m.start() < e and s_ < m.end() for s_, e in taken):
                             taken.append((m.start(), m.end()))
                             found.append(key)
@@ -430,6 +506,19 @@ def records(spec):
             rec['per'] = f"first attested {lo}{'–' + str(hi) if hi and hi != lo else ''} ({chunk[:70]})"[:120]
             out.append(rec)
             continue
+        if dt['mode'] == 'attestations':
+            # one snapshot per dated source the record is listed in (an itinerary, a pilgrimage guide…): the place is
+            # shown at each attestation year only, nothing is inferred between or around them
+            raw_label = str(p.get(dt['field']) or '')
+            years = sorted({int(y) for y in re.findall(dt.get('yearRegex', r'(?<!\d)(\d{3,4})(?!\d)'), raw_label)
+                            if dt.get('min', 1) <= int(y) <= dt.get('max', 1914)})
+            if not years:
+                skipped['no dated attestation'] += 1
+                continue
+            for y in years:
+                out.append(dict(rec, id=f"{rec['id']}:{y}", snap=y,
+                                per=dt.get('label', 'listed in a source of {year}').format(year=y, all=', '.join(map(str, years)))[:120]))
+            continue
         if dt['mode'] == 'snapshot':
             rec['snap'] = dt['year']
             rec['per'] = dt.get('label') or f"listed in {dt['year']}"
@@ -443,8 +532,14 @@ def records(spec):
                 if str(a) in opens:
                     a = None  # the source's code for "unknown"
                 b_open = b not in (None, '') and str(b) in opens
-                pa = parse_dating(a)
-                pb = None if b in (None, '') or b_open else parse_dating(b)
+                pa = _signed_range(a) if dt.get('signedYears') else parse_dating(a)
+                pb = None if b in (None, '') or b_open else (_signed_range(b) if dt.get('signedYears') else parse_dating(b))
+                if pa is None and dt.get('centuryField') and str(p.get(dt['centuryField']) or '').strip().isdigit():
+                    # only the century is given ("11"): that century's window
+                    n = int(str(p[dt['centuryField']]).strip())
+                    if 1 <= n <= 20:
+                        pa = (*_century_window(n, False), 'century')
+                        a = f'{n}th century'
                 raw_label = ' – '.join([str(a)] if a not in (None, '') else []) + (' – (end unknown or continuing)' if b_open else f' – {b}' if b not in (None, '') else '')
                 uncertain = '?' in raw_label
                 lo = pa[0] if pa else None
@@ -467,6 +562,9 @@ def records(spec):
                 if not spec.get('keepUndated'):
                     continue
             elif lo is None:
+                if spec.get('dropUndated'):
+                    skipped['only an end date (left out)'] += 1
+                    continue
                 skipped['only an end date (kept undated)'] += 1
                 lo = hi = None
             if lo is not None:
@@ -501,16 +599,20 @@ def _group_phases(recs, spec, skipped):
         phases = []
         for r in dated:
             a_, b_ = r['env'][0], r['env'][1] if r['env'][1] is not None else r['env'][0]
-            if phases and a_ <= phases[-1]['to'] + 50:
+            # an end the source leaves open ("undetermined") stays open for the whole phase — never closed, never filled in
+            open_end = r['env'][1] is None and bool(spec.get('dating', {}).get('openValues'))
+            if phases and (phases[-1]['open'] or a_ <= phases[-1]['to'] + 50):
                 phases[-1]['to'] = max(phases[-1]['to'], b_)
                 phases[-1]['n'] += 1
                 phases[-1]['labels'].add(r['ty'])
+                phases[-1]['open'] = phases[-1]['open'] or open_end
             else:
-                phases.append({'from': a_, 'to': b_, 'n': 1, 'labels': {r['ty']}, 'base': r})
+                phases.append({'from': a_, 'to': b_, 'n': 1, 'labels': {r['ty']}, 'base': r, 'open': open_end})
         for k, ph in enumerate(phases):
             base = ph['base']
-            out.append(dict(base, id=f"{base['id']}:{k}", env=(ph['from'], ph['to']),
-                            per=f"{spec.get('groupVerb', 'attested by')} {ph['n']} {spec.get('groupNoun', 'dated record')}{'s' if ph['n'] > 1 else ''} ({', '.join(sorted(ph['labels']))[:60]}): {ph['from']}–{ph['to']}"[:120],
+            end = None if ph['open'] else ph['to']
+            out.append(dict(base, id=f"{base['id']}:{k}", env=(ph['from'], end),
+                            per=f"{spec.get('groupVerb', 'attested by')} {ph['n']} {spec.get('groupNoun', 'dated record')}{'s' if ph['n'] > 1 else ''} ({', '.join(sorted(ph['labels']))[:60]}): {ph['from']}–{ph['to'] if end is not None else '(end undetermined)'}"[:120],
                             ty=spec.get('groupType', base['ty'])))
         if len(rs) > len(dated):
             skipped['undated evidence (not used)'] += len(rs) - len(dated)
@@ -570,11 +672,15 @@ def line_features(spec):
             KEEP_GEOM = False
         f, dt = sp.get('fields', {}), sp['dating']
         unc = f.get('uncertain') or {}
+        keeps = sp.get('keep') or []
         for i, p in enumerate(rows):
+            if any(str(p.get(kf['field'])) not in kf['values'] if 'values' in kf else str(p.get(kf['field'])) in kf.get('notValues', [])
+                   for kf in ([keeps] if isinstance(keeps, dict) else keeps)):
+                continue
             g = p.get('__geom')
             if not g or g.get('type') not in ('LineString', 'MultiLineString'):
                 continue
-            pr = {'i': f"{spec['src']}:{k}:{p.get(f.get('id')) if f.get('id') else i}", 'src': spec['src'], 'k': str(_field(p, f.get('type')) or 'road')[:40],
+            pr = {'i': f"{spec['src']}:{k}:{p.get(f.get('id')) if f.get('id') else i}", 'src': spec['src'], 'k': str(f.get('lineKind') or _field(p, f.get('type')) or 'road')[:40],
                   'u': 1 if unc and str(p.get(unc['field'])) in unc['values'] else 0, 'per': dt.get('label', '')[:80]}
             nm = _field(p, f.get('name'))
             if nm:
@@ -611,21 +717,35 @@ def area_features(spec):
         if keep:
             rows = [p for p in rows if str(p.get(keep['field'])) in keep['values']]
         dt = sp['dating']
-        date = {'ef': dt['year'], 'et': dt['year'], 'sn': 1} if dt['mode'] == 'snapshot' else {'ef': dt['from'], 'et': dt['to']}
+        date = {'ef': dt['year'], 'et': dt['year'], 'sn': 1} if dt['mode'] == 'snapshot' else \
+            {'ef': dt['from'], 'et': dt['to']} if dt['mode'] == 'envelope' else None  # 'fields': each unit's own dates, below
         names = sp.get('names') or {}
         for lv in sp.get('dissolve') or []:
-            groups = {}
+            fields = lv['field'] if isinstance(lv['field'], list) else [lv['field']]  # a list: units keyed by several fields (county + hundred)
+            groups, labels, spans = {}, {}, {}
             for p in rows:
                 g = p.get('__geom')
-                key = p.get(lv['field'])
-                if not g or key in (None, ''):
+                if not g or any(p.get(x) in (None, '') for x in fields):
                     continue
-                for v in str(key).split(';')[:1]:  # contested/divided units: the first named holder (the source lists them ';'-separated)
-                    groups.setdefault(v.strip(), []).append(shape(g).buffer(0))
+                # contested/divided units: the first named holder (the source lists them ';'-separated)
+                v = '|'.join(str(p.get(x)).split(';')[0].strip() for x in fields)
+                groups.setdefault(v, []).append(shape(g).buffer(0))
+                labels.setdefault(v, str(p.get(lv.get('nameField', fields[-1]))).split(';')[0].strip())
+                if date is None:
+                    pd = parse_dating(p.get(dt['field']))
+                    if pd and pd[0] is not None:
+                        a_, b_ = spans.get(v, (pd[0], pd[1] or pd[0]))
+                        spans[v] = (min(a_, pd[0]), max(b_, pd[1] or pd[0]))
             for v, geoms in groups.items():
+                if date is None and v not in spans:
+                    continue  # no date of its own: not drawn
                 u = unary_union(geoms).simplify(lv.get('simplify', 0.0005), preserve_topology=True)
                 if u.is_empty:
                     continue
-                out.append((mapping(u), {'i': f"{spec['src']}:{lv['field']}:{v}", 'n': names.get(lv['field'], {}).get(v, v)[:60], 'lv': lv['level'],
-                                         'src': spec['src'], 'per': dt.get('label', '')[:80], **date}, lv.get('minzoom', 4)))
+                d_ = date or {'ef': spans[v][0], 'et': spans[v][1]}
+                key = '|'.join(fields)
+                lab = labels[v] if len(fields) > 1 or lv.get('nameField') else v
+                per = dt.get('label', '') if date else f"{dt.get('label', 'surveyed')} {d_['ef']}–{d_['et']}" if d_['ef'] != d_['et'] else f"{dt.get('label', 'surveyed')} {d_['ef']}"
+                out.append((mapping(u), {'i': f"{spec['src']}:{key}:{v}" + (f':{k}' if k else ''), 'n': names.get(lv['field'] if len(fields) == 1 else key, {}).get(lab, lab)[:60],
+                                         'lv': lv['level'], 'src': spec['src'], 'per': per[:80], **d_}, lv.get('minzoom', 4)))
     return out

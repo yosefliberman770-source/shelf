@@ -1,4 +1,10 @@
 {
+ "agglomerations-roman/original/agglomerations-EN.csv": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.4678112k/349c80412051f3b0353d4a2277d6cedc797fd0b7",
+  "bytes": 2087092,
+  "sha256": "29c74f3f1d3be528e1063db942a4c62ba03be6cf4a888670ecaaa337b7af6126",
+  "downloaded": "2026-10-01"
+ },
  "al-thurayya/original/DATA-LICENSE.md": {
   "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/DATA-LICENSE.md",
   "bytes": 1071,
@@ -269,6 +275,12 @@
   "bytes": 230734,
   "sha256": "99ec4adfb9de4ca2a37212aab82117903e72bed0dc00da438fcf7cde4a6f02ed",
   "downloaded": "2026-09-30"
+ },
+ "daugava-hillforts/original/hillforts-EN.csv": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.aecdrl48/11369fae61785da8e4fab893f14220dd17d2e6b8",
+  "bytes": 10259,
+  "sha256": "3c0e63ac8b0666043f94aa48c65cda25b0ee6f92e6efbb53dd4fbb214acd2e00",
+  "downloaded": "2026-10-01"
  },
  "dicotopo/original/DT01.xml": {
   "url": "https://github.com/chartes/dico-topo/tree/master/data/DT01",
@@ -711,17 +723,41 @@
   "sha256": "4c4135691f39c9122d919ee6f0da7dfdd57df6a8b822d361f7b19c8f9db1d0c3",
   "downloaded": "2026-10-01"
  },
+ "emdigit-waypoints/original/waypoints.geojson": {
+  "url": "https://services2.arcgis.com/V2PQwgZMTFfgM0Xu/arcgis/rest/services/Early_Modern_Digital_Itineraries_(EMDigIt)__Core_Italian_Itinerary_Waypoints/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2088489,
+  "sha256": "51a86fd863152058358161ca2b6cd0daf0316c163561628ba5c9315667f67a7f",
+  "downloaded": "2026-10-01"
+ },
  "engel-hungary/original/Engel2020.zip": {
   "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
   "bytes": 51552337,
   "sha256": "27bf997c6a1f0d61409e536d806552fec525c8b7870ecb5f5201ef9f4b50e057",
   "downloaded": "2026-09-30"
  },
+ "fields-on-fire/original/burned-households_town.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8939571?format=original",
+  "bytes": 120187,
+  "sha256": "a0477986bbf06add855bf83ec83001cb59ef3670364d8887877bab4caad0185c",
+  "downloaded": "2026-10-01"
+ },
+ "fields-on-fire/original/burned-households_town.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8939572",
+  "bytes": 144398,
+  "sha256": "d3f703a19178b70b038f3fd171a159957d21d26db0a6b6c8fc537596a930d48d",
+  "downloaded": "2026-10-01"
+ },
  "finland-heritage/original/tutkija.zip": {
   "url": "https://mverkkodatashare.blob.core.windows.net/share/tutkija.zip",
   "bytes": 38319125,
   "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
   "downloaded": "2026-09-30"
+ },
+ "france-mining-cadastre/original/camino-titres.csv": {
+  "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
+  "bytes": 7275368,
+  "sha256": "ee40023a141f9721fbfab85bed429692a78bf661d10dc141c53399f8130ac73d",
+  "downloaded": "2026-10-01"
  },
  "generalkarte-gazetteer/original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv": {
   "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
@@ -776,6 +812,12 @@
   "provenance": "Downloaded from the official URL by fetch.py.",
   "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
  },
+ "hajj-forts/original/forts.geojson": {
+  "url": "https://services1.arcgis.com/KUeKSLlMUcWvuPRM/arcgis/rest/services/Fortresses_between_Damascus_and_Medina_(coordinates_from_Andrew_Petersen)/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 12710,
+  "sha256": "3aab90cf7840fb2432abe7a5a728b78cd8ea232a73275949a175516972dce847",
+  "downloaded": "2026-10-01"
+ },
  "hced/original/HCED Data v3.csv": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
   "bytes": 2171518,
@@ -787,6 +829,12 @@
   "bytes": 2490,
   "sha256": "7cd17664755fdc2a887df22c8bae8b47f722e1339a62fe3f979adfb25cbabe25",
   "downloaded": "2026-09-30"
+ },
+ "hierokles-synekdemos/original/places.geojson": {
+  "url": "https://services.arcgis.com/ycIuRaoIC4UuCDAS/arcgis/rest/services/hierokles_places/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 302956,
+  "sha256": "581f9655793bf1c1e123aca85b177f491c88792bb00ae7235165ca02e4a507e7",
+  "downloaded": "2026-10-01"
  },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
@@ -878,10 +926,22 @@
   "sha256": "a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327",
   "downloaded": "2026-09-30"
  },
+ "ireland-rail/original/IrishRail_Lines.zip": {
+  "url": "https://www.arcgis.com/sharing/rest/content/items/63612b1edcff44fdb4cf70146eaf6d65/data",
+  "bytes": 1253038,
+  "sha256": "8ba1d7a9905259fee60d6583ea99effd7c96875f1d4d550f7cdb2ad951f5cd4e",
+  "downloaded": "2026-10-01"
+ },
  "ireland-smr/original/SMROpenData.csv": {
   "url": "https://heritagedata.maps.arcgis.com/sharing/rest/content/items/63841b2807504a24942e44955119c339/data",
   "bytes": 169737101,
   "sha256": "99f171b7b120eb7fbb04525f927d4ed8a8a77ccf6b063dd981e4d14024c23768",
+  "downloaded": "2026-10-01"
+ },
+ "ireland-wrecks/original/wrecks.geojson": {
+  "url": "https://services3.arcgis.com/ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks/FeatureServer/3/query (all features, outSR=4326)",
+  "bytes": 2352015,
+  "sha256": "f7792c70f937ad4d4983bec55ab71d81f05d26fc73d7c225e4b102d878ac9cba",
   "downloaded": "2026-10-01"
  },
  "itinere/nightly-export/route-segments.ndjson": {
@@ -1160,6 +1220,12 @@
   "sha256": "1866e937c412e61b462a265de88cd1ab4d525b2667e6c5352e1685a0a6637422",
   "downloaded": "2026-09-30"
  },
+ "ni-smr/original/nismr_10092026.geojson": {
+  "url": "https://admin.opendatani.gov.uk/dataset/46240fa5-db15-469e-b1c8-0460504b951c/resource/a2af36e6-d3f0-4abc-9314-b1b72d5a9e06/download/nismr_10092026.geojson",
+  "bytes": 7209903,
+  "sha256": "cd9e1d825bdff93a639be17e6a68c949bff7f35143f1bc641c7f8bd1c5236948",
+  "downloaded": "2026-10-01"
+ },
  "nmrw-wales/original/nmrw.geojson": {
   "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/NMRW/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 93347256,
@@ -1202,6 +1268,12 @@
   "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
   "downloaded": "2026-09-30"
  },
+ "oetr-1532-campaign/original/settlements.gpkg": {
+  "url": "https://zenodo.org/api/records/7079747/files/UrbanOccupationsOETR_1532_Ottoman_campaign_1840s_settlements_dataset.gpkg/content",
+  "bytes": 16683008,
+  "sha256": "e90ea2b8fde84ca1d9ac91fba9480c40bae46423e03b7c324c630ce5ca3ab962",
+  "downloaded": "2026-10-01"
+ },
  "orkney-saga-names/original/saga_place_names_2025.geojson": {
   "url": "https://services6.arcgis.com/VgBELOF6mvRyDvT0/arcgis/rest/services/Place_Names_in_the_Saga_of_the_Earls_of_Orkney_2025_WFL1/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 125208,
@@ -1214,11 +1286,23 @@
   "sha256": "b3670e8258aa96f7705745a211064f84c5645e836c3862d1f881436dfb1a65ff",
   "downloaded": "2026-10-01"
  },
+ "ottoman-plovdiv/original/Ottoman_Plovdiv_geodata.rar": {
+  "url": "https://zenodo.org/api/records/10046836/files/Ottoman_Plovdiv_geodata.rar/content",
+  "bytes": 1512204,
+  "sha256": "3e0fdaa74cea2ec248ada93d6127a8d5ecfec309f7b3b2600b5a4875bf643c51",
+  "downloaded": "2026-10-01"
+ },
  "periodo/original/periodo-dataset.json": {
   "url": "https://data.perio.do/d.json",
   "bytes": 7806282,
   "sha256": "5482d0dc72e062dfcbd95671b1c2e07f132e30b5b1caff766c172844984432a9",
   "downloaded": "2026-09-30"
+ },
+ "piemonte-medieval/original/fortifications_and_religious_sites_Piemonte_ver1-0.gpkg": {
+  "url": "https://data.mendeley.com/public-files/datasets/268xx6ddf4/files/c889aac1-215c-4502-8ee4-b19966f95e0a/file_downloaded",
+  "bytes": 147456,
+  "sha256": "42877a94c8cdb13bb4fb09b42d516811de982ef1e3f0805d49d7c82d90869501",
+  "downloaded": "2026-10-01"
  },
  "pleiades/original/dumps/README.txt": {
   "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
@@ -1272,6 +1356,18 @@
   "url": "https://download.geonames.org/export/dump/PL.zip",
   "bytes": 2017774,
   "sha256": "9a6daf1d77ef2320e0d4d14e30666b3206d53d056b0d141b8918ea13c6489775",
+  "downloaded": "2026-10-01"
+ },
+ "portic-ports/original/pointcalls.json": {
+  "url": "http://data.portic.fr/api/pointcalls/?params=pointcall_uhgs_id,pointcall_out_date,pointcall_in_date,source_suite&shortenfields=false",
+  "bytes": 18696258,
+  "sha256": "c0af0e088197ad079e0c848027af3bbb94c2c2dde2af7f58fdd803c5fcda8c54",
+  "downloaded": "2026-10-01"
+ },
+ "portic-ports/original/ports.json": {
+  "url": "http://data.portic.fr/api/ports/?srid=4326",
+  "bytes": 1205875,
+  "sha256": "6e9e34fbed3e7561379c443d316a26d2a949a812379d875903aeb5bdff731998",
   "downloaded": "2026-10-01"
  },
  "princes-townspeople/original/cities_dynasties.tab": {
@@ -1928,6 +2024,18 @@
   "sha256": "fab7bd0f195f9fda8753c993d2460964eae515e65a2f2b89637a7a881180cdd7",
   "downloaded": "2026-10-01"
  },
+ "sedd-scania/original/Railroads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3003532",
+  "bytes": 17451,
+  "sha256": "42cb7f051d9ac0c0b78f0035a5b7386612783294f74843bc59770ecf771cd7e9",
+  "downloaded": "2026-10-01"
+ },
+ "sedd-scania/original/Roads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3003533",
+  "bytes": 357408,
+  "sha256": "1a87f854e021a63327551c0fd0e22154152d6c2839ff969616c2848476edc899",
+  "downloaded": "2026-10-01"
+ },
  "slovenia-rkd-register/original/rnpd.csv": {
   "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
   "bytes": 24015168,
@@ -2485,6 +2593,24 @@
   "bytes": 19141157,
   "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
   "downloaded": "2026-09-29"
+ },
+ "wales-cantrefs/original/cantrefs.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Cantrefs_of_Wales_1543_Various_Sources/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 58711464,
+  "sha256": "5af3e764bdd5881b4b933bd6df47da4ddd75f24fb5fdaac24cdfda154e1c6380",
+  "downloaded": "2026-10-01"
+ },
+ "wales-cantrefs/original/commotes.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Commotes_of_Wales_1543_Various_Sources/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 80203376,
+  "sha256": "475bffbe4277060cb1b979e26fbbc168433ab325b3051d8d18ecbe0e6460daa9",
+  "downloaded": "2026-10-01"
+ },
+ "wales-civil-parishes/original/parishes_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 166766156,
+  "sha256": "e6dd829f08e74198809ba7daaccd15d00f108af0babd6baed1afb0f1a945a9bb",
+  "downloaded": "2026-10-01"
  },
  "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {
   "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",

@@ -1,0 +1,104 @@
+{
+ "id": "sedd-roads",
+ "src": "seddroads",
+ "public": true,
+ "enabled": true,
+ "geometry": "lines",
+ "title": "Roads and railways of five Scanian parishes on the 1812–20, 1860s and 1910 maps (SEDD geography, Lund University; Harvard Dataverse)",
+ "licence": "CC0 1.0",
+ "url": "https://doi.org/10.7910/DVN/Z0AHAL",
+ "describe": "Roads and railways digitised from three map series for five rural parishes of western Scania: the Skånska rekognosceringskartan (1812–1820), the 1860s topographic maps and the 1910 economic map; each segment is shown for its own map's date.",
+ "layers": [
+  "roads-cassini"
+ ],
+ "fields": {
+  "id": "roadId",
+  "type": "subType"
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "sedd-scania/original/Roads.zip",
+    "member": "Roads.shp"
+   },
+   "keep": {
+    "field": "mapName",
+    "values": [
+     "MTSM_Scania_1812-1820"
+    ]
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1812,
+    "to": 1820,
+    "label": "road on the Scania reconnaissance map 1812–1820"
+   }
+  },
+  {
+   "read": {
+    "path": "sedd-scania/original/Roads.zip",
+    "member": "Roads.shp"
+   },
+   "keep": {
+    "field": "obsDate",
+    "values": [
+     "1860"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1860,
+    "label": "road on the 1860 topographic map"
+   }
+  },
+  {
+   "read": {
+    "path": "sedd-scania/original/Roads.zip",
+    "member": "Roads.shp"
+   },
+   "keep": {
+    "field": "obsDate",
+    "values": [
+     "1865"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1865,
+    "label": "road on the 1865 topographic map"
+   }
+  },
+  {
+   "read": {
+    "path": "sedd-scania/original/Roads.zip",
+    "member": "Roads.shp"
+   },
+   "keep": {
+    "field": "obsDate",
+    "values": [
+     "1910"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1910,
+    "label": "road on the 1910 economic map"
+   }
+  },
+  {
+   "read": {
+    "path": "sedd-scania/original/Railroads.zip",
+    "member": "Railroads.shp"
+   },
+   "fields": {
+    "id": "railId",
+    "lineKind": "railway"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1910,
+    "label": "railway on the 1910 economic map"
+   }
+  }
+ ]
+}

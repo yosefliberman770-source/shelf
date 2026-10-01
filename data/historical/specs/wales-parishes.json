@@ -1,0 +1,14 @@
+{
+ "id": "wales-parishes", "src": "walesparish", "public": true, "enabled": true, "geometry": "polygons",
+ "title": "Civil parishes and hundreds of Wales on the first-edition Ordnance Survey six-inch maps, surveyed 1860s–1880s (Welsh historic boundaries, ArcGIS 2024)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales/FeatureServer/0",
+ "describe": "Parish boundaries vectorised from the first-edition OS County Series, each shown over the years its sheets were surveyed; hundreds are the union of their parishes over the same years.",
+ "layers": ["historical-units"],
+ "read": {"path": "wales-civil-parishes/original/parishes_os1.geojson"},
+ "dissolve": [
+  {"field": ["County", "Hundred"], "level": "hundred", "minzoom": 6, "simplify": 0.0012},
+  {"field": ["County", "Parish"], "level": "civil parish", "minzoom": 8, "simplify": 0.0004}
+ ],
+ "dating": {"mode": "fields", "field": "SurveyDate", "label": "first-edition OS survey"}
+}

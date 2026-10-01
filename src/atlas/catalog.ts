@@ -967,20 +967,26 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500)', datasets: [], defaultOn: true, coverage: [1475, 1525],
-    hint: 'Counties, duchies, prince-bishoprics and their districts as a dated source reconstructs them — the Low Countries c. 1500 from the Historical Atlas of the Low Countries (merged from its locality boundaries). A reconstruction for one moment: drawn within 25 years of it, lighter away from it. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
+    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500, Wales c. 1570 and 1860s–80s)', datasets: [], defaultOn: true, coverage: [1475, 1890],
+    hint: 'Territorial units as a dated source gives them: counties, duchies and prince-bishoprics of the Low Countries c. 1500 (Historical Atlas of the Low Countries, merged from its locality boundaries); the cantrefs and commotes of Wales as listed c. 1570; Welsh hundreds and civil parishes as surveyed for the first-edition Ordnance Survey maps (1860s–80s). A list or reconstruction for one moment is drawn within 25 years of it, lighter away from it; a survey is drawn over its own survey years. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
     sources: ['historical-units'],
     specs: (c) => {
       const y = c.year;
       const when = ['any',
         ['all', ['!', ['has', 'sn']], ['<=', ['get', 'ef'], y], ['>=', ['get', 'et'], y]],
         ['all', ['has', 'sn'], ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS]]] as FilterSpecification;
-      const lv = (v: string) => ['all', when, ['==', ['get', 'lv'], v]] as FilterSpecification;
+      // levels of the sources, from the largest unit down (each source names its own levels)
+      const MAJOR = ['county / duchy / prince-bishopric', 'cantref', 'hundred'];
+      const MINOR = ['district', 'commote'];
+      const lv = (vs: string[]) => ['all', when, ['in', ['get', 'lv'], ['literal', vs]]] as FilterSpecification;
       const fade = ['case', ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.55, 0.9] as ExpressionSpecification;
       return [
-        { id: 'hunits-district', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('district'), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
-        { id: 'hunits-county', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('county / duchy / prince-bishopric'), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
-        { id: 'hunits-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv('county / duchy / prince-bishopric'), minzoom: 5,
+        { id: 'hunits-parish', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(['civil parish']), minzoom: 8, paint: { 'line-color': C.province, 'line-width': 0.4, 'line-dasharray': [1, 1.5], 'line-opacity': fade } },
+        { id: 'hunits-district', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(MINOR), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
+        { id: 'hunits-county', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv(MAJOR), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
+        { id: 'hunits-parish-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv(['civil parish', ...MINOR]), minzoom: 9,
+          layout: { 'text-field': ['get', 'n'], 'text-size': 10, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1, 'text-opacity': fade } },
+        { id: 'hunits-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv(MAJOR), minzoom: 5,
           layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
       ];
     },

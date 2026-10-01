@@ -1,0 +1,45 @@
+{
+ "id": "fieldsonfire",
+ "src": "fieldsfire",
+ "public": false,
+ "enabled": true,
+ "title": "Fields on Fire: towns of the European Russian Empire with fires recorded 1860–1864 (Ministry of Internal Affairs statistics; Harvard Dataverse)",
+ "licence": "CC BY-NC-SA 4.0 — private pack",
+ "url": "https://doi.org/10.7910/DVN/8S8L0V",
+ "describe": "Provincial and district towns of 49 provinces of the western Russian Empire with the years in which the Ministry of Internal Affairs recorded burned households there (1860–1864); consecutive years are one phase.",
+ "layers": [
+  "gazetteer-settlements"
+ ],
+ "read": {
+  "path": "fields-on-fire/original/burned-households_town.zip",
+  "member": "fieldsonfire_data_burned-households_town.shp",
+  "pointFields": [
+   "long",
+   "lat"
+  ]
+ },
+ "fields": {
+  "id": "obsrvID",
+  "name": "tpnm_eng",
+  "type": [
+   "type"
+  ],
+  "context": [
+   "parent_pro"
+  ],
+  "kind": "settlement",
+  "altNames": {
+   "field": "tpnm_rus",
+   "sep": ";"
+  }
+ },
+ "groupBy": true,
+ "groupNoun": "yearly fire record",
+ "groupVerb": "with",
+ "groupType": "town (fires recorded by the Ministry of Internal Affairs)",
+ "dating": {
+  "mode": "fields",
+  "from": "year"
+ },
+ "datingLabel": "year of the fire record"
+}

@@ -161,6 +161,15 @@ def main():
     w('Counts of *integrated*, *blocked* and *acquisition attempted* include every catalogue record of a collection handled as one source (e.g. all layers of a '
       'blocked atlas, all document records of the Czech AMCR).')
     w('')
+    cyc = load('discovery/cycles.json', [])
+    if cyc:
+        w('**Research cycles** (`cycles.json`, one row per completed cycle; each cycle rebuilds coverage, finds weak cells, searches, investigates, integrates):')
+        w('')
+        w(table(['Cycle', 'Date', 'Universe (unique)', 'Investigated (cum.)', 'Integrated sources (cum.)', 'New this cycle', 'Rejected / blocked (this cycle)',
+                 'Awaiting', 'Cells < 70', 'Main additions'],
+                [(c['cycle'], c['date'], f"{c['universe']:,}", f"{c['investigated']:,}", c['integratedSources'], c['newSources'], f"{c['rejected']} / {c['blocked']}",
+                  f"{c['awaiting']:,}", f"{c['weakBefore']:,} → {c['weakAfter']:,}", c['notes']) for c in cyc]))
+        w('')
     rq = load('discovery/region-questions.json', {})
     if rq:
         qs = list(next(iter(rq.values())).keys())

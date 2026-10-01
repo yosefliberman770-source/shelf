@@ -19,7 +19,7 @@ REGION_LOCAL = {
     'Hungary': ['Magyarország', 'Erdély', 'Dunántúl', 'Alföld'], 'Romania': ['România', 'Transilvania', 'Moldova', 'Țara Românească', 'Banat', 'Dobrogea'],
     'Bulgaria': ['България'], 'Serbia': ['Србија', 'Srbija', 'Vojvodina'], 'Croatia': ['Hrvatska', 'Dalmacija', 'Slavonija', 'Istra'], 'Slovenia': ['Slovenija'],
     'Bosnia': ['Bosna i Hercegovina'], 'Greece': ['Ελλάδα', 'Μακεδονία', 'Κρήτη'], 'Albania': ['Shqipëri'], 'North Macedonia': ['Македонија'],
-    'Ukraine': ['Україна', 'Галичина', 'Волинь', 'Поділля', 'Крим'], 'Belarus': ['Беларусь'], 'Lithuania': ['Lietuva'], 'Latvia': ['Latvija', 'Kurzeme', 'Vidzeme', 'Latgale'],
+    'Ukraine': ['Україна', 'Галичина', 'Волинь', 'Поділля', 'Крим'], 'Belarus': ['Беларусь', 'Белоруссия'], 'Lithuania': ['Lietuva'], 'Latvia': ['Latvija', 'Kurzeme', 'Vidzeme', 'Latgale'],
     'Estonia': ['Eesti'], 'Russia': ['Россия', 'Новгород', 'Псков', 'Москва'], 'Turkey': ['Türkiye', 'Anadolu', 'Trakya'], 'Cyprus': ['Κύπρος', 'Kıbrıs'],
     'Georgia': ['საქართველო'], 'Armenia': ['Հայաստան'], 'Austria': ['Österreich', 'Tirol', 'Kärnten', 'Steiermark', 'Niederösterreich'],
     'Switzerland': ['Schweiz', 'Suisse', 'Svizzera'], 'Ireland': ['Éire'], 'Wales': ['Cymru'], 'Scotland': ['Alba'],
@@ -65,6 +65,17 @@ LOCAL_CONCEPTS = {
     'et': ['linnused', 'kloostrid', 'külad', 'kohanimed', 'teed', 'muistised'],
     'pt': ['castelos', 'mosteiros', 'povoados', 'topónimos', 'moinhos', 'caminhos', 'sítios arqueológicos'],
     'ca': ['castells', 'monestirs', 'despoblats', 'topònims', 'molins', 'camins'],
+    # added in cycle 2 for the weakest regions, which had no local-language queries at all
+    'is': ['fornleifar', 'örnefni', 'bæir', 'kirkjur', 'eyðibýli', 'þingstaðir', 'sögulegt kort'],
+    'ar': ['قلاع', 'أديرة', 'قرى', 'أسماء الأماكن', 'طرق', 'مواقع أثرية', 'خريطة تاريخية', 'خانات'],
+    'he': ['מבצרים', 'מנזרים', 'יישובים', 'שמות מקומות', 'דרכים', 'אתרים ארכאולוגיים'],
+    'sq': ['kalatë', 'manastiret', 'fshatrat', 'toponimet', 'rrugët', 'sitet arkeologjike'],
+    'mk': ['тврдини', 'манастири', 'населби', 'топоними', 'патишта', 'археолошки локалитети'],
+    'ka': ['ციხეები', 'მონასტრები', 'სოფლები', 'ტოპონიმები', 'არქეოლოგიური ძეგლები'],
+    'hy': ['ամրոցներ', 'վանքեր', 'գյուղեր', 'տեղանուններ', 'հնավայրեր'],
+    'be': ['замкі', 'манастыры', 'паселішчы', 'тапонімы', 'дарогі', 'археалагічныя помнікі'],
+    'ga': ['caisleáin', 'mainistreacha', 'logainmneacha', 'bóithre'],
+    'cy': ['cestyll', 'abatai', 'enwau lleoedd', 'ffyrdd', 'safleoedd archeolegol'],
 }
 REGION_LANG = {
     'Deutschland': 'de', 'Bayern': 'de', 'Sachsen': 'de', 'Westfalen': 'de', 'Rheinland': 'de', 'Brandenburg': 'de', 'Thüringen': 'de', 'Hessen': 'de',
@@ -76,10 +87,12 @@ REGION_LANG = {
     'Slovensko': 'sk', 'Magyarország': 'hu', 'Erdély': 'hu', 'Dunántúl': 'hu', 'Alföld': 'hu', 'România': 'ro', 'Transilvania': 'ro', 'Moldova': 'ro',
     'Țara Românească': 'ro', 'Banat': 'ro', 'Dobrogea': 'ro', 'България': 'bg', 'Србија': 'sh', 'Srbija': 'sh', 'Vojvodina': 'sh', 'Hrvatska': 'sh',
     'Dalmacija': 'sh', 'Slavonija': 'sh', 'Istra': 'sh', 'Slovenija': 'sh', 'Bosna i Hercegovina': 'sh', 'Ελλάδα': 'el', 'Μακεδονία': 'el', 'Κρήτη': 'el',
-    'Κύπρος': 'el', 'Україна': 'uk', 'Галичина': 'uk', 'Волинь': 'uk', 'Поділля': 'uk', 'Крим': 'uk', 'Беларусь': 'ru', 'Россия': 'ru', 'Новгород': 'ru',
+    'Κύπρος': 'el', 'Україна': 'uk', 'Галичина': 'uk', 'Волинь': 'uk', 'Поділля': 'uk', 'Крим': 'uk', 'Беларусь': 'be', 'Белоруссия': 'ru', 'Россия': 'ru', 'Новгород': 'ru',
     'Псков': 'ru', 'Москва': 'ru', 'Lietuva': 'lt', 'Latvija': 'lv', 'Kurzeme': 'lv', 'Vidzeme': 'lv', 'Latgale': 'lv', 'Eesti': 'et', 'Türkiye': 'tr',
     'Anadolu': 'tr', 'Trakya': 'tr', 'Kıbrıs': 'tr', 'France': 'fr', 'Suisse': 'fr', 'Belgique': 'fr', 'Wallonie': 'fr', 'Nederland': 'nl', 'Holland': 'nl',
     'Friesland': 'nl', 'Zeeland': 'nl', 'België': 'nl', 'Vlaanderen': 'nl', 'Sverige': 'sv', 'Danmark': 'da', 'Norge': 'no', 'Suomi': 'fi',
+    'Ísland': 'is', 'مصر': 'ar', 'سوريا': 'ar', 'المغرب': 'ar', 'تونس': 'ar', 'ليبيا': 'ar', 'لبنان': 'ar', 'الأردن': 'ar', 'Maroc': 'fr', 'Tunisie': 'fr',
+    'Algérie': 'fr', 'Liban': 'fr', 'ישראל': 'he', 'Shqipëri': 'sq', 'Македонија': 'mk', 'საქართველო': 'ka', 'Հայաստան': 'hy', 'Éire': 'ga', 'Cymru': 'cy',
 }
 
 

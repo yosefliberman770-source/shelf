@@ -1,0 +1,14 @@
+{
+ "id": "hierokles", "src": "hierokles", "public": false, "enabled": true,
+ "title": "Cities of Hierokles' Synekdemos (c. 527/528), located via Pleiades / Barrington Atlas (G. Moss, UNC, ArcGIS)",
+ "licence": "none stated (ArcGIS Online layer by gwmoss_UNC) — private pack",
+ "url": "https://services.arcgis.com/ycIuRaoIC4UuCDAS/arcgis/rest/services/hierokles_places/FeatureServer/0",
+ "describe": "The cities listed by province and diocese in Hierokles' Synekdemos, the early-Byzantine register of the empire's cities, each shown at the register's date only; places the compiler could not locate are marked approximate.",
+ "layers": ["gazetteer-settlements"],
+ "read": {"path": "hierokles-synekdemos/original/places.geojson"},
+ "fields": {"id": "FID", "name": "title", "context": ["province", "diocese"], "type": ["hierokles_"],
+            "kind": "settlement",
+            "approx": {"field": "located", "values": ["0"]}},
+ "dating": {"mode": "snapshot", "year": 527, "label": "listed in Hierokles' Synekdemos (c. 527/528)"},
+ "datingLabel": "the date of the Synekdemos (a snapshot, not the city's lifespan)"
+}

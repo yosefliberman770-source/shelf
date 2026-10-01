@@ -1,0 +1,12 @@
+{
+ "id": "piemonte", "src": "piemonte", "public": true, "enabled": true,
+ "title": "Medieval fortifications and religious buildings of the Susa Valley, Piemonte (field-validated, Mendeley Data 2025)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.17632/268xx6ddf4.1",
+ "describe": "Churches, monasteries and fortified structures along the via Francigena in the Susa Valley, positions validated in the field, each dated to its own year or century.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "piemonte-medieval/original/fortifications_and_religious_sites_Piemonte_ver1-0.gpkg"},
+ "fields": {"id": "fid", "name": "Structure", "context": ["Location", "Municipality"], "type": ["layer", "Monastic order"],
+            "kind": {"field": "layer", "map": {"fortified structure - low medieval structures": "castle", "fortified structure - high medieval structures": "castle", "monastery-convent middle-low medieval": "monastery", "monastery - high medieval": "monastery"}, "default": "church"}},
+ "dating": {"mode": "fields", "from": "Year", "centuryField": "Century"},
+ "datingLabel": "the structure's own year or century in the dataset"
+}

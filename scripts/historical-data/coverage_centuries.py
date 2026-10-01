@@ -12,7 +12,9 @@ Regions are present-day units (Natural Earth map units, so England, Wales and Sc
 convenience, never a historical claim.
 
 Score (0–100) for a cell with n records:
-  Q  = quantity against a target for that category, scaled by the region's area (log scale, capped at 1)
+  Q  = quantity against a target for that category, scaled by the region's area (log scale, capped at 1); each source's
+       records count in proportion to its footprint in the region (full once they fall in ≥ ⅓ of its half-degree cells),
+       so a local study cannot make a whole country look covered (from cycle 2; the unweighted score is kept per cell)
   D  = mean dating weight of the records (DATING)
   V  = distinct sources, capped at 3
   score = 100 · Q^0.8 · (0.55 + 0.30·D + 0.15·V/3)
@@ -151,10 +153,12 @@ class Cells:
         self.cls = defaultdict(lambda: defaultdict(int))
         self.src = defaultdict(lambda: defaultdict(int))
         self.precise = defaultdict(int)
+        self.foot = defaultdict(lambda: defaultdict(set))  # (region, y, cat) → source → half-degree grid cells it has records in
 
-    def add(self, region, cat, a, b, cls, src, precise=True):
+    def add(self, region, cat, a, b, cls, src, precise=True, pt=None):
         if not region or not cat or cls is None:
             return
+        g = (math.floor(pt[0] * 2), math.floor(pt[1] * 2)) if pt else None
         for y in CHECKPOINTS:
             if window_overlap(a, b, y):
                 key = (region, y, cat)
@@ -163,6 +167,19 @@ class Cells:
                 self.cls[key][cls] += 1
                 self.src[key][src] += 1
                 self.precise[key] += 1 if precise else 0
+                if g:
+                    self.foot[key][src].add(g)
+
+    def effective(self, key, area):
+        """Records counted for quantity, each source weighted by its spatial footprint in the region: a source whose records
+        fall in at least a third of the region's half-degree cells counts in full; a local study (a few parishes, one city)
+        counts in proportion, so it cannot make a whole country look covered."""
+        cells_in_region = max(1.0, area / 2000.0)  # a half-degree cell is ≈ 2,000 km² at European latitudes
+        tot = 0.0
+        for src, n in self.src.get(key, {}).items():
+            fp = self.foot.get(key, {}).get(src)
+            tot += n * (min(1.0, 3 * len(fp) / cells_in_region) if fp else 1.0)
+        return tot
 
 
 def regions():
@@ -230,15 +247,15 @@ def measure(at, place_dirs):
                 if src == 'buringh':
                     for yy, v in (ex.get('pop') or {}).items():
                         if v and v > 0:
-                            cells.add(region, 'Population', int(yy) - 49, int(yy) + 50, 'exact' if not ex.get('est') or ex.get('q') else 'period-narrow', 'buringh')
+                            cells.add(region, 'Population', int(yy) - 49, int(yy) + 50, 'exact' if not ex.get('est') or ex.get('q') else 'period-narrow', 'buringh', pt=(lon, lat))
                 a2, b2, cls = dating(a, b, ex)
                 precise = prec == 1 and not ex.get('pq')
-                cells.add(region, category(src, types, ex), a2, b2, cls, src, precise)
+                cells.add(region, category(src, types, ex), a2, b2, cls, src, precise, pt=(lon, lat))
                 if names:
-                    cells.add(region, 'Names', a2, b2, cls, src, precise)
+                    cells.add(region, 'Names', a2, b2, cls, src, precise, pt=(lon, lat))
                 if src == 'hre':
                     if ex.get('fm1'):
-                        cells.add(region, 'Economic', ex['fm1'][0], None, 'attested', 'hre:markets')
+                        cells.add(region, 'Economic', ex['fm1'][0], None, 'attested', 'hre:markets', pt=(lon, lat))
                     for name, ra, rb in ex.get('rule') or []:
                         pass  # counted as polities below
 
@@ -249,9 +266,9 @@ def measure(at, place_dirs):
             p = e['properties']
             region = at(lon, lat)
             y2 = p.get('y2', p['y'])
-            cells.add(region, 'Events', p['y'], y2, 'exact', src)
+            cells.add(region, 'Events', p['y'], y2, 'exact', src, pt=(lon, lat))
             if p['k'] in ('battle', 'siege', 'campaign', 'expedition'):
-                cells.add(region, 'Military', p['y'], y2, 'exact', src)
+                cells.add(region, 'Military', p['y'], y2, 'exact', src, pt=(lon, lat))
 
     # Political: distinct polities per region and checkpoint (Cliopatria label points), plus territories ruling the
     # Empire's towns (Princes and Townspeople) and Domesday hundreds (England 1086).
@@ -327,7 +344,7 @@ def measure(at, place_dirs):
                 a, b, cls = default
             else:
                 a, b, cls = p.get('f'), p.get('t'), 'exact' if (p.get('f') or p.get('t')) else None
-            cells.add(at(lon, lat), cat, a, b, cls, src)
+            cells.add(at(lon, lat), cat, a, b, cls, src, pt=(lon, lat))
 
     # National registers and historical gazetteers: every record in registers.pmtiles, by its own dating.
     # (spec-driven datasets have their own tile set, spec-sites.pmtiles, counted the same way)
@@ -347,9 +364,13 @@ def measure(at, place_dirs):
                 continue  # undated: not evidence for any checkpoint
             region = at(lon, lat)
             precise = not p.get('u')
-            cells.add(region, cat, a, b, cls, p.get('src', 'registers'), precise)
+            if p.get('src') == 'camp1532':
+                cat = 'Events'  # dated halts of an army on campaign
+            if p.get('src') == 'plovdiv' and k == 'settlement':
+                cat = 'Population'  # quarters of one city counted in tax registers: population evidence, not new settlements
+            cells.add(region, cat, a, b, cls, p.get('src', 'registers'), precise, pt=(lon, lat))
             if k == 'settlement' and p.get('src') in ('ivillaris', 'ottomannfs', 'generalkarte', 'lutsch', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'):
-                cells.add(region, 'Names', a, b, cls, p.get('src'), precise)  # each is a historically attested place-name form
+                cells.add(region, 'Names', a, b, cls, p.get('src'), precise, pt=(lon, lat))  # each is a historically attested place-name form
     ins = os.path.join(PUB, 'world', 'tiles', 'inscriptions.pmtiles')
     if os.path.exists(ins):
         for p, lon, lat in tile_features(ins, 10):
@@ -370,12 +391,12 @@ def measure(at, place_dirs):
         for p, lon, lat in tile_features(cas, 11):
             a_, b_ = p.get('ef', 1756), p.get('et', 1815)
             cls = 'period-narrow' if (b_ - a_) <= 150 else 'period-broad'
-            cells.add(at(lon, lat), 'Transport', a_, b_, cls, p.get('src', 'cassini'))
+            cells.add(at(lon, lat), 'Transport', a_, b_, cls, p.get('src', 'cassini'), pt=(lon, lat))
     # Territorial units from spec datasets (data/historical/specs, "geometry": "polygons"): Political, at their dated moment.
     hu = os.path.join(PUB, 'world', 'tiles', 'historical-units.pmtiles')
     if os.path.exists(hu):
         for p, lon, lat in tile_features(hu, 8):
-            cells.add(at(lon, lat), 'Political', p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'))
+            cells.add(at(lon, lat), 'Political', p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'), pt=(lon, lat))
 
     for line in open(os.path.join(CACHE, 'itinere.ndjson'), encoding='utf-8'):
         f = json.loads(line)
@@ -383,13 +404,13 @@ def measure(at, place_dirs):
         if c:
             p = f['properties']
             a, b = p.get('lowerDate'), p.get('upperDate')
-            cells.add(at(c[0], c[1]), 'Transport', a, b, 'period-broad' if a is not None else 'dataset', 'itinere')
+            cells.add(at(c[0], c[1]), 'Transport', a, b, 'period-broad' if a is not None else 'dataset', 'itinere', pt=(c[0], c[1]))
     for f in json.load(open(os.path.join(CACHE, 'viabundus_Viabundus-2-edges.geojson'), encoding='utf-8'))['features']:
         c = first_coord(f.get('geometry'))
         if c:
             p = f['properties']
             a, b = p.get('fromyear'), p.get('toyear')
-            cells.add(at(c[0], c[1]), 'Transport', a or 1350, b or 1650, 'exact' if (a or b) else 'dataset', 'viabundus')
+            cells.add(at(c[0], c[1]), 'Transport', a or 1350, b or 1650, 'exact' if (a or b) else 'dataset', 'viabundus', pt=(c[0], c[1]))
     for fname, cat, src in (('awmc-roads.json', 'Transport', 'awmc'), ('awmc-shoreline.json', 'Physical', 'awmc'), ('awmc-inland-water.json', 'Physical', 'awmc'),
                             ('pleiades-lines.json', None, 'pleiades'), ('physical-change.json', 'Physical', 'polders')):
         for f in json.load(open(os.path.join(PUB, 'atlas', fname), encoding='utf-8'))['features']:
@@ -399,25 +420,29 @@ def measure(at, place_dirs):
             p = f['properties']
             c = cat or ('Transport' if p.get('k') in ('road', 'aqueduct', 'canal') else 'Physical' if p.get('k') == 'river' else None)
             if src == 'polders':
-                cells.add(at(lon, lat), c, p.get('f'), p.get('y'), 'period-broad', src)
+                cells.add(at(lon, lat), c, p.get('f'), p.get('y'), 'period-broad', src, pt=(lon, lat))
             elif p.get('f') is not None or p.get('t') is not None:
-                cells.add(at(lon, lat), c, p.get('f'), p.get('t'), 'period-broad', src)
+                cells.add(at(lon, lat), c, p.get('f'), p.get('t'), 'period-broad', src, pt=(lon, lat))
             else:
-                cells.add(at(lon, lat), c, -750, 640, 'dataset', src)
+                cells.add(at(lon, lat), c, -750, 640, 'dataset', src, pt=(lon, lat))
     return cells
 
 
-def score(cells, region, y, cat, area):
+def score(cells, region, y, cat, area, raw=False):
     if cat == 'Maritime' and region in LANDLOCKED:
         return None
     key = (region, y, cat)
     n = cells.n.get(key, 0)
     if not n:
         return 0
+    if not raw:
+        n_q = cells.effective(key, area)
+    else:
+        n_q = n
     t = TARGET[cat] * max(0.08, min(2.5, (area / 550000) ** 0.7))
     if cat == 'Political':
         t = max(4, TARGET[cat] * max(0.3, min(2.0, (area / 550000) ** 0.5)))
-    q = min(1.0, math.log1p(n) / math.log1p(t))
+    q = min(1.0, math.log1p(n_q) / math.log1p(t))
     d = cells.w[key] / n
     v = min(3, len(cells.src[key])) / 3
     return round(100 * q ** 0.8 * (0.55 + 0.30 * d + 0.15 * v))
@@ -430,13 +455,17 @@ def main():
     cells = measure(at, dirs + ([PRIVATE_PLACES] if private else []))
     out = {'built': date.today().isoformat(), 'checkpoints': CHECKPOINTS, 'categories': CATEGORIES, 'includesPrivatePack': private,
            'method': __doc__.strip(), 'targets': TARGET, 'datingWeights': DATING, 'areaKm2': {r: round(a) for r, a in area.items()}, 'cells': []}
-    weak = []
+    weak, weak_raw = [], 0
     for region in REGIONS:
         for y in CHECKPOINTS:
             for cat in CATEGORIES:
                 s = score(cells, region, y, cat, area[region])
+                s_raw = score(cells, region, y, cat, area[region], raw=True)
                 key = (region, y, cat)
-                cell = {'region': region, 'year': y, 'category': cat, 'score': s, 'records': cells.n.get(key, 0),
+                if s_raw is not None and s_raw < 70:
+                    weak_raw += 1
+                cell = {'region': region, 'year': y, 'category': cat, 'score': s, 'scoreUnweighted': s_raw, 'records': cells.n.get(key, 0),
+                        'effectiveRecords': round(cells.effective(key, area[region]), 1) if cells.n.get(key) else 0,
                         'dating': dict(cells.cls.get(key, {})), 'sources': dict(sorted(cells.src.get(key, {}).items(), key=lambda kv: -kv[1])),
                         'precisePositionShare': round(cells.precise.get(key, 0) / cells.n[key], 2) if cells.n.get(key) else None}
                 out['cells'].append(cell)
@@ -451,7 +480,9 @@ def main():
                      f'{dm.get("period-narrow", 0)},{dm.get("period-broad", 0)},{dm.get("dataset", 0)},"{"; ".join(list(c["sources"])[:4])}"\n')
     write_doc(out, weak)
     total = sum(1 for c in out['cells'] if c['score'] is not None)
-    print(f'{total} cells, {len(weak)} below 70')
+    out['weakUnweighted'] = weak_raw
+    json.dump(out, open(os.path.join(ROOT, 'data', 'historical', 'coverage-centuries.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
+    print(f'{total} cells, {len(weak)} below 70 (footprint-weighted); {weak_raw} below 70 counting every record in full')
 
 
 def write_doc(out, weak):

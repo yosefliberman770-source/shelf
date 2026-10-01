@@ -1,0 +1,16 @@
+{
+ "id": "campaign1532", "src": "camp1532", "public": true, "enabled": true,
+ "title": "Army stops of Süleyman's 1532 campaign between Istanbul and Sofia (UrbanOccupationsOETR, Koç University; Zenodo)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.7079747",
+ "describe": "The halting places of the Ottoman army on the outbound (April–May) and return (November) march of the 1532 campaign between Istanbul and Sofia, from the campaign diary, located by the project; arrival and departure days as the diary gives them.",
+ "layers": ["medieval-archaeology"],
+ "fields": {"id": "OBJECTID", "name": "Name", "type": ["Direction", "Arrival_Day", "Departure_Day"], "context": ["Name_modern"], "kind": "site"},
+ "parts": [
+  {"read": {"path": "oetr-1532-campaign/original/settlements.gpkg", "layer": "DSH_Outbound_Route_Points"},
+   "keep": {"field": "segment_type", "values": ["Army Stop"]},
+   "dating": {"mode": "snapshot", "year": 1532, "label": "army stop on the outbound march of the 1532 campaign (campaign diary)"}},
+  {"read": {"path": "oetr-1532-campaign/original/settlements.gpkg", "layer": "DSH_Inbound_Route_Points"},
+   "keep": {"field": "segment_type", "values": ["Army Stop"]},
+   "dating": {"mode": "snapshot", "year": 1532, "label": "army stop on the return march of the 1532 campaign (campaign diary)"}}
+ ]
+}

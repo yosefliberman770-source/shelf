@@ -1,8 +1,8 @@
 {
- "rawRecords": 1901758,
+ "rawRecords": 1906598,
  "rawByChannel": {
   "datacite": 73850,
-  "zenodo": 59102,
+  "zenodo": 63877,
   "harvard-dataverse": 17227,
   "data.europa.eu": 1001358,
   "figshare": 14400,
@@ -13,7 +13,7 @@
   "arcgis-hub": 20794,
   "ariadne-collections": 98,
   "discovery-chain": 13607,
-  "dataverse": 242727,
+  "dataverse": 242792,
   "europeana-maps": 39568,
   "ogm": 226009,
   "openaire": 37375,
@@ -21,12 +21,12 @@
   "re3data": 3530,
   "rumsey-maps": 38820
  },
- "duplicateRecordsMerged": 1522548,
- "candidates": 379246,
+ "duplicateRecordsMerged": 1527280,
+ "candidates": 379354,
  "byState": {
   "data-inspected": 983,
-  "catalogue-only": 99740,
-  "metadata-inspected": 4554,
+  "catalogue-only": 99706,
+  "metadata-inspected": 4288,
   "integrated": 200,
   "rejected": 8,
   "insufficient-spatial": 199,
@@ -34,8 +34,8 @@
   "promising": 94,
   "high-priority": 12,
   "blocked": 471,
-  "irrelevant": 272537,
-  "duplicate": 5,
+  "irrelevant": 272617,
+  "duplicate": 333,
   "acquired": 1
  },
  "byChannel": {
@@ -45,7 +45,7 @@
   "harvard-dataverse": 6511,
   "ogm": 160896,
   "re3data": 3528,
-  "zenodo": 7769,
+  "zenodo": 7877,
   "discovery-chain": 2007,
   "openaire": 6303,
   "shelf-audit": 153,
@@ -61,19 +61,19 @@
   "figshare": 100
  },
  "byClass": {
-  "A": 79394,
-  "C": 16773,
+  "A": 79418,
+  "C": 16774,
   "E": 69075,
   "G": 3637,
   "B": 84,
   "F": 8,
-  "I": 210275
+  "I": 210358
  },
  "relevant": 12008,
  "byStatus": {
-  "discovered": 378377,
+  "discovered": 378157,
   "integrated": 253,
-  "evaluated": 135,
+  "evaluated": 463,
   "blocked": 471,
   "acquired": 10
  },

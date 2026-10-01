@@ -1,0 +1,220 @@
+{
+ "id": "nismr",
+ "src": "nismr",
+ "public": true,
+ "enabled": true,
+ "title": "Northern Ireland Sites and Monuments Record (Historic Environment Division, OpenDataNI)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://data.europa.eu/data/datasets/northern-ireland-sites-and-monuments-record",
+ "describe": "Raths, cashels, crannogs, souterrains, churches, mottes, tower houses and other monuments of Northern Ireland, dated by the period(s) the record assigns; the years are a conventional Irish period table stated in each label. Records of uncertain or only prehistoric date, non-antiquities and natural features are left out; unlocated records are marked approximate.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "ni-smr/original/nismr_10092026.geojson"
+ },
+ "keep": [
+  {
+   "field": "General_Ty",
+   "notValues": [
+    "NON-ANTIQUITY",
+    "NATURAL FEATURE",
+    "FINDSPOT"
+   ]
+  },
+  {
+   "field": "Edited_Typ",
+   "notContaining": [
+    "NON-ANTIQUITY",
+    "NATURAL FEATURE",
+    "MODERN FEATURE",
+    "modern features"
+   ]
+  }
+ ],
+ "fields": {
+  "id": "SMRNo",
+  "name": "Edited_Typ",
+  "nameSplit": ":",
+  "nameSplitIndex": -1,
+  "nameTitleCase": true,
+  "type": [
+   "General_Ty"
+  ],
+  "context": [
+   "Townland_s",
+   "Council"
+  ],
+  "approx": {
+   "field": "Located",
+   "values": [
+    "Unlocated"
+   ]
+  },
+  "kind": {
+   "field": "General_Ty",
+   "map": {
+    "rath": "settlement",
+    "rath & souterrain": "settlement",
+    "cashel": "settlement",
+    "crannog": "settlement",
+    "settlement": "settlement",
+    "settlement site": "settlement",
+    "hut site": "settlement",
+    "occupation site": "settlement",
+    "ecclesiastical site": "church",
+    "church": "church",
+    "graveyard": "church",
+    "holy well": "church",
+    "bullaun": "church",
+    "penal site": "church",
+    "burial ground": "church",
+    "high cross": "church",
+    "abbey": "monastery",
+    "friary": "monastery",
+    "priory": "monastery",
+    "motte": "castle",
+    "motte & bailey": "castle",
+    "castle": "castle",
+    "tower house": "castle",
+    "fortification": "castle",
+    "fortified outcrop": "castle",
+    "bawn": "castle",
+    "plantation bawn": "castle",
+    "fort": "castle",
+    "star fort": "castle",
+    "pillbox": "castle",
+    "quay": "harbour",
+    "slipway": "harbour",
+    "harbour": "harbour",
+    "bridge": "bridge",
+    "trackway": "road",
+    "road": "road",
+    "mill": "mill",
+    "corn mill": "mill",
+    "windmill": "mill",
+    "kelp kiln": "building",
+    "lime kiln": "building",
+    "house": "building",
+    "battle site": "battle"
+   },
+   "default": "site"
+  },
+  "nameDropParens": true,
+  "nameSplitRequired": true
+ },
+ "dating": {
+  "mode": "periods",
+  "field": "General_Pe",
+  "sep": ";",
+  "label": "NI SMR period; years from the spec's conventional Irish period table",
+  "table": {
+   "e.christ.": [
+    400,
+    1177
+   ],
+   "early medieval": [
+    400,
+    1177
+   ],
+   "e.c./med": [
+    400,
+    1603
+   ],
+   "medieval": [
+    1177,
+    1603
+   ],
+   "med/l.med": [
+    1177,
+    1603
+   ],
+   "late-med": [
+    1350,
+    1603
+   ],
+   "late medieval": [
+    1350,
+    1603
+   ],
+   "post-med": [
+    1603,
+    1800
+   ],
+   "post_med": [
+    1603,
+    1800
+   ],
+   "post-medieval": [
+    1603,
+    1800
+   ],
+   "c12th": [
+    1101,
+    1200
+   ],
+   "c13th": [
+    1201,
+    1300
+   ],
+   "c14th": [
+    1301,
+    1400
+   ],
+   "c15th": [
+    1401,
+    1500
+   ],
+   "c16th": [
+    1501,
+    1600
+   ],
+   "c17th": [
+    1601,
+    1700
+   ],
+   "c18th": [
+    1701,
+    1800
+   ],
+   "c18th/c19th": [
+    1701,
+    1900
+   ],
+   "c19th": [
+    1801,
+    1900
+   ],
+   "c20th": [
+    1901,
+    2000
+   ],
+   "20th century": [
+    1901,
+    2000
+   ],
+   "modern": [
+    1801,
+    1914
+   ]
+  },
+  "ignore": [
+   "uncertain",
+   "prehistoric",
+   "bronze age",
+   "neolithic",
+   "mesolithic",
+   "neo/b.a.",
+   "iron age",
+   "l.b.a.",
+   "e.b.a.",
+   "m.b.a.",
+   "meso/neol",
+   "late neo",
+   "l.b.a./i.a.",
+   "early neo",
+   ""
+  ]
+ },
+ "datingLabel": "NI SMR period"
+}

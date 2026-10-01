@@ -5,6 +5,7 @@
 raw/*/original/**
 raw/*/nightly-export/**
 raw/*/derived-*.json
+raw/*/derived/**
 !raw/*/original/**/
 !raw/*/nightly-export/**/
 !raw/al-thurayya/original/DATA-LICENSE.md

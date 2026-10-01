@@ -1,0 +1,15 @@
+{
+ "id": "wales-cantrefs", "src": "walescantref", "public": true, "enabled": true, "geometry": "polygons",
+ "title": "Cantrefs and commotes of Wales as listed c. 1570 (Peniarth MS 147; WATU) — Welsh historic boundaries (ArcGIS, 2025)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Cantrefs_of_Wales_1543_Various_Sources/FeatureServer/0",
+ "describe": "The medieval Welsh territorial units — cantrefs and their commotes — with boundaries vectorised from the historic sources, shown at the date of the list they come from (Peniarth MS 147, c. 1570); the units are older, but no earlier date is claimed.",
+ "layers": ["historical-units"],
+ "parts": [
+  {"read": {"path": "wales-cantrefs/original/cantrefs.geojson"},
+   "dissolve": [{"field": "StandName", "level": "cantref", "minzoom": 5, "simplify": 0.0015}]},
+  {"read": {"path": "wales-cantrefs/original/commotes.geojson"},
+   "dissolve": [{"field": "StandName", "level": "commote", "minzoom": 7, "simplify": 0.0008}]}
+ ],
+ "dating": {"mode": "snapshot", "year": 1570, "label": "listed in Peniarth MS 147 (c. 1570)"}
+}

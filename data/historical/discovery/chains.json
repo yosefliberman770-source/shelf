@@ -5437,5 +5437,76 @@
 ]
 ],
 "found": 4
+},
+"10.1594/pangaea.963359": {
+"title": "Water chemistry of Lagrangian samplings of Inland Elbe 2023 (MOSES Hydrological Extremes)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kamjunke, Norbert",
+20
+],
+[
+"creator",
+"von Tümpling, Wolf",
+7
+],
+[
+"creator",
+"Hoff, Andrea",
+5
+],
+[
+"creator",
+"Koschorreck, Matthias",
+37
+]
+],
+"found": 69
+},
+"10.1594/pangaea.963358": {
+"title": "Water chemistry of Lagrangian samplings of Inland Elbe 2022 (MOSES Hydrological Extremes)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kamjunke, Norbert",
+20
+],
+[
+"creator",
+"von Tümpling, Wolf",
+7
+],
+[
+"creator",
+"Hoff, Andrea",
+5
+],
+[
+"creator",
+"Koschorreck, Matthias",
+37
+]
+],
+"found": 69
+},
+"10.34847/nkl.ec493t3m": {
+"title": "Projet Rurland, Bassée, Sites archéologiques",
+"level": 0,
+"edges": [
+[
+"creator",
+"Reddé, Michel",
+100
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 300
 }
 }

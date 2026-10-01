@@ -59,12 +59,15 @@ REGION_MAP = {
 # Column-name signals (many languages).
 LAT = re.compile(r'^(lat|latitude|y|y_coord|ycoord|lat_dd|breite|lat_wgs84|wgs84_lat|coord_y|y_wgs84|szeroko|šířka|latitud|latitudine)$|(^|_)lat(itude)?($|_)', re.I)
 LON = re.compile(r'^(lon|lng|long|longitude|x|x_coord|xcoord|lon_dd|länge|laenge|lon_wgs84|wgs84_lon|coord_x|x_wgs84|długo|délka|longitud|longitudine)$|(^|_)(lon|lng|longitude)($|_)', re.I)
-DATE_COL = re.compile(r'date|year|jahr|datier|datace|datov|datum|chronolog|period|perioad|periodo|périod|centur|jahrh|siècle|secolo|siglo|stulec|století|század|vek\b|век|'
+DATE_COL = re.compile(r'_pe$|date|year|jahr|datier|datace|datov|datum|chronolog|period|perioad|periodo|périod|centur|jahrh|siècle|secolo|siglo|stulec|století|század|vek\b|век|'
                       r'from|to$|start|end|begin|anno|epoch|époque|epoca|zeit|founded|built|erected|first_?ment|attest|fecha|rok|év|god|leto|dating|tpq|taq|ante|post|age\b', re.I)
 NAME_COL = re.compile(r'name|nom\b|nome|nazwa|név|naziv|nimi|navn|namn|title|titel|place|toponym|ort\b|lieu|luogo|lugar|miejsc|helység|settlement|site', re.I)
 YEARISH = re.compile(r'(?<!\d)(1[0-9]{3}|[2-9][0-9]{2})(?!\d)|\b([IVX]{1,5})\.?\s*(?:sz|st|jh|century|siècle|secolo|w\.|stol)|\b\d{1,2}(?:st|nd|rd|th)\s*c|\b\d{1,2}\.\s*(?:jh|jahrh|század|stol)', re.I)
 PERIOD_VAL = re.compile(r'mediev|middle age|mittelalter|médiév|medioev|średniow|středov|középkor|roman|römisch|romain|byzant|ottoman|osman|neolith|bronze|iron age|eisenzeit|'
-                        r'hallstatt|latène|la tène|migration|merowing|karoling|viking|early modern|neuzeit|renaiss|baroque|barock', re.I)
+                        r'hallstatt|latène|la tène|migration|merowing|karoling|viking|early modern|neuzeit|renaiss|baroque|barock|'
+                        # period vocabularies of heritage records (NI SMR "E.CHRIST.", "POST-MED", "C17TH"; English, Irish, Islamic dynasties)
+                        r'christian|e\.\s?christ|post[- _]?med|anglo[- ]saxon|\bnorman\b|\btudor\b|\bgeorgian\b|victorian|carolingian|gallo-roman|frankish|\bavars?\b|árpád|piast|přemysl|hussite|'
+                        r'habsburg|safavid|mamluk|ayyubid|umayyad|abbasid|fatimid|crusader|seljuk|\bc\d{2}(?:st|nd|rd|th)\b', re.I)
 
 _host_locks = defaultdict(threading.Lock)
 _host_last = defaultdict(float)
@@ -103,6 +106,17 @@ def _fetch_once(url, limit, accept, timeout):
         return None, str(e)[:80]
 
 
+def fetch_head(url, n=2_000_000):
+    """The first n bytes of a (large) file, for profiling its header and first rows."""
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': UA, 'Range': f'bytes=0-{n - 1}'})
+        with urllib.request.urlopen(req, timeout=90) as r:
+            b = r.read(n)
+        return b.rsplit(b'\n', 1)[0], 'partial'
+    except Exception as e:  # noqa: BLE001
+        return None, str(e)[:80]
+
+
 def jget(url):
     b, ct = fetch(url, 20_000_000, 'application/json')
     if b is None:
@@ -119,6 +133,10 @@ def files_of(c):
     """[(name, size, url)] and a note, from the hosting repository's API."""
     doi = (c.get('doi') or '').lower()
     url = c.get('url') or ''
+    if not doi:
+        m = re.search(r'(?:dx\.)?doi\.org/(10\.[^\s?#]+)', url, re.I)
+        if m:
+            doi = urllib.parse.unquote(m.group(1)).lower()
     if c.get('files') and isinstance(c['files'], list) and isinstance(c['files'][0], dict):
         return [(f.get('n') or f.get('name'), f.get('s') or f.get('size'), f.get('u') or f.get('url')) for f in c['files']], 'catalogue file list'
     m = re.search(r'zenodo\.(\d+)', doi) or re.search(r'zenodo\.org/(?:records?|doi/10\.5281/zenodo\.)/?(\d+)', url)
@@ -389,7 +407,8 @@ def profile_arcgis(url):
 def choose_file(files):
     """The most promising file to profile: structured geodata first, then tables; small enough to fetch."""
     rank = {'gpkg': 0, 'geojson': 1, 'zip': 2, 'kml': 3, 'csv': 4, 'tsv': 4, 'xlsx': 5, 'xls': 6, 'json': 7, 'dbf': 8, 'txt': 9, 'tab': 9}
-    ok = [(rank[ext_of(n)], s or 0, n, u) for n, s, u in files if ext_of(n) in rank and u and (not s or int(s) <= MAX_BYTES)]
+    ok = [(rank[ext_of(n)], s or 0, n, u) for n, s, u in files if ext_of(n) in rank and u
+          and (not s or int(s) <= MAX_BYTES or ext_of(n) in ('csv', 'tsv', 'txt', 'tab'))]
     return sorted(ok)[0] if ok else None
 
 
@@ -415,7 +434,15 @@ def need_of(c, need):
     return round(sum(vals) / max(1, len(vals)) * min(1, len(vals) / 6), 3) if vals else 0.0
 
 
+# Measurement series at sampling stations (water chemistry, isotopes, catches, sediment cores): positions and dates, but
+# not historical places — the automated pass used to score them "promising".
+ENV_SERIES = re.compile(r'water chemistry|isotop|bycatch|sediment|pollen|δ1[358]|stable isotope|plankton|biomass|'
+                        r'occurrence download|bathymetr|grain[- ]size|ice core|geochem|hydrolog', re.I)  # dendro/radiocarbon may date buildings and sites: kept
+
+
 def judge(p, c, need_v):
+    if ENV_SERIES.search(c.get('title') or ''):
+        return 'irrelevant', 'measurement series at sampling stations, not historical places (title)'
     if not p:
         return 'data-inspected', 'could not read the sample in a known format'
     sp, tm = p.get('spatial'), (p.get('datedShare') or 0) >= 0.2
@@ -451,6 +478,8 @@ def investigate(c, need):
             return rec
         _, size, name, u = ch
         b, ct = fetch(u)
+        if b is None and 'too large' in str(ct) and ext_of(name) in ('csv', 'tsv', 'txt', 'tab'):
+            b, ct = fetch_head(u)  # a text table too large to fetch whole: its first 2 MB are enough to profile
         if b is None:
             rec['state'] = 'metadata-inspected'
             rec['why'] = f'file {name}: {ct}'
@@ -470,6 +499,7 @@ def main():
     args = sys.argv[1:]
     opt = lambda k, d: type(d)(args[args.index(k) + 1]) if k in args else d  # noqa: E731
     limit, minrel, workers = opt('--limit', 3000), opt('--min-relevance', 50), opt('--workers', 8)
+    recheck_states = set(opt('--recheck-states', '').split(',')) - {''}
     need = need_index()
     done = {}
     if os.path.exists(OUT):
@@ -483,7 +513,12 @@ def main():
     for line in gzip.open(os.path.join(DISC, 'inventory.jsonl.gz'), 'rt', encoding='utf-8'):
         c = json.loads(line)
         redo = '--redo' in args and c['id'] in done and re.search(r'error:|EOF|landing page|HTTP 5', done[c['id']].get('why', ''))
-        if (c['id'] in done and not redo) or c.get('relevance', 0) < minrel or not c.get('regions') or c.get('state') in ('integrated', 'blocked', 'duplicate'):
+        # --recheck-states a,b: sample again what an earlier pass left in those states (e.g. after the period vocabulary grew)
+        recheck = c['id'] in done and done[c['id']].get('state') in recheck_states
+        if recheck:
+            redo = True
+        if (c['id'] in done and not redo) or c.get('relevance', 0) < minrel or not c.get('regions') or \
+                (c.get('state') not in ('catalogue-only', 'metadata-inspected', 'data-inspected', None) and not recheck):
             continue
         if c['channel'] in ('loc-maps', 'europeana-maps', 'rumsey-maps', 'ogm', 'harvard-geodata', 'wikidata-register', 'shelf-audit', 're3data'):
             continue  # maps go to the map index; registers/repositories are followed as discovery chains, not sampled

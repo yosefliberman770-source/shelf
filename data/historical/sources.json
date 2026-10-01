@@ -1284,5 +1284,191 @@
     "path": "original/HALC Codebook.xlsx"
    }
   ]
+ },
+ {
+  "id": "hierokles-synekdemos",
+  "local_only": true,
+  "arcgis": "https://services.arcgis.com/ycIuRaoIC4UuCDAS/arcgis/rest/services/hierokles_places/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/places.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "hajj-forts",
+  "local_only": true,
+  "arcgis": "https://services1.arcgis.com/KUeKSLlMUcWvuPRM/arcgis/rest/services/Fortresses_between_Damascus_and_Medina_(coordinates_from_Andrew_Petersen)/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/forts.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "emdigit-waypoints",
+  "local_only": true,
+  "arcgis": "https://services2.arcgis.com/V2PQwgZMTFfgM0Xu/arcgis/rest/services/Early_Modern_Digital_Itineraries_(EMDigIt)__Core_Italian_Itinerary_Waypoints/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/waypoints.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "piemonte-medieval",
+  "files": [
+   {
+    "url": "https://data.mendeley.com/public-files/datasets/268xx6ddf4/files/c889aac1-215c-4502-8ee4-b19966f95e0a/file_downloaded",
+    "path": "original/fortifications_and_religious_sites_Piemonte_ver1-0.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "agglomerations-roman",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://api.nakala.fr/data/10.34847/nkl.4678112k/349c80412051f3b0353d4a2277d6cedc797fd0b7",
+    "path": "original/agglomerations-EN.csv"
+   }
+  ]
+ },
+ {
+  "id": "daugava-hillforts",
+  "files": [
+   {
+    "url": "https://api.nakala.fr/data/10.34847/nkl.aecdrl48/11369fae61785da8e4fab893f14220dd17d2e6b8",
+    "path": "original/hillforts-EN.csv"
+   }
+  ]
+ },
+ {
+  "id": "ni-smr",
+  "files": [
+   {
+    "url": "https://admin.opendatani.gov.uk/dataset/46240fa5-db15-469e-b1c8-0460504b951c/resource/a2af36e6-d3f0-4abc-9314-b1b72d5a9e06/download/nismr_10092026.geojson",
+    "path": "original/nismr_10092026.geojson"
+   }
+  ]
+ },
+ {
+  "id": "wales-cantrefs",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/",
+  "files": [
+   {
+    "path": "original/cantrefs.geojson",
+    "note": "snapshot of Historic_Cantrefs_of_Wales_1543_Various_Sources/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/commotes.geojson",
+    "note": "snapshot of Historic_Commotes_of_Wales_1543_Various_Sources/FeatureServer/0 via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "wales-civil-parishes",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/parishes_os1.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "france-mining-cadastre",
+  "files": [
+   {
+    "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
+    "path": "original/camino-titres.csv",
+    "note": "data.gouv.fr resource df16a407-5292-4f03-b8b7-f028b66b5150 redirects here"
+   }
+  ]
+ },
+ {
+  "id": "ireland-wrecks",
+  "local_only": true,
+  "arcgis": "https://services3.arcgis.com/ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks/FeatureServer/3",
+  "files": [
+   {
+    "path": "original/wrecks.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "ireland-rail",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://www.arcgis.com/sharing/rest/content/items/63612b1edcff44fdb4cf70146eaf6d65/data",
+    "path": "original/IrishRail_Lines.zip"
+   }
+  ]
+ },
+ {
+  "id": "fields-on-fire",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8939572",
+    "path": "original/burned-households_town.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8939571?format=original",
+    "path": "original/burned-households_town.tab"
+   }
+  ]
+ },
+ {
+  "id": "portic-ports",
+  "local_only": true,
+  "files": [
+   {
+    "url": "http://data.portic.fr/api/ports/?srid=4326",
+    "path": "original/ports.json"
+   },
+   {
+    "url": "http://data.portic.fr/api/pointcalls/?params=pointcall_uhgs_id,pointcall_out_date,pointcall_in_date,source_suite&shortenfields=false",
+    "path": "original/pointcalls.json"
+   }
+  ],
+  "derived": "scripts/historical-data/portic_years.py → derived/ports-attested.csv"
+ },
+ {
+  "id": "ottoman-plovdiv",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10046836/files/Ottoman_Plovdiv_geodata.rar/content",
+    "path": "original/Ottoman_Plovdiv_geodata.rar"
+   }
+  ],
+  "derived": "scripts/historical-data/plovdiv_extract.py → derived/quarters.geojson, derived/buildings.geojson"
+ },
+ {
+  "id": "oetr-1532-campaign",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7079747/files/UrbanOccupationsOETR_1532_Ottoman_campaign_1840s_settlements_dataset.gpkg/content",
+    "path": "original/settlements.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "sedd-scania",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3003533",
+    "path": "original/Roads.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3003532",
+    "path": "original/Railroads.zip"
+   }
+  ]
  }
 ]
