@@ -330,8 +330,10 @@ def measure(at, place_dirs):
             cells.add(at(lon, lat), cat, a, b, cls, src)
 
     # National registers and historical gazetteers: every record in registers.pmtiles, by its own dating.
-    reg_path = os.path.join(PUB, 'world', 'tiles', 'registers.pmtiles')
-    if os.path.exists(reg_path):
+    # (spec-driven datasets have their own tile set, spec-sites.pmtiles, counted the same way)
+    for reg_path in (os.path.join(PUB, 'world', 'tiles', 'registers.pmtiles'), os.path.join(PUB, 'world', 'tiles', 'spec-sites.pmtiles')):
+        if not os.path.exists(reg_path):
+            continue
         for p, lon, lat in tile_features(reg_path, 11):
             k = p.get('k')
             cat = KIND_CAT.get(k)
