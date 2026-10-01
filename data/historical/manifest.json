@@ -968,6 +968,20 @@
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
  },
+ "hus-och-gard/original/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg": {
+  "url": "https://zenodo.org/api/records/18231456/files/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg/content",
+  "bytes": 385024,
+  "sha256": "25318f7e07c9566547ec0276153b146b8f7f41b590a8de505b6f310316d65118",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "hus-och-gard/original/Hus och g\u00e5rd punkter sweref_not_fixed_location.gpkg": {
+  "url": "https://zenodo.org/api/records/18231456/files/Hus och g\u00e5rd punkter sweref_not_fixed_location.gpkg/content",
+  "bytes": 176128,
+  "sha256": "3adaba03274b2bb0a06aadee4befdf1016e883b11328e77a0b0195b827af1211",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
  "index-villaris-1680/original/IndexVillaris1680-v2.0.4.zip": {
   "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
   "bytes": 11461666,

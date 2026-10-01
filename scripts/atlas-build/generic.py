@@ -494,6 +494,11 @@ def records(spec):
                 out.append(rec)
                 continue
             dt = dict(dt, mode='periods', field=dt.get('periodField', dt['field']))
+        if dt['mode'] == 'flags':
+            # one yes/no column per period (per_ROM = 1, per_VIK = 1 …): the flagged periods, then dated like named periods
+            on = {str(v) for v in dt.get('true', ['1', 'True', 'true', 'J', 'x'])}
+            p['__flags'] = ';'.join(name for col, name in dt['flags'].items() if str(p.get(col)) in on)
+            dt = dict(dt, mode='periods', field='__flags', sep=';')
         if dt['mode'] == 'periods':
             # Named periods (one field, separated), each mapped by the spec's own period table (a stated convention, e.g.
             # standard Egyptian chronology); separate periods stay separate phases (merged only when overlapping or within 50 years).

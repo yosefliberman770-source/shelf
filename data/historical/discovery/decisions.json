@@ -1530,6 +1530,49 @@
    "state": "integrated",
    "region": "Low Countries",
    "note": "Free-reuse licence (Modellicentie gratis hergebruik). The 1778 (Ferraris) and 1873 land-use layers added to the original-maps index as tiled WMS overlays (the INBO WMS draws only from about zoom 14); the vector data (WFS/OGC API) is not downloaded this cycle — a land-cover polygon layer is a candidate for later."
+  },
+  {
+   "title": "Dataset - Hus och gård i det förurbana samhället",
+   "match": [
+    "zenodo.18231455",
+    "zenodo.18231456"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Sweden",
+   "dataset": "hus-och-gard",
+   "note": "531 excavated houses (CC BY 4.0) → public spec hus-och-gard: 342 dated phases from the project's period flags (Roman Iron Age → Middle Ages) via the stated Swedish period scheme; 58 houses with unfixed location marked approximate; Stone/Bronze Age-only houses left out."
+  },
+  {
+   "title": "Toponymy in Nineteenth-Century Trento",
+   "match": [
+    "zenodo.18852123",
+    "zenodo.18852124"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Italy",
+   "note": "A few dozen street names of one square in Trento (5 KB); too local for the atlas."
+  },
+  {
+   "title": "Georeferenced toponyms relating to the Consegne dei Boschi (1822)",
+   "match": [
+    "zenodo.17277119"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Italy",
+   "note": "37 micro-toponyms of one Ligurian forest; too local."
+  },
+  {
+   "title": "Early-Medieval British Isles (ArcGIS)",
+   "match": [
+    "ROSiDsWkQXhsUAs0/arcgis/rest/services/B8WMi"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Britain and Ireland",
+   "note": "14 hand-entered annal events (a course project); not a dataset to integrate."
   }
  ]
 }

@@ -132,6 +132,21 @@ class NewOptions(unittest.TestCase):
         self.assertEqual([(r['lon'], r['lat'], r['precise']) for r in recs], [(4.9611, 46.5775, False)])
         self.assertEqual(skipped['no usable position'], 1)
 
+    def test_period_flag_columns(self):
+        import json
+        import tempfile
+        fc = {'type': 'FeatureCollection', 'features': [
+            {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [17.3, 59.6]}, 'properties': {'id': 'a', 'R': '1', 'F': '1', 'V': '0', 'M': '1'}},
+            {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [17.3, 59.6]}, 'properties': {'id': 'b', 'R': '0', 'F': '0', 'V': '0', 'M': None}}]}
+        with tempfile.TemporaryDirectory() as d:
+            json.dump(fc, open(os.path.join(d, 'h.geojson'), 'w'))
+            spec = {'src': 't', 'read': {'path': os.path.join(d, 'h.geojson')}, 'fields': {'id': 'id', 'kind': 'building'},
+                    'dating': {'mode': 'flags', 'flags': {'R': 'roman iron age', 'F': 'migration period', 'V': 'viking age', 'M': 'middle ages'},
+                               'table': {'roman iron age': [1, 400], 'migration period': [400, 550], 'viking age': [800, 1050], 'middle ages': [1050, 1520]}}}
+            recs, skipped = generic.records(spec)
+        self.assertEqual(sorted(r['env'] for r in recs), [(1, 550), (1050, 1520)])  # two phases; the unflagged Viking Age is not filled in
+        self.assertEqual(skipped['no period in the atlas range'], 1)
+
 
 class Areas(unittest.TestCase):
     def test_units_dated_by_their_own_survey_years(self):

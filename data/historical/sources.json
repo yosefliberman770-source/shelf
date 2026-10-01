@@ -1703,5 +1703,20 @@
     "note": "snapshot via fetch_arcgis.py (227 records)"
    }
   ]
+ },
+ {
+  "id": "hus-och-gard",
+  "url": "https://doi.org/10.5281/zenodo.18231456",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/Hus och gård punkter sweref_fixed_location.gpkg",
+    "note": "473 houses, fixed location"
+   },
+   {
+    "path": "original/Hus och gård punkter sweref_not_fixed_location.gpkg",
+    "note": "58 houses, location not fixed (approximate)"
+   }
+  ]
  }
 ]
