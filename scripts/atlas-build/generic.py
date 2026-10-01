@@ -393,7 +393,15 @@ def records(spec):
     from collections import Counter
     f, dt = spec['fields'], spec['dating']
     out, skipped = [], Counter()
+    excl = set()
+    if spec.get('excludeIdsFrom'):
+        # records another dataset already shows (e.g. a public subset of the same database): left out here, not drawn twice
+        ex = spec['excludeIdsFrom']
+        excl = {str(r.get(ex['field'])).strip() for r in read_rows({'read': ex['read']})}
     for i, p in enumerate(read_rows(spec)):
+        if excl and str(p.get(spec['fields'].get('id'))).strip() in excl:
+            skipped['already shown by ' + spec['excludeIdsFrom'].get('label', 'another dataset')] += 1
+            continue
         keeps = spec.get('keep') or []
         if any(str(p.get(k['field'])) not in k['values'] if 'values' in k else (str(p.get(k['field'])) in k.get('notValues', []) or any(v in str(p.get(k['field'])) for v in k.get('notContaining', [])))
                for k in ([keeps] if isinstance(keeps, dict) else keeps)):
