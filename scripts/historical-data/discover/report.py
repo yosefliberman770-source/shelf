@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write docs/HISTORICAL_SOURCES_SEARCH.md — deliverables A–S of the 2026-10 discovery pass — from the generated files:
+"""Write docs/HISTORICAL_SOURCES_SEARCH.md — deliverables A–T of the 2026-10 discovery pass — from the generated files:
 
   data/historical/discovery/inventory.jsonl.gz, summary.json, harvard.json, decisions.json
   data/historical/coverage-centuries.json (now) and coverage-centuries-before.json (before this pass)
@@ -35,6 +35,54 @@ CLASS_TEXT = {'A': 'A — structured data, downloadable', 'B': 'B — identifier
               'D': 'D — needs extraction from tables/text', 'E': 'E — scanned or georeferenced map image (raster)', 'F': 'F — register property without a resolvable formatter',
               'G': 'G — metadata only, access unclear', 'H': 'H — restricted / paid', 'I': 'I — not relevant on inspection (relevance < 25)'}
 
+
+# Second coverage pass (2026-10-01): written by hand after the run of scripts/atlas-build/registers2.py; its numbers come from
+# that run (place-index counts) and from coverage_centuries.py before and after it.
+SECTION_T = """## T. Coverage pass for the weakest regions (2026-10-01, second pass)
+
+**Aim.** Raise measured coverage for the weakest regions (Egypt, Maghreb, Levant and Cyprus after 1000; then Estonia, Lithuania, Ireland, Iceland, Norway and Bosnia). Only public, openly licensed datasets whose records carry their own dating were used. Nothing needing an account, a payment, a guestbook form or the user's decision was used.
+
+**Added (public, `scripts/atlas-build/registers2.py`):**
+
+| Dataset | Licence | Records | Dating basis |
+| --- | --- | --- | --- |
+| [VIA-TARIQ: medieval road system of the Levant (Bilād al-Šām)](https://doi.org/10.5281/zenodo.21981430) — A. Pažout, UAB | CC BY 4.0 | 434 site phases of 420 sites (423 in the place index; 11 only in the tiles: 8 sanctuaries and unnamed places, and Hims and al-Salt, whose names are also ordinary English words and so fall under the index's common-word rule) and 2,372 road segments | Each site's own presence flags per period (only "yes" counts; "possible"/"unknown" do not). The periods are the dataset's own: Early Islamic 650–950, Middle Islamic 950–1250, Early Mamluk 1250–1350, Late Mamluk 1350–1517, split at the conventional dynastic breaks of 750 and 1099. The split follows the dataset's own Umayyad/Abbasid and Fatimid/Ayyubid–Crusader flags. A "no" between periods leaves a gap, so the site has separate phases (14 sites). The site's own earliest date and abandonment date narrow a phase. Roads: each segment only in its own period layer. Fainter where the source marks the course conjectured or hypothetical. |
+| [Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772](https://doi.org/10.5281/zenodo.10912495) — S. Litak, B. Szady, IHGK KUL | CC BY-NC 4.0 (public, as with the Lutsch map) | 9,042 (7,715 parish and auxiliary churches, 1,327 religious houses) | The years of the documents each record cites ("AKK. AV43, k. 121, 1748 r."): the first to the last cited year (6,248 records), or a single-year snapshot (1,693). The 1,101 records that cite no dated document carry only the atlas's reference date, c. 1772, marked as a dataset-level period (`env` basis `dataset`, tile `ds=1`, coverage weight 0.15). |
+
+**How it was added without the raw cache.** The raw source cache for the other datasets is not on this machine, so a full rebuild would have dropped them. The new group therefore has its own tiles (`registers-2.pmtiles`, `levant-roads.pmtiles`). Its rows are merged into the existing place index: rows are added to the cell, name and id shards in place, and a re-run first removes this group's earlier rows. The script counts every dataset's rows, name entries and id entries before and after. It stops without writing if any other dataset would change.
+
+**Proof that nothing was dropped.** All 31 existing datasets have the same rows, name entries and id entries before and after. 9,465 rows were added (330,065 → 339,530). Every changed index file is its committed version plus rows of the two new sources. A second run leaves the index byte-identical. A full build (`sites.py`) produces the same group through the same functions.
+
+**Coverage (public data only).** The private pack is not on this machine. The last measurement with the pack gave 5,487 cells below 70. Re-run here without it, the same holdings give **5,860** before this pass and **5,835** after (−25).
+
+Cells crossing 70:
+- Levant: 8 cells. Transport 1100–1500 rose from 0–27 to 71–84.
+- Turkey: 10 cells, from Transport around Antioch and Cilicia, which lie inside VIA-TARIQ's area.
+- Lithuania, Belarus, Ukraine and Romania & Moldova: 7 cells in Religious 1700–1800. Lithuania went from 52 to 90 at 1700 and from 52 to 88 at 1800.
+
+Partial gains:
+- Levant Settlements 1100–1500: 45–51 → 63–64.
+- Levant Names: up to 77.
+- Levant Archaeology.
+- Egypt Settlements and Names: Sinai and the Delta edge, +2 to +4.
+
+Two cells fell slightly: Czechia Religious 1700 and 1800, from 100 to 98, because of dataset-level records in Czech Silesia.
+
+**Tried, not used (recorded in `decisions.json`):**
+- Egypt and the Maghreb after 1000: no open, dated, downloadable dataset was found. Searches covered Zenodo, Harvard Dataverse, data.europa.eu and the inventory, with terms such as Mamluk, Fayyum/al-Nābulusī, Ibn al-Jīʿān, Ottoman Egypt, Maghreb/Tunisia/Morocco sites, Islamic Cairo and caravanserais.
+- Atlas of Islamic History v7.5 (Zenodo 19312622): CC BY 4.0, but its coordinates and classifications were filled in by a language model ("enriched via Claude API"). Not used.
+- Nile Delta Palimpsestual River Network: undated by design.
+- Cyprus Medieval Ports (Book of Curiosities, Harvard Dataverse): the files need a guestbook response.
+- Estonian register of cultural monuments: the WFS at gsavalik.envir.ee is reachable (12,494 monuments), but it has no dating field.
+- Lithuanian register (data.gov.lt): the portal returns HTTP 500 and the record has no distribution.
+- data.gov.ie: HTTP 502.
+- Wikidata items with an inception date in Egypt, the Maghreb, the Levant and Cyprus: only a few hundred, and the existing Wikidata snapshot already covers that area.
+
+**Next.**
+- Egypt: digitised Mamluk and Ottoman village registers (Ibn al-Jīʿān 1477; the 1527 Ottoman survey). These need an open, georeferenced edition.
+- Lithuania and Estonia: register exports by hand (Q2).
+- Cyprus: the Book of Curiosities guestbook (user's decision).
+"""
 
 def load(p, default=None):
     p = os.path.join(H, p)
@@ -115,7 +163,7 @@ def main():
     L = []
     w = L.append
 
-    w('# Historical-geography source search: deliverables A–S')
+    w('# Historical-geography source search: deliverables A–T')
     w('')
     w(f"Generated by `scripts/historical-data/discover/report.py` from the files listed at the end. Scope: the map only. "
       f"Built {now['built']}.")
@@ -398,6 +446,7 @@ def main():
     w('3. Copernicus EU-Hydro for detailed rivers — needs the user\'s free account.')
     w('4. Systematic attestation dating (first mentions per place) from national place-name dictionaries — the largest remaining gain for the Names category.')
     w('')
+    w(SECTION_T)
     w('---')
     w('')
     w('Generated files: `data/historical/discovery/{inventory.jsonl.gz, summary.json, harvard.json, decisions.json, inspected.jsonl}`, '

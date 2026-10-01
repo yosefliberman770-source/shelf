@@ -592,6 +592,8 @@ def build(rows_only=False):
     stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
                                      'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
                                      'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0); Arkas 2.0 Slovenia (CC BY-SA 4.0)')
+    import registers2
+    stats['registers2'] = registers2.build_tiles()
     from cassini_tiles import build_cassini_roads
     stats['cassiniRoads'] = build_cassini_roads(TILES)
     from cassini_tiles import build_inscriptions
@@ -701,6 +703,43 @@ NO_ART_EN = {'Gravhaug': 'Burial mound', 'Gravrøys': 'Burial cairn', 'Tuft': 'H
              'Kirkested': 'Church site', 'Kirke': 'Church', 'Bygdeborg': 'Hillfort', 'Båtstø': 'Boat landing', 'Naust': 'Boathouse',
              'Nausttuft': 'Boathouse site', 'Gårdshaug': 'Farm mound', 'Borg': 'Castle', 'Bosetning-aktivitetsområde': 'Settlement area',
              'Gårdstun': 'Farmstead', 'Kaupang': 'Trading place', 'Handelssted': 'Trading place'}
+
+
+def common_words():
+    return {w.strip().lower() for w in open(os.path.join(ROOT, 'public', 'atlas', 'common-words.txt'), encoding='utf-8') if w.strip()}
+
+
+def register_entries(loaders, rows, feats, reg_stats, reg_index):
+    """Place-index rows and tile features for register loaders (registers.py). Every record keeps only the dating its own
+    source gives; a record dated only by its dataset's own reference period ('envb': 'dataset') says so (env basis
+    'dataset', tile property ds=1). Dated records go into the place index; undated ones only into the tiles."""
+    COMMON_WORDS = common_words()
+    for name, fn in loaders:
+        res = fn()
+        recs, note = (res if isinstance(res, tuple) else (res, None))
+        reg_stats[name] = {'records': len(recs), **({'notes': note} if note else {})}
+        for x in recs:
+            lon, lat = x['lon'], x['lat']
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                continue
+            pr = {'src': x['src'], 'st': x['ty'][:80], 'per': x.get('per'), 'u': None if x['precise'] else 1}
+            env = None
+            if x.get('snap'):
+                env = [x['snap'], x['snap'], x.get('envb') or 'source']
+                pr.update(ef=x['snap'], et=x['snap'], sn=1)
+            elif x.get('env'):
+                env = [x['env'][0], x['env'][1], x.get('envb') or 'source']
+                pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
+            if x.get('envb') == 'dataset':
+                pr['ds'] = 1
+            feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
+            # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
+            if env and x['kind'] not in ('site', 'building') and x['name'].strip().lower() not in COMMON_WORDS:
+                extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
+                         **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
+                rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
+                             [list(n) for n in x['names'] if n[0] and n[0].strip().lower() not in COMMON_WORDS][:6], x['ctx'][:2], [], extra])
+                reg_index[x['src']] += 1
 
 
 def regional_layers(recs, rows, sites_out):
@@ -838,7 +877,6 @@ def regional_layers(recs, rows, sites_out):
     # a period the record names, or the single year in which a gazetteer or register lists it ('sn': a snapshot). Dated
     # records go into the place index; undated ones only into the tiles (drawn when the reader includes undated records).
     import registers as REG
-    COMMON_WORDS = {w.strip().lower() for w in open(os.path.join(ROOT, 'public', 'atlas', 'common-words.txt'), encoding='utf-8') if w.strip()}
     register_feats[:] = []
     reg_stats, reg_index = {}, Counter()
     loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
@@ -849,31 +887,11 @@ def regional_layers(recs, rows, sites_out):
                ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
                ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining),
                ('arkas', REG.arkas))
-    for name, fn in loaders:
-        res = fn()
-        recs, note = (res if isinstance(res, tuple) else (res, None))
-        reg_stats[name] = {'records': len(recs), **({'notes': note} if note else {})}
-        for x in recs:
-            lon, lat = x['lon'], x['lat']
-            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
-                continue
-            pr = {'src': x['src'], 'st': x['ty'][:80], 'per': x.get('per'), 'u': None if x['precise'] else 1}
-            env = None
-            if x.get('snap'):
-                env = [x['snap'], x['snap'], 'source']
-                pr.update(ef=x['snap'], et=x['snap'], sn=1)
-            elif x.get('env'):
-                env = [x['env'][0], x['env'][1], 'source']
-                pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
-            register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
-            # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
-            if env and x['kind'] not in ('site', 'building') and x['name'].strip().lower() not in COMMON_WORDS:
-                extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
-                         **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
-                rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
-                             [list(n) for n in x['names'] if n[0] and n[0].strip().lower() not in COMMON_WORDS][:6], x['ctx'][:2], [], extra])
-                reg_index[x['src']] += 1
+    register_entries(loaders, rows, register_feats, reg_stats, reg_index)
     stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'tileFeatures': len(register_feats)}
+    # The second group (registers2.py): its own tiles, built here or on its own by registers2.py without the rest.
+    import registers2
+    stats['registers2'] = registers2.add_rows(rows)
 
     # Private data pack (never published): datasets with no licence to republish, or terms that forbid it.
     private, prows = [], []

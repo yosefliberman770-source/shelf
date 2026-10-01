@@ -367,6 +367,80 @@
    "dataset": "ariadne",
    "region": "Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others",
    "note": "Harvested per country (API: 50/page, 10,000/query; Hungary per municipality). Each phase keeps its own period; records without a point placed at their municipality. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack."
+  },
+  {
+   "title": "Geospatial data for the Medieval road system in the Levant (Bilād al-Šām) — VIA-TARIQ",
+   "url": "https://doi.org/10.5281/zenodo.21981430",
+   "match": [
+    "10.5281/zenodo.21981430"
+   ],
+   "status": "integrated",
+   "dataset": "viatariq",
+   "region": "Levant",
+   "note": "420 sites (434 phases) from their own per-period presence flags and earliest/abandonment dates; 2,372 road segments, each in its own period layer (650–950, 950–1250, 1250–1350, 1350–1517). CC BY 4.0, public."
+  },
+  {
+   "title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth in the Eighteenth Century",
+   "url": "https://doi.org/10.5281/zenodo.10912495",
+   "match": [
+    "10.5281/zenodo.10912495"
+   ],
+   "status": "integrated",
+   "dataset": "latinchurch",
+   "region": "Poland, Lithuania, Belarus, Ukraine, Latvia",
+   "note": "9,042 churches and religious houses c. 1772, dated by the years of the documents each record cites; 1,101 without a dated document keep only the atlas reference date (dataset-level). CC BY-NC 4.0, public as with the Lutsch map."
+  },
+  {
+   "title": "İslam Tarih Atlası / Atlas of Islamic History (v7.5)",
+   "url": "https://doi.org/10.5281/zenodo.19312622",
+   "match": [
+    "10.5281/zenodo.19312622"
+   ],
+   "status": "evaluated",
+   "region": "Egypt, Maghreb, Levant",
+   "note": "CC BY 4.0, but coordinates and classifications of its gazetteer layers were filled in by a language model; not a citable position source."
+  },
+  {
+   "title": "Nile Delta Palimpsestual River Network (PRN)",
+   "url": "https://doi.org/10.5281/zenodo.14812208",
+   "match": [
+    "10.5281/zenodo.14812208"
+   ],
+   "status": "evaluated",
+   "region": "Egypt",
+   "note": "Channels of all periods in one layer, undated by design."
+  },
+  {
+   "title": "Cyprus Medieval Ports (Book of Curiosities)",
+   "url": "https://doi.org/10.7910/DVN/JSGUAF",
+   "match": [
+    "10.7910/dvn/jsguaf"
+   ],
+   "status": "blocked",
+   "region": "Cyprus",
+   "note": "CC0, but Harvard Dataverse requires a guestbook response before download (needs the user)."
+  },
+  {
+   "title": "Register of Estonian Cultural Monuments (WFS, gsavalik.envir.ee)",
+   "url": "https://gsavalik.envir.ee/geoserver/muinsuskaitse/wfs",
+   "match": [
+    "gsavalik.envir.ee",
+    "0315d899-05e5-4635-bb2b-26f7fe6e03d1"
+   ],
+   "status": "evaluated",
+   "region": "Estonia",
+   "note": "Reachable (12,494 monuments with outlines, name, type, register number) but no dating field; would stay undated."
+  },
+  {
+   "title": "Lithuania: Cultural heritage register (data.gov.lt 2945)",
+   "url": "https://data.gov.lt/datasets/2945/",
+   "match": [
+    "https-data-gov-lt-datasets-2945-",
+    "data.gov.lt/datasets/2945"
+   ],
+   "status": "blocked",
+   "region": "Lithuania",
+   "note": "No distribution in the catalogue record; data.gov.lt answered HTTP 500 on 2026-10-01; licence says non-commercial only."
   }
  ]
 }

@@ -950,6 +950,12 @@
   "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
   "downloaded": "2026-09-29"
  },
+ "latin-church-1772/original/latin_church_1772-v1.zip": {
+  "url": "https://zenodo.org/api/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip/content",
+  "bytes": 4039020,
+  "sha256": "9f7e4d88e7d7daa82eae4784118c6bb6b869babdfaf8607c9292dda06ab02fa4",
+  "downloaded": "2026-10-01"
+ },
  "latvia-monuments/original/geonames-LV.zip": {
   "url": "https://download.geonames.org/export/dump/LV.zip",
   "bytes": 1068796,
@@ -2334,6 +2340,66 @@
   "url": "https://zenodo.org/api/records/6368451/files/historical_place_gazetteer_tyrol_links_202203.csv/content",
   "bytes": 102114,
   "sha256": "d1193b6ea0be0e1754d0fbb8deee884a8bd80a3cd60b4f1b630a8f75bfea02cb",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/bibliography.md": {
+  "url": "https://zenodo.org/api/records/21981430/files/bibliography.md/content",
+  "bytes": 34637,
+  "sha256": "64c081bbb070b9aee094d22e122e39dfc6da579733744f333446d271409d1c75",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/early_islamic_roads.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/early_islamic_roads.geojson/content",
+  "bytes": 1813021,
+  "sha256": "2209838c19a64983be8f353c271499e2b0bab9f464992391b505cdc12fa051e3",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/early_islamic_sites.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/early_islamic_sites.geojson/content",
+  "bytes": 79669,
+  "sha256": "768b74ef9a639a5eee1ebca565e233c2483264fcc01a5b9e052859802e7a1884",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/early_mamluk_roads.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_roads.geojson/content",
+  "bytes": 1942225,
+  "sha256": "a8583de0491deb69b04c56f1af33fe06bd634a16427b2f80db3aecf65cc12192",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/early_mamluk_sites.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_sites.geojson/content",
+  "bytes": 104141,
+  "sha256": "4f24cda47f2fda7edc60da31e2610428cdd4d87e714d0d06b25822b14b4667dc",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/late_mamluk_roads.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_roads.geojson/content",
+  "bytes": 1963237,
+  "sha256": "08239183e4ae8552c6616e4d7dd5ba97ee192af95a1b69ac44652dd7c8626ae5",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/late_mamluk_sites.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_sites.geojson/content",
+  "bytes": 110905,
+  "sha256": "e5cc363472c5b94fe82dbb2f24696bc3737488b8373291796bfbe157db952be4",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/middle_islamic_roads.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_roads.geojson/content",
+  "bytes": 1828977,
+  "sha256": "55dafe1813b5cb1b3450466e0e99a4a8c5b395fd7d68eb406f5d9322a48c2356",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/middle_islamic_sites.geojson": {
+  "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_sites.geojson/content",
+  "bytes": 104378,
+  "sha256": "369c6d6d8f7b3bed5f118f23a61cf7a55c304dc463aa295e09105cb27eb258fd",
+  "downloaded": "2026-10-01"
+ },
+ "via-tariq-levant/original/readme.md": {
+  "url": "https://zenodo.org/api/records/21981430/files/readme.md/content",
+  "bytes": 6450,
+  "sha256": "afafe4c1ee2d1a3fa529925d7bd3e4c7e0fe886fac795179d5c2ae9331c9b929",
   "downloaded": "2026-10-01"
  },
  "viabundus/original/Viabundus-2-edges.geojson": {

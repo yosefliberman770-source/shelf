@@ -28,7 +28,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
   | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels'
-  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'lirelist';
+  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'viatariq' | 'latinchurch' | 'lirelist';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -58,6 +58,8 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   swegeo: { name: 'Sweden: the older geometrical maps, 1630–1655 (Vitterhetsakademien, Riksarkivet)', url: 'https://doi.org/10.5281/zenodo.15121019', license: 'CC BY 4.0' },
   tyrolmine: { name: 'Places in Tyrolean mining documents, 15th–16th c. (Univ. Innsbruck)', url: 'https://doi.org/10.5281/zenodo.6368451', license: 'CC BY 4.0' },
   arkas: { name: 'Arkas 2.0: archaeological sites of Slovenia (ZRC SAZU)', url: 'https://doi.org/10.5281/zenodo.7820725', license: 'CC BY-SA 4.0' },
+  viatariq: { name: 'VIA-TARIQ: medieval road system of the Levant (A. Pažout, UAB)', url: 'https://doi.org/10.5281/zenodo.21981430', license: 'CC BY 4.0' },
+  latinchurch: { name: 'Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (S. Litak, B. Szady, IHGK KUL)', url: 'https://doi.org/10.5281/zenodo.10912495', license: 'CC BY-NC 4.0' },
   lutsch: { name: 'Features of the Lutsch map of Transylvania, 1751', url: 'https://doi.org/10.7910/DVN/ETORPU', license: 'CC BY-NC-SA 4.0' },
   hydrolakes: { name: 'HydroLAKES v1.0 (Messager et al. 2016); dam dates from Wikidata', url: 'https://www.hydrosheds.org/products/hydrolakes', license: 'CC BY 4.0' },
   physlabels: { name: 'Natural Earth (ranges, plains); Wikidata (peaks)', url: 'https://www.naturalearthdata.com/', license: 'public domain / CC0' },
@@ -91,7 +93,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
 const privateTile = (file: string) => privateHas(`tiles/${file}`);
 const PRIVATE_SITES = () => privateTile('private-sites.pmtiles');
 /** The site layers draw the public sites and, where the private pack is loaded, the private ones. */
-const siteSources = () => ['medieval-sites', 'register-sites', ...(PRIVATE_SITES() ? ['private-sites'] : [])];
+const siteSources = () => ['medieval-sites', 'register-sites', 'register-sites-2', ...(PRIVATE_SITES() ? ['private-sites'] : [])];
 
 export interface LayerCtx {
   year: HistYear;
@@ -188,6 +190,8 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   // From the private data pack only (licence not verified, or no republishing): never on the public site.
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
   'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'register-sites-2': (c) => ({ ...pmtiles(c, 'registers-2.pmtiles', 'viatariq', 11), attribution: (['viatariq', 'latinchurch'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'levant-roads': (c) => pmtiles(c, 'levant-roads.pmtiles', 'viatariq', 11),
   'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),
@@ -533,10 +537,10 @@ export const LAYERS: AtlasLayerDef[] = [
     specs: (c) => sitePoints('dated-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4 }),
   },
   {
-    id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'], defaultOn: true, coverage: SITES,
-    hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918) and on the Russian 3-verst map (surveyed 1877–1879); the settlements of the Kingdom of Romania, 1904–1913 (RoHGIS); Icelandic farms in the Jarðabók of 1703; Swedish villages, churches and mills on the land-survey maps of 1630–1655; places named in medieval inquisition registers (1240s–1520s); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date. A place listed in one year is drawn (lighter) within 25 years of it.',
-    sources: ['register-sites'],
-    specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites'] }),
+    id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'viatariq'], defaultOn: true, coverage: SITES,
+    hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918) and on the Russian 3-verst map (surveyed 1877–1879); the settlements of the Kingdom of Romania, 1904–1913 (RoHGIS); Icelandic farms in the Jarðabók of 1703; Swedish villages, churches and mills on the land-survey maps of 1630–1655; places named in medieval inquisition registers (1240s–1520s); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date; towns and villages of the medieval Levant in the periods the VIA-TARIQ project records them (650–1517). A place listed in one year is drawn (lighter) within 25 years of it.',
+    sources: ['register-sites', 'register-sites-2'],
+    specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites', 'register-sites-2'] }),
   },
   {
     id: 'inscriptions', group: 'places', alsoIn: ['economic'], label: 'Latin inscriptions (find-spots, 100–799)', datasets: ['lirelist'], defaultOn: true, coverage: [100, 799],
@@ -738,6 +742,17 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
+    id: 'roads-levant', group: 'infrastructure', label: 'Medieval roads of the Levant (VIA-TARIQ, 650–1517)', datasets: ['viatariq'], defaultOn: true, coverage: [650, 1517],
+    hint: 'The road network of Bilād al-Šām reconstructed by the VIA-TARIQ project (A. Pažout) from medieval itineraries and geographers, archaeology and historical-geographical studies — one network per period of the dataset: Early Islamic 650–950, Middle Islamic 950–1250, Early Mamluk 1250–1350, Late Mamluk 1350–1517. Each segment is shown only in its own period. Thicker: main roads. Fainter: course conjectured or hypothetical in the source.', sources: ['levant-roads'],
+    specs: (c) => {
+      const y = c.year;
+      const filter = ['all', ['<=', ['get', 'ef'], y], ['>=', ['get', 'et'], y]] as FilterSpecification;
+      return [{ id: 'roads-levant-line', type: 'line', source: 'levant-roads', 'source-layer': 'roads', filter,
+        paint: { 'line-color': '#8d5524', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, ['case', ['==', ['get', 'k'], 'main'], 0.7, 0.4], 10, ['case', ['==', ['get', 'k'], 'main'], 2.4, 1.4]],
+          'line-opacity': ['case', ['==', ['get', 'u'], 1], 0.5, 0.85] } }];
+    },
+  },
+  {
     id: 'roads-ancient', group: 'infrastructure', label: 'Roads (Barrington Atlas / AWMC)', datasets: ['awmc'], defaultOn: false, coverage: BARRINGTON,
     hint: 'Roads of the Greek and Roman world from the Barrington Atlas (AWMC). Dashed where the source gives no period (shown up to 640 CE); faded where the period is marked uncertain.', sources: ['awmc-roads'],
     specs: (c) => [
@@ -831,7 +846,7 @@ export const LAYERS: AtlasLayerDef[] = [
     hint: 'Expeditions placed at one point by Wikidata (usually where they began or were centred) — not their route.', sources: ['wikidata-events'], specs: (c) => events('expeditions', 'expedition', '#00838f', c),
   },
   {
-    id: 'castles', group: 'military', alsoIn: ['places'], label: 'Castles & fortifications (Europe)', datasets: ['wikidata', 'merimee', 'finreg'], defaultOn: true, coverage: SITES,
+    id: 'castles', group: 'military', alsoIn: ['places'], label: 'Castles & fortifications (Europe)', datasets: ['wikidata', 'merimee', 'finreg', 'viatariq'], defaultOn: true, coverage: SITES,
     hint: 'Castles, tower houses, mottes, town walls and other fortifications from Wikidata, shown from their recorded founding date or first mention. Most castles in Wikidata have no such date (about 5,000 of 32,000 do), so most appear only with “Include undated records” — hollow. France adds castles and fortified houses from the Mérimée register, dated by their main building campaign (lighter dots); Finland adds strongholds its register classes as medieval. Zoom in to see them all.', get sources() { return siteSources(); },
     specs: (c) => sitePoints('castles', ['castle', 'fortification'], C.fort, c, { labelZoom: 9, radius: 2.8 }),
   },
@@ -926,7 +941,7 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'religious-houses', group: 'economic', alsoIn: ['places'], label: 'Monasteries, churches, cathedrals & universities (Europe)', datasets: ['wikidata', 'germaniasacra', 'merimee', 'finreg'], defaultOn: true, coverage: SITES,
+    id: 'religious-houses', group: 'economic', alsoIn: ['places'], label: 'Monasteries, churches, cathedrals & universities (Europe)', datasets: ['wikidata', 'germaniasacra', 'merimee', 'finreg', 'latinchurch'], defaultOn: true, coverage: SITES,
     hint: 'Abbeys, priories, convents, friaries and other religious houses, cathedrals, bishops’ sees and early universities, from Wikidata — joined, for the Holy Roman Empire, with Germania Sacra’s monastery database, which dates each order’s tenure of each house. Shown from the recorded founding or first mention to the recorded dissolution. Where no dissolution is recorded the house is drawn on to the present, which is often wrong after the Reformation or secularisation. France adds protected medieval churches, abbeys and cathedrals from the Mérimée register, dated by the century of their main building campaign (lighter dots: the building dates from then — the site may be older); Finland adds churches the national register classes as medieval.', get sources() { return siteSources(); },
     specs: (c) => sitePoints('religious-houses', ['monastery', 'cathedral', 'diocese', 'university', 'church'], C.religious, c, { labelZoom: 8, radius: 2.8 }),
   },
@@ -1044,7 +1059,7 @@ const LABEL_PRIORITY: Record<string, number> = {
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'roads-levant', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

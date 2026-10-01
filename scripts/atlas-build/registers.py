@@ -1161,3 +1161,150 @@ def arkas():
                     'per': f"{r['Datacija']} (Arkas dating)",
                     'ty': f"{r['Vrsta_najdisca']} · {r['Opredelitev']}"[:120], 'ctx': [c for c in (r['Ime_naselja'], r['Regija']) if c], 'names': []})
     return out, dict(skipped)
+
+
+# ── Levant: VIA-TARIQ medieval roads and sites of Bilād al-Šām (Pažout, UAB; Zenodo 21981430), CC BY 4.0 ─────────
+# The dataset comes as one road file and one site file per period of its own scheme: Early Islamic 650–950, Middle
+# Islamic 950–1250, Early Mamluk 1250–1350, Late Mamluk 1350–1517 (readme.md). A site carries its own presence flags
+# per dynasty ('yes', 'no', 'possible', 'unknown') and its own earliest and abandonment dates (9999 = unknown).
+# Only 'yes' counts. Inside the two long layers the dynastic break is the conventional one (750 Abbasid revolution,
+# 1099 Crusader conquest); the Mamluk split is the file the site appears in. A site's periods form phases; a 'no'
+# between them leaves a gap (separate phases, never one span across it). Its own minDate/maxDate narrow a phase.
+VIA_TARIQ_FILES = ('early_islamic', 'middle_islamic', 'early_mamluk', 'late_mamluk')
+VIA_TARIQ_LAYER = {'early_islamic': (650, 950, 'Early Islamic'), 'middle_islamic': (950, 1250, 'Middle Islamic'),
+                   'early_mamluk': (1250, 1350, 'Early Mamluk'), 'late_mamluk': (1350, 1517, 'Late Mamluk')}
+VIA_TARIQ_FLAGS = {'early_islamic': (('umayyad', 650, 750, 'Umayyad'), ('abbasid', 750, 950, 'Abbasid')),
+                   'middle_islamic': (('fatimid', 950, 1099, 'Fatimid / Middle Byzantine'), ('ayyubidCru', 1099, 1250, 'Ayyubid–Crusader')),
+                   'early_mamluk': (('mamluk', 1250, 1350, 'Early Mamluk'),), 'late_mamluk': (('mamluk', 1350, 1517, 'Late Mamluk'),)}
+VIA_TARIQ_KIND = {'city': 'settlement', 'settlement': 'settlement', 'station': 'road', 'fort': 'fortification', 'bridge': 'bridge',
+                  'sanctuary': 'site', 'place': 'site'}
+
+
+def _epsg_to_wgs84(code):
+    from pyproj import Transformer
+    t = Transformer.from_crs(code, 4326, always_xy=True)
+    return lambda x, y, z=None: t.transform(x, y)
+
+
+def via_tariq():
+    tr = _epsg_to_wgs84(3395)  # the files are in World Mercator (readme.md)
+    sites = defaultdict(dict)
+    for layer in VIA_TARIQ_FILES:
+        for f in json.load(open(raw('via-tariq-levant', f'{layer}_sites.geojson'), encoding='utf-8'))['features']:
+            sites[f['properties']['Id']][layer] = f
+    out, skipped = [], Counter()
+    for sid, by_layer in sorted(sites.items()):
+        first = next(iter(by_layer.values()))
+        q = first['properties']
+        windows = []
+        for layer in VIA_TARIQ_FILES:
+            if layer not in by_layer:
+                continue
+            p = by_layer[layer]['properties']
+            for flag, a, b, label in VIA_TARIQ_FLAGS[layer]:
+                if (p.get(flag) or '').strip().lower() == 'yes':
+                    windows.append((a, b, label))
+        if not windows:
+            skipped['no period marked yes (only possible / unknown / no)'] += 1
+            continue
+        phases = []
+        for a, b, label in sorted(windows):
+            if phases and a <= phases[-1][1]:
+                phases[-1] = (phases[-1][0], max(phases[-1][1], b), phases[-1][2] + [label])
+            else:
+                phases.append((a, b, [label]))
+        lo = None if q['minDate'] in (None, 9999, '9999') else int(q['minDate'])
+        hi = None if q['maxDate'] in (None, 9999, '9999') else int(q['maxDate'])
+        lon, lat = tr(*first['geometry']['coordinates'][:2])
+        kind = VIA_TARIQ_KIND.get(q['type'], 'site')
+        names = [(q['modernName'], None, None, 'modern name')] if q.get('modernName') and q['modernName'] != q['name'] else []
+        for i, (a, b, labels) in enumerate(phases):
+            note = ''
+            # The site's own earliest and abandonment dates narrow the phase when they fall inside it.
+            if lo is not None and a < lo <= b:
+                a, note = lo, f'; earliest date {lo}'
+            if hi is not None and a <= hi < b:
+                b, note = hi, note + f'; abandoned {hi}'
+            out.append({'src': 'viatariq', 'id': f'{sid}' + (f'.{i + 1}' if i else ''), 'name': q['name'][:80], 'kind': kind,
+                        'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': True, 'env': (a, b),
+                        'per': f"{', '.join(labels)} (VIA-TARIQ period flags{note})",
+                        'ty': f"{q['type']} · {q.get('biblio') or ''}".strip(' ·')[:120], 'ctx': [], 'names': names})
+        if len(phases) > 1:
+            skipped['sites with a gap between periods (kept as separate phases)'] += 1
+    return out, dict(skipped)
+
+
+def via_tariq_roads():
+    """Road segments per period layer: each segment shown in its own layer's period only (its file), with the medieval source
+    and literature the dataset cites. Faint where the dataset marks the course conjectured or hypothetical."""
+    from shapely.geometry import mapping, shape
+    from shapely.ops import transform
+    tr = _epsg_to_wgs84(3395)
+    out = []
+    for layer in VIA_TARIQ_FILES:
+        a, b, label = VIA_TARIQ_LAYER[layer]
+        for f in json.load(open(raw('via-tariq-levant', f'{layer}_roads.geojson'), encoding='utf-8'))['features']:
+            p = f['properties']
+            g = transform(tr, shape(f['geometry']))
+            src_text = (p.get('source') or '').strip()
+            props = {'i': f"vt:{layer}:{p['Id']}", 'k': 'main' if p.get('typeCode') == 2 else 'secondary', 'ef': a, 'et': b, 'src': 'viatariq',
+                     'per': f'{label} layer ({a}–{b})', 'u': 0 if p.get('segmentCer') == 'Certain' else 1, 'rc': p.get('roadCer') or '',
+                     **({'n': p['name'][:60]} if (p.get('name') or '').strip() else {}),
+                     **({'it': p['itinerary'].strip()[:40]} if (p.get('itinerary') or '').strip() else {}),
+                     **({'ms': src_text[:120]} if src_text else {}), **({'lit': p['biblio'][:120]} if (p.get('biblio') or '').strip() else {})}
+            out.append((mapping(g), props, 5 if p.get('typeCode') == 2 else 7))
+    return out
+
+
+# ── Poland–Lithuania: Atlas of the Latin Church c. 1772 (Litak, Szady; IHGK KUL; Zenodo 10912495), CC BY-NC 4.0 ─────
+# Parish and auxiliary churches and religious houses of the Commonwealth. Each record cites the documents it rests on,
+# most with their year ("AKK. AV43, k. 121, 1748 r."). A record is dated by those document years only: the span from
+# the first to the last cited year (a single year is a snapshot). A record citing no dated document keeps only the
+# atlas's own reference date, c. 1772, as a dataset-level evidence period.
+LATIN_CHURCH_REF = 1772
+LATIN_CHURCH_TYPE = {'świątynia główna': 'parish church', 'świątynia pomocnicza': 'auxiliary church'}
+
+
+def _doc_years(text):
+    return sorted({int(y) for y in re.findall(r'(?<!\d)(1[3-8]\d\d)\s*r\.', text or '') if 1300 <= int(y) <= 1800})
+
+
+def latin_church_1772():
+    tr = _epsg_to_wgs84(3857)
+    z = zipfile.ZipFile(raw('latin-church-1772', 'latin_church_1772-v1.zip'))
+    base = next(n for n in z.namelist() if n.endswith('/'))
+    out, skipped = [], Counter()
+    for fname in ('churches', 'monasteries'):
+        for f in json.loads(z.read(f'{base}{fname}.geojson'))['features']:
+            p = f['properties']
+            cs = (f.get('geometry') or {}).get('coordinates') or []
+            if not cs:
+                skipped['no position'] += 1
+                continue
+            lon, lat = tr(*cs[0][:2])
+            place = (p.get('pl_name') or '').strip()
+            if fname == 'churches':
+                what = LATIN_CHURCH_TYPE.get(p.get('type'), p.get('type') or 'church')
+                name, kind, rid = f'{place}, {what}', 'church', f"c{p['ob_id']}"
+                ty = ' · '.join(x for x in (what, f"dedication {p['title']}" if p.get('title') else '', f"diocese {p['diocese']}" if p.get('diocese') else '',
+                                            f"deanery {p['deanery']}" if p.get('deanery') else '') if x)
+            else:
+                order = (p.get('name') or 'religious house').strip()
+                name, kind, rid = f'{place}, {order.split(" - ")[0]}', 'monastery', f"m{p['ob_id']}"
+                ty = ' · '.join(x for x in (order, 'female house' if p.get('category') == 'z' else 'male house',
+                                            f"diocese {p['diocese']}" if p.get('diocese') else '') if x)
+            ys = _doc_years(p.get('source'))
+            rec = {'src': 'latinchurch', 'id': rid, 'name': name[:80], 'kind': kind, 'lon': round(lon, 5), 'lat': round(lat, 5), 'precise': True,
+                   'ty': ty[:120], 'ctx': list(dict.fromkeys(c for c in (place, p.get('diocese')) if c)),
+                   'names': [(n, None, None, lang) for n, lang in ((p.get('pl_name_de'), 'de'), (p.get('pl_name_v'), 'variant'))
+                             if n and n.strip() and n != place]}
+            if len(ys) == 1:
+                rec.update(snap=ys[0], per=f'named in a document of {ys[0]} cited by the atlas')
+            elif ys:
+                rec.update(env=(ys[0], ys[-1]), per=f'named in documents of {ys[0]}–{ys[-1]} cited by the atlas')
+            else:
+                rec.update(snap=LATIN_CHURCH_REF, envb='dataset',
+                           per='no dated document cited; the atlas describes the Church c. 1772')
+                skipped['no dated document cited (dataset reference year only)'] += 1
+            out.append(rec)
+    return out, dict(skipped)
