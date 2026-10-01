@@ -1986,5 +1986,32 @@
     "note": "WFS muinaisjaannos_piste, 41,723 points, paged"
    }
   ]
+ },
+ {
+  "id": "russia-livestock-1864",
+  "doi": "10.7910/DVN/OTTZQY",
+  "licence": "CC BY-NC 4.0 — private pack",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8545227?format=original",
+    "path": "original/farmlands_provinces.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544831?format=original",
+    "path": "original/livestock_european-russia_1864_codebook.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544829?format=original",
+    "path": "original/livestock_european-russia_1864_main.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8545226?format=original",
+    "path": "original/livestock_european-russia_1864_readme.txt"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544830?format=original",
+    "path": "original/livestock_european-russia_1864_totals.tab"
+   }
+  ]
  }
 ]

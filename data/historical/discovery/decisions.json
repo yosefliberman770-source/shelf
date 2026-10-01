@@ -1655,6 +1655,28 @@
    "region": "Finland",
    "dataset": "finland-relics",
    "note": "41,723 points (CC BY 4.0). Medieval-classed sites were already integrated (finreg). Added: 2,983 Iron Age-classed sites (500 BC–1150). Not added: 18,325 'historiallinen' sites — the class spans 1150–1900 and would show e.g. 19th-century tar pits from the 12th century; candidates if a finer dating (alatyyppi, kyppi.fi records) can be obtained."
+  },
+  {
+   "title": "Farmlands: Counting Sheep — livestock census of European Russia 1864 (Harvard Dataverse)",
+   "match": [
+    "OTTZQY"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "W Russia",
+   "dataset": "russia-livestock-1864",
+   "note": "49 province polygons with the total head of livestock from the totals table (CC BY-NC 4.0, private pack), snapshot 1864 as the source's census year. Per-animal counts kept in the vault, not shown."
+  },
+  {
+   "title": "EAMENA Bani Walid (Libya) heritage places",
+   "match": [
+    "eamena-baniwalid",
+    "mlacd_baniwalid"
+   ],
+   "status": "insufficient-temporal",
+   "state": "insufficient-temporal",
+   "region": "Maghreb",
+   "note": "224 records, CC BY 4.0. Every explicit date field is empty; the only dating is EAMENA cultural period names (e.g. 'Roman Imperial (North Africa)', 'Byzantine (Maghreb)'). EAMENA's own date ranges for these periods are not in the download, and 121 records are Unknown/blank, so not integrated rather than assigning invented ranges. Candidate if EAMENA's period chronology table is obtained."
   }
  ]
 }

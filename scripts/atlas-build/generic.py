@@ -226,7 +226,7 @@ def _raw(path):
     return p if os.path.exists(p) else None
 
 
-def _open_bytes(read):
+def _raw_or_derive(read):
     p = _raw(read['path'])
     if p is None and read.get('derive'):
         # a file derived from originals in the vault (e.g. per-port attestation years): made by its script when missing
@@ -234,6 +234,11 @@ def _open_bytes(read):
         import sys as _sys
         subprocess.run([_sys.executable, os.path.join(os.path.dirname(__file__), '..', '..', read['derive'])], check=True)
         p = _raw(read['path'])
+    return p
+
+
+def _open_bytes(read):
+    p = _raw_or_derive(read)
     if p is None:
         raise FileNotFoundError(read['path'])
     if read.get('member'):
@@ -316,7 +321,9 @@ def _gpkg_rows(b, read):
 
 def _shp_rows(read):
     import shapefile
-    p = _raw(read['path'])
+    p = _raw_or_derive(read)
+    if p is None:
+        raise FileNotFoundError(read['path'])
     if p.lower().endswith('.zip'):
         z = zipfile.ZipFile(p)
         base = read['member'][:-4]
@@ -445,6 +452,11 @@ def read_rows(spec):
                 p['__wgs'] = True
             except (KeyError, TypeError, ValueError):
                 pass
+    if read.get('coalesce') and rows:
+        # the first field with a value (e.g. an exact year before a period class) into one field
+        co = read['coalesce']
+        for p in rows:
+            p[co['into']] = next((p.get(k) for k in co['fields'] if _val(p.get(k)) is not None), None)
     if read.get('translateDating') and rows:
         # a dating field in another language's conventions, translated into __dating (the original stays as it is)
         tr = {'lt': lt_dating, 'lv': lv_dating}[read['translateDating']['lang']]

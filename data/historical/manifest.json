@@ -2564,6 +2564,36 @@
   "downloaded": "2026-10-01",
   "licence": "Etalab 2.0"
  },
+ "russia-livestock-1864/original/farmlands_provinces.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8545227?format=original",
+  "bytes": 1410432,
+  "sha256": "fd57e77c6a0e2b66af2d4c4646d10397759b45f18d09134a85ca6c753fd21f3a",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_codebook.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544831?format=original",
+  "bytes": 1013,
+  "sha256": "0a9a16cd0cb0481592007b0e88575a85a3c1dfac129d3aa338406b2210158833",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_main.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544829?format=original",
+  "bytes": 25312,
+  "sha256": "7498eee1fd6122d88fcafd317bb0d1bd76028881106beea5623209c439337e2e",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_readme.txt": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8545226?format=original",
+  "bytes": 5148,
+  "sha256": "4ed2926f7ae946af30005737b8025cde63547ab8daac744fe911c23041307896",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_totals.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544830?format=original",
+  "bytes": 1973,
+  "sha256": "c3cbb2e593cd7014996346918373a8d7312c1a45f1a5f93d95e2c3dc1d507cc8",
+  "downloaded": "2026-10-01"
+ },
  "russian-3verst-gazetteer/original/Russian_3verst.csv": {
   "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
   "bytes": 506311,
