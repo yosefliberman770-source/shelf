@@ -1054,5 +1054,59 @@
     "path": "original/1_Najdisca_2023-Apr-12_0708.csv"
    }
   ]
+ },
+ {
+  "id": "via-tariq-levant",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/readme.md/content",
+    "path": "original/readme.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/bibliography.md/content",
+    "path": "original/bibliography.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_sites.geojson/content",
+    "path": "original/early_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_roads.geojson/content",
+    "path": "original/early_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_sites.geojson/content",
+    "path": "original/middle_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_roads.geojson/content",
+    "path": "original/middle_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_sites.geojson/content",
+    "path": "original/early_mamluk_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_roads.geojson/content",
+    "path": "original/early_mamluk_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_sites.geojson/content",
+    "path": "original/late_mamluk_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_roads.geojson/content",
+    "path": "original/late_mamluk_roads.geojson"
+   }
+  ]
+ },
+ {
+  "id": "latin-church-1772",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip/content",
+    "path": "original/latin_church_1772-v1.zip"
+   }
+  ]
  }
 ]
