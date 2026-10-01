@@ -153,6 +153,13 @@ class NewOptions(unittest.TestCase):
         for text, span in cases.items():
             self.assertEqual(generic.parse_dating(generic.lt_dating(text))[:2], span, text)
 
+    def test_latvian_monument_datings(self):
+        cases = {'19. gs. 2.p.': (1851, 1900), '14.-15.gs.': (1301, 1500), '1871.': (1871, 1871), '19. gs. 2.c.': (1826, 1850),
+                 'Vēlais dzelzs laikmets': (801, 1200), '19./20. gs.': (1801, 2000)}
+        for text, span in cases.items():
+            self.assertEqual(generic.parse_dating(generic.lv_dating(text))[:2], span, text)
+        self.assertIsNone(generic.lv_dating('Vēlais bronzas - vidējais dzelzs laikmets'))  # not narrowed to the mapped part
+
 
 class Areas(unittest.TestCase):
     def test_units_dated_by_their_own_survey_years(self):

@@ -129,6 +129,38 @@ def lt_dating(text):
 
 
 
+def lv_dating(text):
+    """A Latvian monument-list dating ("14.-15.gs.", "19. gs. I p.", "17.gs.b.", "1871.", "1927.-1961.") in the English forms
+    parse_dating reads (gs. = century; s./sāk. = beginning, v./vid. = middle, b./beig. = end, I/II p. = first/second half)."""
+    if text is None:
+        return None
+    t = str(text)
+    low = t.lower()
+    if re.search(r'bronz|akmens|neolīt|mezolīt|paleolīt', low):
+        return None  # prehistoric periods: left undated rather than narrowed to the part that is mapped
+    # the conventional Latvian archaeological periods (as centuries: years below 100 are not read as years)
+    periods = [(r'agr\w* dzelzs laikmet\w*', '1st century - 4th century'), (r'vidēj\w* dzelzs laikmet\w*', '5th century - 8th century'),
+               (r'vēl\w* dzelzs laikmet\w*', '9th century - 12th century'), (r'dzelzs laikmet\w*', '1st century - 12th century'),
+               (r'viduslaik\w*', '1201-1561'), (r'jaun\w* laik\w*', '1561-1795')]
+    for pat, rep in periods:
+        low = re.sub(pat, f' {rep} ', low)
+    t = low
+    # quarters: "19. gs. 2.c." → 1826–1850
+    t = re.sub(r'\b(\d{1,2})\.?\s*gs\.?\s*([1-4])\.\s*c\.', lambda m: f' {(int(m.group(1)) - 1) * 100 + (int(m.group(2)) - 1) * 25 + 1}-{(int(m.group(1)) - 1) * 100 + int(m.group(2)) * 25} ', t)
+    t = re.sub(r'(\d{3,4})\.', r'\1', t)  # "1871." → 1871
+    part = [(r'(?:s\.|sāk\w*\.?)', 'early'), (r'(?:b\.|beig\w*\.?)', 'late'), (r'(?:v\.|vid\w*\.?)', 'mid'),
+            (r'(?:i\s*p\.|1\.\s*p\.|1\.\s*puse)', 'first half'), (r'(?:ii\s*p\.|2\.\s*p\.|2\.\s*puse)', 'second half')]
+
+    def cent(m):
+        w = (m.group(2) or '').strip()
+        p = next((v for k, v in part if w and re.fullmatch(k, w)), '')
+        return f' {p} {int(m.group(1))}th century '
+    t = re.sub(r'\b(\d{1,2})\.?\s*gs\.?\s*(ii\s*p\.|i\s*p\.|[12]\.\s*p\.|[12]\.\s*puse|s\.|sāk\w*\.?|b\.|beig\w*\.?|v\.|vid\w*\.?)?', cent, t)
+    t = re.sub(r'\b(\d{1,2})\.?\s*[-–/]\s*(?=\s*(?:early |late |mid |first half |second half )?\d+th century)', lambda m: f'{int(m.group(1))}th century - ', t)
+    return re.sub(r'\s+', ' ', t).strip()
+
+
+
 def parse_dating(text) -> tuple[int | None, int | None, str] | None:
     """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
     if text is None:
@@ -415,7 +447,7 @@ def read_rows(spec):
                 pass
     if read.get('translateDating') and rows:
         # a dating field in another language's conventions, translated into __dating (the original stays as it is)
-        tr = {'lt': lt_dating}[read['translateDating']['lang']]
+        tr = {'lt': lt_dating, 'lv': lv_dating}[read['translateDating']['lang']]
         for p in rows:
             p['__dating'] = tr(p.get(read['translateDating']['field']))
     if read.get('fixMojibake') and rows:

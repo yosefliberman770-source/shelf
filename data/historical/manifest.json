@@ -1468,6 +1468,12 @@
   "sha256": "e0cabc84f888d1fe2d6b37259150abc48723c808ce565647e5da18639017da22",
   "downloaded": "2026-10-01"
  },
+ "latvia-monuments/original/monuments.geojson": {
+  "url": "https://services9.arcgis.com/AW5pFI46lnz0wQIw/arcgis/rest/services/kulturas_pieminekli_NKMP_12_2024/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 14856098,
+  "sha256": "f3d43858fda70858971a7d783cbfa685d0cd55246b4b7d4bddfc8d3247919979",
+  "downloaded": "2026-10-01"
+ },
  "latvia-monuments/original/saraksts.csv": {
   "url": "https://data.gov.lv/dati/dataset/79e7246f-57cc-41fc-9a10-96521422359c/resource/25583e4e-ca54-430e-b275-b38057a5ee70/download/saraksts.csv",
   "bytes": 2012570,

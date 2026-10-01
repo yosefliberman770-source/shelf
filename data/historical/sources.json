@@ -1964,5 +1964,16 @@
     "note": "kvr_poligonai_enriched/FeatureServer/0 via fetch_arcgis.py (12,378)"
    }
   ]
+ },
+ {
+  "id": "latvia-monuments",
+  "arcgis": "https://services9.arcgis.com/AW5pFI46lnz0wQIw/arcgis/rest/services/kulturas_pieminekli_NKMP_12_2024/FeatureServer/0",
+  "licence": "attributes = the CC0 state list (data.gov.lv dataset 79e7246f…); this ArcGIS geometry copy states no licence — private pack",
+  "files": [
+   {
+    "path": "original/monuments.geojson",
+    "note": "snapshot via fetch_arcgis.py (8,370)"
+   }
+  ]
  }
 ]

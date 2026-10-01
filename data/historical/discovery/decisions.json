@@ -1620,6 +1620,29 @@
    "region": "Lithuania",
    "dataset": "lithuania-kvr",
    "note": "Found by the cycle-4 targeted ArcGIS search (kvr.kpd.lt itself blocks automated access). CC BY 4.0 → public spec lithuania-kvr: 15,800 objects dated by the register's own age text, translated from Lithuanian conventions (century parts, millennia, decades; tested); 5,433 without an age left out; type-only names not indexed as places."
+  },
+  {
+   "title": "Latvia: state-protected cultural monuments (NKMP list, Dec 2024) — ArcGIS geometry copy",
+   "match": [
+    "kulturas_pieminekli_NKMP_12_2024",
+    "79e7246f-57cc-41fc-9a10-96521422359c"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Latvia",
+   "dataset": "latvia-monuments",
+   "note": "8,082 monuments dated from the list's own dating, translated from Latvian conventions (centuries with parts and quarters; archaeological periods by the stated Latvian scheme; Bronze/Stone Age left undated; tested). The CC0 list on data.gov.lv has no coordinates; the geometry comes from an ArcGIS copy without a licence → private spec latvia-monuments."
+  },
+  {
+   "title": "Estonia: Kultuurimälestis ArcGIS copies (municipal / project)",
+   "match": [
+    "Kultuurimälestis_150925",
+    "SiiriKobras"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "Estonia",
+   "note": "Partial copies (48 objects) of the Estonian register with no dating fields; the full register (register.muinas.ee) still blocks automated access."
   }
  ]
 }
