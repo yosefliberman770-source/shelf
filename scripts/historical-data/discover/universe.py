@@ -44,11 +44,11 @@ EUROPE_BBOX = (-25, 27, 62, 72)
 q = urllib.parse.quote
 
 
-def get(url, tries=4, accept='application/json', raw=False):
+def get(url, tries=4, accept='application/json', raw=False, headers=None):
     last = None
     for i in range(tries):
         try:
-            req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': accept})
+            req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': accept, **(headers or {})})
             with urllib.request.urlopen(req, timeout=90) as r:
                 b = r.read()
                 return b if raw else json.loads(b.decode('utf-8', 'replace'))
@@ -213,7 +213,10 @@ def europa(s, pages=2):
 
 
 def zenodo(s):
-    d = get(f'https://zenodo.org/api/records?q={q(s)}&type=dataset&size=25')
+    # A personal access token (environment variable ZENODO_TOKEN, read-only, never stored in the repository) raises the page
+    # size from 25 to 100; without it the harvest still works, four times slower.
+    tok = os.environ.get('ZENODO_TOKEN')
+    d = get(f"https://zenodo.org/api/records?q={q(s)}&type=dataset&size={100 if tok else 25}", headers={'Authorization': f'Bearer {tok}'} if tok else None)
     if d is None:
         return None
     out = []
