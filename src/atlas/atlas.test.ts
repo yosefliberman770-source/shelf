@@ -3,7 +3,7 @@ import { featureFilter, validateStyleMin } from '@maplibre/maplibre-gl-style-spe
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, type LayerCtx, LAYERS, SOURCE_SPECS } from './catalog';
+import { DATASET_CREDIT, DEFAULT_LAYERS, DRAW_ORDER, labelKey, type LayerCtx, LAYERS, SOURCE_SPECS, switchTerrainToFallback } from './catalog';
 import { eventNear, existedIn, fromAstro, ohmExisted, shiftYear, toAstro, yearLabel } from './time';
 
 const PACK = join(__dirname, '../../public/atlas');
@@ -80,6 +80,42 @@ describe('atlas layer catalog', () => {
   });
 });
 
+describe('base map', () => {
+  const ctx: LayerCtx = { year: 1300, base: '/atlas/', eventWindow: 0 };
+  const all = LAYERS.filter((l) => !l.unavailable).flatMap((l) => l.specs(ctx)) as { id: string; source?: string; 'source-layer'?: string }[];
+  it('takes only water from the modern map — no modern borders, roads or places', () => {
+    const used = new Set(all.filter((l) => l.source === 'ofm').map((l) => l['source-layer']));
+    expect([...used].sort()).toEqual(['water_name', 'waterway']);
+  });
+  it('lets historical labels win over modern river and sea names (villages over sea names)', () => {
+    for (const id of ['cities', 'towns', 'kingdoms', 'battles']) {
+      expect(labelKey(id), id).toBeGreaterThan(labelKey('rivers'));
+      expect(labelKey(id), id).toBeGreaterThan(labelKey('water-names'));
+    }
+    expect(labelKey('villages')).toBeGreaterThan(labelKey('water-names'));
+  });
+  it('names today’s lakes only from 1900 (no IJsselmeer in 1300), and seas always', () => {
+    const ids = (year: number) => LAYERS.find((l) => l.id === 'water-names')!.specs({ ...ctx, year }).map((l) => l.id);
+    expect(ids(1300)).toEqual(['water-names-sea']);
+    expect(ids(1950)).toEqual(['water-names-sea', 'water-names-lake']);
+  });
+  it('draws the large rivers zoomed out and hands over to the exact rivers closer in', () => {
+    const net = all.find((l) => l.id === 'rivers-modern') as unknown as { source: string; maxzoom: number };
+    const osm = all.find((l) => l.id === 'rivers-osm') as unknown as { minzoom: number };
+    expect(net.source).toBe('hydrorivers');
+    expect(osm.minzoom).toBeLessThan(net.maxzoom);
+  });
+  it('keeps the relief under the water and switches to the fallback relief tiles once', () => {
+    expect(DRAW_ORDER.indexOf('terrain')).toBe(0);
+    expect(String((SOURCE_SPECS.terrain(ctx) as { tiles: string[] }).tiles[0])).toContain('mapterhorn');
+    expect(switchTerrainToFallback()).toBe(true);
+    expect(switchTerrainToFallback()).toBe(false);
+    const fb = SOURCE_SPECS.terrain(ctx) as { tiles: string[]; tileSize: number };
+    expect(fb.tiles[0]).toContain('elevation-tiles-prod');
+    expect(fb.tileSize).toBe(256);
+  });
+});
+
 describe('atlas data packs', () => {
   it('lists license and attribution for every dataset', () => {
     const m = pack<{ datasets: Record<string, { license: string; attribution: string; files: string[] }> }>('manifest.json');
@@ -99,7 +135,7 @@ describe('atlas data packs', () => {
   });
   it('ships vector tiles for the heavy layers and no whole-world files', () => {
     const tiles = readdirSync(join(PACK, '../world/tiles'));
-    for (const t of ['pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles', 'domesday.pmtiles', 'gough.pmtiles', 'navigation.pmtiles']) expect(tiles).toContain(t);
+    for (const t of ['hydrorivers.pmtiles', 'pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles', 'domesday.pmtiles', 'gough.pmtiles', 'navigation.pmtiles']) expect(tiles).toContain(t);
     expect(readdirSync(PACK)).not.toContain('pleiades-places.json');
     expect(readdirSync(PACK)).not.toContain('pleiades-gazetteer.json');
   });

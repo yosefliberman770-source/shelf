@@ -149,6 +149,23 @@ class BuildRejectsBadRecords(unittest.TestCase):
                         self.assertTrue(shape(ft['geometry']).is_valid, f'invalid polygon in tile {z}/{x}/{y}')
 
 
+class BaseMapRivers(unittest.TestCase):
+    def test_rivers_appear_by_size(self):
+        import build
+        self.assertEqual(build.river_minzoom(800000), 3)   # Danube
+        self.assertEqual(build.river_minzoom(6000), 5)
+        self.assertEqual(build.river_minzoom(150), 8)
+        self.assertIsNone(build.river_minzoom(149))
+        self.assertIsNone(build.river_minzoom(None))
+
+    def test_smoothing_keeps_the_ends_so_segments_still_meet(self):
+        import build
+        line = [(0, 0), (1, 0), (1, 1), (2, 1)]
+        out = build.chaikin(line)
+        self.assertEqual((out[0], out[-1]), (line[0], line[-1]))
+        self.assertGreater(len(out), len(line))
+
+
 class UndatedEvidence(unittest.TestCase):
     REG = quality.dataset_registry(os.path.join(os.path.dirname(__file__), '..', '..'))
 

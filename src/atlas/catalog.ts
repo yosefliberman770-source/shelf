@@ -26,7 +26,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 ];
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
-  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly';
+  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -36,7 +36,9 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   wikidata: { name: 'Wikidata', url: 'https://www.wikidata.org/', license: 'CC0' },
   naturalearth: { name: 'Natural Earth', url: 'https://www.naturalearthdata.com/', license: 'public domain' },
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
-  terrain: { name: 'Terrain Tiles (Mapzen/AWS, SRTM & others)', url: 'https://github.com/tilezen/joerd/blob/master/docs/attribution.md', license: 'see sources' },
+  terrain: { name: 'Mapterhorn terrain (Copernicus GLO-30 and national elevation models; fallback: Mapzen/AWS Terrain Tiles)', url: 'https://mapterhorn.com/attribution', license: 'open data, see sources' },
+  hydrosheds: { name: 'HydroRIVERS v1.0 (Lehner & Grill 2013, HydroSHEDS)', url: 'https://www.hydrosheds.org/products/hydrorivers', license: 'CC BY 4.0' },
+  openfreemap: { name: 'OpenFreeMap © OpenMapTiles, data from OpenStreetMap', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
   itinere: { name: 'Itiner-e (Brughmans et al. 2024)', url: 'https://itiner-e.org/', license: 'CC BY 4.0' },
   viabundus: { name: 'Viabundus 2', url: 'https://www.viabundus.eu/', license: 'CC BY 4.0' },
   althurayya: { name: 'al-Ṯurayyā Gazetteer (after G. Cornu)', url: 'https://althurayya.github.io/', license: 'Apache-2.0' },
@@ -108,7 +110,7 @@ export interface AtlasLayerDef {
 // ── Palette (muted, map-like; works on the parchment base) ────────────────
 const C = {
   settlement: '#7a4a1e', city: '#5b2c0f', town: '#7a4a1e', village: '#9c7a57', port: '#1f6f8b', fort: '#8b2e2e', arch: '#8a7d5a',
-  river: '#4f8fb3', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
+  river: '#4f8fb3', riverNet: '#3b7ca6', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
   road: '#9b2226', roadOhm: '#bb6a2b', bridge: '#444444',
   empire: '#b03a2e', kingdom: '#2e7d32', republic: '#1565c0', otherState: '#7b6a58', province: '#6d4c41', territory: '#8e44ad', border: '#5d4037',
   battle: '#c62828', siege: '#6a1b9a', campaign: '#ef6c00', war: '#000000',
@@ -121,6 +123,10 @@ const FONT_ITALIC = ['OpenHistorical Italic'];
 /** AWMC/Barrington data covers the Greek and Roman world, c. 750 BCE – 640 CE. */
 const BARRINGTON: [HistYear, HistYear] = [-750, 640];
 
+/** Today's lake names are shown from this year: many lakes and reservoirs, and their names, are modern. */
+const MODERN_LAKE_NAMES = 1900;
+/** A river's mean discharge (m³/s), which sets its width. */
+const RIVER_Q: ExpressionSpecification = ['coalesce', ['get', 'q'], 0];
 const u = (k = 'u'): ExpressionSpecification => ['coalesce', ['get', k], 0];
 /** Fainter when uncertain, when rough, or when the date isn't recorded. */
 const certaintyOpacity = (strong = 0.95): ExpressionSpecification => ['case',
@@ -173,8 +179,26 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   // A war picked in the Military panel, numbered in date order (built by the map).
   'war-sequence': () => ({ type: 'geojson', data: { type: 'FeatureCollection', features: [] } }),
   ohm: () => ({ type: 'vector', tiles: ['https://vtiles.openhistoricalmap.org/maps/ohm/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 14, attribution: credit('ohm') }),
-  terrain: () => ({ type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 12, attribution: credit('terrain') }),
+  // Relief: Mapterhorn (Copernicus 30 m, sharper, 512 px tiles); if it fails, the older AWS tiles (see switchTerrainToFallback).
+  terrain: () => (terrainFallback
+    ? { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 12, attribution: credit('terrain') }
+    : { type: 'raster-dem', tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'], encoding: 'terrarium', tileSize: 512, maxzoom: 12, attribution: credit('terrain') }),
+  // Modern rivers by size, for zoomed-out views (see docs/BASE_MAP.md).
+  hydrorivers: (c) => pmtiles(c, 'hydrorivers.pmtiles', 'hydrosheds', 8),
+  // OpenStreetMap water, waterways and water names (free, no key). Also in the base style.
+  ofm: () => OFM_SOURCE,
 };
+
+/** OpenStreetMap vector tiles via OpenFreeMap: the base map's water, and named rivers and seas. */
+export const OFM_SOURCE: SourceSpecification = { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: credit('openfreemap') };
+
+let terrainFallback = false;
+/** Switch the relief to the fallback tiles (after the primary ones failed). Returns false if already switched. */
+export function switchTerrainToFallback(): boolean {
+  if (terrainFallback) return false;
+  terrainFallback = true;
+  return true;
+}
 
 export function credit(id: DatasetId): string {
   const d = DATASET_CREDIT[id];
@@ -485,7 +509,8 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'terrain', group: 'physical', label: 'Terrain', datasets: ['terrain'], defaultOn: true,
     hint: 'Shaded relief from modern elevation data. Mountains haven’t moved much; coastlines and rivers have.', sources: ['terrain'],
-    specs: () => [{ id: 'terrain-hillshade', type: 'hillshade', source: 'terrain', paint: { 'hillshade-exaggeration': 0.45, 'hillshade-shadow-color': '#5a4a3a', 'hillshade-highlight-color': '#fffaf0', 'hillshade-accent-color': '#6d5a44' } }],
+    // Neutral grey shadows read as landform rather than as a colour; the "igor" method keeps ridges crisp without a plastic look.
+    specs: () => [{ id: 'terrain-hillshade', type: 'hillshade', source: 'terrain', paint: { 'hillshade-method': 'igor', 'hillshade-exaggeration': ['interpolate', ['linear'], ['zoom'], 3, 0.55, 8, 0.45, 12, 0.35], 'hillshade-shadow-color': '#4a4744', 'hillshade-highlight-color': 'rgba(255,255,255,0.5)', 'hillshade-accent-color': '#4a4744' } }],
   },
   {
     id: 'coast-modern', group: 'physical', label: 'Coastlines (modern)', datasets: ['naturalearth'], defaultOn: false,
@@ -498,12 +523,37 @@ export const LAYERS: AtlasLayerDef[] = [
     specs: (c) => [{ id: 'coast-ancient-line', type: 'line', source: 'awmc-shoreline', filter: existedIn(c.year, { undated: { within: BARRINGTON } }) as FilterSpecification, paint: { 'line-color': C.ancientCoast, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.8], 'line-opacity': ['case', ['>=', u(), 1], 0.4, ['==', ['get', 'as'], 1], 0.4, 0.85] } }],
   },
   {
-    id: 'rivers', group: 'physical', label: 'Rivers', datasets: ['naturalearth', 'pleiades'], defaultOn: true,
-    hint: 'Blue: rivers as they run today (Natural Earth) — many have shifted since antiquity. Darker named lines: ancient river courses recorded in Pleiades.', sources: ['ne-rivers', 'pleiades-lines'],
+    id: 'rivers', group: 'physical', label: 'Rivers', datasets: ['hydrosheds', 'openfreemap', 'naturalearth', 'pleiades'], defaultOn: true,
+    hint: 'Blue: rivers as they run today — large rivers first, tributaries as you zoom in (HydroRIVERS; closer in, OpenStreetMap). Many have shifted since antiquity. Darker named lines: ancient river courses recorded in Pleiades.', sources: ['hydrorivers', 'ofm', 'ne-rivers', 'pleiades-lines'],
     specs: (c) => [
-      { id: 'rivers-modern', type: 'line', source: 'ne-rivers', filter: ['<=', ['get', 'sr'], ['step', ['zoom'], 5, 4, 7, 6, 10]] as FilterSpecification, paint: { 'line-color': C.river, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 9, 1.6], 'line-opacity': 0.55 } },
+      // Zoomed out: the river network by upstream area, as wide as the river is large (mean discharge, m³/s).
+      // Its lines come from a 500 m elevation model, so from zoom 8 they give way to the exact OpenStreetMap rivers.
+      { id: 'rivers-modern', type: 'line', source: 'hydrorivers', 'source-layer': 'rivers', maxzoom: 8.6, layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': C.riverNet, 'line-opacity': ['interpolate', ['linear'], ['zoom'], 7.8, 0.9, 8.6, 0] as ExpressionSpecification,
+          'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 3, ['interpolate', ['linear'], RIVER_Q, 0, 0.6, 1000, 1.1, 6000, 2], 8, ['interpolate', ['linear'], RIVER_Q, 0, 0.9, 50, 1.2, 1000, 2.6, 6000, 4]] as ExpressionSpecification } },
+      { id: 'rivers-osm', type: 'line', source: 'ofm', 'source-layer': 'waterway', minzoom: 7.8, filter: ['==', ['get', 'class'], 'river'] as FilterSpecification, layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': C.riverNet, 'line-opacity': ['interpolate', ['linear'], ['zoom'], 7.8, 0, 8.6, 0.9] as ExpressionSpecification, 'line-width': ['interpolate', ['linear'], ['zoom'], 8, 1.2, 12, 1.8, 15, 2.6] as ExpressionSpecification } },
       { id: 'rivers-ancient', type: 'line', source: 'pleiades-lines', filter: ['all', ['==', ['get', 'k'], 'river'], existedIn(c.year, { undated: 'show' })] as FilterSpecification, paint: { 'line-color': '#2b6f95', 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.8, 9, 2.4], 'line-opacity': certaintyOpacity(0.9) } },
-      { id: 'rivers-label', type: 'symbol', source: 'ne-rivers', minzoom: 5, filter: ['has', 'n'] as FilterSpecification, layout: { 'symbol-placement': 'line', 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 11 }, paint: { 'text-color': '#2b6f95', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+      // Names: up to zoom 11 from Natural Earth's named rivers (OpenStreetMap stores rivers in short pieces, too short
+      // on screen to carry a name until then); from zoom 11 from OpenStreetMap's named rivers (English name if any).
+      { id: 'rivers-label', type: 'symbol', source: 'ne-rivers', minzoom: 5, maxzoom: 11, filter: ['has', 'n'] as FilterSpecification,
+        layout: { 'symbol-placement': 'line', 'symbol-spacing': 250, 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 10.5, 10, 11.5] as ExpressionSpecification, 'text-letter-spacing': 0.06 },
+        paint: { 'text-color': '#2b6f95', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      { id: 'rivers-label-osm', type: 'symbol', source: 'ofm', 'source-layer': 'waterway', minzoom: 11, filter: ['all', ['==', ['get', 'class'], 'river'], ['has', 'name']] as FilterSpecification,
+        layout: { 'symbol-placement': 'line', 'symbol-spacing': 350, 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': FONT_ITALIC, 'text-size': ['interpolate', ['linear'], ['zoom'], 11, 11.5, 14, 12.5] as ExpressionSpecification, 'text-letter-spacing': 0.06 },
+        paint: { 'text-color': '#2b6f95', 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+    ],
+  },
+  {
+    id: 'water-names', group: 'physical', label: 'Seas & lakes (names)', datasets: ['openfreemap'], defaultOn: true,
+    hint: 'Today’s names of seas, gulfs and straits, for orientation (OpenStreetMap); lake names only from 1900, as many lakes and their names are modern (the IJsselmeer dates from 1932). Historical names come from the historical layers.', sources: ['ofm'],
+    specs: (c) => [
+      { id: 'water-names-sea', type: 'symbol', source: 'ofm', 'source-layer': 'water_name', filter: ['in', ['get', 'class'], ['literal', ['ocean', 'sea', 'bay', 'strait', 'gulf']]] as FilterSpecification,
+        layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': FONT_ITALIC, 'text-size': ['interpolate', ['linear'], ['zoom'], 3, 10.5, 8, 14] as ExpressionSpecification, 'text-letter-spacing': 0.18, 'text-max-width': 7 },
+        paint: { 'text-color': '#3f7396', 'text-halo-color': 'rgba(255,255,255,0.45)', 'text-halo-width': 1 } },
+      ...(c.year < MODERN_LAKE_NAMES ? [] : [{ id: 'water-names-lake', type: 'symbol', source: 'ofm', 'source-layer': 'water_name', minzoom: 6, filter: ['==', ['get', 'class'], 'lake'] as FilterSpecification,
+        layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': FONT_ITALIC, 'text-size': 11, 'text-max-width': 6, 'text-letter-spacing': 0.05 },
+        paint: { 'text-color': '#3f7396', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } } as LayerSpecification]),
     ],
   },
   {
@@ -850,11 +900,14 @@ const LABEL_PRIORITY: Record<string, number> = {
   cities: 80, 'urban-population': 78, ports: 75, settlements: 72, towns: 70, 'islamic-places': 68, 'medieval-places': 66,
   'religious-houses': 45, castles: 44, 'hre-towns': 64, 'medieval-markets': 42, 'medieval-archaeology': 37, 'dated-settlements': 38, 'empire-dioceses': 36,
   domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
+  // Modern base-map names: river names keep the middle rank they always had (below towns, kingdoms and battles);
+  // sea and lake names give way to every historical label.
+  'water-names': 20,
 };
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-names', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

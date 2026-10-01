@@ -111,6 +111,26 @@
     "land": 1420,
     "rivers": 1201
    }
+  },
+  {
+   "id": "hydrosheds",
+   "name": "HydroRIVERS v1.0 (HydroSHEDS)",
+   "url": "https://www.hydrosheds.org/products/hydrorivers",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "HydroRIVERS v1.0, Lehner & Grill 2013 (CC BY 4.0)",
+   "files": [
+    "../world/tiles/hydrorivers.pmtiles"
+   ],
+   "notes": "Modern river network of Europe with upstream area and discharge, used for the zoomed-out base map (to zoom 8). Lines are derived from a 500 m elevation model; rivers have moved since antiquity.",
+   "retrieved": "2026-10-01",
+   "counts": {
+    "segments": 136290,
+    "tiles": 1827,
+    "rejected": []
+   }
   }
  ]
 }

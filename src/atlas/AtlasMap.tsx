@@ -3,7 +3,7 @@
 // uncertain or undated things are drawn differently and say so when tapped.
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
+import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OFM_SOURCE, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, switchTerrainToFallback, UNAVAILABLE_LABEL } from './catalog';
 import { assembleParts, installPrivateData, loadPrivateData, PrivateDataError, privateHeader, privateLoadError, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
@@ -57,9 +57,10 @@ function baseStyle(base: string): StyleSpecification {
     glyphs: GLYPHS,
     sources: {
       'ne-land': { type: 'geojson', data: base + 'ne-land.json', attribution: credit('naturalearth') },
-      // Detailed coastlines and water (OpenStreetMap via OpenFreeMap: free, no key). Only the water shapes are
-      // used — no modern roads, places or labels. Offline, the coarse Natural Earth coast underneath remains.
-      ofm: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>' },
+      // Detailed coastlines and water (OpenStreetMap via OpenFreeMap: free, no key). Only water is used — shapes,
+      // named rivers and water names (layers in catalog.ts); no modern roads, borders or places. Offline, the
+      // coarse Natural Earth coast underneath remains.
+      ofm: OFM_SOURCE,
       focus: { type: 'geojson', data: EMPTY },
       pins: { type: 'geojson', data: EMPTY },
       route: { type: 'geojson', data: EMPTY },
@@ -204,8 +205,22 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
           map.setLayoutProperty('land', 'visibility', on ? 'none' : 'visible');
         };
         map.on('sourcedata', (e) => { if (e.sourceId === 'ofm' && e.tile && e.isSourceLoaded) detailedBase(true); });
+        // Relief: if the primary terrain tiles keep failing, switch to the fallback tiles in the same place.
+        let terrainErrors = 0;
+        const terrainFailed = () => {
+          if (++terrainErrors < 3 || !switchTerrainToFallback() || !map) return;
+          const layers = map.getStyle().layers;
+          const i = layers.findIndex((l) => l.id === 'terrain-hillshade');
+          if (i >= 0) map.removeLayer('terrain-hillshade');
+          if (map.getSource('terrain')) map.removeSource('terrain');
+          if (i >= 0) {
+            map.addSource('terrain', SOURCE_SPECS.terrain(ctxRef.current));
+            map.addLayer(layers[i], layers[i + 1]?.id);
+          }
+        };
         map.on('error', (e) => {
-          if ((e as { sourceId?: string }).sourceId === 'ofm') detailedBase(false);
+          if ((e as { sourceId?: string }).sourceId === 'terrain') terrainFailed();
+          else if ((e as { sourceId?: string }).sourceId === 'ofm') detailedBase(false);
           else if (!map?.loaded()) console.warn('atlas', e.error?.message);
         });
         map.on('click', (e) => onClickRef.current(e));

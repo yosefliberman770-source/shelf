@@ -50,6 +50,7 @@ SOURCES = {
     'cliopatria': 'https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/main/cliopatria.geojson.zip',
     'ne_land': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson',
     'ne_rivers': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson',
+    'hydrorivers': 'https://data.hydrosheds.org/file/HydroRIVERS/HydroRIVERS_v10_eu_shp.zip',
     'awmc_roads': AWMC_RAW + 'Cultural-Data/roads/roads.geojson',
     'awmc_shoreline': AWMC_RAW + 'Physical Data/shoreline/shoreline.geojson',
     'awmc_inland': AWMC_RAW + 'Physical Data/inland_water/inland-water-OSM.geojson',
@@ -849,6 +850,59 @@ def natural_earth():
     return {'land': len(out), 'rivers': len(rivers)}
 
 
+# ── HydroRIVERS: the modern river network for the base map, with a hierarchy ──
+# A river appears from the zoom its upstream area warrants (Danube and Rhine first, tributaries later). The lines
+# come from a 15-arc-second DEM (about 500 m), so they are used only up to zoom 8; closer in, the map draws the
+# exact, named OpenStreetMap rivers instead (see docs/BASE_MAP.md).
+RIVER_ZOOMS = ((50000, 3), (20000, 4), (5000, 5), (1500, 6), (500, 7), (150, 8))
+EUROPE_BOX = (-25, 34, 45, 72)
+
+
+def river_minzoom(upstream_km2):
+    """The first zoom at which a river with this upstream area is drawn, or None if it is too small."""
+    return next((z for t, z in RIVER_ZOOMS if (upstream_km2 or 0) >= t), None)
+
+
+def chaikin(coords, rounds=2):
+    """Round off the stair-steps a raster-derived line has; the ends stay where they are, so segments still meet."""
+    for _ in range(rounds):
+        if len(coords) < 3:
+            return coords
+        out = [coords[0]]
+        for (x0, y0), (x1, y1) in zip(coords, coords[1:]):
+            out += [(0.75 * x0 + 0.25 * x1, 0.75 * y0 + 0.25 * y1), (0.25 * x0 + 0.75 * x1, 0.25 * y0 + 0.75 * y1)]
+        out.append(coords[-1])
+        coords = out
+    return coords
+
+
+def hydrorivers():
+    import shapefile  # pyshp
+    import zipfile
+    import tiler
+    log('HydroRIVERS (Europe)')
+    z = zipfile.ZipFile(fetch('hydrorivers', SOURCES['hydrorivers']))
+    part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'))
+    w, s_, e, n = EUROPE_BOX
+    feats = []
+    for rec, shp in zip(r.iterRecords(fields=['HYRIV_ID', 'UPLAND_SKM', 'DIS_AV_CMS']), r.iterShapes()):
+        x0, y0, x1, y1 = shp.bbox
+        if x1 < w or x0 > e or y1 < s_ or y0 > n:
+            continue
+        mz = river_minzoom(rec['UPLAND_SKM'])
+        if mz is None:
+            continue
+        q = rec['DIS_AV_CMS'] or 0
+        coords = [(round(x, 5), round(y, 5)) for x, y in chaikin([tuple(p) for p in shp.points])]
+        feats.append(({'type': 'LineString', 'coordinates': coords}, {'i': rec['HYRIV_ID'], 'q': round(q) if q >= 10 else round(q, 1)}, mz))
+    out = os.path.join(OUT, '..', 'world', 'tiles', 'hydrorivers.pmtiles')
+    stats = tiler.build(out, 'rivers', feats, 8, 'HydroRIVERS (Europe)', 'HydroRIVERS v1.0, Lehner & Grill 2013 (CC BY 4.0)', min_zoom=3)
+    stats = {'segments': stats['features'], 'tiles': stats['tiles'], 'rejected': stats['rejected']}
+    log('  ', stats)
+    return stats
+
+
 # ── Gazetteer: every Pleiades place with all its names, for name lookup ──────
 
 # Pleiades connection types that say one place is part of / inside another.
@@ -1221,6 +1275,11 @@ def manifest(stats):
              'licenseUrl': 'https://www.naturalearthdata.com/about/terms-of-use/', 'commercial': True, 'shareAlike': False,
              'attribution': 'Made with Natural Earth', 'files': ['ne-land.json', 'ne-rivers.json'], 'notes': 'Modern coastline and modern river courses. Rivers and coasts have moved since antiquity; ancient coastlines come from AWMC.',
              'retrieved': today, 'counts': stats.get('naturalearth')},
+            {'id': 'hydrosheds', 'name': 'HydroRIVERS v1.0 (HydroSHEDS)', 'url': 'https://www.hydrosheds.org/products/hydrorivers', 'license': 'CC BY 4.0',
+             'licenseUrl': 'https://creativecommons.org/licenses/by/4.0/', 'commercial': True, 'shareAlike': False,
+             'attribution': 'HydroRIVERS v1.0, Lehner & Grill 2013 (CC BY 4.0)', 'files': ['../world/tiles/hydrorivers.pmtiles'],
+             'notes': 'Modern river network of Europe with upstream area and discharge, used for the zoomed-out base map (to zoom 8). Lines are derived from a 500 m elevation model; rivers have moved since antiquity.',
+             'retrieved': today, 'counts': stats.get('hydrosheds')},
         ],
     }
     with open(os.path.join(OUT, 'manifest.json'), 'w', encoding='utf-8') as fh:
@@ -1236,7 +1295,7 @@ def main():
     if os.path.exists(mpath):
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
     steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases), ('common', polity_common_names),
-             ('wikidata', wikidata_events), ('naturalearth', natural_earth)]
+             ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers)]
     for key, fn in steps:
         stats[key] = fn() if not only or key in only else old.get(key)
     if not only or 'world' in only:

@@ -12,10 +12,13 @@ current base in the same views:
 - `scripts/basemap-prototype/hydrorivers_tiles.py` builds the river tiles.
 - `scripts/basemap-prototype/style-compare.html` draws both styles.
 
-The screenshots are in `docs/basemap/`. They show a 412 px phone width, without any historical layers, so that only
-the base differs.
+**Correction (same day).** The first version of this document compared the prototype with a hand-made copy of the
+current style. That copy drew the relief above the sea, and the real app does not. So the claim that "the relief
+muddies the sea" and the Europe and Aegean comparisons built on it were wrong, and they have been removed. All
+before/after pictures are now screenshots of the real app (the build of `main` against this branch), at 412 px phone
+width, with the default historical layers on, year 1300. Step 1 is in `docs/basemap/step1/`.
 
-![Europe](basemap/compare-europe.jpg)
+![Europe](basemap/step1/europe.jpg)
 
 ---
 
@@ -35,7 +38,7 @@ The base is put together in two places.
 
 | Layer | Source | Notes |
 |---|---|---|
-| `terrain` (on) | AWS `elevation-tiles-prod` Terrarium PNG, 256 px, maxzoom 12 | A hillshade at exaggeration 0.45 with warm brown shadows (`#5a4a3a`). It is drawn **above** the water fill, because `terrain` comes first in `DRAW_ORDER` but after the base layers. |
+| `terrain` (on) | AWS `elevation-tiles-prod` Terrarium PNG, 256 px, maxzoom 12 | A hillshade at exaggeration 0.45 with warm brown shadows (`#5a4a3a`). It is drawn under the water, because `terrain` comes first in `DRAW_ORDER` and `sync()` moves `water-detail` above the political layers. |
 | `rivers` (on) | `public/atlas/ne-rivers.json` (2.0 MB GeoJSON) | Natural Earth **10m** `rivers_lake_centerlines`, simplified at 0.005° (≈500 m). It is filtered by `scalerank` (≤5 at z<4, ≤7 at z<6, all ≤10 after). It has about 170 named features in Europe, and labels from z5. |
 | `lakes` (on) | AWMC inland water | This is ancient-world (Barrington) data. It is not a modern base layer. |
 | `coast-modern` (off) | `ne-land.json` | A dashed outline of the same 1:50m land. |
@@ -50,22 +53,20 @@ There are also some fixed settings:
 
 ## B. Why it looks poor (measured, not assumed)
 
-![Alps](basemap/compare-alps.jpg)
+![Alps](basemap/step1/alps.jpg)
 
 1. **Almost no rivers.**
    - Natural Earth 10m is a 1:10 million dataset. At z7 in the Alps it draws three rivers (Rhein, Inn, Ticino) and nothing else.
-   - The OpenMapTiles `waterway` layer, which is on the same OpenFreeMap tiles, is nearly empty below z12. The project
-     generalises it that way on purpose.
-   - So between z5 and z11, where Shelf is used most, Europe has no river network. Tributaries, the Po system, the
-     Seine–Marne–Oise and the Vistula basin are all missing.
+   - The OpenMapTiles `waterway` layer, on the same OpenFreeMap tiles, has only named major rivers below z12 (5–13 per
+     tile at z6–10). It is exact, but sparse, and it is stored in short pieces, too short on screen to carry a name
+     until about z11. Shelf did not use it.
+   - So between z5 and z10, where Shelf is used most, Europe has almost no river network. Tributaries, the Po system,
+     the Seine–Marne–Oise and the Vistula basin are all missing.
 2. **No physical or reference names at all.** The base has no sea, gulf, strait, lake, mountain or modern place
    label. OpenFreeMap carries `water_name`, `mountain_peak` and `place`, but Shelf does not use them. The only names on
    screen are historical ones, so a reader cannot find "where Lake Constance is" unless a historical layer happens to
    name it.
-3. **The relief muddies the sea.**
-   - Terrarium contains bathymetry, and the hillshade is drawn over the water fill. So the seabed of the Aegean, the
-     Tyrrhenian and the Norwegian shelf shows through as grey-brown blotches.
-   - This is the biggest reason the map looks "dirty" at continental zoom. See `compare-aegean.jpg` and `compare-europe.jpg`.
+3. *(Withdrawn: the relief does not show through the sea in the real app. See the correction at the top.)*
 4. **The relief is blurred and too warm.**
    - AWS Terrarium is a 256 px PNG from SRTM-era sources. At z7–10 it is over-zoomed and soft.
    - Its brown shadow on a beige land colour gives the whole map one muddy tone. The old-atlas look comes from a
@@ -163,15 +164,15 @@ The run covered 224,603 segments (lon −25…45, lat 34…72). It produced 24,4
 
 - **z3–7: excellent.** France at z5.5 shows the Seine with its meanders, the Marne, Oise, Loire, Allier, Vienne,
   Garonne, Dordogne, Lot and Rhône, all with widths from discharge. The Alps at z7 go from 3 rivers to the full valley
-  network. See `compare-france.jpg` and `compare-alps.jpg`.
+  network.
 - **z8 and above: not usable alone.** The 500 m DEM-derived lines are stair-stepped and run beside the real channel.
-  The Rhine at Boppard and the Mosel at Koblenz (`compare-rhine.jpg`) show this. The Netherlands
-  (`compare-netherlands.jpg`) shows it too: HydroRIVERS draws the Flevoland drainage grid as rivers, and its Rhine
-  branches do not follow the Waal and Lek.
+  The Rhine at Boppard and the Mosel at Koblenz show this. So does the Netherlands: HydroRIVERS draws the Flevoland
+  drainage grid as rivers, and its Rhine branches do not follow the Waal and Lek. (Seen in the prototype; its pictures
+  were removed with the faulty comparison, but the finding is about HydroRIVERS itself.)
 - **So hierarchy and geometry must come from different sources.** HydroRIVERS (or EU-Hydro) decides *which* rivers
   appear at a zoom. From z8, EU-Hydro or OSM must give the *line* and the *name*.
 
-![Middle Rhine](basemap/compare-rhine.jpg)
+![Middle Rhine](basemap/step1/rhine.jpg)
 
 **Mapterhorn compared with AWS.** One z8 tile measured:
 
@@ -180,8 +181,8 @@ The run covered 224,603 segments (lon −25…45, lat 34…72). It produced 24,4
 | Mapterhorn (512 px WebP) | 284 KB | 4× more than AWS |
 | AWS (256 px PNG) | 103 KB | — |
 
-Per area of ground, Mapterhorn is cheaper and sharper. In the prototype the Alps and the Rhine gorge are visibly
-crisper (`compare-alps.jpg`, `compare-rhine.jpg`).
+Per area of ground, Mapterhorn is cheaper and sharper. In the app, the Alps, the Rhine gorge and western Norway are
+visibly crisper (`step1/alps.jpg`, `step1/rhine.jpg`, `step1/norway-fjords.jpg`).
 
 **OpenFreeMap compared with self-hosted tiles.** Keep OpenFreeMap for z≥11 (the full OSM detail of a continent cannot
 fit on GitHub Pages). Stop depending on it for z≤10.
@@ -475,15 +476,7 @@ Techniques:
 
 The plan is in order, each step can be shipped on its own, and none changes historical data or the temporal model.
 
-1. **Fix the two biggest visual faults now**, without new data (`catalog.ts`, `AtlasMap.tsx`):
-   - Move the hillshade **below** the base water. Add the `terrain` layer before `water-detail`, or move
-     `water-detail` above it in `sync()`'s `before` logic.
-   - Switch the `terrain` source to Mapterhorn (`https://tiles.mapterhorn.com/{z}/{x}/{y}.webp`, `tileSize: 512`,
-     `maxzoom: 12`) with the AWS URL as a fallback on error.
-   - Change the hillshade paint to `igor` with cool shadows.
-   - Add OpenFreeMap `water_name` (sea and lake) labels to `baseStyle`.
-   - Add credits for Mapterhorn and Copernicus in `credit()`.
-   - Test: a vitest test that `terrain-hillshade` sits below `water-detail` in the final layer list.
+1. **Done (step 1, see "Step 1: what changed" below):** sharper relief, the river network, and sea and lake names.
 2. **`scripts/basemap-build/`** (new, in the style of `scripts/atlas-build/`):
    - `fetch.py` downloads the open sources into `data/basemap/raw/` (not in git). It records URL, date and SHA-256
      in a manifest, as `scripts/historical-data/fetch.py` does. The sources are HydroRIVERS, HydroLAKES, GRanD,
@@ -544,3 +537,29 @@ The plan is in order, each step can be shipped on its own, and none changes hist
 - OpenFreeMap — https://openfreemap.org/
 - Natural Earth — https://www.naturalearthdata.com/
 - GeoNames — https://download.geonames.org/export/dump/
+
+## Step 1: what changed (1 October 2026)
+
+| Change | Where | Detail |
+|---|---|---|
+| Sharper relief | `catalog.ts` `terrain` | Mapterhorn (Copernicus GLO-30), 512 px WebP, `hillshade-method: 'igor'`, neutral grey shadows (`#4a4744`), exaggeration 0.55 → 0.35 with zoom. After 3 failed tiles the map switches once to the old AWS tiles (`switchTerrainToFallback`, `AtlasMap.tsx`). |
+| River network | `build.py` `hydrorivers()` → `public/world/tiles/hydrorivers.pmtiles` | HydroRIVERS, 136,290 segments with upstream area ≥ 150 km², z3–8, **9.5 MB**. Rivers appear by upstream area (≥ 50,000 km² at z3 … ≥ 150 km² at z8), width from mean discharge, corners smoothed (Chaikin, ends kept). |
+| Exact rivers closer in | `rivers-osm` | OpenStreetMap rivers (OpenFreeMap `waterway`, class `river`) fade in at z7.8–8.6 as HydroRIVERS fades out. |
+| River names | `rivers-label`, `rivers-label-osm` | Natural Earth names to z11, OpenStreetMap names from z11 (its pieces are too short on screen before that). Same label rank as before. |
+| Sea and lake names | new layer `water-names` (on) | Seas, gulfs, straits and bays always. **Lake names only from 1900**: many lakes and their names are modern (in 1300 the map wrote "IJsselmeer", which dates from 1932). Lowest label rank, so every historical label wins. |
+| Credits | `catalog.ts`, `public/atlas/manifest.json` | Mapterhorn, HydroRIVERS (CC BY 4.0), OpenFreeMap/OSM (ODbL). |
+
+Tests added:
+
+- the base takes only `waterway` and `water_name` from the modern map (no borders, roads or places);
+- historical labels outrank modern water names;
+- the river hand-over happens around zoom 8;
+- the relief fallback switches once;
+- no lake names before 1900;
+- river zoom thresholds and smoothing (Python).
+
+Known limits after step 1:
+
+- Water shapes are still today's: the IJsselmeer and Flevoland in 1300, reservoirs at every date. That is the `change` layer in E.
+- From z8.6 to z11 only OpenStreetMap's named major rivers show, so the network thins out there until EU-Hydro or OSM tributaries are added (E, rivers z8–10).
+- No mountain range or peak names yet, and no modern reference places.
