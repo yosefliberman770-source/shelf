@@ -137,7 +137,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   layersRequest?: { layers: string[]; n: number };
   onLayersChange?: (layers: string[]) => void;
   /** Original historical maps laid over the reconstruction (image placed by its four corners). */
-  mapOverlays?: { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number }[];
+  mapOverlays?: { id: string; url: string; tiles?: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number }[];
   /** Shown over the map (e.g. the "What am I looking at?" chip). */
   children?: React.ReactNode;
 }) {
@@ -375,7 +375,11 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     }
     for (const o of want.values()) {
       if (!map.getSource(`ov-${o.id}`)) {
-        map.addSource(`ov-${o.id}`, { type: 'image', url: o.url, coordinates: o.coordinates });
+        if (o.tiles) {
+          // a tiled scan: streamed from its publisher, only within its extent
+          const [[w, n], , [e, s]] = o.coordinates;
+          map.addSource(`ov-${o.id}`, { type: 'raster', tiles: [o.tiles], tileSize: 256, bounds: [w, s, e, n], maxzoom: 19 });
+        } else map.addSource(`ov-${o.id}`, { type: 'image', url: o.url, coordinates: o.coordinates });
         map.addLayer({ id: `ov-${o.id}`, type: 'raster', source: `ov-${o.id}`, paint: { 'raster-opacity': o.opacity, 'raster-fade-duration': 0 } }, TOP);
         shownOverlays.current.add(o.id);
       } else map.setPaintProperty(`ov-${o.id}`, 'raster-opacity', o.opacity);

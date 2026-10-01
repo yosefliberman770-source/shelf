@@ -162,7 +162,7 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   ], [book.item?.histStart, book.item?.histEnd, warMarks]);
   // ── Original maps laid over the reconstruction ──
   const [mapOverlays, setMapOverlays] = useState<ActiveOverlay[]>([]);
-  const overlayImages = useMemo(() => mapOverlays.map((o) => ({ id: o.id, url: o.overlay.url, coordinates: o.overlay.coordinates, opacity: o.opacity })), [mapOverlays]);
+  const overlayImages = useMemo(() => mapOverlays.map((o) => ({ id: o.id, url: o.overlay.url, tiles: o.overlay.tiles, coordinates: o.overlay.coordinates, opacity: o.opacity })), [mapOverlays]);
   // A newly added original map: bring it into view.
   const overlayCount = useRef(0);
   useEffect(() => {

@@ -1417,6 +1417,16 @@
    "status": "evaluated",
    "state": "irrelevant",
    "note": "Historical animal/plant sightings (environmental history), not a map category here; kept as a lead only."
+  },
+  {
+   "title": "Welsh georeferenced historical map scans (tiled MapServers: estate maps, tithe and enclosure surveys, charts, 1600s–1890)",
+   "match": [
+    "tiles.arcgis.com/tiles/YFaBqL5jL3y8fq7s"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "100 tiled services from the same publisher as the Welsh boundary layers; 94 whose own name gives the year the map was made are in the original-maps index (public/world/maps/georef-index.json) and can be laid over the atlas, streamed from the publisher's tile server and credited to the holder in each service's copyright line (National Library of Wales, North East Wales Archives, Bangor University, Grosvenor Estate). 6 without a year in the name (incl. the Barmouth–South Stack coastal chart) are left out rather than dated by guess."
   }
  ]
 }

@@ -96,3 +96,16 @@ describe('georeferenced layers from university map libraries (WMS)', () => {
     expect(Number(p.get('height'))).toBe(Math.round((800 * (y1 - y0)) / (x1 - x0)));
   });
 });
+
+describe('georeferenced scans served as map tiles by their publisher', () => {
+  it('previews the tile at the middle of the map and lays the tiles only within the map’s extent', async () => {
+    const { wmsOverlay, xyzTile } = await import('./maps');
+    // Llandegla tithe map (1847): the extent from the publisher's tile service
+    const xyz = { url: 'https://example.org/MapServer/tile/{z}/{y}/{x}', bbox: [-3.23336, 53.0217, -3.10992, 53.08693] as [number, number, number, number] };
+    expect(xyzTile(xyz)).toBe('https://example.org/MapServer/tile/11/666/1005');
+    expect(xyzTile(xyz, 2)).toBe('https://example.org/MapServer/tile/13/2666/4023');
+    const o = wmsOverlay({ id: 'gis:x', title: 'Llandegla Tithe Survey 1847', date: parseDate('1847'), subjects: [], collection: 'gis', holder: 'National Library of Wales', page: '', rights: '', xyz })!;
+    expect(o.tiles).toBe(xyz.url);
+    expect(o.coordinates).toEqual([[-3.23336, 53.08693], [-3.10992, 53.08693], [-3.10992, 53.0217], [-3.23336, 53.0217]]);
+  });
+});
