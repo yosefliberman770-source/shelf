@@ -436,13 +436,18 @@ def build_world(only=None):
     import sites  # Europe-wide medieval sites and towns (Wikidata, Germania Sacra, Buringh, HCED)
     if only == {'places'}:
         rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + sites.build(rows_only=True)[0]
-        return places_index(rows)
+        out = places_index(rows)
+        import entities  # the entity layer is derived from the place index, so it is rebuilt with it
+        entities.main()
+        return out
     site_rows, site_stats = sites.build(rows_only=bool(only) and 'sites' not in only)
     # The private place index goes with the private tiles into the private data pack (never into public/).
     if sites.private_rows:
         site_stats['privatePlaces'] = places_index(sites.private_rows, os.path.join(sites.PRIVATE_BUILD, 'places'))
     rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows
     stats = {'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
+    import entities  # the entity layer is derived from the place index (public and private), so it is rebuilt with it
+    entities.main()
     if site_stats:
         stats['tiles-sites'] = site_stats
     log('  ', stats)

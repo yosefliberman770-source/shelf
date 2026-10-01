@@ -5,6 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
+import { BASIS_LABEL, CLAIM_LABEL, claimText, covers, datasetName, type Entity, entityOf, type EntityLabel, LABEL_RULE, labelAt } from '../../atlas/entities';
 import { dateBasisNote, existedAround, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
@@ -185,13 +186,25 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
     eventsNear([place.lon, place.lat], 30, year, 300).then((e) => !dead && setEvents(e.slice(0, 10))).catch(() => !dead && setEvents([]));
     return () => { dead = true; };
   }, [place.key, year]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The same place in other datasets (stored claims, scripts/atlas-build/entities.py) and its label for this year.
+  const [entity, setEntity] = useState<Entity | null>(null);
+  useEffect(() => {
+    let dead = false;
+    setEntity(null);
+    if (place.gaz) entityOf(place.key).then((e) => !dead && setEntity(e ?? null)).catch(() => {});
+    return () => { dead = true; };
+  }, [place.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const label = useMemo(() => (entity && entity.m.length > 1 ? labelAt(entity, year) : undefined), [entity, year]);
+  // The book's own wording or a recorded English name stays the name shown (names.ts); otherwise the entity's name for the year.
+  const title = label && !['as-written', 'english'].includes(place.nameRoles?.rule ?? '') ? label.name : place.title;
   const nowNames = place.gaz ? namesAround(place.gaz, year) : place.names;
   const otherNames = place.names.filter((n) => !nowNames.includes(n));
   const nameLine = (n: { name: string; from?: number; to?: number; lang?: string }, i: number) => <span key={i}>{i > 0 ? ' · ' : ''}<bdi dir="auto">{n.name}</bdi>{n.from !== undefined || n.to !== undefined ? ` (${span(n.from, n.to)})` : ''}</span>;
   return (
     <div className="card tight hmap-info">
-      <div className="book-title" style={{ fontSize: 22 }}><bdi>{place.title}</bdi></div>
-      {place.recordTitle && place.recordTitle !== place.title && <div className="small muted">Recorded as <bdi>{place.recordTitle}</bdi></div>}
+      <div className="book-title" style={{ fontSize: 22 }}><bdi>{title}</bdi></div>
+      {label && <div className="small muted">{title === label.name ? `Name in ${yearLabel(year)}` : <>In {yearLabel(year)}: <bdi>{label.name}</bdi></>} — {LABEL_RULE[label.rule]} <span className="tiny faint">({[...new Set(label.sources.map(datasetName))].join(', ')})</span></div>}
+      {(place.recordTitle ?? place.title) !== title && <div className="small muted">Recorded as <bdi>{place.recordTitle ?? place.title}</bdi></div>}
       {place.written.toLowerCase() !== place.title.toLowerCase() && <div className="small muted">“{place.written}” in the book</div>}
       <div className="row wrap gap-4 mt-4">
         <span className={`chip cert-${place.certainty}`} style={{ minHeight: 22, fontSize: 11 }}>{CERTAINTY_LABEL[place.certainty].split(' — ')[0]}</span>
@@ -244,8 +257,41 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
       )}
       <PlaceNotes place={place} bookId={bookId} />
       <WhyBlock place={place} />
+      {entity && <EntityBlock entity={entity} year={year} label={label} self={place.key} onOpenPlace={onOpenPlace} />}
       <SourcesBlock sources={[...place.sources, ...(pol?.length ? [{ name: 'Cliopatria (Seshat)', license: 'CC BY 4.0', url: 'https://github.com/Seshat-Global-History-Databank/cliopatria', note: 'Political entity for this year' }] : []), ...(events?.length ? [{ name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', note: 'Events nearby' }] : [])]} />
     </div>
+  );
+}
+
+// ── The same place across datasets ──────────────────────────────────────
+
+/**
+ * Which records of other datasets describe this place, by which stored claim and on what evidence; the claims that
+ * were not applied (ambiguous, refused) too; and every name form with its dates and the records that give it.
+ */
+export function EntityBlock({ entity, year, label, self, onOpenPlace }: { entity: Entity; year: HistYear; label?: EntityLabel; self: string; onOpenPlace: (key: string, name: string) => void }) {
+  const others = entity.m.filter((k) => k !== self);
+  const titleOf = (k: string) => entity.n.find((f) => f[4] !== 'name' && f[5].includes(entity.m.indexOf(k)))?.[0] ?? k;
+  const recordLabel = (k: string) => `${datasetName(k)} · ${titleOf(k)}`;
+  const forms = [...entity.n].sort((a, b) => (a[1] ?? 99999) - (b[1] ?? 99999));
+  return (
+    <details className="atlas-why">
+      <summary>Same place in other datasets ({others.length}){entity.c.some((c) => c[3] !== 'joined') ? ' · and records not joined' : ''}</summary>
+      <dl className="hmap-facts">
+        {others.length > 0 && <><dt>Joined records</dt><dd>{others.map((k) => <div key={k}><button className="atlas-war small" onClick={() => onOpenPlace(k, titleOf(k))}><bdi>{recordLabel(k)}</bdi></button></div>)}</dd></>}
+        {label && <><dt>Name in {yearLabel(year)}</dt><dd><bdi>{label.name}</bdi> <span className="tiny faint">— {LABEL_RULE[label.rule]}</span></dd></>}
+        <dt>Name forms</dt><dd>{forms.slice(0, 30).map((f, i) => (
+          <div key={i} className={covers(f, year) ? '' : 'faint'}>
+            <bdi dir="auto">{f[0]}</bdi> <span className="tiny">({f[1] === null && f[2] === null ? 'undated' : span(f[1] ?? undefined, f[2] ?? undefined)}{f[1] !== null && f[2] === null && f[4] === 'name' ? ', one attestation' : ''}; {BASIS_LABEL[f[4]]}{f[3] ? `; ${f[3]}` : ''}) — {[...new Set(f[5].map((m) => datasetName(entity.m[m])))].join(', ')}</span>
+          </div>))}
+          {forms.length > 30 && <div className="tiny faint">and {forms.length - 30} more</div>}
+        </dd>
+        <dt>Claims</dt><dd>{entity.c.map((c, i) => (
+          <div key={i} className="small"><b>{CLAIM_LABEL[c[3]]}</b>: <bdi>{recordLabel(c[0])}</bdi> ↔ <bdi>{recordLabel(c[1])}</bdi> <span className="tiny faint">— {claimText(c)}</span></div>))}
+        </dd>
+      </dl>
+      <div className="tiny faint">Records are joined only by a shared Wikidata item, or a shared recorded name within a distance set by the kind of place; never two records of one dataset. Each join is a stored claim with its evidence; names keep their own dates and sources. Grey forms are not current in {yearLabel(year)}.</div>
+    </details>
   );
 }
 

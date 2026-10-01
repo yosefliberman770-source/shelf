@@ -857,54 +857,81 @@ Spatial quality pass over every point record Shelf holds (public place index, pr
 
 Reading it: *water-near* is mostly coordinate precision or a shoreline that moved (expected for harbours, polders, lagoon islands); *water-far* in a non-maritime dataset is a real error or a sunk/lost place and is reviewed per record; *stacked* marks placeholder positions (records placed at a parish or county centre) — they are kept and should be drawn as approximate; *swapped* is a lat/lon exchange (fixed in the loader when a whole dataset has it, as with the Generalkarte gazetteer).
 
-## O. Entity-resolution report
+## O. Entity layer: places through time, joined by stored claims
 
-`scripts/historical-data/entity_report.py` → `data/historical/audit/entities.json`. 417,892 index records → 405,346 entities; 10,500 entities are described by more than one dataset (23,046 records); the largest joins 31 records.
+```text
+The entity layer: one historical place through time, assembled from source records by stored, reversible claims.
 
-  python3 scripts/historical-data/entity_report.py → data/historical/audit/entities.json  Generic rule (no hand-made pairs): two records from *different* datasets are the same place when they share a name — any of their recorded names, compared normalised (case, accents, punctuation, a leading article dropped) — and lie within a distance that depends on what they are (a town's centre and its castle can be a kilometre or two apart; two churches of the same dedication in one town are not one church), or when they carry the same Wikidata item. Records of the same dataset are never merged (a dataset's own duplicates are reported separately).
+Three levels are kept apart (docs/HISTORICAL_SOURCES_SEARCH.md, O):
+  source record  — a row of public/world/places as its dataset published it; never edited here
+  entity         — a place through time, with an id of its own, made of records from *different* datasets
+  map label      — the name shown for a year, chosen from the entity's dated name forms (label_at)
 
-| Dataset pair | Shared entities |
+A join is a *claim* with its evidence, not an edit. Every claim considered is stored, also the ones not applied, so any
+grouping can be audited ("why are these one place?" and "why are these not one place?") and reversed by dropping it.
+Claims are tried strongest first:
+  1. id    — the records carry the same external identifier (a Wikidata item).
+  2. name  — the records share a recorded name form (normalised) and lie within a distance set by what they are.
+A claim is applied only if the two groups have no dataset in common: two records of one dataset are never one place
+(a dataset's own duplicates are its own business). A name claim is held back as ambiguous when another record of
+the same dataset is about as close under the same name. Nothing is hand-paired; no name equivalence is hard-coded
+("Istanbul = Constantinople" falls out of dated name forms, or does not appear at all).
+```
+
+Built by `scripts/atlas-build/entities.py` into `public/world/entities/` (and, when the private pack is built, a full build into it); read by `src/atlas/entities.ts`, shown in the place panel ("Same place in other datasets"), audit in `data/historical/audit/entities.json`.
+
+**Public.** 330,065 records; 7,260 places described by more than one dataset (15,299 records, the largest joining 5). Claims: 9,030 joined, 485 held back as ambiguous, 136 refused (would have made two records of one dataset one place).
+
+| Claim basis and outcome | Claims |
 | --- | --- |
-| rohgis + wikidata | 1437 |
-| generalkarte + ottomannfs | 1127 |
-| ivillaris + mfairs | 970 |
-| hre + viabundus | 947 |
-| cassini + dicotopo | 920 |
-| canmore + wikidata | 718 |
-| buringh + pleiades | 525 |
-| ebidat + wikidata | 460 |
-| ebidat + viabundus | 414 |
-| ebidat + hre | 334 |
-| viabundus + wikidata | 302 |
-| pleiades + wikidata | 301 |
-| buringh + viabundus | 297 |
-| germaniasacra + wikidata | 281 |
-| buringh + hre | 275 |
+| id joined | 354 |
+| id refused | 1 |
+| name ambiguous | 485 |
+| name joined | 8676 |
+| name refused | 135 |
+
+| Dataset pair | Shared places |
+| --- | --- |
+| rohgis + wikidata | 1390 |
+| generalkarte + ottomannfs | 1116 |
+| hre + viabundus | 926 |
+| canmore + wikidata | 707 |
+| buringh + pleiades | 512 |
+| pleiades + wikidata | 304 |
+| viabundus + wikidata | 294 |
+| buringh + viabundus | 280 |
+| germaniasacra + wikidata | 280 |
+| buringh + hre | 272 |
 | generalkarte + rohgis | 253 |
-| hre + wikidata | 235 |
-| buringh + cassini | 220 |
-| dicotopo + pleiades | 212 |
-| buringh + dissiloc | 183 |
-| afontium + wikidata | 182 |
-| cassini + dissiloc | 177 |
-| dicotopo + dissiloc | 168 |
-| cassini + pleiades | 150 |
+| hre + wikidata | 230 |
+| buringh + cassini | 212 |
+| buringh + dissiloc | 175 |
+| cassini + dissiloc | 168 |
 | ottomannfs + pleiades | 147 |
+| cassini + pleiades | 143 |
+| dissiloc + pleiades | 130 |
+| dissiloc + ivillaris | 126 |
+| generalkarte + pleiades | 121 |
+| ivillaris + wikidata | 88 |
+| buringh + ivillaris | 88 |
+| buringh + wikidata | 77 |
+| althurayya + pleiades | 71 |
+| nsh + wikidata | 50 |
 
-Examples (first groups found):
+Label chosen for a year (rule in `label_at()` / `labelAt()`):
 
-- **London**: {buringh:London, dissiloc:London, ivillaris:LONDON, mfairs:London, pleiades:Londinium/Augusta}
-- **Paris**: {buringh:Paris, cassini:Paris, dissiloc:Parisiis: Beata Maria, pleiades:Lutetia}
-- **Roma**: {buringh:Rome, dissiloc:Roma, dissiloc:Rome, pleiades:Roma}
-- **York**: {buringh:York, ivillaris:YORK, mfairs:York, pleiades:Eburacum, tib:York}
-- **Köln**: {buringh:Koeln, hre:Koeln, pleiades:Ara Ubiorum/Col. Claudia Ara Agrippinensium, viabundus:Köln}
-- **Constantinople**: {buringh:Istanbul, dissiloc:Constantinopolis, generalkarte:Konstantinopel, pleiades:Byzantium, pleiades:Constantinopolis, pleiades:İstanbul, tib:Constantinople, tib:Istanbul, wikidata:Istanbul}
-- **Istanbul**: {buringh:Istanbul, dissiloc:Constantinopolis, generalkarte:Konstantinopel, pleiades:Byzantium, pleiades:Constantinopolis, pleiades:İstanbul, tib:Constantinople, tib:Istanbul, wikidata:Istanbul}
-- **Kraków**: {hre:Krakow, viabundus:Krakow am See} · {afontium:Kraków, buringh:Kraków}
-- **Lübeck**: {buringh:Lübeck, hre:Luebeck, viabundus:Lübeck, wikidata:Liubice}
-- **Sofia**: {buringh:Sofia, dissiloc:Sofia, generalkarte:Sofia, ottomannfs:Sofya, pleiades:Serdica}
+- **London** (`e1233f99f1f9b`, 4 records): 100: Londinium (dated-name, pleiades:79574); 900: London (evidence-period, buringh:London|51.50|-0.17); 1300: London (evidence-period, buringh:London|51.50|-0.17); 1800: London (dated-name, pleiades:79574)
+- **Paris** (`e903eaf969de6`, 4 records): 300: Lutecia (dated-name, pleiades:109126); 1200: Paris (evidence-period, buringh:Paris|48.87|2.33)
+- **Köln** (`e5e3847a9e558`, 4 records): 100: Col. Claudia Ara Agrippinensium (dated-name, pleiades:108751); 1200: Koeln (dated-record, hre:14060); 1800: Köln (dated-name, pleiades:108751)
+- **York** (`e70616354b737`, 3 records): 200: Eboracum (dated-name, pleiades:89175); 900: York (evidence-period, buringh:York|53.97|-1.08); 1300: York (evidence-period, buringh:York|53.97|-1.08)
+- **Constantinople** (`ee4b57515f320`, 5 records): 300: Constantinopolis (evidence-period, pleiades:520998); 1300: al-Qustantīnīya (dated-name, pleiades:520998); 1600: Istanbul (dated-record, wikidata:Q406); 1900: Istanbul (dated-name, pleiades:520998)
+- **Kraków** (`ef60211befaee`, 2 records): 1300: Krakow am See (dated-record, viabundus:4017); 1580: Krakow am See (dated-record, viabundus:4017)
+- **Lübeck** (`e93bbbd60c4a6`, 2 records): 1300: Lübeck (dated-record, viabundus:4604)
+- **Sofia** (`ecc9a1b26db26`, 5 records): 300: Sertica (dated-name, pleiades:207439); 1300: Sofia (evidence-period, buringh:Sofia|42.68|23.32); 1600: Ṣofya (dated-name, pleiades:207439); 1900: Sofia (dated-name, pleiades:207439)
+- **Aachen** (`e83b5205211a1`, 4 records): 800: Aachen (dated-record, hre:14001); 1500: Aachen (dated-record, hre:14001)
+- **Ljubljana** (`e3b72753cbb28`, 3 records): 200: Emona (dated-record, pleiades:197258); 1500: Ljubljana (dated-record, buringh:Ljubljana|46.05|14.52); 1900: Ljubljana (dated-name, pleiades:197258)
 
-**Recommended generic mechanism.** Keep three levels: *source record* (as published, never edited), *entity* (a place through time, with an id of its own) and *map representation* (what is drawn for a given year). Records join an entity by evidence, in order: a shared external identifier (Wikidata, Pleiades, GeoNames, national register ids); a shared name form (any recorded name, normalised) within a distance that depends on the kind of place; a link stated by a source (e.g. a gazetteer that cites another). A join is a stored claim with its evidence, reversible, and never merges two records of the same dataset. Names stay attached to their records with their own dates, so the label for a year is chosen from the entity's name forms valid then — no rule like "Istanbul = Constantinople" is hard-coded; it falls out of the dated name forms.
+Next: map labels in the vector tiles still use each record's own title; drawing the entity label for the year on the map needs the tiles rebuilt from the source caches (not in every build environment). External identifiers beyond Wikidata (Pleiades, GeoNames, national register ids) join as soon as a dataset carries them in its rows.
 
 ## P. Base-map recommendations
 
@@ -924,7 +951,7 @@ Examples (first groups found):
 ## R. Medium-term plan (weeks)
 
 1. Historical map overlays: done for 1,052 public georeferenced Harvard/NYU layers (map archive → overlay). Next: check each holder’s server allows browser loading (CORS) from the phone; add LoC and Rumsey georeferences via Allmaps as they appear.
-2. Entity layer as in O: store joins as claims; use them to pick the label for a year from dated name forms.
+2. Entity layer as in O: done (claims with evidence, entities, dated name forms, label for a year in the place panel). Next: the same label on the map tiles.
 3. Link the Swedish younger geometrical maps (1680–1700) transcriptions to places (they have map ids, no coordinates).
 4. Ottoman tax registers beyond the NFS gazetteer (e.g. Hanley's 1530 names) — only with a reliable identification method, never by guessing a modern namesake.
 
@@ -937,4 +964,4 @@ Examples (first groups found):
 
 ---
 
-Generated files: `data/historical/discovery/{inventory.jsonl.gz, summary.json, harvard.json, decisions.json, inspected.jsonl}`, `data/historical/coverage-centuries.json`, `data/historical/coverage-centuries-before.json`, `data/historical/weak-cells.csv`, `data/historical/audit/{spatial-qa.json, entities.json}`. Scripts: `scripts/historical-data/discover/*.py`, `scripts/historical-data/coverage_centuries.py`, `scripts/historical-data/spatial_qa.py`, `scripts/historical-data/entity_report.py`, `scripts/atlas-build/registers.py`.
+Generated files: `data/historical/discovery/{inventory.jsonl.gz, summary.json, harvard.json, decisions.json, inspected.jsonl}`, `data/historical/coverage-centuries.json`, `data/historical/coverage-centuries-before.json`, `data/historical/weak-cells.csv`, `data/historical/audit/{spatial-qa.json, entities.json}`. Scripts: `scripts/historical-data/discover/*.py`, `scripts/historical-data/coverage_centuries.py`, `scripts/historical-data/spatial_qa.py`, `scripts/atlas-build/entities.py`, `scripts/atlas-build/registers.py`.

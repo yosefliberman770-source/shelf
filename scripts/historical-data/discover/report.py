@@ -67,6 +67,33 @@ def cand_row(c):
     return [link(c), c['channel'], c['accessClass'], ', '.join(c['regions'][:2]) or '—', per, c['status']]
 
 
+def section_o(ent):
+    """Section O, from the entity build's audit (scripts/atlas-build/entities.py)."""
+    out = ['## O. Entity layer: places through time, joined by stored claims', '']
+    reps = ent if isinstance(ent, list) else ([ent] if ent else [])
+    if not reps or 'claims' not in reps[0]:
+        return out + ['Not yet run (`python3 scripts/atlas-build/entities.py`).', '']
+    out += ['```text', reps[0]['method'], '```', '']
+    out += ['Built by `scripts/atlas-build/entities.py` into `public/world/entities/` (and, when the private pack is built, a full build into it); '
+            'read by `src/atlas/entities.ts`, shown in the place panel ("Same place in other datasets"), audit in `data/historical/audit/entities.json`.', '']
+    for r in reps:
+        c = r['claims']
+        out += [f"**{r['label'].capitalize()}.** {r['records']:,} records; {r['multiSourceEntities']:,} places described by more than one dataset "
+                f"({r['recordsInMultiSourceEntities']:,} records, the largest joining {r['largestEntity']}). Claims: {c.get('joined', 0):,} joined, "
+                f"{c.get('ambiguous', 0):,} held back as ambiguous, {c.get('refused', 0):,} refused (would have made two records of one dataset one place).", '']
+        out += [table(['Claim basis and outcome', 'Claims'], list(r['claimsByBasis'].items())), '']
+        out += [table(['Dataset pair', 'Shared places'], r['sourcePairs'][:25]), '']
+        out += ['Label chosen for a year (rule in `label_at()` / `labelAt()`):', '']
+        for name, ex in r['examples'].items():
+            out.append(f"- **{name}** (`{ex['entity']}`, {len(ex['records'])} records): " + '; '.join(
+                f"{y}: {v['label']} ({v['rule']}, {', '.join(v['sources'])})" for y, v in ex['labels'].items()))
+        out.append('')
+    out += ['Next: map labels in the vector tiles still use each record\'s own title; drawing the entity label for the year on the map needs the '
+            'tiles rebuilt from the source caches (not in every build environment). External identifiers beyond Wikidata (Pleiades, GeoNames, '
+            'national register ids) join as soon as a dataset carries them in its rows.', '']
+    return out
+
+
 def main():
     summ = load('discovery/summary.json')
     harv = load('discovery/harvard.json')
@@ -334,31 +361,8 @@ def main():
     w('')
 
     # ── O ──
-    w('## O. Entity-resolution report')
-    w('')
-    if ent:
-        w(f"`scripts/historical-data/entity_report.py` → `data/historical/audit/entities.json`. {ent['records']:,} index records → {ent['entities']:,} entities; "
-          f"{ent['multiSourceEntities']:,} entities are described by more than one dataset ({ent['recordsInMultiSourceEntities']:,} records); the largest joins {ent['largestEntity']} records.")
-        w('')
-        w(ent.get('method', '').split('\n\n', 1)[-1].replace('\n', ' '))
-        w('')
-        w(table(['Dataset pair', 'Shared entities'], ent['sourcePairs'][:25]))
-        w('')
-        w('Examples (first groups found):')
-        w('')
-        for k, groups in ent['examples'].items():
-            if groups:
-                w(f"- **{k}**: " + ' · '.join('{' + ', '.join(g) + '}' for g in groups))
-        w('')
-        w('**Recommended generic mechanism.** Keep three levels: *source record* (as published, never edited), *entity* (a place through time, '
-          'with an id of its own) and *map representation* (what is drawn for a given year). Records join an entity by evidence, in order: a shared external '
-          'identifier (Wikidata, Pleiades, GeoNames, national register ids); a shared name form (any recorded name, normalised) within a distance that depends '
-          'on the kind of place; a link stated by a source (e.g. a gazetteer that cites another). A join is a stored claim with its evidence, reversible, and '
-          'never merges two records of the same dataset. Names stay attached to their records with their own dates, so the label for a year is chosen from '
-          'the entity\'s name forms valid then — no rule like "Istanbul = Constantinople" is hard-coded; it falls out of the dated name forms.')
-    else:
-        w('Not yet run.')
-    w('')
+    for line in section_o(ent):
+        w(line)
 
     # ── P ──
     w('## P. Base-map recommendations')
@@ -383,7 +387,7 @@ def main():
     w('## R. Medium-term plan (weeks)')
     w('')
     w('1. Historical map overlays: done for 1,052 public georeferenced Harvard/NYU layers (map archive → overlay). Next: check each holder’s server allows browser loading (CORS) from the phone; add LoC and Rumsey georeferences via Allmaps as they appear.')
-    w('2. Entity layer as in O: store joins as claims; use them to pick the label for a year from dated name forms.')
+    w('2. Entity layer as in O: done (claims with evidence, entities, dated name forms, label for a year in the place panel). Next: the same label on the map tiles.')
     w('3. Link the Swedish younger geometrical maps (1680–1700) transcriptions to places (they have map ids, no coordinates).')
     w('4. Ottoman tax registers beyond the NFS gazetteer (e.g. Hanley\'s 1530 names) — only with a reliable identification method, never by guessing a modern namesake.')
     w('')
@@ -399,7 +403,7 @@ def main():
     w('Generated files: `data/historical/discovery/{inventory.jsonl.gz, summary.json, harvard.json, decisions.json, inspected.jsonl}`, '
       '`data/historical/coverage-centuries.json`, `data/historical/coverage-centuries-before.json`, `data/historical/weak-cells.csv`, '
       '`data/historical/audit/{spatial-qa.json, entities.json}`. Scripts: `scripts/historical-data/discover/*.py`, `scripts/historical-data/coverage_centuries.py`, '
-      '`scripts/historical-data/spatial_qa.py`, `scripts/historical-data/entity_report.py`, `scripts/atlas-build/registers.py`.')
+      '`scripts/historical-data/spatial_qa.py`, `scripts/atlas-build/entities.py`, `scripts/atlas-build/registers.py`.')
     out = os.path.join(ROOT, 'docs', 'HISTORICAL_SOURCES_SEARCH.md')
     open(out, 'w', encoding='utf-8').write('\n'.join(L) + '\n')
     print(out, len(L), 'lines')
