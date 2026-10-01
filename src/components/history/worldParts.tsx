@@ -75,6 +75,9 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
     setChecking((c) => ({ ...c, [m.id]: 'checking' }));
     const w = wmsOverlay(m);
     if (w) {
+      // The library's server must return an image (some answer with an error document, or refuse other sites).
+      const ok = await fetch(wmsImage(m.wms!, 64).url).then((r) => r.ok && (r.headers.get('content-type') ?? '').startsWith('image/')).catch(() => false);
+      if (!ok) { setChecking((c) => ({ ...c, [m.id]: 'The library’s map server didn’t return this map just now — try View, or the record page.' })); return; }
       setChecking((c) => ({ ...c, [m.id]: 'ok' }));
       if (!overlays.some((x) => x.id === m.id)) setOverlays([...overlays, { id: m.id.replace(/[^a-z0-9]/gi, '_'), map: m, overlay: w, opacity: 0.75 }].slice(-2));
       return;
