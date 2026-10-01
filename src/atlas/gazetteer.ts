@@ -8,6 +8,7 @@
 // index. Names are linked to a place only when its dataset records that name
 // for it; places from different datasets are treated as the same place only
 // when they carry the name *and* lie within a few kilometres of each other.
+import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { getJSON, km, type Pos } from './data';
 import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
@@ -18,7 +19,7 @@ export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: 
 export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250'
   | 'nsh' | 'nokm' | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'wdextra'
   // From the owner's private data pack only (see privateData.ts):
-  | 'tib' | 'mfairs' | 'afontium' | 'ran' | 'dicotopo' | 'raa' | 'ebidat' | 'darmc' | 'dkff' | 'ariadne' | 'latin1772';
+  | 'tib' | 'mfairs' | 'afontium' | 'ran' | 'dicotopo' | 'raa' | 'ebidat' | 'darmc' | 'dkff' | 'ariadne' | 'latin1772' | 'amcr' | SpecDatasetId;
 export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
 export interface GazPlace {
   /** "<gazetteer>:<id>", e.g. "pleiades:423025" */
@@ -96,6 +97,7 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'darmc', name: 'DARMC scholarly datasets (private data)', license: 'not stated (private use)', url: 'https://darmc.harvard.edu/', coverage: [1, 1500], core: [400, 1500], box: [-12, 12, 45, 65], describe: 'Dated shipwrecks, Carolingian coin hoards and rural Anglo-Saxon settlements.', record: () => 'https://darmc.harvard.edu/' },
   { id: 'dkff', name: 'Danish register of ancient monuments (private data)', license: 'not verified (private use)', url: 'https://www.kulturarv.dk/fundogfortidsminder/', coverage: [400, 1600], core: [800, 1536], box: [8, 54.5, 15.5, 58], describe: 'Danish monuments the register dates to the Viking Age or Middle Ages.', record: () => 'https://www.kulturarv.dk/fundogfortidsminder/' },
   { id: 'ariadne', name: 'ARIADNE archaeology catalogue (private data)', license: 'varies by provider (private use)', url: 'https://portal.ariadne-infrastructure.eu/', coverage: [1, 1914], core: [400, 1800], box: [-25, 34, 45, 67], describe: 'Archaeological sites and fieldwork records from national providers (Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others), each phase dated by the periods its provider gives.', record: () => 'https://portal.ariadne-infrastructure.eu/' },
+  { id: 'amcr', name: 'AMCR — Archaeological Map of the Czech Republic (private data)', license: 'CC BY-NC 4.0 (private use)', url: 'https://digiarchiv.aiscr.cz/', coverage: [-800, 2000], core: [500, 1800], box: [12.0, 48.5, 18.9, 51.1], describe: 'Archaeological sites and fieldwork in Czechia, each with the AMCR periods (years from its PeriodO-linked vocabulary) of what was found.', record: (id) => `https://digiarchiv.aiscr.cz/id/${String(id).split(':')[0]}` },
   { id: 'latin1772', name: 'Atlas of the Latin Church in Poland-Lithuania c. 1772 (private data)', license: 'CC BY-NC 4.0 (private use)', url: 'https://doi.org/10.5281/zenodo.10912495', coverage: [1772, 1772], core: [1772, 1772], box: [14, 46.5, 34, 58], describe: 'Parish and auxiliary churches and religious houses of the Latin Church across the Polish-Lithuanian Commonwealth around 1772.', record: () => 'https://doi.org/10.5281/zenodo.10912495' },
   { id: 'canmore', name: 'Canmore — National Record of the Historic Environment (Scotland)', license: 'OGL v3', url: 'https://www.trove.scot/', coverage: [79, 1914], core: [400, 1900], box: [-9, 54.5, -0.5, 61], describe: 'Scottish monuments, buildings and sites, each dated by the period its record names (Canmore period terms; broad periods converted with the ScAPA thesaurus years).', record: (id) => `https://www.trove.scot/place/${id}` },
   { id: 'irlsmr', name: 'Archaeological Survey of Ireland (Sites and Monuments Record)', license: 'CC BY 4.0', url: 'https://www.archaeology.ie/', coverage: [400, 1900], core: [400, 1700], box: [-11, 51.3, -5.3, 55.5], describe: 'Irish monuments; dated only where the monument class names a date (e.g. “House - 17th century”), otherwise undated.', record: () => 'https://maps.archaeology.ie/historicenvironment' },
@@ -117,6 +119,11 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'wdextra', name: 'Wikidata (dated churches, manors, later settlements)', license: 'CC0', url: 'https://www.wikidata.org/', coverage: [-400, 1914], core: [1600, 1914], box: [-32, 24, 62, 72], describe: 'Churches, mosques, synagogues, manor houses and caravanserais with a founding date or first written mention in Wikidata, and settlements first recorded 1600–1914; dates at the precision Wikidata records them.', record: (id) => `https://www.wikidata.org/wiki/${id}` },
   { id: 'arkas', name: 'Arkas 2.0 (Slovenian archaeological sites)', license: 'CC BY-SA 4.0', url: 'https://doi.org/10.5281/zenodo.7820725', coverage: [-800, 1914], core: [1, 1000], box: [13.3, 45.4, 16.7, 46.9], describe: 'Archaeological sites of Slovenia with their own dating in years (Roman, late antique and medieval).', record: () => 'https://iza2.zrc-sazu.si/en/zbirka/arkas' },
   { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
+  // Datasets read through spec files (data/historical/specs; generated registry).
+  ...(Object.entries(SPEC_DATASETS) as [SpecDatasetId, (typeof SPEC_DATASETS)[SpecDatasetId]][]).map(([id, d]): GazetteerInfo => ({
+    id, name: d.public ? d.name : `${d.name} (private data)`, license: d.license, url: d.url, coverage: [...d.coverage], core: [...d.core], box: [...d.box],
+    describe: d.describe, record: () => d.url,
+  })),
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
 /** Gazetteers whose period covers the year (all of them when the year is unknown). */

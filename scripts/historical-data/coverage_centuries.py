@@ -18,6 +18,7 @@ Score (0–100) for a cell with n records:
   score = 100 · Q^0.8 · (0.55 + 0.30·D + 0.15·V/3)
 So a region full of records dated only by "the dataset covers 1000–1500" cannot reach 70, however many it has.
 """
+import glob
 import json
 import math
 import os
@@ -210,6 +211,8 @@ def representative(g):
 
 
 REGISTER_SRCS = {'canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas', 'wdextra'}
+# Spec-driven datasets (data/historical/specs) are register-like too.
+REGISTER_SRCS |= {json.load(open(p, encoding='utf-8'))['src'] for p in glob.glob(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'historical', 'specs', '*.json'))}
 
 
 def measure(at, place_dirs):

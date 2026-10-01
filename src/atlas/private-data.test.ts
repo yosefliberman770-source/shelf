@@ -146,7 +146,7 @@ describe('installing a pack on the device', () => {
 });
 
 describe('nothing private reaches the public site', () => {
-  const PRIVATE_SOURCES = ['tib', 'mfairs', 'afontium', 'ran', 'dicotopo', 'raa', 'ebidat', 'darmc', 'dkff', 'ariadne', 'latin1772'];
+  const PRIVATE_SOURCES = ['tib', 'mfairs', 'afontium', 'ran', 'dicotopo', 'raa', 'ebidat', 'darmc', 'dkff', 'ariadne', 'latin1772', 'amcr'];
   it('the public place index holds no record of a private dataset', () => {
     const dir = join(ROOT, 'public/world/places/c');
     const srcs = new Set(readdirSync(dir).flatMap((f) => (JSON.parse(readFileSync(join(dir, f), 'utf8')) as unknown[][]).map((r) => r[0] as string)));

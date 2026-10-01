@@ -1328,3 +1328,130 @@ def wikidata_extra():
                 rec['cw'] = hi - lo + 1
             out.append(rec)
     return out, dict(skipped)
+
+
+# ── Czechia: AMCR, the Archaeological Map of the Czech Republic (api.aiscr.cz OAI-PMH; CC BY-NC 4.0 → private pack) ──
+# Sites (lokalita) and fieldwork events (akce): each documentation unit lies on a spatial unit (PIAN, geometry in WGS84)
+# and holds components, each with an AMCR period whose years come from AMCR's own period vocabulary (PeriodO-linked).
+# A unit's periods are merged into phases as for ARIADNE (overlapping or within 50 years); no period is narrowed.
+# Restricted records (the API answers 403 for them) and negative units (nothing found) are left out.
+AMCR_KIND = {'hillfort': 'castle', 'castle': 'castle', 'fortified manor': 'castle', 'fortress': 'castle', 'field fortification': 'castle',
+             'outpost/watchtower': 'castle', 'military camp': 'castle', 'enclosed settlement': 'settlement', 'settlement': 'settlement',
+             'village/town': 'settlement', 'city': 'settlement', 'suburb': 'settlement', 'proto-urban agglomeration': 'settlement',
+             'hill settlement': 'settlement', 'elite settlement': 'settlement', 'individual homestead': 'settlement', 'curia/manorial farm': 'building',
+             'church': 'church', 'chapel': 'church', 'monastery': 'monastery', 'synagogue': 'church', 'mill': 'mill', 'channel/millrace': 'mill',
+             'mine': 'mine', 'extracting site': 'mine', 'panning site': 'mine', 'quarry': 'mine', 'iron production site': 'mine', 'glassworks': 'mine',
+             'roads': 'road', 'transportation structure': 'road', 'bridge/ford': 'bridge', 'railway': 'road', 'hoard': 'hoard', 'battlefield': 'site'}
+
+
+def _gz_text(path):
+    """A gzip file's text, tolerating a file still being written (what was complete is returned)."""
+    import zlib
+    d, out = zlib.decompressobj(16 + zlib.MAX_WBITS), []
+    with open(path, 'rb') as fh:
+        while True:
+            b = fh.read(1 << 22)
+            if not b:
+                break
+            try:
+                out.append(d.decompress(b))
+            except zlib.error:
+                break
+    return b''.join(out).decode('utf-8', 'replace')
+
+
+def _gz_records(path):
+    import zlib
+    d, buf = zlib.decompressobj(16 + zlib.MAX_WBITS), ''
+    with open(path, 'rb') as fh:
+        while True:
+            b = fh.read(1 << 22)
+            if not b:
+                break
+            try:
+                buf += d.decompress(b).decode('utf-8', 'replace')
+            except zlib.error:
+                break
+            parts = buf.split('</record>')
+            for p in parts[:-1]:
+                i = p.find('<record>')
+                if i >= 0:
+                    yield p[i:]
+            buf = parts[-1]
+
+
+def amcr():
+    from shapely import wkt
+    base = raw('amcr-czechia')
+    voc = {}
+    for f in ('heslo_obdobi', 'heslo_areal'):
+        for r in re.findall(r'<record>.*?</record>', _gz_text(os.path.join(base, f + '.xml.gz')), re.S):
+            hid = re.search(r'<amcr:ident_cely>([^<]+)', r)
+            en = re.search(r'<amcr:heslo_en[^>]*>([^<]*)', r)
+            cs = re.search(r'<amcr:heslo xml:lang="cs">([^<]*)', r)
+            a, b = re.search(r'<amcr:rok_od_min>(-?\d+)', r), re.search(r'<amcr:rok_do_max>(-?\d+)', r)
+            if hid:
+                voc[hid.group(1)] = {'en': (en.group(1) if en else '') or (cs.group(1) if cs else ''), 'from': int(a.group(1)) if a else None, 'to': int(b.group(1)) if b else None}
+    pian = {}
+    for r in _gz_records(os.path.join(base, 'pian.xml.gz')):
+        if '403 Forbidden' in r:
+            continue
+        pid = re.search(r'<amcr:ident_cely>([^<]+)', r)
+        g = re.search(r'<amcr:geom_wkt EPSG="4326">([^<]+)', r)
+        if pid and g:
+            try:
+                s = wkt.loads(g.group(1))
+                p = s if s.geom_type == 'Point' else s.representative_point()
+            except Exception:  # noqa: BLE001
+                continue
+            pr = re.search(r'<amcr:presnost[^>]*>([^<]*)', r)
+            pian[pid.group(1)] = (round(p.x, 5), round(p.y, 5), pr.group(1) if pr else '')
+    out, skipped = [], Counter()
+    for f, what in (('archeologicky_zaznam_lokalita', 'site'), ('archeologicky_zaznam_akce', 'fieldwork')):
+        path = os.path.join(base, f + '.xml.gz')
+        if not os.path.exists(path):
+            continue
+        for r in _gz_records(path):
+            if '403 Forbidden' in r:
+                skipped['restricted record (not public)'] += 1
+                continue
+            m = re.search(r'<amcr:ident_cely>([^<]+)', r)
+            if not m:
+                skipped['record without content (deleted or empty)'] += 1
+                continue
+            rid = m.group(1)
+            katastr = re.search(r'<amcr:hlavni_katastr[^>]*>([^<]*)', r)
+            okres = re.search(r'<amcr:okres[^>]*>([^<]*)', r)
+            nazev = re.search(r'<amcr:nazev>([^<]*)', r)
+            for du in re.findall(r'<amcr:dokumentacni_jednotka>.*?</amcr:dokumentacni_jednotka>', r, re.S):
+                if '<amcr:negativni_jednotka>true' in du:
+                    skipped['negative unit (nothing found)'] += 1
+                    continue
+                pm = re.search(r'<amcr:pian id="([^"]+)"', du)
+                if not pm or pm.group(1) not in pian:
+                    skipped['spatial unit not public or missing'] += 1
+                    continue
+                lon, lat, prec = pian[pm.group(1)]
+                temporal, areas = [], []
+                for comp in re.findall(r'<amcr:komponenta>.*?</amcr:komponenta>', du, re.S):
+                    om = re.search(r'<amcr:obdobi[^>]*id="([^"]+)"', comp)
+                    am = re.search(r'<amcr:areal[^>]*id="([^"]+)"', comp)
+                    v = voc.get(om.group(1)) if om else None
+                    if v and v['from'] is not None and v['to'] is not None:
+                        temporal.append({'from': v['from'], 'until': v['to'], 'periodName': v['en']})
+                    if am and am.group(1) in voc:
+                        areas.append(voc[am.group(1)]['en'])
+                phases = ariadne_phases(temporal)
+                if not phases:
+                    skipped['no component with a period in 1–1914'] += 1
+                    continue
+                kind = next((AMCR_KIND[a] for a in areas if a in AMCR_KIND), 'site')
+                place = katastr.group(1) if katastr else (okres.group(1) if okres else '')
+                # Sites have names; fieldwork events only trench labels ("Sonda 01"), so an event is named by its place and area.
+                label = (nazev.group(1) if nazev and what == 'site' else '') or f"{place} — {areas[0] if areas else 'archaeological fieldwork'}"
+                for k, (a, b, names) in enumerate(phases):
+                    out.append({'src': 'amcr', 'id': f"{rid}:{pm.group(1)}:{k}", 'name': label[:80], 'kind': kind, 'lon': lon, 'lat': lat,
+                                'precise': prec in ('odchylka jednotky metrů', 'odchylka desítky metrů'), 'env': (max(a, -800), b),
+                                'per': f"{'; '.join(n for n in names if n)[:80]} (AMCR period, {a}–{b})",
+                                'ty': f"{what} · {', '.join(sorted(set(areas)))[:80] or 'unspecified'}", 'ctx': [c for c in (place, okres.group(1) if okres else '') if c][:2], 'names': []})
+    return out, dict(skipped)

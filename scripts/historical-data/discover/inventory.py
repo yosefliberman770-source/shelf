@@ -155,7 +155,7 @@ def classify(c):
     # Access class (A–I, as in the brief).
     if c['channel'] in ('wikidata-register',):
         cls = 'B' if c.get('formatter') else 'F'
-    elif c['channel'] in ('ogm', 'harvard-geodata', 'loc-maps'):
+    elif c['channel'] in ('ogm', 'harvard-geodata', 'loc-maps', 'europeana-maps', 'rumsey-maps'):
         cls = 'E' if re.search(r'raster|geotiff|scanned|image|tif|jpeg|map', fmts) and not re.search(r'shapefile|vector|polygon|line|point', fmts) else 'A'
     elif re.search(SERVICE, fmts) and not re.search(STRUCTURED_FMT, ' '.join(c.get('formats', [])).lower()):
         cls = 'C'
@@ -323,6 +323,42 @@ def from_ogm(base):
                    type=' '.join(d.get('gbl_resourceClass_sm') or [d.get('layer_geom_type_s', '')]), references=refs[:600], foundBy=[{'q': f'{inst} catalogue'}])
 
 
+UNIVERSE = os.path.join(ROOT, 'scripts', 'atlas-build', '.cache', 'universe')
+UNI_CHANNEL = {'datacite': 'datacite', 'openaire': 'openaire', 'europa': 'data.europa.eu', 'zenodo': 'zenodo', 'arcgis': 'arcgis-hub',
+               'pangaea': 'pangaea', 'europeana': 'europeana-maps', 'rumsey': 'rumsey-maps', 'dataverse': 'dataverse', 're3data': 're3data', 'ogm': 'ogm', 'chains': 'discovery-chain'}
+
+
+def from_universe():
+    """The wide harvest (universe.py): compact records per channel."""
+    for f in sorted(glob.glob(os.path.join(UNIVERSE, '*.jsonl.gz'))):
+        ch = os.path.basename(f).split('.')[0]
+        try:
+            fh = gzip.open(f, 'rt', encoding='utf-8')
+            for line in fh:
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if not r.get('title'):
+                    continue
+                as_list = lambda v: v if isinstance(v, list) else [v] if v else []  # noqa: E731
+                for k in ('kw', 'countries', 'fmts', 'creators', 'lic'):
+                    r[k] = as_list(r.get(k))
+                files = r.get('files') if isinstance(r.get('files'), list) else []
+                fmts = [x for x in (r.get('fmts') or []) if isinstance(x, str)] + sorted({os.path.splitext(x.get('n') or '')[1].lstrip('.').lower() for x in files if isinstance(x, dict)})
+                c = cand(UNI_CHANNEL.get(ch, ch), doi=r.get('doi'), url=r.get('url'), title=r.get('title'), description=r.get('desc'),
+                         institution=r.get('inst'), repository=r.get('repo'), creators=r.get('creators') or [], year=r.get('year'),
+                         keywords=[k for k in (r.get('kw') or []) + (r.get('countries') or []) if isinstance(k, str)], formats=fmts,
+                         type=r.get('type') or '', licence=r.get('lic') or [], bbox=r.get('bbox') if isinstance(r.get('bbox'), list) and len(r['bbox']) == 4 else None,
+                         foundBy=[{'q': r.get('q'), 'ch': ch}] if r.get('q') else [{'ch': ch}])
+                for k in ('files', 'rel', 'cites', 'iiif', 'pt', 'refs', 'georef', 'access', 'years', 'item', 'oaid', 'rid', 'sizes', 'spatial'):
+                    if r.get(k) not in (None, '', []):
+                        c[k] = r[k]
+                yield c
+        except (EOFError, OSError):
+            continue  # a file still being written ends mid-block: what was read is kept
+
+
 def from_shelf_lists():
     """Shelf's earlier candidate lists (166 seeds and their reconciliation) and the acquired vault, so known sources keep their status."""
     rec = os.path.join(ROOT, 'data', 'historical', 'audit', 'reconciliation.json')
@@ -338,12 +374,14 @@ def main():
     if len(sys.argv) > 1:
         global SCRATCH_OGM
         SCRATCH_OGM = sys.argv[1]
-    gens = [from_datacite(), from_zenodo(), from_dataverse(), from_europa(), from_figshare(), from_whg(), from_loc(), from_wikidata_registers(), from_shelf_lists()]
+    gens = [from_datacite(), from_zenodo(), from_dataverse(), from_europa(), from_figshare(), from_whg(), from_loc(), from_wikidata_registers(), from_shelf_lists(), from_universe()]
     if SCRATCH_OGM:
         gens += [from_ogm(d) for d in sorted(glob.glob(os.path.join(SCRATCH_OGM, 'ogm-*'))) if os.path.isdir(d)]
     seen = {}
+    raw_count = Counter()
     for g in gens:
         for c in g:
+            raw_count[c['channel']] += 1
             k = (c.get('doi') or '').lower() or (c.get('url') or '').lower() or c['title'].lower()
             if not k:
                 continue
@@ -359,7 +397,7 @@ def main():
     merged = {}
     for c in seen.values():
         k = re.sub(r'\W+', ' ', c['title'].lower()).strip() + '|' + re.sub(r'\W+', ' ', str(c.get('institution') or '').lower()).strip()
-        if c['channel'] in ('ogm', 'harvard-geodata', 'loc-maps', 'wikidata-register') or len(c['title']) < 12:
+        if c['channel'] in ('ogm', 'harvard-geodata', 'loc-maps', 'europeana-maps', 'rumsey-maps', 'wikidata-register') or len(c['title']) < 12:
             k = c['id']
         if k in merged:
             m = merged[k]
@@ -367,6 +405,7 @@ def main():
             m['foundBy'] = (m.get('foundBy') or []) + [x for x in c.get('foundBy') or [] if x not in (m.get('foundBy') or [])][:10]
         else:
             merged[k] = c
+    dup_records = sum(raw_count.values()) - len(merged)
     cands = [classify(c) for c in merged.values()]
     DECISIONS = json.load(open(os.path.join(OUT, 'decisions.json'), encoding='utf-8'))['decisions']
     used = set()
@@ -388,18 +427,52 @@ def main():
             c = classify(cand('direct-search', url=d.get('url'), title=d['title'], description=d['note'], foundBy=[{'q': 'direct search, 2026-10 pass'}]))
             c['status'], c['decision'] = d['status'], {k: v for k, v in d.items() if k != 'match'}
             cands.append(c)
+    # Investigation state: a recorded decision first, else the deepest automated investigation, else what the metadata says.
+    inv = {}
+    ip = os.path.join(OUT, 'investigations.jsonl.gz')
+    if os.path.exists(ip):
+        try:
+            for line in gzip.open(ip, 'rt', encoding='utf-8'):
+                r = json.loads(line)
+                if DEPTH.get(r['state'], 0) >= DEPTH.get(inv.get(r['id'], {}).get('state'), -1):
+                    inv[r['id']] = r
+        except (EOFError, ValueError):
+            pass  # still being written
+    for c in cands:
+        if c.get('decision', {}).get('state'):
+            c['state'] = c['decision']['state']
+        elif c['id'] in inv:
+            c['state'] = inv[c['id']]['state']
+            c['investigation'] = {k: inv[c['id']].get(k) for k in ('why', 'at', 'need') if inv[c['id']].get(k) is not None}
+        elif c['relevance'] < 25 or not c['regions']:
+            c['state'] = 'irrelevant'  # by its metadata: off-topic, or nothing ties it to Europe / the Mediterranean
+        else:
+            c['state'] = 'catalogue-only'
     os.makedirs(OUT, exist_ok=True)
     cands.sort(key=lambda c: -c['relevance'])
-    with gzip.open(os.path.join(OUT, 'inventory.jsonl.gz'), 'wt', encoding='utf-8') as fh:
+    # Full records for every candidate not ruled irrelevant; a compact line for every candidate (the whole universe).
+    with gzip.open(os.path.join(OUT, 'inventory.jsonl.gz'), 'wt', encoding='utf-8') as fh, \
+            gzip.open(os.path.join(OUT, 'universe-index.jsonl.gz'), 'wt', encoding='utf-8') as fx:
         for c in cands:
-            fh.write(json.dumps(c, ensure_ascii=False, default=list) + '\n')
-    summ = {'candidates': len(cands), 'byChannel': Counter(c['channel'] for c in cands), 'byClass': Counter(c['accessClass'] for c in cands),
+            if c['state'] != 'irrelevant':
+                d = dict(c)
+                d['description'] = d.get('description', '')[:600]
+                fh.write(json.dumps(d, ensure_ascii=False, default=list) + '\n')
+            fx.write(json.dumps([c['id'], c['channel'], c['title'][:120], c.get('doi') or c.get('url'), c['relevance'], c['state'],
+                                 c['regions'][:3], c['categories'][:4]], ensure_ascii=False, default=list) + '\n')
+    summ = {'rawRecords': sum(raw_count.values()), 'rawByChannel': raw_count, 'duplicateRecordsMerged': dup_records,
+            'candidates': len(cands), 'byState': Counter(c['state'] for c in cands), 'byChannel': Counter(c['channel'] for c in cands), 'byClass': Counter(c['accessClass'] for c in cands),
             'relevant': sum(c['relevance'] >= 50 for c in cands), 'byStatus': Counter(c['status'] for c in cands), 'byRegion(relevance≥50)': Counter(r for c in cands if c['relevance'] >= 50 for r in c['regions']),
             'byCategory(relevance≥50)': Counter(k for c in cands if c['relevance'] >= 50 for k in c['categories']),
             'byCentury(relevance≥50)': Counter(p for c in cands if c['relevance'] >= 50 for p in c['periods']),
             'queries': sum(len(glob.glob(os.path.join(DISC, d, '*.json'))) for d in os.listdir(DISC) if os.path.isdir(os.path.join(DISC, d)))}
     json.dump(summ, open(os.path.join(OUT, 'summary.json'), 'w'), ensure_ascii=False, indent=1, default=dict)
     print(json.dumps(summ, ensure_ascii=False, default=dict)[:1500])
+
+
+DEPTH = {'discovered': 0, 'catalogue-only': 1, 'irrelevant': 1, 'metadata-inspected': 2, 'data-inspected': 3, 'insufficient-temporal': 4,
+         'insufficient-spatial': 4, 'promising': 5, 'high-priority': 6, 'rejected': 6, 'duplicate': 6, 'blocked': 6, 'acquisition-attempted': 7,
+         'acquired': 8, 'validated': 9, 'integrated': 10}
 
 
 def known_sources():

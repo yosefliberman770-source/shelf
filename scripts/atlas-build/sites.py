@@ -855,6 +855,17 @@ def regional_layers(recs, rows, sites_out):
                ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
                ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining),
                ('arkas', REG.arkas), ('wdextra', REG.wikidata_extra))
+    # Spec-driven datasets (data/historical/specs/*.json, read by generic.py): public ones join the registers here.
+    import generic as GEN
+    spec_loaded = {}
+
+    def spec_loader(sp):
+        def fn():
+            recs, skipped = GEN.records(sp)
+            spec_loaded[sp['src']] = recs
+            return recs, skipped
+        return fn
+    loaders += tuple((sp['src'], spec_loader(sp)) for sp in GEN.specs(public=True))
     for name, fn in loaders:
         res = fn()
         recs, note = (res if isinstance(res, tuple) else (res, None))
@@ -932,6 +943,19 @@ def regional_layers(recs, rows, sites_out):
     for x in ari:
         add('ariadne', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
     stats['ariadneSkipped'] = ari_skip
+    amcr_recs, amcr_skip = REG2.amcr() if os.path.exists(os.path.join(RAW, 'amcr-czechia', 'original', 'pian.xml.gz')) else ([], {})
+    for x in amcr_recs:
+        add('amcr', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
+    stats['amcrSkipped'] = amcr_skip
+    for sp in GEN.specs(public=False):
+        recs, skipped = GEN.records(sp)
+        spec_loaded[sp['src']] = recs
+        for x in recs:
+            env = x.get('env') or ((x['snap'], x['snap']) if x.get('snap') else None)
+            add(sp['src'], x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=env, per=x.get('per'), ty=x['ty'], precise=x['precise'],
+                **({'sn': 1} if x.get('snap') else {}))
+        stats.setdefault('privateSpecs', {})[sp['src']] = {'records': len(recs), 'skipped': skipped}
+    GEN.write_app_module(spec_loaded)
     for x in REG2.latin_church_1772():
         add('latin1772', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(1772, 1772), per=x['per'], ty=x['ty'], sn=1)
     for x in regional.sweden():
