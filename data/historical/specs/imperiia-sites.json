@@ -1,0 +1,487 @@
+{
+ "id": "imperiia-sites",
+ "src": "imperiasites",
+ "public": false,
+ "enabled": true,
+ "title": "Russian Empire places: towns, villages, post stations, military and economic sites of the 1820s (Piadyshev atlas), towns of 1727, town populations 1719–1781, unrest 1800–1900 (Imperiia project, Harvard; ArcGIS/WorldMap)",
+ "licence": "none stated on the ArcGIS items — private pack",
+ "url": "https://www.arcgis.com/home/user.html?user=koneill_worldmap",
+ "describe": "Places of the Imperiia project: district towns, villages, post stations, fortresses, factories and monasteries digitised from Piadyshev's atlas (1820–1827, shown over those years); towns of the 1727 provincial reform; town populations in the revisions of 1719, c. 1743 and 1781 and the 1766 figures (each a snapshot of its count, only towns with a figure); and incidents of unrest per town in five 20-year periods.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "dedupe": false,
+ "fields": {},
+ "dating": {
+  "mode": "envelope",
+  "from": 1820,
+  "to": 1827,
+  "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "imperiia/original/Uezd_towns_1820s_.geojson"
+   },
+   "fields": {
+    "id": "OBJECTID_1",
+    "name": "Placename",
+    "type": [
+     "Group_",
+     "Status"
+    ],
+    "context": [
+     "Uz_name",
+     "Prov_name"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Villages_1820s_.geojson"
+   },
+   "fields": {
+    "id": "OBJECTID_1",
+    "name": "Placename",
+    "type": [
+     "Group_"
+    ],
+    "context": [
+     "Uz_name",
+     "Prov_name"
+    ],
+    "kind": "settlement"
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Post_stations.geojson"
+   },
+   "fields": {
+    "id": "GazID",
+    "name": "Placename",
+    "type": [
+     "Admin_3rd"
+    ],
+    "context": [
+     "Admin_3rd",
+     "Prov_name"
+    ],
+    "kind": "station"
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "post station as mapped in Piadyshev's atlas (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Military_sites_1820s_.geojson"
+   },
+   "fields": {
+    "id": "OBJECTID_1",
+    "name": "Placename",
+    "type": [
+     "Category"
+    ],
+    "context": [
+     "Uz_name",
+     "Prov_name"
+    ],
+    "kind": {
+     "field": "Category",
+     "map": {
+      "factory": "mill",
+      "plant": "mill",
+      "mill": "mill",
+      "mine": "mine",
+      "works": "mill",
+      "fortress": "castle",
+      "fort": "castle",
+      "redoubt": "castle",
+      "fortified line": "castle"
+     },
+     "default": "castle"
+    }
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Economic_sites_1820s_.geojson"
+   },
+   "fields": {
+    "id": "OBJECTID_1",
+    "name": "Placename",
+    "type": [
+     "Category"
+    ],
+    "context": [
+     "Uz_name",
+     "Prov_name"
+    ],
+    "kind": {
+     "field": "Category",
+     "map": {
+      "factory": "mill",
+      "plant": "mill",
+      "mill": "mill",
+      "mine": "mine",
+      "works": "mill",
+      "fortress": "castle",
+      "fort": "castle",
+      "redoubt": "castle",
+      "fortified line": "castle"
+     },
+     "default": "mill"
+    }
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Monasteries.geojson"
+   },
+   "fields": {
+    "id": "GazID",
+    "name": "Placename",
+    "type": [
+     "Category"
+    ],
+    "context": [
+     "Admin_3rd",
+     "Prov_name"
+    ],
+    "kind": "monastery"
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Guberniia_in_1727_with_labels_.geojson"
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Location",
+    "type": [
+     "Status"
+    ],
+    "context": [
+     "Guberniia"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1727,
+    "label": "town listed in the provincial reform of 1727 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Population_in_1719_1st_revision_by_town.geojson"
+   },
+   "keep": {
+    "field": "First_Revi",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Location",
+    "type": [
+     "First_Revi"
+    ],
+    "typeMap": {},
+    "context": [
+     "Uezd__coun",
+     "Guberniia"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1719,
+    "label": "population in the first revision (1719): see figure"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Population_c_1743_2nd_revision_by_town.geojson"
+   },
+   "keep": {
+    "field": "Second_Rev",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Location",
+    "type": [
+     "Second_Rev"
+    ],
+    "context": [
+     "Uezd__coun",
+     "Guberniia"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1743,
+    "label": "population in the second revision (c. 1743): see figure"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Population_figures_1766.geojson"
+   },
+   "keep": {
+    "field": "Uezd_pop",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Location",
+    "type": [
+     "Uezd_pop"
+    ],
+    "context": [
+     "Uezdnye_go",
+     "Guberniia"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1766,
+    "label": "population figure of 1766 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Population_3rd_revision_1781.geojson"
+   },
+   "keep": {
+    "field": "Third_Revi",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Location",
+    "type": [
+     "Third_Revi"
+    ],
+    "context": [
+     "Uezd__coun",
+     "Guberniia"
+    ],
+    "kind": "town"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1781,
+    "label": "population in the third revision (1781): see figure"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Unrest_1800_to_1820.geojson"
+   },
+   "keep": {
+    "field": "F1800_1820",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Placename",
+    "type": [
+     "F1800_1820"
+    ],
+    "context": [
+     "Location"
+    ],
+    "kind": "event",
+    "generic": true
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1800,
+    "to": 1820,
+    "label": "incidents of unrest 1800–1820 (count in the record; Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Unrest_1821_to_1840.geojson"
+   },
+   "keep": {
+    "field": "F1821_1840",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Placename",
+    "type": [
+     "F1821_1840"
+    ],
+    "context": [
+     "Location"
+    ],
+    "kind": "event",
+    "generic": true
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1821,
+    "to": 1840,
+    "label": "incidents of unrest 1821–1840 (count in the record; Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Unrest_1841_to_1860.geojson"
+   },
+   "keep": {
+    "field": "F1841_1860",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Placename",
+    "type": [
+     "F1841_1860"
+    ],
+    "context": [
+     "Location"
+    ],
+    "kind": "event",
+    "generic": true
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1841,
+    "to": 1860,
+    "label": "incidents of unrest 1841–1860 (count in the record; Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Unrest_1861_to_1880.geojson"
+   },
+   "keep": {
+    "field": "F1861_1880",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Placename",
+    "type": [
+     "F1861_1880"
+    ],
+    "context": [
+     "Location"
+    ],
+    "kind": "event",
+    "generic": true
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1861,
+    "to": 1880,
+    "label": "incidents of unrest 1861–1880 (count in the record; Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Unrest_1881_to_1900.geojson"
+   },
+   "keep": {
+    "field": "F1881_1900",
+    "notValues": [
+     "0",
+     "None",
+     ""
+    ]
+   },
+   "fields": {
+    "id": "GorID",
+    "name": "Placename",
+    "type": [
+     "F1881_1900"
+    ],
+    "context": [
+     "Location"
+    ],
+    "kind": "event",
+    "generic": true
+   },
+   "dating": {
+    "mode": "envelope",
+    "from": 1881,
+    "to": 1900,
+    "label": "incidents of unrest 1881–1900 (count in the record; Imperiia project)"
+   }
+  }
+ ]
+}

@@ -1718,5 +1718,236 @@
     "note": "58 houses, location not fixed (approximate)"
    }
   ]
+ },
+ {
+  "id": "imperiia",
+  "arcgis": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services",
+  "licence": "none stated on the ArcGIS items (Harvard WorldMap migration, owners koneill_worldmap / easteurotopo_worldmap) — private pack",
+  "files": [
+   {
+    "path": "original/Boundaries_in_1547.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1584.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1613.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1645.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1689.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1725.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1740.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1762.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1796.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1801.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1825.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1855.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1881.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1894.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Cossack_Hetmanate_1649_1657.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Cossack_villages.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Don_Cossack_Territory.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Economic_sites_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Fortifications_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Fortresses.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Guberniia_in_1727_with_labels_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Guberniia_provinces_1820s.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Gubernskie_goroda_provincial_towns_1827.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Households_in_1719.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Households_per_uezd_in_1816.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Military_sites_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Monasteries.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Mosques_1886.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Orthodox_Churches_1727.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Pale_of_Settlement_1825_1887.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Pale_of_Settlement_in_1791.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_1719_revision_by_guberniia.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_3rd_revision_1781.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_c_1743_2nd_revision_by_town.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_figures_1766.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_in_1719_1st_revision_by_town.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Post_roads.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Post_stations.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Provincial_boundaries_1856.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Region_of_Jewish_restriction_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Regions_in_1781.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Second_partition_1793.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Third_partition_1795.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Tsarist_troop_deployments_1773.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Tsarist_troop_deployments_1774.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezd_boundaries_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezd_towns_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezdy_Voevodstva.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1800_to_1820.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1821_to_1840.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1841_to_1860.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1861_to_1880.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1881_to_1900.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uvarov_s_Expedition_Itinerary_1847_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Villages_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Wooden_Churches.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
  }
 ]

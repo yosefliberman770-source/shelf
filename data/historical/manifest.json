@@ -982,6 +982,342 @@
   "downloaded": "2026-10-01",
   "licence": "CC BY 4.0"
  },
+ "imperiia/original/Boundaries_in_1547.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1547/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 13986,
+  "sha256": "8794aa10749b37e6bbe41efc64dde2c55bdfd911202c7b6409c6ef8181473631",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1584.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1584/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 19625,
+  "sha256": "af30440e15867a305e20641ad7efe37a13a41077d40cb04597358f96fd069cab",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1613.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1613/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 34276,
+  "sha256": "bdaf6f940b0b08110bfdb613502ca23dbf8f69d1f975d75ff0a9ac2cef6cf6e8",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1645.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1645/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 44987,
+  "sha256": "72b6934bcc4ebc300e0187292e70342fbbfec2934da87ac9e0e55e06d1785948",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1689.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1689/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 48988,
+  "sha256": "6d6128edac2f0cdccc34e64c8c01a418b99e7f0b68e97cd43ed3a7c846d75911",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1725.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1725/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 50145,
+  "sha256": "58dcd46af58a5935cd2ecadedfb830420a1b243727c43472b0920490f4ae36fe",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1740.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1740/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 136271,
+  "sha256": "d6d97198fd6dc452950b68a4e992e2282a591b9840b09cd599e75aaee36750be",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1762.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1762/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 129358,
+  "sha256": "05f72bafc9b4b5f3fa63d4ff76ff2e193eff569718d29ec049a919d45b6a8f7e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1796.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1796/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 144473,
+  "sha256": "917f867a31e150c2567e6b904aa8dcf2eb3dc86c4d6a946673aef23854fca9de",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1801.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1801/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 131570,
+  "sha256": "9c5ca9544aaefe8e693a4aeb57fdafceb474458672a1e77209e5df61e10f58fe",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1825.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1825/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 149837,
+  "sha256": "ab0c1fc3b97a190cbafafc374f15ad8693ed79b85131143e4962636d3ea490a7",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1855.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1855/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 143813,
+  "sha256": "c225df0455414b462fba57ad033d83c62b4c574eefd93b41041fcccc4553309e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1881.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1881/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 80136,
+  "sha256": "f27f6f5fe738c9780c85110dcf14f0becff40062edb4267348998189ada6e78e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1894.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1894/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 67848,
+  "sha256": "d84a3d84d3f893b2f33e0644f9ce28851ea96d997abed425369a9b0cf25a8892",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Cossack_Hetmanate_1649_1657.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Cossack_Hetmanate_1649_1657/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 9361,
+  "sha256": "ed0d00569584483bf8025c6cd949ee87a65bb5259f4aa19d365fdb745337014e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Cossack_villages.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Cossack_villages/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 23871,
+  "sha256": "64fb1247da545d18a297e23be2c8b837138573f48f0bdf5d78212cb6f183405b",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Don_Cossack_Territory.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Don_Cossack_Territory/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 152080,
+  "sha256": "5a4a2c64a99baa93dea09d5b41f423502d38b93ae2a943be84e87174da2b2bec",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Economic_sites_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Economic_sites_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 58542,
+  "sha256": "79b9e707526a3f50b7368c405722343e8e7bda4125da793d3c994e8d1bfe2750",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Fortifications_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Fortifications_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2405,
+  "sha256": "c19ef9fd0283203c4054c039b8b4e9a3bf2862de4ca102249eaea2caae4aa4d5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Fortresses.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Fortresses/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 49967,
+  "sha256": "c224c8c44ddcacff6e4b6a9117b8312e29473ff77ed025b6fd013b4836f71554",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Guberniia_in_1727_with_labels_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Guberniia_in_1727_with_labels_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 156312,
+  "sha256": "680b62bc970bc0afd10a9ec3d345a34bd355a2c80737bba38f7b4ba4cd42a955",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Guberniia_provinces_1820s.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Guberniia_provinces_1820s/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 11369354,
+  "sha256": "e7f0fd58ec9133520f00b77d57202c41e3ca6b762fb8bd5fc234c4bed6180d68",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Gubernskie_goroda_provincial_towns_1827.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Gubernskie_goroda_provincial_towns_1827/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 18375,
+  "sha256": "0c38294256091f99fc74a688cc7417977ef43d8ec3724989bf3ed12e327bbbe5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Households_in_1719.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Households_in_1719/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 73272,
+  "sha256": "51a726238f159ca34a833f4f98276c7ee7b4dcfd3284ef496706d83682cf2e0f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Households_per_uezd_in_1816.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Households_per_uezd_in_1816/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 57120,
+  "sha256": "dec85a82b56ea415498f760937062c7f4aa2a2d2993ab46de97f7dd3ff1a2f73",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Military_sites_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Military_sites_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 105371,
+  "sha256": "e5caf68d08ded5e3b96595c126530232d27b1eb39733b590d200da0aeb301a39",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Monasteries.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Monasteries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 24110,
+  "sha256": "1e6a490230bfc4bd5b80064d3b67a5c626039f39f9793edced054a1293f173d1",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Mosques_1886.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Mosques_1886/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 267445,
+  "sha256": "72c40ab937735bac54724efbb3906e2f2eda84b23f2f03b52af41bccb6041ff9",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Orthodox_Churches_1727.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Orthodox_Churches_1727/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 155306,
+  "sha256": "f3e04fe23a763052059c3474734fb25291664d52c5410cfdc0c4c309a5308124",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Pale_of_Settlement_1825_1887.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Pale_of_Settlement_1825_1887/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 29109,
+  "sha256": "1e37fefc6ad01a26b4c2aa7fd005af2bdd347ccde2c7b334bc9bb6d5d2d31778",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Pale_of_Settlement_in_1791.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Pale_of_Settlement_in_1791/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 383787,
+  "sha256": "2ed51e5d0d474a8889449edbac718bb850afd15efaf6cba8bce966bfb0f0647b",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_1719_revision_by_guberniia.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_1719_revision_by_guberniia/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4883901,
+  "sha256": "1e986c557200fd9eaef1076cfb99ddcf01662321694d7591f1dddd442cad63aa",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_3rd_revision_1781.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_3rd_revision_1781/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76431,
+  "sha256": "653b3db85058ea11904dd0fec22a571b3f2d5d675789e8383eb256322e501fde",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_c_1743_2nd_revision_by_town.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_c_1743_2nd_revision_by_town/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76331,
+  "sha256": "dfdc0e0bb0386ed51095ec92b1043190beaff5618120cf733a74b0f1f4928987",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_figures_1766.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_figures_1766/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 78512,
+  "sha256": "dca4e67f9557d079a9c6e7f1f2fe336fdb5ff6b6f397f5fcc4cfb9d8090df35d",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_in_1719_1st_revision_by_town.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_in_1719_1st_revision_by_town/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76285,
+  "sha256": "3900ffed7fa062caec16311025c5e80a4a4e1914fef9654fb1fb7814f5e39ee6",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Post_roads.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Post_roads/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2098767,
+  "sha256": "73c6cb7da1945ab844dae52df71f5602d6f6ca2ca54de0324baeda50e6b21a8f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Post_stations.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Post_stations/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 1267050,
+  "sha256": "5ed9631854b300ec8ec805ecc644cc4fc058b322c1cf2375219132f28d5a1e97",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Provincial_boundaries_1856.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Provincial_boundaries_1856/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10010143,
+  "sha256": "b887feed8be63cd0c1ea0177ef0f70db59ec2c58057cdb018c0fc59cd7e8e93c",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Region_of_Jewish_restriction_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Region_of_Jewish_restriction_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 711764,
+  "sha256": "bf0358f3a9328a72a67a2421cb0c5a4a72e4ee29b4168a92131543ba4bc5fc45",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Regions_in_1781.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Regions_in_1781/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4266339,
+  "sha256": "f00ba178545659bb2a5a068d242704c76bcabee9d456e1cd39e8ddb7510e8d86",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Second_partition_1793.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Second_partition_1793/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 249647,
+  "sha256": "e605379257bacd9f178c249c363f22bb0016544e46a0041263a68786a4d625c7",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Third_partition_1795.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Third_partition_1795/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 249734,
+  "sha256": "6fcf47c808e483714a54c20d82cde095ff6a6e1ddbbf27206ac9ec922cd8a377",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Tsarist_troop_deployments_1773.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Tsarist_troop_deployments_1773/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 86455,
+  "sha256": "19471ec22323fab6167457ae33922406aeacb23f55d7326b47704a515ea5d2e5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Tsarist_troop_deployments_1774.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Tsarist_troop_deployments_1774/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 143775,
+  "sha256": "7ce2d7d8dac0fde7e469fee8a4ba700c2485642b42b83557bf951bcc1160bfc6",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezd_boundaries_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezd_boundaries_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 56793,
+  "sha256": "c268aaf31d495c9adfe0e6c7498b7f631236a97fc64b9419f14ed2ecedd34934",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezd_towns_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezd_towns_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 161472,
+  "sha256": "be7abcd55366b9330de93aeb286b584099d24a90fec6e2e2f1ea8ea4ff803521",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezdy_Voevodstva.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezdy_Voevodstva/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 18440903,
+  "sha256": "b547710f52084d0297acc00c3ad48e1c9c54002fbc276b58ee47a6e1c08c05f2",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1800_to_1820.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1800_to_1820/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 14063,
+  "sha256": "14bcc3cdadd0587fd9b88a634ec7cfe12386a6e349112d027b18bd62bbc97f57",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1821_to_1840.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1821_to_1840/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "fc6ced06e5de0ef1786b61da61a8d27e464d51883febdf1679b523524156e257",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1841_to_1860.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1841_to_1860/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "c46991106c8fb26604999b5f0e12e9baa95935df3b2449b3b3a739e810effac3",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1861_to_1880.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1861_to_1880/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10801,
+  "sha256": "e0726aa67d62a08782a0076801eb13880e5ea8977d33fc4576b607e88d5ea288",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1881_to_1900.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1881_to_1900/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "016a8cc68a9158d0abc7bc715e3fc7093191103046b0a1436866d7826a250f1f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uvarov_s_Expedition_Itinerary_1847_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uvarov_s_Expedition_Itinerary_1847_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 7495,
+  "sha256": "f9a72275021aa8ae30127ccef86105703e0f2c721ef99e206463e33419c6236f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Villages_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Villages_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 1507344,
+  "sha256": "68daecd53f9d94e8751120f26d801f4dba76b299fbe956c772c4df079284520a",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Wooden_Churches.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Wooden_Churches/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 622,
+  "sha256": "52498dcb1393349dfcf56141d95bdeb03e49fe83a06d77d7075d20bba75b7791",
+  "downloaded": "2026-10-01"
+ },
  "index-villaris-1680/original/IndexVillaris1680-v2.0.4.zip": {
   "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
   "bytes": 11461666,
