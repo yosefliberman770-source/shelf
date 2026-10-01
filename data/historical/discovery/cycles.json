@@ -26,5 +26,21 @@
   "weakBefore": 5130,
   "weakAfter": 5092,
   "notes": "Unweighted metric 5,130 → 5,092; with the new footprint weighting (a local study no longer counts for a whole country) 5,622 cells are below 70 — the stricter baseline for cycle 3. Added: NI SMR, Welsh cantrefs/commotes and parishes, French mining concessions, PORTIC ports, Irish wrecks and stations, Fields on Fire, Ottoman Plovdiv, 1532 campaign, Scanian roads, Hierokles, Hajj forts, EMDigIt, Roman agglomerations, Piemonte, Daugava hillforts"
+ },
+ {
+  "cycle": 3,
+  "date": "2026-10-01",
+  "universe": 380823,
+  "investigated": 14910,
+  "integratedSources": 51,
+  "newSources": 16,
+  "rejected": 1,
+  "blocked": 0,
+  "awaiting": 94725,
+  "weakBefore": 5622,
+  "weakAfter": 5604,
+  "weakUnweightedBefore": 5092,
+  "weakUnweightedAfter": 5083,
+  "notes": "Footprint-weighted metric 5,622 → 5,604 (unweighted 5,092 → 5,083). Added: full Zbiva, Low Countries mint authorities, Ottoman temettuat villages, Welsh counties/boroughs/wards/constituencies/poor-law unions, 2nd-edition parishes and pre-1840 townships, Early Modern Weather (private), Finnish lake-ore workings, Galicia & Austrian Silesia buildings (density layer) and district censuses, Digital Atlas of Dioceses (c. 1250/1350/1450), Orthodox monasteries (private), French mill surveys 1794–1809, RurLand, English oyster fisheries, Swedish pre-urban houses; 94 Welsh map scans and Flanders land use 1778/1873 as tiled overlays. Rejected: Atlas of Islamic History (unsourced, generated narrative). Fixed: date parser kept only the first year of '1852-62' and '1850s'; investigations file repaired after an interrupted run."
  }
 ]

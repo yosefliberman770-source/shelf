@@ -104,7 +104,7 @@ describe('georeferenced scans served as map tiles by their publisher', () => {
     const xyz = { url: 'https://example.org/MapServer/tile/{z}/{y}/{x}', bbox: [-3.23336, 53.0217, -3.10992, 53.08693] as [number, number, number, number] };
     expect(xyzTile(xyz)).toBe('https://example.org/MapServer/tile/11/666/1005');
     expect(xyzTile(xyz, 2)).toBe('https://example.org/MapServer/tile/13/2666/4023');
-    const o = wmsOverlay({ id: 'gis:x', title: 'Llandegla Tithe Survey 1847', date: parseDate('1847'), subjects: [], collection: 'gis', holder: 'National Library of Wales', page: '', rights: '', xyz })!;
+    const o = wmsOverlay({ id: 'gis:x', title: 'Llandegla Tithe Survey 1847', date: parseDate('1847')!, subjects: [], collection: 'gis', holder: 'National Library of Wales', page: '', rights: '', xyz })!;
     expect(o.tiles).toBe(xyz.url);
     // a WMS drawn only from zoom 12, served tile by tile: the preview asks for one 256 px tile's box at zoom 12
     const wms = { url: 'https://example.org/wms?LAYERS=L&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256', bbox: [2.5, 50.7, 5.9, 51.5] as [number, number, number, number], minzoom: 12 };
