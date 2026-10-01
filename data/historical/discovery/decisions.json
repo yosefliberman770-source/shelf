@@ -1573,6 +1573,27 @@
    "state": "irrelevant",
    "region": "Britain and Ireland",
    "note": "14 hand-entered annal events (a course project); not a dataset to integrate."
+  },
+  {
+   "title": "Denkmalschutz und Kultur - Landkreis Cham (castles, monasteries, churches, monuments)",
+   "match": [
+    "b1414d3ddeb04c9c95054489d8c27d51",
+    "opendata_denkmalschutz_kultur"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Bavaria",
+   "note": "CC BY 4.0 but one district: 16 castles (with built/destroyed dates), 8 monasteries; too small to add as a dataset this cycle; candidate if Bavarian district open-data layers are gathered together."
+  },
+  {
+   "title": "Sites outside the Delta Survey area (EES ArcGIS)",
+   "match": [
+    "Sites_outside_the_Delta_Survey_area"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Egypt",
+   "note": "4 sites (Pelusium, Alexandria, Plinthine…), already in Pleiades and outside the EES Delta Survey that is integrated (eesdelta)."
   }
  ]
 }
