@@ -242,7 +242,14 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     for (const def of want) {
       for (const s of def.sources) if (!map.getSource(s)) map.addSource(s, SOURCE_SPECS[s](c));
       const specs = def.specs(c);
-      const existing = managed.current.get(def.id);
+      let existing = managed.current.get(def.id);
+      // A setting can change which map layers a definition has (the grey undated-sites layer exists only while
+      // "Include undated records" is on): then it is put back whole, in its place in the drawing order.
+      if (existing && (existing.length !== specs.length || specs.some((s) => !existing!.includes(s.id)))) {
+        for (const lid of existing) if (map.getLayer(lid)) map.removeLayer(lid);
+        managed.current.delete(def.id);
+        existing = undefined;
+      }
       if (existing) {
         for (const spec of specs) {
           if (!map.getLayer(spec.id)) continue;

@@ -315,40 +315,51 @@ function events(id: string, kind: string | string[], color: string, ctx: LayerCt
 // ── Europe-wide medieval sites (Wikidata + Germania Sacra) and towns (Buringh) ──
 /** Sites founded up to 1650 (later ones are left out at build time). */
 const SITES: [HistYear, HistYear] = [300, 1900];
+/** Zoom from which sites with no date at all are drawn (about town level), when the reader includes undated records. */
+export const UNDATED_MINZOOM = 9;
+/** How long before its first record (or evidence period) a site is drawn, hollow, when the reader includes undated records. */
+export const BEFORE_RECORD_YEARS = 60;
 function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number }): LayerSpecification[] {
-  // Own dates only (founding / first mention → dissolution, as recorded). A site with no recorded date
-  // is not evidence it stood in the chosen year: hidden unless the reader includes undated records.
-  // Likewise a site before its first mention: only a founding date says it did not exist yet, so before an
-  // attestation it is "not yet recorded" — shown, hollow, only when the reader includes unevidenced records.
+  // Own dates only (founding / first mention → dissolution, as recorded), or an evidence period (a building-campaign
+  // century, a register's period class, a style): shown inside them. Without own evidence at the year nothing is drawn,
+  // unless the reader includes undated records — and then:
+  //   • first recorded later (or evidence period begins later; a first mention is not a founding): hollow from
+  //     BEFORE_RECORD_YEARS before that record, never further back;
+  //   • no date at all (or only an end, which says nothing about a beginning): grey "?" dots, only from town-level
+  //     zoom and only inside the period the record's dataset covers (w0–w1 from the build; older tiles: this layer's
+  //     period) — so they never fill the overview map at every date.
   const y = ctx.year;
-  const notYetRecorded: ExpressionSpecification = ['all', ['has', 'f'], ['>', ['get', 'f'], y], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'],
-    ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]];
-  // Records dated only by an evidence period (a building-campaign century, a register's period class): shown inside it.
-  // A record with only an end (a dissolution, a destruction) existed at some time before it, but nothing says
-  // since when: before its end it is as unevidenced as an undated record.
+  const kind: ExpressionSpecification = ['in', ['get', 'k'], ['literal', kinds]];
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
   const when: ExpressionSpecification = ['all', existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]];
-  // A site with no evidence at the year (no dates at all, first recorded later, or only an end) is drawn only when the
-  // reader includes unevidenced records, and then only inside the period its dataset covers (w0–w1, written by the
-  // build from the dataset registry) — so a medieval church with no recorded date never sits on a map of 68 CE.
-  // Tiles built before the window existed fall back to this layer's own period.
+  const soon = (field: string): ExpressionSpecification => ['all', ['>', ['get', field], y], ['<=', ['-', ['get', field], BEFORE_RECORD_YEARS], y]];
+  const recordedSoon: ExpressionSpecification = ['any',
+    ['all', ['has', 'f'], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'], soon('f'), ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]],
+    ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['has', 'ef'], soon('ef')]];
   const inWindow: ExpressionSpecification = ['all', ['<=', ['coalesce', ['get', 'w0'], SITES[0]], y], ['>=', ['coalesce', ['get', 'w1'], SITES[1]], y]];
-  const noEvidence: ExpressionSpecification = ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]];
-  // Before an evidence period begins (a register's period class, a building style) the site is not shown as absent
-  // either: like a place first recorded later, it may be older — hollow, inside the window, on request.
-  const beforeEvidence: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['has', 'ef'], ['>', ['get', 'ef'], y]];
-  const unevidenced: ExpressionSpecification = ['all', inWindow, ['any', noEvidence, notYetRecorded, endOnly, beforeEvidence]];
-  const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], ctx.showUndated ? ['any', when, unevidenced] : when] as FilterSpecification;
+  const noStart: ExpressionSpecification = ['any', ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]], endOnly];
+  const filter = ['all', kind, ctx.showUndated ? ['any', when, recordedSoon] : when] as FilterSpecification;
+  const undatedFilter = ['all', kind, inWindow, noStart] as FilterSpecification;
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
   const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];
-  const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']]];
-  return (PRIVATE_SITES() ? ['medieval-sites', 'private-sites'] : ['medieval-sites']).flatMap((source, i): LayerSpecification[] => [
-    { id: `${id}-pt${i ? '-private' : ''}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],
-      'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, 0.8, 1.4],
-      'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5] } },
-    { id: `${id}-label${i ? '-private' : ''}`, type: 'symbol', source, 'source-layer': 'sites', filter, minzoom: opts.labelZoom, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true, 'text-max-width': 9 }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
-  ]);
+  const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']], ['<=', ['coalesce', ['get', 'ef'], -99999], y]];
+  return (PRIVATE_SITES() ? ['medieval-sites', 'private-sites'] : ['medieval-sites']).flatMap((source, i): LayerSpecification[] => {
+    const sfx = i ? '-private' : '';
+    return [
+      { id: `${id}-pt${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],
+        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, 0.8, 1.4],
+        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5] } },
+      { id: `${id}-label${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter, minzoom: opts.labelZoom, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true, 'text-max-width': 9 }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
+      ...(ctx.showUndated ? [
+        { id: `${id}-undated${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter: undatedFilter, minzoom: UNDATED_MINZOOM, paint: {
+          'circle-radius': opts.radius * 1.6, 'circle-color': '#b8b2a7', 'circle-opacity': 0.55, 'circle-stroke-color': '#8a847a', 'circle-stroke-width': 1 } },
+        { id: `${id}-undated-q${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter: undatedFilter, minzoom: UNDATED_MINZOOM, layout: {
+          'text-field': ['step', ['zoom'], '?', opts.labelZoom, ['concat', '? ', ['get', 'n']]], 'text-font': FONT_ITALIC, 'text-size': 10, 'text-anchor': 'left', 'text-offset': [-0.35, 0], 'text-optional': true, 'text-allow-overlap': false },
+          paint: { 'text-color': '#6f695f', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+      ] as LayerSpecification[] : []),
+    ];
+  });
 }
 
 /** Buringh's sample years; between two of them the estimate is interpolated. */

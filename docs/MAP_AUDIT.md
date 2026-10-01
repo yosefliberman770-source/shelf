@@ -143,7 +143,16 @@ mentioned in 1200, a DicoTopo commune first attested in 1150), which were drawn 
 | Markets and fairs (private) | The map tiles lacked the grant year the gazetteer already had | First grant per place | **Yes**: not drawn before its first grant |
 | DicoTopo, Germania Sacra, Nordic, Bridges | Dated by first attestation | — | Already imported; only the display before the first record changed |
 
-**The map rule now** (`sitePoints`, `catalog.ts`; windows written by `with_window` in `sites.py`):
+**The map rule (revised the same day, at the owner's choice — the problem was at every date, not one):**
+- Records with dates or an evidence period: unchanged.
+- First recorded later, or before an evidence period begins: drawn hollow from **60 years** before that record, never
+  further back (only when "Include undated records" is on).
+- No date at all (or only an end, which says nothing about a beginning): never on the overview map. With "Include
+  undated records" on, they appear as **grey "?" dots from zoom 9 (town level)**, inside their dataset's period.
+- Measured, Poland area, undated records on, overview zoom: 900 — 2,988 → 396; 1100 — 2,675 → 531; 1200 — 2,800 → 869
+  (without undated records: 387, 482, 714). At town zoom the undated places are all still there (1,750–2,970).
+
+The first version of the rule, kept for the record (`sitePoints`, `catalog.ts`; windows written by `with_window` in `sites.py`):
 - Records with dates or an evidence period: unchanged.
 - A record with no evidence at the chosen year — no dates, first recorded later, only an end date, or before its evidence
   period begins — is drawn only when the reader includes undated records, and then only inside the period its dataset
