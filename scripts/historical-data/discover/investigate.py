@@ -495,20 +495,46 @@ def investigate(c, need):
     return rec
 
 
+def read_all(path):
+    """Every complete record of an appended .jsonl.gz, including those after a member left unfinished by a killed run."""
+    import zlib
+    if not os.path.exists(path):
+        return []
+    raw, pos, chunks = open(path, 'rb').read(), 0, []
+    while True:
+        pos = raw.find(b'\x1f\x8b\x08', pos)
+        if pos < 0:
+            break
+        d = zlib.decompressobj(16 + zlib.MAX_WBITS)
+        try:
+            chunks.append(d.decompress(raw[pos:]))
+        except zlib.error:
+            pos += 3
+            continue
+        pos = len(raw) - len(d.unused_data) if d.eof else pos + 3
+    out = []
+    for line in b''.join(chunks).decode('utf-8', 'replace').split('\n'):
+        try:
+            out.append(json.loads(line))
+        except ValueError:
+            continue  # blank, or the cut-off last line of an unfinished member
+    return out
+
+
 def main():
     args = sys.argv[1:]
     opt = lambda k, d: type(d)(args[args.index(k) + 1]) if k in args else d  # noqa: E731
     limit, minrel, workers = opt('--limit', 3000), opt('--min-relevance', 50), opt('--workers', 8)
     recheck_states = set(opt('--recheck-states', '').split(',')) - {''}
     need = need_index()
-    done = {}
-    if os.path.exists(OUT):
-        try:
-            for line in gzip.open(OUT, 'rt', encoding='utf-8'):
-                r = json.loads(line)
-                done[r['id']] = r
-        except (EOFError, ValueError):
-            pass
+    done = {r['id']: r for r in read_all(OUT)}
+    if done:
+        # rewritten as one clean gzip stream: a run killed mid-write leaves an unfinished member, after which gzip
+        # readers stop — everything appended later would be invisible to them
+        with gzip.open(OUT + '.tmp', 'wt', encoding='utf-8') as f:
+            for r in done.values():
+                f.write(json.dumps(r, ensure_ascii=False, default=str) + '\n')
+        os.replace(OUT + '.tmp', OUT)
     cands = []
     for line in gzip.open(os.path.join(DISC, 'inventory.jsonl.gz'), 'rt', encoding='utf-8'):
         c = json.loads(line)
