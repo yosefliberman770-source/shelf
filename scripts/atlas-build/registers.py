@@ -1078,11 +1078,11 @@ def ariadne_phases(temporal):
 def ariadne():
     base = raw('ariadne', '')
     out, skipped = [], Counter()
-    gn = {}
+    gn, seen_ids = {}, set()
     for f in sorted(os.listdir(base)) if os.path.isdir(base) else []:
         if not f.endswith('.jsonl.gz'):
             continue
-        country = f[:-9].replace('_', ' ')
+        country = re.sub(r'\.part\d+$', '', f[:-9]).replace('_', ' ')
         cc = {'Hungary': 'HU'}.get(country)
         if cc and cc not in gn:
             idx = defaultdict(list)
@@ -1093,9 +1093,21 @@ def ariadne():
                         for n in {g[1], g[2]}:
                             idx[norm(n)].append((float(g[5]), float(g[4])))
             gn[cc] = idx
-        with gzip.open(os.path.join(base, f), 'rt', encoding='utf-8') as fh:
-            for line in fh:
-                h = json.loads(line)
+        def lines(path):
+            try:
+                with gzip.open(path, 'rt', encoding='utf-8') as fh:
+                    yield from fh
+            except (EOFError, OSError):
+                skipped['file cut off by an interrupted harvest (complete records kept)'] += 1
+        if True:
+            for line in lines(os.path.join(base, f)):
+                try:
+                    h = json.loads(line)
+                except ValueError:
+                    continue  # a line cut off by an interrupted harvest
+                if h['id'] in seen_ids:
+                    continue
+                seen_ids.add(h['id'])
                 d = h['data']
                 phases = ariadne_phases(d.get('temporal'))
                 if not phases:

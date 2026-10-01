@@ -62,7 +62,8 @@ def places(cc):
     with zipfile.ZipFile(path) as z:
         for line in io.TextIOWrapper(z.open(f'{cc}.txt'), encoding='utf-8'):
             f = line.split('\t')
-            if f[6] == 'P':
+            # Municipalities and towns only (record titles begin with the municipality), not hamlets or town districts.
+            if f[6] == 'P' and f[7] in ('PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLC'):
                 names.add(f[1])
     return sorted(names)
 
@@ -70,13 +71,32 @@ def places(cc):
 def main():
     args = sys.argv[1:]
     by_place = '--by-place' in args
+    shard = next((tuple(map(int, a.split('=')[1].split('/'))) for a in args if a.startswith('--shard=')), (0, 1))
     os.makedirs(ROOT, exist_ok=True)
     for country in [a for a in args if not a.startswith('--')]:
-        path = os.path.join(ROOT, f"{country.replace(' ', '_')}.jsonl.gz")
+        path = os.path.join(ROOT, f"{country.replace(' ', '_')}{f'.part{shard[0]}' if shard[1] > 1 else ''}.jsonl.gz")
         seen = set()
-        with gzip.open(path, 'wt', encoding='utf-8') as out:
+        # Records already stored by any earlier run or slice of this country are not fetched twice.
+        for other in [os.path.join(ROOT, f) for f in os.listdir(ROOT) if f.startswith(country.replace(' ', '_') + '.') and f.endswith('.jsonl.gz')] if by_place else []:
+            if other == path:
+                continue
+            try:
+                with gzip.open(other, 'rt', encoding='utf-8') as fh:
+                    for line in fh:
+                        seen.add(json.loads(line)['id'])
+            except (EOFError, OSError, ValueError):
+                pass
+        if by_place and os.path.exists(path):
+            # Resume: keep what an earlier (interrupted) run already stored.
+            try:
+                with gzip.open(path, 'rt', encoding='utf-8') as fh:
+                    for line in fh:
+                        seen.add(json.loads(line)['id'])
+            except (EOFError, OSError, ValueError):
+                pass
+        with gzip.open(path, 'at' if by_place else 'wt', encoding='utf-8') as out:
             if by_place:
-                for i, name in enumerate(places(GEONAMES[country])):
+                for i, name in enumerate(places(GEONAMES[country])[shard[0]::shard[1]]):
                     harvest({'country': country, 'q': name}, seen, out)
                     if i % 200 == 0:
                         print(country, i, len(seen), flush=True)
