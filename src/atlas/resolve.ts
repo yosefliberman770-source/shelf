@@ -14,7 +14,7 @@ import { norm } from '../lib/history/assess';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, recordFit, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type PlaceConfidence, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
@@ -96,6 +96,9 @@ export interface Resolution {
   /** The combined evidence behind this result, when online sources were consulted. */
   evidence?: PlaceEvidence;
 }
+
+/** The atlas's place-match scale on the reader's confidence scale (certain → HIGH … possible → LOW). */
+export const CONFIDENCE_OF: Record<PlaceConfidence, Confidence> = { certain: 'HIGH', probable: 'MEDIUM', possible: 'LOW', ambiguous: 'AMBIGUOUS', unresolved: 'UNRESOLVED' };
 
 const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
 
@@ -284,15 +287,8 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   let local: Resolution | undefined;
   const m = await matchName(written, year, { context, expected }).catch(() => undefined);
   if (m?.status === 'unique' && m.place) {
-    const attested = m.fit === 'within' || m.fit === 'near' || m.fit === 'no-year';
-    // An undated record inside the dataset's own period counts when the book's geography agrees with it.
-    const fitsBook = !!context?.points.length && contextDistance(context, [m.place.lon, m.place.lat]) < 1500;
-    // A record known only to a period counts when the book's own geography agrees with it.
-    const periodFits = m.fit === 'period' && fitsBook;
-    // First recorded only after the date: a possibility the reader can see, never a placed answer.
-    // Namesakes first recorded only after the date are shown, but don't make the answer ambiguous.
-    const rivals = m.candidates.filter((c) => c.key !== m.place!.key && recordFit(c, year) !== 'unattested');
-    const status: Confidence = m.fit === 'unattested' ? 'LOW' : rivals.length === 0 && (attested || periodFits) ? 'HIGH' : 'MEDIUM';
+    // Identity and dates are weighed together once, in the gazetteer (placeConfidence), and only mapped here.
+    const status = CONFIDENCE_OF[m.confidence];
     const method = `${[m.place, ...m.corroborating].map((p) => gazetteerInfo(p.gazetteer).name).join(' + ')} name match`;
     const place = fromGaz(m.place, written, why(m.reason, method, { matchedName: m.matchedName?.name, matchedIsTitle: m.matchedName?.isTitle }), status, m.corroborating, year);
     const alsoPolity = livePolity ? polityPlace(livePolity, 'LOW') : undefined;
@@ -370,8 +366,9 @@ export async function offlineUnique(names: string[], year: HistYear): Promise<Ma
   for (const n of [...new Set(names)]) {
     if (out.has(normName(n))) continue;
     const m = await matchName(n, year).catch(() => undefined);
-    // Underline only clear cases: one place, located on the map with confidence.
-    if (m?.status === 'unique' && m.place && m.candidates.length === 1 && m.place.uncertain === 0) out.set(normName(n), m.place);
+    // Underline only clear cases: one place, located with confidence, and its dates support the year (certain or
+    // probable — a place first recorded only later, or with no dates at all, is not underlined as if it were known then).
+    if (m?.status === 'unique' && m.place && m.candidates.length === 1 && m.place.uncertain === 0 && (m.confidence === 'certain' || m.confidence === 'probable')) out.set(normName(n), m.place);
   }
   return out;
 }

@@ -4,7 +4,7 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap, MapGeoJSONFeature, MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type DatasetId, DEFAULT_LAYERS, DRAW_ORDER, labelKey, GROUPS, type LayerCtx, layerById, LAYERS, OHM_LATIN_LANGS, PALETTE, POLITY_PALETTE, SOURCE_SPECS, UNAVAILABLE_LABEL } from './catalog';
-import { assembleParts, installPrivateData, loadPrivateData, privateHeader, privateLoadError, privateTileSource, privateTiles, removePrivateData } from './privateData';
+import { assembleParts, installPrivateData, loadPrivateData, PrivateDataError, privateHeader, privateLoadError, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
@@ -786,12 +786,23 @@ function PrivateDataControl() {
       if (r.state === 'incomplete') { setMsg(`Got ${all.length} file${all.length > 1 ? 's' : ''} (${mb(r.have)} of ${mb(r.need)}). Add the remaining part${r.need - r.have > 26e6 ? 's' : ''}.`); return; }
       if (r.state === 'needFirst') { setMsg(`Got ${all.length} file${all.length > 1 ? 's' : ''} (${mb(r.have)}). Now add the first part (…part1.pack).`); return; }
       if (r.state === 'error') { setMsg(r.message); return; }
-      setMsg('Saving on this device…');
-      await installPrivateData(r.blob);
+      await save(r.blob);
+    } catch (e) {
+      setMsg(`Could not load: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+  // An older file never silently replaces a newer one: the owner is asked.
+  const [older, setOlder] = useState<Blob | null>(null);
+  const save = async (blob: Blob, allowOlder = false) => {
+    setOlder(null);
+    setMsg('Checking and saving on this device…');
+    try {
+      await installPrivateData(blob, { allowOlder });
       setMsg('Saved and checked. Restarting the map…');
       setTimeout(() => location.reload(), 800);
     } catch (e) {
-      setMsg(`Could not load: ${e instanceof Error ? e.message : String(e)}`);
+      if (e instanceof PrivateDataError && e.code === 'older') setOlder(blob);
+      setMsg(`${e instanceof PrivateDataError && e.code === 'older' ? '' : 'Could not load: '}${e instanceof Error ? e.message : String(e)}`);
     }
   };
   return (
@@ -810,7 +821,8 @@ function PrivateDataControl() {
         {header ? 'Replace with a newer file' : picked.length ? 'Add another part' : 'Load private data file'}
         <input type="file" multiple hidden onChange={(e) => { add(e.target.files); e.target.value = ''; }} />
       </label>
-      {picked.length > 0 && <button className="btn xs" onClick={() => { setPicked([]); setMsg(undefined); }}>Start over</button>}
+      {older && <button className="btn xs" onClick={() => save(older, true)}>Replace anyway</button>}
+      {picked.length > 0 && <button className="btn xs" onClick={() => { setPicked([]); setMsg(undefined); setOlder(null); }}>Start over</button>}
       {header && <button className="btn xs" onClick={async () => { await removePrivateData(); location.reload(); }}>Remove from this device</button>}
       {picked.length > 0 && <ul className="tiny">{picked.map((f) => <li key={f.name + f.size}>{f.name} — {mb(f.size)}</li>)}</ul>}
       {loadError && !msg && <p className="tiny" role="status">A saved file is on this device but could not be opened: {loadError}</p>}

@@ -259,6 +259,9 @@ def bridges():
 
 # ── Local only: TIB Maps of Power; markets and fairs of England & Wales ───
 
+TIB_REPOSITORY = re.compile(r'\b(national library|state library|library of|bibliot|museum|archive[s]?)\b', re.I)
+
+
 def tib():
     files = sorted(glob.glob(os.path.join(RAW, 'tib-maps-of-power', 'original', 'places-page-*.json')))
     out = []
@@ -285,8 +288,14 @@ def tib():
                     m = re.match(r'(-?\d{1,4})-', (s.get('start') or {}).get('earliest') or '')
                     if m:
                         first = int(m.group(1)) if first is None else min(first, int(m.group(1)))
-                out.append({'id': ft['@id'].rsplit('/', 1)[-1], 'name': ft['properties']['title'], 'kind': kind, 'types': types[:6],
-                            'first': first, 'lon': round(pt['coordinates'][0], 5), 'lat': round(pt['coordinates'][1], 5)})
+                name = ft['properties']['title']
+                # The project also records where its sources are kept today (national libraries, museums, archives):
+                # present-day institutions, not places of the Byzantine world.
+                if TIB_REPOSITORY.search(name):
+                    continue
+                out.append({'id': ft['@id'].rsplit('/', 1)[-1], 'name': name, 'kind': kind, 'types': types[:6],
+                            'first': first, 'lon': round(pt['coordinates'][0], 5), 'lat': round(pt['coordinates'][1], 5),
+                            'area': bool(pt.get('fromArea'))})
     return out
 
 

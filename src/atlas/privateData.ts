@@ -7,12 +7,17 @@
  * Pack format (written by scripts/atlas-build/private_pack.py):
  *   8 bytes  "SHELFPK1"
  *   4 bytes  header length N (little-endian uint32)
- *   N bytes  header JSON: { version, built, datasets: [{ id, name, records, licence }], files: { path: [offset, length] } }
+ *   N bytes  header JSON: { version, built, datasets: [{ id, name, records, licence }], files: { path: [offset, length] },
+ *            crc32?: CRC-32 of all file bytes (packs built since this field was added) }
  *   …        file bytes; offsets are from the end of the header
  */
 
 export interface PrivateDataset { id: string; name: string; records: number; licence: string }
-export interface PrivateHeader { version: number; built: string; datasets: PrivateDataset[]; files: Record<string, [number, number]> }
+export interface PrivateHeader { version: number; built: string; datasets: PrivateDataset[]; files: Record<string, [number, number]>; crc32?: number }
+/** Why a pack was not installed: `older` can be overridden by the owner, the others cannot. */
+export class PrivateDataError extends Error {
+  constructor(public code: 'older' | 'size' | 'damaged' | 'not-kept', message: string) { super(message); }
+}
 export interface Loaded { header: PrivateHeader; blob: Blob; start: number }
 
 const MAGIC = 'SHELFPK1';
@@ -143,23 +148,51 @@ export async function openPrivateData(file: Blob): Promise<PrivateHeader> {
   return loaded.header;
 }
 
+/** Bytes copied (and checked) at a time: a phone never holds the whole pack in memory twice. */
+const CHUNK = 8 * 1024 * 1024;
+const CRC_TABLE = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crcUpdate(crc: number, bytes: Uint8Array): number {
+  let c = crc;
+  for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  return c;
+}
+
 /**
- * Store a pack file on this device (replacing any earlier one). The bytes are copied first, so the stored copy does not
- * depend on the picked files staying readable (phones may withdraw access to them after a reload), and the stored copy
- * is read back and checked before this returns.
+ * Store a pack file on this device (replacing any earlier one). The bytes are copied in pieces, so the stored copy does
+ * not depend on the picked files staying readable (phones may withdraw access to them after a reload) and the phone never
+ * holds the pack twice in memory; its size and checksum are checked on the way, and the stored copy is read back and
+ * checked before this returns. An older pack does not replace a newer one unless `allowOlder` is set. Nothing is
+ * replaced when any check fails: the pack already on the device stays as it was.
  */
-export async function installPrivateData(file: Blob): Promise<PrivateHeader> {
-  await readHeader(file);
-  const copy = new Blob([await file.arrayBuffer()]);
+export async function installPrivateData(file: Blob, opts: { allowOlder?: boolean } = {}): Promise<PrivateHeader> {
+  const l = await readHeader(file);
+  const current = loaded?.header ?? (await loadPrivateData());
+  if (current && !opts.allowOlder && current.built > l.header.built) {
+    throw new PrivateDataError('older', `This file was built on ${l.header.built}; the one on this device is newer (${current.built}).`);
+  }
+  if (file.size !== packSize(l)) {
+    throw new PrivateDataError('size', `This file is ${file.size < packSize(l) ? 'incomplete' : 'longer than its header says'} (${file.size.toLocaleString()} of ${packSize(l).toLocaleString()} bytes).`);
+  }
+  const pieces: Blob[] = [];
+  let crc = 0xffffffff;
+  for (let off = 0; off < file.size; off += CHUNK) {
+    const bytes = new Uint8Array(await file.slice(off, Math.min(off + CHUNK, file.size)).arrayBuffer());
+    if (off + bytes.length > l.start) crc = crcUpdate(crc, bytes.subarray(Math.max(0, l.start - off)));
+    pieces.push(new Blob([bytes]));
+  }
+  if (l.header.crc32 !== undefined && ((crc ^ 0xffffffff) >>> 0) !== l.header.crc32) {
+    throw new PrivateDataError('damaged', 'This file is damaged (its checksum does not match). Download the parts again.');
+  }
+  const copy = new Blob(pieces);
   await tx('readwrite', (s) => s.put(copy, 'current'));
   const stored = await tx<Blob | undefined>('readonly', (s) => s.get('current'));
-  if (!stored || stored.size !== file.size) throw new Error(`The phone did not keep the file (saved ${stored ? stored.size : 0} of ${file.size} bytes). It may be low on storage space.`);
-  const l = await readHeader(stored);
+  if (!stored || stored.size !== file.size) throw new PrivateDataError('not-kept', `The phone did not keep the file (saved ${stored ? stored.size : 0} of ${file.size} bytes). It may be low on storage space.`);
+  const kept = await readHeader(stored);
   // Ask the browser not to clear it when space runs low (it may say no; the data still works).
   await navigator.storage?.persist?.().catch(() => false);
-  loaded = l;
+  loaded = kept;
   loadError = null;
-  return l.header;
+  return kept.header;
 }
 
 /** Forget the pack for this session (tests; removePrivateData also deletes it from the device). */

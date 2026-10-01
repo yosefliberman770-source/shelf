@@ -477,7 +477,8 @@
     "path": "original/atlas-gis-shapefile.zip",
     "manual": true
    }
-  ]
+  ],
+  "local_only": true
  },
  {
   "id": "germania-sacra",

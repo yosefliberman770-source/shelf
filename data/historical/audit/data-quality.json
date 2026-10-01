@@ -1,0 +1,3928 @@
+{
+ "generated": "2026-10-01",
+ "registry": {
+  "pleiades": {
+   "private": false,
+   "box": [
+    -20.0,
+    -25.0,
+    120.0,
+    65.0
+   ]
+  },
+  "viabundus": {
+   "private": false,
+   "box": [
+    -2.0,
+    45.0,
+    32.0,
+    66.0
+   ]
+  },
+  "althurayya": {
+   "private": false,
+   "box": [
+    -10.0,
+    5.0,
+    85.0,
+    56.0
+   ]
+  },
+  "wikidata": {
+   "private": false,
+   "box": [
+    -32.0,
+    24.0,
+    62.0,
+    72.0
+   ]
+  },
+  "germaniasacra": {
+   "private": false,
+   "box": [
+    -4.0,
+    41.0,
+    28.0,
+    60.0
+   ]
+  },
+  "hre": {
+   "private": false,
+   "box": [
+    4.0,
+    45.0,
+    24.0,
+    56.0
+   ]
+  },
+  "merimee": {
+   "private": false,
+   "box": [
+    -5.0,
+    41.0,
+    10.0,
+    51.5
+   ]
+  },
+  "finreg": {
+   "private": false,
+   "box": [
+    19.0,
+    59.0,
+    32.0,
+    70.5
+   ]
+  },
+  "wbohemia": {
+   "private": false,
+   "box": [
+    12.0,
+    49.0,
+    14.5,
+    50.6
+   ]
+  },
+  "bridges1250": {
+   "private": false,
+   "box": [
+    -6.0,
+    49.9,
+    2.0,
+    55.9
+   ]
+  },
+  "nsh": {
+   "private": false,
+   "box": [
+    -25.0,
+    54.0,
+    32.0,
+    71.5
+   ]
+  },
+  "nokm": {
+   "private": false,
+   "box": [
+    4.0,
+    57.9,
+    31.5,
+    71.5
+   ]
+  },
+  "tib": {
+   "private": true,
+   "box": [
+    12.0,
+    34.0,
+    32.0,
+    50.0
+   ]
+  },
+  "mfairs": {
+   "private": true,
+   "box": [
+    -6.0,
+    49.9,
+    2.0,
+    55.9
+   ]
+  },
+  "afontium": {
+   "private": true,
+   "box": [
+    14.0,
+    48.5,
+    27.0,
+    55.0
+   ]
+  },
+  "ran": {
+   "private": true,
+   "box": [
+    20.0,
+    43.5,
+    30.0,
+    48.5
+   ]
+  },
+  "dicotopo": {
+   "private": true,
+   "box": [
+    -5.0,
+    41.0,
+    10.0,
+    51.5
+   ]
+  },
+  "raa": {
+   "private": true,
+   "box": [
+    10.5,
+    55.0,
+    24.5,
+    69.5
+   ]
+  },
+  "ebidat": {
+   "private": true,
+   "box": [
+    3.0,
+    45.5,
+    31.0,
+    63.0
+   ]
+  },
+  "darmc": {
+   "private": true,
+   "box": [
+    -12.0,
+    12.0,
+    45.0,
+    65.0
+   ]
+  },
+  "dkff": {
+   "private": true,
+   "box": [
+    8.0,
+    54.5,
+    15.5,
+    58.0
+   ]
+  },
+  "buringh": {
+   "private": false,
+   "box": [
+    -25.0,
+    27.0,
+    60.0,
+    71.0
+   ]
+  }
+ },
+ "publicIndex": {
+  "present": true,
+  "records": 151929,
+  "flags": {
+   "coarse position (under 2 decimals)": {
+    "count": 3557,
+    "examples": [
+     {
+      "key": "pleiades:376000",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376006",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376010",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376011",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376007",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376008",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376012",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376004",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376005",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376013",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376009",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376002",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:376003",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:373826",
+      "title": "Herakleioi Thines",
+      "lon": 20.5,
+      "lat": 31.5
+     },
+     {
+      "key": "pleiades:375996",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:375999",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:375995",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:375994",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:375998",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:375992",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 31.0
+     },
+     {
+      "key": "pleiades:374482",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:374483",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:374484",
+      "title": "Untitled",
+      "lon": 21.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373906",
+      "title": "Tritonis? Palus",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373738",
+      "title": "Asby(s)tai",
+      "lon": 21.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373804",
+      "title": "Gasr et-Tuil",
+      "lon": 20.3,
+      "lat": 32.2167
+     },
+     {
+      "key": "pleiades:373859",
+      "title": "Myrsinitis (river)",
+      "lon": 21.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373839",
+      "title": "Lathon/Leton (river)",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373878",
+      "title": "Pseudopenias Pr.",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:373827",
+      "title": "Hesperidum Horti",
+      "lon": 20.5,
+      "lat": 32.5
+     },
+     {
+      "key": "pleiades:570185",
+      "title": "Cyparissius Sinus",
+      "lon": 21.4167,
+      "lat": 37.5
+     },
+     {
+      "key": "pleiades:534546",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534547",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534542",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534544",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534548",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534549",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:534545",
+      "title": "Untitled",
+      "lon": 20.5,
+      "lat": 39.25
+     },
+     {
+      "key": "pleiades:481911",
+      "title": "Meropus M.",
+      "lon": 20.5,
+      "lat": 40.5
+     },
+     {
+      "key": "pleiades:481920",
+      "title": "Neapolis",
+      "lon": 21.5,
+      "lat": 41.5
+     }
+    ]
+   },
+   "end date only (shown only at its end; unevidenced before)": {
+    "count": 592,
+    "examples": [
+     {
+      "key": "wikidata:Q15076364",
+      "title": "De viridarios Beatae Mariae abbey",
+      "lon": 21.72407,
+      "lat": 36.83723,
+      "to": 1266
+     },
+     {
+      "key": "wikidata:Q123246016",
+      "title": "Zelená Hora",
+      "lon": 20.40788,
+      "lat": 48.95907,
+      "to": 1462
+     },
+     {
+      "key": "wikidata:Q12763797",
+      "title": "Cejkov Castle",
+      "lon": 21.76666,
+      "lat": 48.46556,
+      "to": 1673
+     },
+     {
+      "key": "wikidata:Q1315126",
+      "title": "Castle of Sátoraljaújhely",
+      "lon": 21.63889,
+      "lat": 48.38583,
+      "to": 1526
+     },
+     {
+      "key": "wikidata:Q126975465",
+      "title": "Castle in Wyszogród",
+      "lon": 20.19411,
+      "lat": 52.38586,
+      "to": 1798
+     },
+     {
+      "key": "wikidata:Q206095",
+      "title": "Daphne Cistercian monastery",
+      "lon": 23.63583,
+      "lat": 38.01306,
+      "to": 1458
+     },
+     {
+      "key": "wikidata:Q131286475",
+      "title": "Suraż Castle",
+      "lon": 22.94661,
+      "lat": 52.94325,
+      "to": 1603
+     },
+     {
+      "key": "viabundus:20364",
+      "title": "Auvaismäki",
+      "lon": 22.35891,
+      "lat": 60.57203,
+      "to": 1550
+     },
+     {
+      "key": "wikidata:Q3087789",
+      "title": "Cathedral of the Resurrection of Christ, Ivano-Frankivsk",
+      "lon": 24.70867,
+      "lat": 48.9224,
+      "to": 1752
+     },
+     {
+      "key": "wikidata:Q4301518",
+      "title": "1 St. George's Square, Lviv",
+      "lon": 24.01333,
+      "lat": 49.83639,
+      "to": 1972
+     },
+     {
+      "key": "wikidata:Q16619130",
+      "title": "Zavaliv Castle",
+      "lon": 25.04219,
+      "lat": 49.20594,
+      "to": 1940
+     },
+     {
+      "key": "wikidata:Q18630554",
+      "title": "Schloss Mihowa",
+      "lon": 25.38,
+      "lat": 48.15,
+      "to": 1917
+     },
+     {
+      "key": "viabundus:19756",
+      "title": "Renko",
+      "lon": 24.28692,
+      "lat": 60.89374,
+      "to": 1556
+     },
+     {
+      "key": "wikidata:Q25443362",
+      "title": "Kościół i klasztor Karmelitów Bosych pw. NMP i św. Józefa w Kamieńcu Podolskim",
+      "lon": 26.57261,
+      "lat": 48.67774,
+      "to": 1930
+     },
+     {
+      "key": "wikidata:Q46211636",
+      "title": "Mănăstirea Sîrcova",
+      "lon": 28.78294,
+      "lat": 47.74206,
+      "to": 1845
+     },
+     {
+      "key": "wikidata:Q115441079",
+      "title": "Monaster Trójcy Świętej w Czerei",
+      "lon": 29.30359,
+      "lat": 54.64311,
+      "to": 1834
+     },
+     {
+      "key": "wikidata:Q4370733",
+      "title": "Bernardinian Monastery in Polack",
+      "lon": 28.7722,
+      "lat": 55.48049,
+      "to": 1832
+     },
+     {
+      "key": "wikidata:Q16700032",
+      "title": "Transfiguration Cathedral",
+      "lon": 28.20048,
+      "lat": 59.37793,
+      "to": 1944
+     },
+     {
+      "key": "wikidata:Q15198367",
+      "title": "Spaski Monastery in Mahilioŭ",
+      "lon": 30.33349,
+      "lat": 53.89522,
+      "to": 1918
+     },
+     {
+      "key": "wikidata:Q2094477",
+      "title": "Zverin Monastery",
+      "lon": 31.27613,
+      "lat": 58.53596,
+      "to": 1919
+     },
+     {
+      "key": "wikidata:Q81615851",
+      "title": "Cherkasskiy Uspenskiy monastyr",
+      "lon": 32.07346,
+      "lat": 49.44857,
+      "to": 1923
+     },
+     {
+      "key": "wikidata:Q4392914",
+      "title": "Rekonsky monastery",
+      "lon": 33.17065,
+      "lat": 59.28544,
+      "to": 1917
+     },
+     {
+      "key": "wikidata:Q4320757",
+      "title": "Nicholas-Medvedsky Monastery",
+      "lon": 32.32262,
+      "lat": 60.11099,
+      "to": 1704
+     },
+     {
+      "key": "wikidata:Q123140218",
+      "title": "Saint Hilarion monastery",
+      "lon": 34.3663,
+      "lat": 31.4472,
+      "to": 614
+     },
+     {
+      "key": "wikidata:Q6898396",
+      "title": "Monastery of the Virgins",
+      "lon": 35.2368,
+      "lat": 31.77581,
+      "to": 614
+     },
+     {
+      "key": "wikidata:Q15833861",
+      "title": "Maria-Magdalenenkloster",
+      "lon": 35.07266,
+      "lat": 32.92649,
+      "to": 1291
+     },
+     {
+      "key": "wikidata:Q4536634",
+      "title": "Saints Joachim and Anne Monastery, Mozhaysk",
+      "lon": 36.01639,
+      "lat": 55.51139,
+      "to": 1764
+     },
+     {
+      "key": "wikidata:Q4411490",
+      "title": "Old church of the Dormition",
+      "lon": 39.61019,
+      "lat": 52.61246,
+      "to": 1764
+     },
+     {
+      "key": "wikidata:Q4320775",
+      "title": "Nikolo-Skovorodsky monastery",
+      "lon": 39.84244,
+      "lat": 57.60009,
+      "to": 1660
+     },
+     {
+      "key": "wikidata:Q2684237",
+      "title": "Cathedral of Alexander Nevsky",
+      "lon": 41.63509,
+      "lat": 41.65247,
+      "to": 1936
+     },
+     {
+      "key": "wikidata:Q116311890",
+      "title": "Epiphany Cathedral of the Kostroma Kremlin",
+      "lon": 40.92816,
+      "lat": 57.76357,
+      "to": 1934
+     },
+     {
+      "key": "wikidata:Q4415431",
+      "title": "Semigorodnyaya Uspenskaya pustyn",
+      "lon": 40.1975,
+      "lat": 59.78035,
+      "to": 1926
+     },
+     {
+      "key": "wikidata:Q4499207",
+      "title": "Uspensky Monastery",
+      "lon": 41.65932,
+      "lat": 64.21854,
+      "to": 1920
+     },
+     {
+      "key": "wikidata:Q222846",
+      "title": "Chaldean Catholic Eparchy of Amadiya",
+      "lon": 42.9833,
+      "lat": 36.85,
+      "to": 2013
+     },
+     {
+      "key": "wikidata:Q115802700",
+      "title": "St. Gr. Lusavorich Monastery",
+      "lon": 45.80559,
+      "lat": 39.14901,
+      "to": 2006
+     },
+     {
+      "key": "wikidata:Q115802905",
+      "title": "St. Stepanos Monastery",
+      "lon": 45.88932,
+      "lat": 38.98409,
+      "to": 2010
+     },
+     {
+      "key": "wikidata:Q115803047",
+      "title": "St. Hakob-Hayrapet Monastery",
+      "lon": 45.88972,
+      "lat": 39.079,
+      "to": 2000
+     },
+     {
+      "key": "wikidata:Q116980318",
+      "title": "St. Tovma Monastery",
+      "lon": 45.28556,
+      "lat": 39.45204,
+      "to": 2011
+     },
+     {
+      "key": "wikidata:Q13054815",
+      "title": "Holy Cross Monastery (Shamen)",
+      "lon": 45.50481,
+      "lat": 39.46399,
+      "to": 2008
+     },
+     {
+      "key": "wikidata:Q21704107",
+      "title": "St. Khach Monastery (Unus)",
+      "lon": 45.98817,
+      "lat": 39.01631,
+      "to": 2000
+     }
+    ]
+   },
+   "more than 25 km offshore (review)": {
+    "count": 174,
+    "examples": [
+     {
+      "key": "wikidata:Q21555461",
+      "title": "Moni Strophadon",
+      "lon": 21.01412,
+      "lat": 37.25021,
+      "km": 45.4,
+      "kind": "monastery"
+     },
+     {
+      "key": "finreg:1000037937",
+      "title": "Jungfruskär",
+      "lon": 21.07009,
+      "lat": 60.14039,
+      "km": 32.1,
+      "kind": "site"
+     },
+     {
+      "key": "pleiades:373773",
+      "title": "Chersonesos Akra",
+      "lon": 23.5,
+      "lat": 32.5,
+      "km": 31.3,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:987802100",
+      "title": "Antikythera Apollo Sanctuary",
+      "lon": 23.2959,
+      "lat": 35.8862,
+      "km": 36.3,
+      "kind": "archaeological-site,sanctuary"
+     },
+     {
+      "key": "pleiades:560670",
+      "title": "Palaiokastro",
+      "lon": 23.2958,
+      "lat": 35.8875,
+      "km": 36.2,
+      "kind": "archaeological-site,settlement"
+     },
+     {
+      "key": "wikidata:Q110303460",
+      "title": "Palaiokastro of Antikythera",
+      "lon": 23.29672,
+      "lat": 35.88684,
+      "km": 36.3,
+      "kind": "castle"
+     },
+     {
+      "key": "pleiades:572296",
+      "title": "Untitled",
+      "lon": 22.25,
+      "lat": 36.25,
+      "km": 28.6,
+      "kind": "quarry"
+     },
+     {
+      "key": "pleiades:572297",
+      "title": "Untitled",
+      "lon": 22.25,
+      "lat": 36.25,
+      "km": 28.6,
+      "kind": "quarry"
+     },
+     {
+      "key": "pleiades:540838",
+      "title": "Ipnoi",
+      "lon": 23.25,
+      "lat": 39.75,
+      "km": 27.3,
+      "kind": "people"
+     },
+     {
+      "key": "pleiades:590087",
+      "title": "Vatsiana",
+      "lon": 24.103,
+      "lat": 34.8214,
+      "km": 39.0,
+      "kind": "settlement"
+     },
+     {
+      "key": "pleiades:589859",
+      "title": "Kaudos?",
+      "lon": 24.0714,
+      "lat": 34.8673,
+      "km": 34.9,
+      "kind": "settlement"
+     },
+     {
+      "key": "pleiades:599491",
+      "title": "Anaphe",
+      "lon": 25.7997,
+      "lat": 36.3591,
+      "km": 31.8,
+      "kind": "settlement"
+     },
+     {
+      "key": "pleiades:599504",
+      "title": "Apollo Asgelatos (temple)",
+      "lon": 25.8238,
+      "lat": 36.3613,
+      "km": 34.2,
+      "kind": "church-2,temple-2"
+     },
+     {
+      "key": "pleiades:589995",
+      "title": "Pholegandros (settlement)",
+      "lon": 24.9199,
+      "lat": 36.6266,
+      "km": 35.6,
+      "kind": "settlement"
+     },
+     {
+      "key": "wikidata:Q108701123",
+      "title": "Monastery of Zoodochos Pigi",
+      "lon": 25.82987,
+      "lat": 36.35808,
+      "km": 34.8,
+      "kind": "monastery"
+     },
+     {
+      "key": "wikidata:Q20379594",
+      "title": "Panagia Kalamiotissa monastery, Anafi",
+      "lon": 25.8461,
+      "lat": 36.3486,
+      "km": 36.5,
+      "kind": "monastery"
+     },
+     {
+      "key": "wikidata:Q38284937",
+      "title": "Castle of Chora Folegandrou",
+      "lon": 24.919,
+      "lat": 36.62805,
+      "km": 35.5,
+      "kind": "castle"
+     },
+     {
+      "key": "pleiades:550845",
+      "title": "Psyra (settlement)",
+      "lon": 25.5622,
+      "lat": 38.5491,
+      "km": 28.0,
+      "kind": "settlement"
+     },
+     {
+      "key": "wikidata:Q21682923",
+      "title": "Dormition of the Virgin monastery",
+      "lon": 25.5885,
+      "lat": 38.599,
+      "km": 25.4,
+      "kind": "monastery"
+     },
+     {
+      "key": "pleiades:463803480",
+      "title": "Ptolemaic Kingdom",
+      "lon": 26.6941,
+      "lat": 33.6977,
+      "km": 143.8,
+      "kind": "state"
+     },
+     {
+      "key": "pleiades:590055",
+      "title": "Soroni",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:590062",
+      "title": "Soura",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:590417",
+      "title": "Untitled",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "aqueduct"
+     },
+     {
+      "key": "pleiades:591924",
+      "title": "Untitled",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "cemetery"
+     },
+     {
+      "key": "pleiades:591922",
+      "title": "Unnamed cemeteries",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "cemetery"
+     },
+     {
+      "key": "pleiades:593435",
+      "title": "Untitled",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "quarry"
+     },
+     {
+      "key": "pleiades:589991",
+      "title": "Phanes",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589928",
+      "title": "Mesobounos",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589923",
+      "title": "Mantra Boutouriou",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589954",
+      "title": "Nessos",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589902",
+      "title": "Lelos",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589963",
+      "title": "Orthe",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589977",
+      "title": "Paradeisi",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589966",
+      "title": "Pagoi",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589970",
+      "title": "Palaiokastron",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589930",
+      "title": "Metropolite",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589951",
+      "title": "Napes",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589732",
+      "title": "Bigla",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589708",
+      "title": "Argos?",
+      "lon": 26.75,
+      "lat": 34.75,
+      "km": 58.9,
+      "kind": "unknown"
+     },
+     {
+      "key": "pleiades:589725",
+      "title": "Bati",
+      "lon": 26.25,
+      "lat": 34.75,
+      "km": 28.4,
+      "kind": "unknown"
+     }
+    ]
+   },
+   "outside the dataset’s documented region": {
+    "count": 5,
+    "examples": [
+     {
+      "key": "nsh:s872",
+      "title": "Miklagarður",
+      "lon": 28.98438,
+      "lat": 41.01186,
+      "dataset": "nsh"
+     },
+     {
+      "key": "germaniasacra:12260",
+      "title": "Deutschordenskommende Kaysersberg",
+      "lon": 48.13841,
+      "lat": 7.26282,
+      "dataset": "germaniasacra"
+     },
+     {
+      "key": "germaniasacra:12349",
+      "title": "Zisterzienserabtei Santa María de Carracedo",
+      "lon": -6.73139,
+      "lat": 42.57083,
+      "dataset": "germaniasacra"
+     },
+     {
+      "key": "germaniasacra:12347",
+      "title": "Zisterzienserabtei San Martín de Castañeda",
+      "lon": -6.72,
+      "lat": 42.13528,
+      "dataset": "germaniasacra"
+     },
+     {
+      "key": "germaniasacra:12370",
+      "title": "Zisterzienserabtei Santa María de la Espina",
+      "lon": -5.1,
+      "lat": 41.7325,
+      "dataset": "germaniasacra"
+     }
+    ]
+   },
+   "five or more records of one dataset at one exact position": {
+    "count": 180,
+    "examples": [
+     {
+      "dataset": "pleiades",
+      "lon": 21.5,
+      "lat": 31.0,
+      "records": 19
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 20.5,
+      "lat": 32.5,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 21.75,
+      "lat": 37.75,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 21.75,
+      "lat": 38.25,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 20.75,
+      "lat": 39.25,
+      "records": 8
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 20.5,
+      "lat": 39.25,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 21.5,
+      "lat": 45.5,
+      "records": 101
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 20.0,
+      "lat": 49.5,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.5,
+      "lat": 37.5,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 23.625,
+      "lat": 37.875,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 23.875,
+      "lat": 37.875,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.25,
+      "lat": 37.25,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.25,
+      "lat": 36.75,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.75,
+      "lat": 37.75,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 23.625,
+      "lat": 38.125,
+      "records": 13
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 23.875,
+      "lat": 38.125,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.25,
+      "lat": 38.75,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 22.5,
+      "lat": 42.5,
+      "records": 17
+     },
+     {
+      "dataset": "wikidata",
+      "lon": 23.83033,
+      "lat": 53.67475,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 25.25,
+      "lat": 35.25,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 25.25,
+      "lat": 37.25,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.5,
+      "lat": 30.5,
+      "records": 9
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.75,
+      "lat": 34.75,
+      "records": 25
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.25,
+      "lat": 34.75,
+      "records": 15
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.5,
+      "lat": 37.5,
+      "records": 11
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.25,
+      "lat": 36.75,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.25,
+      "lat": 37.75,
+      "records": 15
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.0,
+      "lat": 37.25,
+      "records": 13
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.25,
+      "lat": 38.25,
+      "records": 10
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.25,
+      "lat": 39.75,
+      "records": 7
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.25,
+      "lat": 39.25,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.75,
+      "lat": 38.75,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.0,
+      "lat": 39.25,
+      "records": 25
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 27.5,
+      "lat": 42.5,
+      "records": 9
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 26.5,
+      "lat": 44.5,
+      "records": 32
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 28.75,
+      "lat": 38.75,
+      "records": 8
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 28.25,
+      "lat": 38.75,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 29.25,
+      "lat": 40.25,
+      "records": 5
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 29.75,
+      "lat": 40.75,
+      "records": 6
+     },
+     {
+      "dataset": "pleiades",
+      "lon": 29.0,
+      "lat": 41.0,
+      "records": 20
+     }
+    ]
+   }
+  }
+ },
+ "privateIndex": {
+  "present": true,
+  "records": 88560,
+  "flags": {
+   "coarse position (under 2 decimals)": {
+    "count": 352,
+    "examples": []
+   },
+   "more than 25 km offshore (review)": {
+    "count": 5,
+    "examples": []
+   },
+   "outside the dataset’s documented region": {
+    "count": 4,
+    "examples": []
+   },
+   "end date only (shown only at its end; unevidenced before)": {
+    "count": 281,
+    "examples": []
+   },
+   "five or more records of one dataset at one exact position": {
+    "count": 441,
+    "examples": []
+   }
+  }
+ },
+ "privateDatasetsInPublicIndex": [],
+ "coverage": {
+  "byDataset": {
+   "wikidata": 77836,
+   "pleiades": 34458,
+   "dicotopo": 29140,
+   "afontium": 26204,
+   "dkff": 10772,
+   "merimee": 9875,
+   "nokm": 8941,
+   "ebidat": 8263,
+   "viabundus": 7488,
+   "raa": 5300,
+   "ran": 2865,
+   "tib": 2802,
+   "althurayya": 2518,
+   "germaniasacra": 2502,
+   "hre": 2390,
+   "mfairs": 2371,
+   "buringh": 2237,
+   "finreg": 1823,
+   "darmc": 843,
+   "wbohemia": 839,
+   "nsh": 764,
+   "bridges1250": 258
+  },
+  "byKind": {
+   "settlement": 102251,
+   "castle": 46463,
+   "monastery": 21709,
+   "church": 17188,
+   "site": 7587,
+   "town": 4627,
+   "hoard": 4325,
+   "market": 3379,
+   "villa": 2117,
+   "fortification": 2094,
+   "bridge": 1682,
+   "archaeological-site": 1434,
+   "fort": 1423,
+   "road": 1376,
+   "cathedral": 1325,
+   "river": 1291,
+   "station": 1258,
+   "people": 1052,
+   "towns": 995,
+   "cemetery": 839,
+   "wreck": 769,
+   "mountain": 559,
+   "temple-2": 553,
+   "sanctuary": 507,
+   "island": 484,
+   "fort-2": 454,
+   "waystations": 445,
+   "toll": 436,
+   "region": 430,
+   "diocese": 413,
+   "feature": 403,
+   "cape": 388,
+   "aqueduct": 381,
+   "tomb": 342,
+   "regions": 328,
+   "unknown": 317,
+   "mine-2": 299,
+   "bath": 265,
+   "monument": 263,
+   "numbered feature": 259
+  },
+  "datedness": {
+   "own dates": 121878,
+   "evidence period": 78096,
+   "no temporal evidence": 40515
+  },
+  "byDatasetKind": {
+   "pleiades": {
+    "settlement": 10409,
+    "villa": 2117,
+    "archaeological-site": 1434,
+    "fort": 1423,
+    "river": 1291,
+    "station": 1258,
+    "people": 1052,
+    "road": 1007,
+    "cemetery": 839,
+    "bridge": 695,
+    "mountain": 559,
+    "temple-2": 553
+   },
+   "althurayya": {
+    "towns": 995,
+    "waystations": 445,
+    "regions": 328,
+    "villages": 243,
+    "xroads": 189,
+    "waters": 140,
+    "capitals": 113,
+    "sites": 48,
+    "metropoles": 13,
+    "quarters": 4
+   },
+   "wikidata": {
+    "castle": 31343,
+    "settlement": 25082,
+    "monastery": 17811,
+    "fortification": 1409,
+    "cathedral": 1309,
+    "diocese": 413,
+    "bridge": 322,
+    "university": 147
+   },
+   "buringh": {
+    "town": 2237
+   },
+   "viabundus": {
+    "settlement": 6595,
+    "toll": 436,
+    "bridge": 166,
+    "ferry": 99,
+    "fair": 96,
+    "harbour": 55,
+    "lock": 29,
+    "staple": 12
+   },
+   "germaniasacra": {
+    "monastery": 2502
+   },
+   "hre": {
+    "town": 2390
+   },
+   "finreg": {
+    "site": 1285,
+    "settlement": 368,
+    "church": 112,
+    "fortification": 58
+   },
+   "nsh": {
+    "settlement": 312,
+    "church": 255,
+    "site": 95,
+    "monastery": 56,
+    "castle": 43,
+    "market": 3
+   },
+   "nokm": {
+    "settlement": 3915,
+    "site": 2210,
+    "church": 1692,
+    "market": 987,
+    "fortification": 137
+   },
+   "merimee": {
+    "church": 7436,
+    "castle": 1979,
+    "monastery": 270,
+    "bridge": 156,
+    "market": 18,
+    "cathedral": 16
+   },
+   "bridges1250": {
+    "bridge": 258
+   },
+   "wbohemia": {
+    "settlement": 839
+   },
+   "tib": {
+    "settlement": 1214,
+    "site": 782,
+    "church": 506,
+    "monastery": 156,
+    "fortification": 144
+   },
+   "darmc": {
+    "wreck": 483,
+    "hoard": 278,
+    "settlement": 82
+   },
+   "ran": {
+    "settlement": 1742,
+    "church": 471,
+    "site": 372,
+    "fortification": 194,
+    "monastery": 86
+   },
+   "ebidat": {
+    "castle": 8263
+   },
+   "afontium": {
+    "settlement": 23589,
+    "church": 2615
+   },
+   "raa": {
+    "site": 2430,
+    "settlement": 1999,
+    "church": 451,
+    "castle": 130,
+    "road": 98,
+    "hoard": 93,
+    "wreck": 79,
+    "monastery": 20
+   },
+   "dicotopo": {
+    "settlement": 22366,
+    "castle": 3976,
+    "church": 2192,
+    "monastery": 606
+   },
+   "mfairs": {
+    "market": 2371
+   },
+   "dkff": {
+    "hoard": 3954,
+    "settlement": 3739,
+    "church": 1149,
+    "castle": 640,
+    "site": 412,
+    "road": 271,
+    "wreck": 207,
+    "monastery": 163,
+    "fortification": 152,
+    "bridge": 85
+   }
+  },
+  "byDatasetRegion": {
+   "pleiades": {
+    "Italy": 6412,
+    "Greece & Aegean": 5362,
+    "North Africa": 3561,
+    "Anatolia": 2981,
+    "Iberia": 2476,
+    "France": 2344,
+    "Middle East & Iran": 1816,
+    "Other": 1792
+   },
+   "althurayya": {
+    "Middle East & Iran": 1196,
+    "Other": 430,
+    "Levant": 202,
+    "Egypt": 201,
+    "North Africa": 155,
+    "Anatolia": 149,
+    "Iberia": 132,
+    "Italy": 42
+   },
+   "wikidata": {
+    "Bohemia & Austria": 14234,
+    "Germany": 11354,
+    "France": 7639,
+    "British Isles": 6274,
+    "Hungary & Carpathian basin": 6262,
+    "Iberia": 6198,
+    "Italy": 6176,
+    "Poland & Baltic lands": 4290
+   },
+   "buringh": {
+    "Italy": 380,
+    "Iberia": 332,
+    "France": 319,
+    "British Isles": 194,
+    "Low Countries": 193,
+    "Ukraine, Belarus & Rus’": 190,
+    "Germany": 179,
+    "Hungary & Carpathian basin": 89
+   },
+   "viabundus": {
+    "Germany": 3949,
+    "Low Countries": 1527,
+    "Scandinavia & Baltic Sea": 1520,
+    "Poland & Baltic lands": 297,
+    "Bohemia & Austria": 126,
+    "France": 63,
+    "Hungary & Carpathian basin": 3,
+    "Ukraine, Belarus & Rus’": 3
+   },
+   "germaniasacra": {
+    "Low Countries": 1066,
+    "Germany": 509,
+    "France": 377,
+    "Bohemia & Austria": 249,
+    "Poland & Baltic lands": 120,
+    "Italy": 61,
+    "Iberia": 37,
+    "Scandinavia & Baltic Sea": 34
+   },
+   "hre": {
+    "Germany": 1506,
+    "Bohemia & Austria": 276,
+    "Poland & Baltic lands": 269,
+    "Low Countries": 175,
+    "France": 159,
+    "Scandinavia & Baltic Sea": 5
+   },
+   "finreg": {
+    "Scandinavia & Baltic Sea": 1823
+   },
+   "nsh": {
+    "Scandinavia & Baltic Sea": 482,
+    "Other": 281,
+    "Greece & Aegean": 1
+   },
+   "nokm": {
+    "Scandinavia & Baltic Sea": 8941
+   },
+   "merimee": {
+    "France": 8710,
+    "Iberia": 872,
+    "Low Countries": 163,
+    "Italy": 73,
+    "British Isles": 57
+   },
+   "bridges1250": {
+    "British Isles": 258
+   },
+   "wbohemia": {
+    "Bohemia & Austria": 839
+   },
+   "tib": {
+    "Greece & Aegean": 1291,
+    "Balkans": 1142,
+    "Italy": 194,
+    "Hungary & Carpathian basin": 103,
+    "Romania & Moldavia": 35,
+    "Bohemia & Austria": 33,
+    "British Isles": 4
+   },
+   "darmc": {
+    "Italy": 193,
+    "France": 181,
+    "British Isles": 100,
+    "Greece & Aegean": 97,
+    "Low Countries": 76,
+    "Scandinavia & Baltic Sea": 33,
+    "Iberia": 31,
+    "Levant": 30
+   },
+   "ran": {
+    "Hungary & Carpathian basin": 1519,
+    "Romania & Moldavia": 1346
+   },
+   "ebidat": {
+    "Germany": 5272,
+    "Low Countries": 1535,
+    "France": 955,
+    "Bohemia & Austria": 330,
+    "Hungary & Carpathian basin": 108,
+    "Scandinavia & Baltic Sea": 55,
+    "Italy": 8
+   },
+   "afontium": {
+    "Poland & Baltic lands": 25914,
+    "Hungary & Carpathian basin": 282,
+    "Scandinavia & Baltic Sea": 8
+   },
+   "raa": {
+    "Scandinavia & Baltic Sea": 5300
+   },
+   "dicotopo": {
+    "France": 24486,
+    "Iberia": 2561,
+    "Low Countries": 1367,
+    "British Isles": 725,
+    "Other": 1
+   },
+   "mfairs": {
+    "British Isles": 2371
+   },
+   "dkff": {
+    "Scandinavia & Baltic Sea": 10346,
+    "Germany": 426
+   }
+  },
+  "byRegionFirstCentury": {
+   "North Africa": {
+    "-100": 1,
+    "-50": 5,
+    "-40": 2,
+    "-25": 2,
+    "-20": 1,
+    "-10": 1,
+    "-8": 465,
+    "-6": 46,
+    "-5": 1,
+    "-4": 467,
+    "-2": 1,
+    "-1": 2389,
+    "1": 7,
+    "2": 7,
+    "3": 138,
+    "4": 2,
+    "5": 3,
+    "6": 1,
+    "7": 3,
+    "8": 159,
+    "9": 7,
+    "10": 2,
+    "11": 4,
+    "12": 4,
+    "13": 2,
+    "14": 2,
+    "15": 13,
+    "16": 17,
+    "17": 3,
+    "undated": 115
+   },
+   "Greece & Aegean": {
+    "-26000": 1,
+    "-100": 30,
+    "-60": 1,
+    "-50": 1,
+    "-40": 10,
+    "-34": 1,
+    "-31": 11,
+    "-30": 30,
+    "-20": 92,
+    "-17": 1,
+    "-16": 31,
+    "-15": 1,
+    "-13": 7,
+    "-12": 4,
+    "-10": 9,
+    "-9": 13,
+    "-8": 1388,
+    "-7": 1,
+    "-6": 1369,
+    "-5": 7,
+    "-4": 755,
+    "-3": 3,
+    "-2": 4,
+    "-1": 1057,
+    "1": 21,
+    "3": 312,
+    "4": 45,
+    "5": 33,
+    "6": 29,
+    "7": 54,
+    "8": 9,
+    "9": 25,
+    "10": 68,
+    "11": 58,
+    "12": 131,
+    "13": 191,
+    "14": 487,
+    "15": 124,
+    "16": 39,
+    "17": 15,
+    "18": 1,
+    "19": 2,
+    "20": 2,
+    "undated": 2243
+   },
+   "Balkans": {
+    "-100": 1,
+    "-60": 1,
+    "-20": 2,
+    "-8": 31,
+    "-6": 23,
+    "-4": 43,
+    "-1": 313,
+    "1": 6,
+    "2": 2,
+    "3": 43,
+    "4": 13,
+    "5": 11,
+    "6": 1,
+    "7": 20,
+    "8": 12,
+    "9": 11,
+    "10": 12,
+    "11": 29,
+    "12": 58,
+    "13": 296,
+    "14": 473,
+    "15": 178,
+    "16": 18,
+    "17": 1,
+    "19": 1,
+    "20": 1,
+    "undated": 513
+   },
+   "Romania & Moldavia": {
+    "-100": 2,
+    "-8": 14,
+    "-6": 10,
+    "-4": 27,
+    "-1": 387,
+    "1": 2,
+    "2": 2,
+    "3": 170,
+    "4": 19,
+    "5": 12,
+    "6": 20,
+    "7": 99,
+    "8": 121,
+    "9": 69,
+    "10": 389,
+    "11": 23,
+    "12": 24,
+    "13": 116,
+    "14": 234,
+    "15": 1064,
+    "16": 1526,
+    "17": 5,
+    "undated": 200
+   },
+   "Hungary & Carpathian basin": {
+    "-62": 1,
+    "-34": 1,
+    "-8": 16,
+    "-6": 2,
+    "-4": 15,
+    "-1": 397,
+    "1": 1,
+    "2": 1,
+    "3": 130,
+    "4": 7,
+    "5": 13,
+    "6": 30,
+    "7": 57,
+    "8": 40,
+    "9": 55,
+    "10": 529,
+    "11": 122,
+    "12": 351,
+    "13": 1258,
+    "14": 1873,
+    "15": 1833,
+    "16": 1410,
+    "17": 19,
+    "undated": 700
+   },
+   "Poland & Baltic lands": {
+    "-8": 8,
+    "-4": 13,
+    "-1": 53,
+    "1": 1,
+    "3": 18,
+    "6": 2,
+    "7": 3,
+    "8": 4,
+    "9": 7,
+    "10": 46,
+    "11": 78,
+    "12": 157,
+    "13": 807,
+    "14": 1013,
+    "15": 837,
+    "16": 27246,
+    "17": 74,
+    "18": 5,
+    "19": 1,
+    "20": 1,
+    "undated": 704
+   },
+   "Scandinavia & Baltic Sea": {
+    "-50": 1,
+    "-20": 1,
+    "-8": 3,
+    "-5": 950,
+    "-4": 1,
+    "-1": 58,
+    "1": 1,
+    "2": 1,
+    "3": 17,
+    "4": 1942,
+    "5": 7,
+    "6": 2299,
+    "7": 46,
+    "8": 3604,
+    "9": 518,
+    "10": 257,
+    "11": 11737,
+    "12": 2624,
+    "13": 1736,
+    "14": 1248,
+    "15": 984,
+    "16": 1438,
+    "17": 239,
+    "18": 4,
+    "undated": 815
+   },
+   "Egypt": {
+    "-60": 1,
+    "-50": 1,
+    "-45": 13,
+    "-30": 8,
+    "-27": 50,
+    "-22": 3,
+    "-21": 29,
+    "-17": 2,
+    "-16": 67,
+    "-11": 7,
+    "-8": 82,
+    "-7": 9,
+    "-6": 66,
+    "-4": 357,
+    "-2": 2,
+    "-1": 355,
+    "1": 5,
+    "2": 2,
+    "3": 168,
+    "4": 4,
+    "5": 2,
+    "6": 1,
+    "7": 5,
+    "8": 202,
+    "10": 2,
+    "11": 3,
+    "12": 1,
+    "13": 1,
+    "15": 3,
+    "undated": 121
+   },
+   "Other": {
+    "-100": 14,
+    "-62": 2,
+    "-60": 1,
+    "-40": 7,
+    "-33": 1,
+    "-30": 24,
+    "-25": 2,
+    "-23": 1,
+    "-21": 4,
+    "-20": 33,
+    "-16": 16,
+    "-14": 2,
+    "-11": 1,
+    "-10": 29,
+    "-9": 3,
+    "-8": 335,
+    "-7": 2,
+    "-6": 117,
+    "-4": 389,
+    "-3": 6,
+    "-2": 5,
+    "-1": 541,
+    "1": 11,
+    "2": 5,
+    "3": 94,
+    "4": 8,
+    "5": 16,
+    "6": 17,
+    "7": 25,
+    "8": 445,
+    "9": 300,
+    "10": 25,
+    "11": 23,
+    "12": 57,
+    "13": 74,
+    "14": 38,
+    "15": 61,
+    "16": 160,
+    "17": 27,
+    "18": 13,
+    "19": 6,
+    "20": 3,
+    "undated": 556
+   },
+   "Ukraine, Belarus & Rus’": {
+    "-100": 5,
+    "-40": 5,
+    "-30": 1,
+    "-20": 6,
+    "-10": 4,
+    "-8": 120,
+    "-7": 3,
+    "-6": 387,
+    "-4": 154,
+    "-3": 2,
+    "-1": 85,
+    "1": 3,
+    "3": 10,
+    "4": 1,
+    "5": 3,
+    "6": 10,
+    "7": 6,
+    "8": 18,
+    "9": 16,
+    "10": 43,
+    "11": 79,
+    "12": 154,
+    "13": 139,
+    "14": 265,
+    "15": 537,
+    "16": 924,
+    "17": 81,
+    "18": 20,
+    "19": 12,
+    "20": 4,
+    "undated": 469
+   },
+   "Anatolia": {
+    "-180": 1,
+    "-100": 36,
+    "-90": 4,
+    "-65": 6,
+    "-62": 8,
+    "-60": 2,
+    "-55": 2,
+    "-50": 4,
+    "-40": 16,
+    "-33": 5,
+    "-30": 28,
+    "-24": 6,
+    "-20": 33,
+    "-18": 6,
+    "-17": 3,
+    "-16": 16,
+    "-15": 7,
+    "-14": 2,
+    "-12": 5,
+    "-10": 76,
+    "-9": 34,
+    "-8": 289,
+    "-7": 2,
+    "-6": 187,
+    "-4": 452,
+    "-3": 2,
+    "-2": 3,
+    "-1": 1020,
+    "1": 2,
+    "3": 463,
+    "4": 11,
+    "5": 6,
+    "6": 13,
+    "7": 28,
+    "8": 157,
+    "9": 12,
+    "10": 34,
+    "11": 18,
+    "12": 25,
+    "13": 25,
+    "14": 8,
+    "15": 11,
+    "16": 3,
+    "17": 2,
+    "undated": 947
+   },
+   "Levant": {
+    "-180": 1,
+    "-100": 24,
+    "-90": 2,
+    "-62": 5,
+    "-40": 9,
+    "-33": 23,
+    "-30": 4,
+    "-24": 1,
+    "-20": 19,
+    "-16": 1,
+    "-14": 10,
+    "-12": 20,
+    "-10": 13,
+    "-8": 86,
+    "-7": 1,
+    "-6": 36,
+    "-4": 291,
+    "-3": 1,
+    "-2": 8,
+    "-1": 520,
+    "1": 11,
+    "2": 3,
+    "3": 146,
+    "4": 7,
+    "5": 16,
+    "6": 13,
+    "7": 9,
+    "8": 208,
+    "9": 2,
+    "10": 2,
+    "11": 9,
+    "12": 31,
+    "13": 13,
+    "14": 6,
+    "15": 2,
+    "16": 10,
+    "17": 1,
+    "undated": 304
+   },
+   "Middle East & Iran": {
+    "-100": 17,
+    "-90": 2,
+    "-65": 14,
+    "-62": 4,
+    "-60": 5,
+    "-55": 2,
+    "-50": 6,
+    "-40": 11,
+    "-34": 1,
+    "-33": 3,
+    "-30": 45,
+    "-26": 1,
+    "-25": 3,
+    "-24": 26,
+    "-20": 41,
+    "-16": 22,
+    "-15": 2,
+    "-14": 1,
+    "-12": 1,
+    "-10": 32,
+    "-9": 2,
+    "-8": 223,
+    "-7": 1,
+    "-6": 159,
+    "-5": 2,
+    "-4": 236,
+    "-3": 1,
+    "-2": 33,
+    "-1": 512,
+    "1": 21,
+    "2": 84,
+    "3": 133,
+    "4": 3,
+    "5": 8,
+    "6": 1,
+    "7": 13,
+    "8": 1201,
+    "9": 8,
+    "10": 9,
+    "11": 4,
+    "12": 8,
+    "13": 17,
+    "14": 8,
+    "15": 9,
+    "16": 3,
+    "17": 3,
+    "undated": 534
+   },
+   "British Isles": {
+    "-130": 1,
+    "-40": 28,
+    "-30": 17,
+    "-25": 14,
+    "-22": 1,
+    "-20": 17,
+    "-13": 1,
+    "-12": 1,
+    "-10": 4,
+    "-9": 1,
+    "-8": 98,
+    "-6": 4,
+    "-5": 2,
+    "-4": 14,
+    "-3": 1,
+    "-1": 900,
+    "1": 295,
+    "2": 9,
+    "3": 32,
+    "4": 4,
+    "5": 23,
+    "6": 33,
+    "7": 142,
+    "8": 57,
+    "9": 145,
+    "10": 143,
+    "11": 532,
+    "12": 984,
+    "13": 1787,
+    "14": 671,
+    "15": 192,
+    "16": 140,
+    "17": 38,
+    "18": 17,
+    "19": 6,
+    "20": 2,
+    "undated": 5141
+   },
+   "Iberia": {
+    "-26000": 1,
+    "-100": 1,
+    "-40": 2,
+    "-30": 6,
+    "-20": 10,
+    "-18": 1,
+    "-12": 1,
+    "-10": 8,
+    "-9": 5,
+    "-8": 133,
+    "-6": 112,
+    "-5": 2,
+    "-4": 575,
+    "-3": 1,
+    "-2": 6,
+    "-1": 1331,
+    "1": 27,
+    "2": 8,
+    "3": 116,
+    "4": 8,
+    "5": 58,
+    "6": 10,
+    "7": 221,
+    "8": 204,
+    "9": 332,
+    "10": 549,
+    "11": 819,
+    "12": 939,
+    "13": 864,
+    "14": 627,
+    "15": 294,
+    "16": 315,
+    "17": 198,
+    "18": 102,
+    "19": 11,
+    "20": 1,
+    "undated": 4741
+   },
+   "France": {
+    "-100": 3,
+    "-90": 1,
+    "-50": 5,
+    "-40": 15,
+    "-30": 1,
+    "-20": 1,
+    "-10": 6,
+    "-8": 112,
+    "-7": 1,
+    "-6": 47,
+    "-5": 2,
+    "-4": 403,
+    "-3": 2,
+    "-2": 3,
+    "-1": 1483,
+    "1": 46,
+    "2": 34,
+    "3": 261,
+    "4": 74,
+    "5": 349,
+    "6": 198,
+    "7": 488,
+    "8": 731,
+    "9": 1643,
+    "10": 2775,
+    "11": 7231,
+    "12": 8807,
+    "13": 6463,
+    "14": 3924,
+    "15": 1831,
+    "16": 1073,
+    "17": 1038,
+    "18": 519,
+    "19": 130,
+    "undated": 5533
+   },
+   "Low Countries": {
+    "-8": 2,
+    "-6": 1,
+    "-4": 37,
+    "-1": 381,
+    "1": 14,
+    "2": 7,
+    "3": 40,
+    "4": 5,
+    "5": 11,
+    "6": 21,
+    "7": 131,
+    "8": 150,
+    "9": 315,
+    "10": 352,
+    "11": 767,
+    "12": 1608,
+    "13": 1555,
+    "14": 1185,
+    "15": 880,
+    "16": 178,
+    "17": 215,
+    "18": 19,
+    "20": 1,
+    "undated": 1818
+   },
+   "Italy": {
+    "-100": 2,
+    "-60": 1,
+    "-50": 1,
+    "-40": 9,
+    "-30": 13,
+    "-20": 161,
+    "-17": 2,
+    "-14": 1,
+    "-10": 25,
+    "-9": 4,
+    "-8": 1163,
+    "-7": 7,
+    "-6": 393,
+    "-5": 4,
+    "-4": 1293,
+    "-3": 5,
+    "-2": 11,
+    "-1": 2496,
+    "1": 132,
+    "2": 18,
+    "3": 269,
+    "4": 48,
+    "5": 41,
+    "6": 20,
+    "7": 285,
+    "8": 117,
+    "9": 80,
+    "10": 153,
+    "11": 265,
+    "12": 294,
+    "13": 388,
+    "14": 314,
+    "15": 319,
+    "16": 220,
+    "17": 78,
+    "19": 1,
+    "undated": 4906
+   },
+   "Germany": {
+    "-100": 2,
+    "-34": 1,
+    "-30": 1,
+    "-20": 1,
+    "-14": 1,
+    "-10": 1,
+    "-8": 13,
+    "-7": 1,
+    "-6": 11,
+    "-5": 1,
+    "-4": 35,
+    "-1": 373,
+    "1": 18,
+    "2": 14,
+    "3": 60,
+    "4": 11,
+    "5": 19,
+    "6": 33,
+    "7": 141,
+    "8": 752,
+    "9": 724,
+    "10": 892,
+    "11": 1803,
+    "12": 3118,
+    "13": 4151,
+    "14": 2133,
+    "15": 864,
+    "16": 321,
+    "17": 193,
+    "18": 10,
+    "19": 6,
+    "20": 1,
+    "undated": 8003
+   },
+   "Bohemia & Austria": {
+    "-14": 1,
+    "-12": 1,
+    "-10": 1,
+    "-8": 14,
+    "-6": 10,
+    "-4": 25,
+    "-1": 252,
+    "1": 3,
+    "3": 28,
+    "4": 1,
+    "7": 8,
+    "8": 46,
+    "9": 35,
+    "10": 97,
+    "11": 419,
+    "12": 1065,
+    "13": 2810,
+    "14": 5590,
+    "15": 1604,
+    "16": 1308,
+    "17": 129,
+    "18": 3,
+    "20": 1,
+    "undated": 3025
+   }
+  }
+ },
+ "datasets": {
+  "afontium": {
+   "records": 26204,
+   "kinds": {
+    "settlement": 23589,
+    "church": 2615
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 26204,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 1550,
+   "latestStart": 1550,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Poland & Baltic lands": 25914,
+    "Hungary & Carpathian basin": 282,
+    "Scandinavia & Baltic Sea": 8
+   }
+  },
+  "althurayya": {
+   "records": 2518,
+   "kinds": {
+    "towns": 995,
+    "waystations": 445,
+    "regions": 328,
+    "villages": 243,
+    "xroads": 189,
+    "waters": 140,
+    "capitals": 113,
+    "sites": 48,
+    "metropoles": 13,
+    "quarters": 4
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 2518,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": null,
+   "latestStart": null,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Middle East & Iran": 1196,
+    "Other": 430,
+    "Levant": 202,
+    "Egypt": 201,
+    "North Africa": 155,
+    "Anatolia": 149
+   }
+  },
+  "bridges1250": {
+   "records": 258,
+   "kinds": {
+    "bridge": 258
+   },
+   "ownDates": 94,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 164,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 920,
+   "latestStart": 1424,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "British Isles": 258
+   }
+  },
+  "buringh": {
+   "records": 2237,
+   "kinds": {
+    "town": 2237
+   },
+   "ownDates": 450,
+   "evidencePeriodOnly": 1786,
+   "noTemporalEvidence": 1,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 136,
+   "earliestStart": -800,
+   "latestStart": 2000,
+   "startsAfter1600": 147,
+   "withEndDate": 0,
+   "regions": {
+    "Italy": 380,
+    "Iberia": 332,
+    "France": 319,
+    "British Isles": 194,
+    "Low Countries": 193,
+    "Ukraine, Belarus & Rus’": 190
+   }
+  },
+  "darmc": {
+   "records": 843,
+   "kinds": {
+    "wreck": 483,
+    "hoard": 278,
+    "settlement": 82
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 842,
+   "noTemporalEvidence": 1,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 1,
+   "earliestStart": -300,
+   "latestStart": 1500,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Italy": 193,
+    "France": 181,
+    "British Isles": 100,
+    "Greece & Aegean": 97,
+    "Low Countries": 76,
+    "Scandinavia & Baltic Sea": 33
+   }
+  },
+  "dicotopo": {
+   "records": 29140,
+   "kinds": {
+    "settlement": 22366,
+    "castle": 3976,
+    "church": 2192,
+    "monastery": 606
+   },
+   "ownDates": 29140,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 100,
+   "latestStart": 1892,
+   "startsAfter1600": 1883,
+   "withEndDate": 0,
+   "regions": {
+    "France": 24486,
+    "Iberia": 2561,
+    "Low Countries": 1367,
+    "British Isles": 725,
+    "Other": 1
+   }
+  },
+  "dkff": {
+   "records": 10772,
+   "kinds": {
+    "hoard": 3954,
+    "settlement": 3739,
+    "church": 1149,
+    "castle": 640,
+    "site": 412,
+    "road": 271,
+    "wreck": 207,
+    "monastery": 163,
+    "fortification": 152,
+    "bridge": 85
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 10772,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 400,
+   "latestStart": 1536,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Scandinavia & Baltic Sea": 10346,
+    "Germany": 426
+   }
+  },
+  "ebidat": {
+   "records": 8263,
+   "kinds": {
+    "castle": 8263
+   },
+   "ownDates": 7429,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 834,
+   "startsFoundingDates": 7152,
+   "withStatedCorrection": 4,
+   "earliestStart": 600,
+   "latestStart": 1550,
+   "startsAfter1600": 0,
+   "withEndDate": 4659,
+   "regions": {
+    "Germany": 5272,
+    "Low Countries": 1535,
+    "France": 955,
+    "Bohemia & Austria": 330,
+    "Hungary & Carpathian basin": 108,
+    "Scandinavia & Baltic Sea": 55
+   }
+  },
+  "finreg": {
+   "records": 1823,
+   "kinds": {
+    "site": 1285,
+    "settlement": 368,
+    "church": 112,
+    "fortification": 58
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 1823,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": -500,
+   "latestStart": 1150,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Scandinavia & Baltic Sea": 1823
+   }
+  },
+  "germaniasacra": {
+   "records": 2502,
+   "kinds": {
+    "monastery": 2502
+   },
+   "ownDates": 2498,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 4,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 3,
+   "earliestStart": 450,
+   "latestStart": 1649,
+   "startsAfter1600": 225,
+   "withEndDate": 2410,
+   "regions": {
+    "Low Countries": 1066,
+    "Germany": 509,
+    "France": 377,
+    "Bohemia & Austria": 249,
+    "Poland & Baltic lands": 120,
+    "Italy": 61
+   }
+  },
+  "hre": {
+   "records": 2390,
+   "kinds": {
+    "town": 2390
+   },
+   "ownDates": 2388,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 2,
+   "startsFoundingDates": 94,
+   "withStatedCorrection": 0,
+   "earliestStart": -10000,
+   "latestStart": 1938,
+   "startsAfter1600": 29,
+   "withEndDate": 0,
+   "regions": {
+    "Germany": 1506,
+    "Bohemia & Austria": 276,
+    "Poland & Baltic lands": 269,
+    "Low Countries": 175,
+    "France": 159,
+    "Scandinavia & Baltic Sea": 5
+   }
+  },
+  "merimee": {
+   "records": 9875,
+   "kinds": {
+    "church": 7436,
+    "castle": 1979,
+    "monastery": 270,
+    "bridge": 156,
+    "market": 18,
+    "cathedral": 16
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 9875,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 100,
+   "latestStart": 1475,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "France": 8710,
+    "Iberia": 872,
+    "Low Countries": 163,
+    "Italy": 73,
+    "British Isles": 57
+   }
+  },
+  "mfairs": {
+   "records": 2371,
+   "kinds": {
+    "market": 2371
+   },
+   "ownDates": 2371,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 600,
+   "latestStart": 1516,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "British Isles": 2371
+   }
+  },
+  "nokm": {
+   "records": 8941,
+   "kinds": {
+    "settlement": 3915,
+    "site": 2210,
+    "church": 1692,
+    "market": 987,
+    "fortification": 137
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 8941,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 400,
+   "latestStart": 1350,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Scandinavia & Baltic Sea": 8941
+   }
+  },
+  "nsh": {
+   "records": 764,
+   "kinds": {
+    "settlement": 312,
+    "church": 255,
+    "site": 95,
+    "monastery": 56,
+    "castle": 43,
+    "market": 3
+   },
+   "ownDates": 465,
+   "evidencePeriodOnly": 299,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 870,
+   "latestStart": 1595,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Scandinavia & Baltic Sea": 482,
+    "Other": 281,
+    "Greece & Aegean": 1
+   }
+  },
+  "pleiades": {
+   "records": 34458,
+   "kinds": {
+    "settlement": 10274,
+    "villa": 2115,
+    "river": 1282,
+    "station": 1252,
+    "fort": 1150,
+    "people": 1038,
+    "road": 1004,
+    "cemetery": 700,
+    "bridge": 674,
+    "archaeological-site,settlement": 554
+   },
+   "ownDates": 26123,
+   "evidencePeriodOnly": 6591,
+   "noTemporalEvidence": 1744,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": -2600000,
+   "latestStart": 1600,
+   "startsAfter1600": 0,
+   "withEndDate": 26123,
+   "regions": {
+    "Italy": 6412,
+    "Greece & Aegean": 5362,
+    "North Africa": 3561,
+    "Anatolia": 2981,
+    "Iberia": 2476,
+    "France": 2344
+   }
+  },
+  "raa": {
+   "records": 5300,
+   "kinds": {
+    "site": 2430,
+    "settlement": 1999,
+    "church": 451,
+    "castle": 130,
+    "road": 98,
+    "hoard": 93,
+    "wreck": 79,
+    "monastery": 20
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 5300,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 375,
+   "latestStart": 1350,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Scandinavia & Baltic Sea": 5300
+   }
+  },
+  "ran": {
+   "records": 2865,
+   "kinds": {
+    "settlement": 1742,
+    "church": 471,
+    "site": 372,
+    "fortification": 194,
+    "monastery": 86
+   },
+   "ownDates": 0,
+   "evidencePeriodOnly": 2865,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 300,
+   "latestStart": 1600,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Hungary & Carpathian basin": 1519,
+    "Romania & Moldavia": 1346
+   }
+  },
+  "tib": {
+   "records": 2802,
+   "kinds": {
+    "settlement": 1214,
+    "site": 782,
+    "church": 506,
+    "monastery": 156,
+    "fortification": 144
+   },
+   "ownDates": 2225,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 577,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 1,
+   "latestStart": 1917,
+   "startsAfter1600": 8,
+   "withEndDate": 0,
+   "regions": {
+    "Greece & Aegean": 1291,
+    "Balkans": 1142,
+    "Italy": 194,
+    "Hungary & Carpathian basin": 103,
+    "Romania & Moldavia": 35,
+    "Bohemia & Austria": 33
+   }
+  },
+  "viabundus": {
+   "records": 7488,
+   "kinds": {
+    "settlement": 4702,
+    "settlement,town": 560,
+    "toll": 377,
+    "settlement,toll": 293,
+    "settlement,town,fair": 206,
+    "settlement,town,fair,toll": 174,
+    "bridge": 157,
+    "settlement,town,toll": 151,
+    "settlement,fair": 120,
+    "ferry": 93
+   },
+   "ownDates": 7208,
+   "evidencePeriodOnly": 280,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": -16,
+   "latestStart": 1860,
+   "startsAfter1600": 285,
+   "withEndDate": 186,
+   "regions": {
+    "Germany": 3949,
+    "Low Countries": 1527,
+    "Scandinavia & Baltic Sea": 1520,
+    "Poland & Baltic lands": 297,
+    "Bohemia & Austria": 126,
+    "France": 63
+   }
+  },
+  "wbohemia": {
+   "records": 839,
+   "kinds": {
+    "settlement": 839
+   },
+   "ownDates": 839,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 0,
+   "startsFoundingDates": 0,
+   "withStatedCorrection": 0,
+   "earliestStart": 993,
+   "latestStart": 1497,
+   "startsAfter1600": 0,
+   "withEndDate": 0,
+   "regions": {
+    "Bohemia & Austria": 839
+   }
+  },
+  "wikidata": {
+   "records": 77836,
+   "kinds": {
+    "castle": 31343,
+    "settlement": 25082,
+    "monastery": 17811,
+    "fortification": 1409,
+    "cathedral": 1309,
+    "diocese": 413,
+    "bridge": 322,
+    "university": 147
+   },
+   "ownDates": 40648,
+   "evidencePeriodOnly": 0,
+   "noTemporalEvidence": 37188,
+   "startsFoundingDates": 12035,
+   "withStatedCorrection": 1,
+   "earliestStart": -3399,
+   "latestStart": 1649,
+   "startsAfter1600": 688,
+   "withEndDate": 6590,
+   "regions": {
+    "Bohemia & Austria": 14234,
+    "Germany": 11354,
+    "France": 7639,
+    "British Isles": 6274,
+    "Hungary & Carpathian basin": 6262,
+    "Iberia": 6198
+   }
+  }
+ },
+ "buringh": {
+  "towns": 2237,
+  "positionTakenFromWikidata": 124,
+  "share": 0.055,
+  "movedKmMedian": 2.0,
+  "movedKmMax": 222,
+  "note": "Positions the source gives wrongly (lost decimals, another town of the name) are replaced by the matching Wikidata town, and the distance is stated on the record; there is no uniform shift to correct."
+ },
+ "tiles": [
+  {
+   "file": "public/world/tiles/domesday.pmtiles",
+   "bytes": 2958678,
+   "minZoom": 0,
+   "maxZoom": 10,
+   "bounds": [
+    -5.7159762,
+    49.9586785,
+    1.7651573,
+    54.6638033
+   ],
+   "layers": [
+    "units"
+   ],
+   "attribution": "Brookes, S. (2020) Domesday Shires and Hundreds of England, ADS, doi:10.5284/1058999 (CC BY 4.0)",
+   "tilesRead": 422,
+   "complete": true,
+   "featuresAtMaxZoom": 1899,
+   "geometry": {
+    "Polygon": 725,
+    "MultiPolygon": 378,
+    "Point": 796
+   },
+   "temporal": {
+    "no dates": 1899
+   },
+   "properties": [
+    "c",
+    "i",
+    "k",
+    "n"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/gough.pmtiles",
+   "bytes": 533107,
+   "minZoom": 4,
+   "maxZoom": 11,
+   "bounds": [
+    -5.4807777,
+    50.183189,
+    1.3040733,
+    54.9009657
+   ],
+   "layers": [
+    "gough"
+   ],
+   "attribution": "Oksanen, E., Brookes, S. (2024) The Routes and Roads of the Gough Map: GIS Database, ADS, doi:10.5284/1124312 (CC BY 4.0)",
+   "tilesRead": 745,
+   "complete": true,
+   "featuresAtMaxZoom": 649,
+   "geometry": {
+    "LineString": 452,
+    "Point": 179,
+    "MultiLineString": 18
+   },
+   "temporal": {
+    "no dates": 649
+   },
+   "properties": [
+    "c",
+    "ca",
+    "ev",
+    "i",
+    "k",
+    "lg",
+    "mg",
+    "n",
+    "no",
+    "pd",
+    "v"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/gs-dioceses.pmtiles",
+   "bytes": 710908,
+   "minZoom": 4,
+   "maxZoom": 9,
+   "bounds": [
+    3.4325766,
+    45.1038529,
+    28.2087904,
+    59.6709638
+   ],
+   "layers": [
+    "dioceses"
+   ],
+   "attribution": "Germania Sacra (CC BY-SA 3.0)",
+   "tilesRead": 761,
+   "complete": true,
+   "featuresAtMaxZoom": 2,
+   "geometry": {
+    "Polygon": 1,
+    "MultiPolygon": 1
+   },
+   "temporal": {
+    "no dates": 2
+   },
+   "properties": [
+    "n"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/hre-towns.pmtiles",
+   "bytes": 1187675,
+   "minZoom": 5,
+   "maxZoom": 10,
+   "bounds": [
+    6.08472,
+    47.4094399,
+    22.84472,
+    55.08333
+   ],
+   "layers": [
+    "towns"
+   ],
+   "attribution": "Princes and Townspeople (Bogucka, Cantoni, Mohr, Weigand), CC0",
+   "tilesRead": 1136,
+   "complete": true,
+   "featuresAtMaxZoom": 2390,
+   "geometry": {
+    "Point": 2390
+   },
+   "temporal": {
+    "own dates": 2388,
+    "no dates": 2
+   },
+   "properties": [
+    "a",
+    "cc",
+    "ch",
+    "f",
+    "fb",
+    "fd",
+    "i",
+    "lf",
+    "m",
+    "mt",
+    "n",
+    "q",
+    "rl"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/itinere.pmtiles",
+   "bytes": 12601696,
+   "minZoom": 3,
+   "maxZoom": 10,
+   "bounds": [
+    -9.7687,
+    12.714455,
+    43.4671179,
+    55.976665
+   ],
+   "layers": [
+    "roads"
+   ],
+   "attribution": "Itiner-e (Brughmans et al. 2024), CC BY 4.0",
+   "tilesRead": 11770,
+   "complete": true,
+   "featuresAtMaxZoom": 17159,
+   "geometry": {
+    "LineString": 16377,
+    "MultiLineString": 782
+   },
+   "temporal": {
+    "no dates": 16619,
+    "own dates": 540,
+    "end only": 11
+   },
+   "properties": [
+    "au",
+    "b",
+    "c",
+    "cp",
+    "f",
+    "fe",
+    "i",
+    "k",
+    "n",
+    "t",
+    "te"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/medieval-sites.pmtiles",
+   "bytes": 20708186,
+   "minZoom": 4,
+   "maxZoom": 11,
+   "bounds": [
+    -28.62883,
+    7.26282,
+    61.79917,
+    71.16579
+   ],
+   "layers": [
+    "sites"
+   ],
+   "attribution": "Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)",
+   "tilesRead": 38185,
+   "complete": true,
+   "featuresAtMaxZoom": 102518,
+   "geometry": {
+    "Point": 102518
+   },
+   "temporal": {
+    "own dates": 44237,
+    "evidence period": 20925,
+    "no dates": 37356,
+    "end only": 583
+   },
+   "properties": [
+    "bc",
+    "d",
+    "dio",
+    "ef",
+    "et",
+    "f",
+    "fb",
+    "gs",
+    "i",
+    "k",
+    "mr",
+    "n",
+    "nb",
+    "nl",
+    "o",
+    "per",
+    "riv",
+    "src",
+    "st",
+    "t",
+    "u"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/navigation.pmtiles",
+   "bytes": 801306,
+   "minZoom": 4,
+   "maxZoom": 11,
+   "bounds": [
+    -5.1437532,
+    50.2040488,
+    1.7337899,
+    55.7729588
+   ],
+   "layers": [
+    "nav"
+   ],
+   "attribution": "Oksanen, E. (2019) Inland Navigation in England and Wales before 1348: GIS Database, ADS, doi:10.5284/1057497 (CC BY 4.0)",
+   "tilesRead": 748,
+   "complete": true,
+   "featuresAtMaxZoom": 3,
+   "geometry": {
+    "LineString": 1,
+    "Point": 1,
+    "MultiLineString": 1
+   },
+   "temporal": {
+    "no dates": 3
+   },
+   "properties": [
+    "cl",
+    "co",
+    "h",
+    "k",
+    "ld",
+    "n",
+    "no",
+    "rf",
+    "w"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/pleiades.pmtiles",
+   "bytes": 4302126,
+   "minZoom": 3,
+   "maxZoom": 10,
+   "bounds": [
+    -13.8249999,
+    -22.3026,
+    120.0124,
+    63.2008
+   ],
+   "layers": [
+    "places"
+   ],
+   "attribution": "Pleiades (CC BY 3.0)",
+   "tilesRead": 9562,
+   "complete": true,
+   "featuresAtMaxZoom": 20340,
+   "geometry": {
+    "Point": 20340
+   },
+   "temporal": {
+    "own dates": 18748,
+    "no dates": 525,
+    "evidence period": 1067
+   },
+   "properties": [
+    "a",
+    "db",
+    "ef",
+    "eo",
+    "et",
+    "f",
+    "i",
+    "im",
+    "iw",
+    "l",
+    "n",
+    "p",
+    "r",
+    "t",
+    "ty",
+    "u"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/rural-settlement.pmtiles",
+   "bytes": 1094491,
+   "minZoom": 0,
+   "maxZoom": 10,
+   "bounds": [
+    -5.7194149,
+    49.9497293,
+    1.761682,
+    55.8077056
+   ],
+   "layers": [
+    "rural"
+   ],
+   "attribution": "Roberts, B. K. & Wrathmell, S., Atlas of Rural Settlement in England GIS © English Heritage (personal and business use; not for republication)",
+   "tilesRead": 470,
+   "complete": true,
+   "featuresAtMaxZoom": 3,
+   "geometry": {
+    "Polygon": 1,
+    "MultiPolygon": 1,
+    "Point": 1
+   },
+   "temporal": {
+    "no dates": 3
+   },
+   "properties": [
+    "ca",
+    "cd",
+    "d",
+    "ds",
+    "k",
+    "n",
+    "p",
+    "s"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/thurayya-places.pmtiles",
+   "bytes": 884112,
+   "minZoom": 3,
+   "maxZoom": 10,
+   "bounds": [
+    -9.6480999,
+    7.6075899,
+    83.42513,
+    55.7345599
+   ],
+   "layers": [
+    "places"
+   ],
+   "attribution": "al-Ṯurayyā Gazetteer (Romanov & Seydi), after G. Cornu",
+   "tilesRead": 3715,
+   "complete": true,
+   "featuresAtMaxZoom": 2518,
+   "geometry": {
+    "Point": 2518
+   },
+   "temporal": {
+    "no dates": 2518
+   },
+   "properties": [
+    "i",
+    "k",
+    "n",
+    "rg"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/thurayya-routes.pmtiles",
+   "bytes": 1762630,
+   "minZoom": 4,
+   "maxZoom": 10,
+   "bounds": [
+    -9.6485112,
+    12.7930065,
+    80.0390472,
+    54.8669116
+   ],
+   "layers": [
+    "routes"
+   ],
+   "attribution": "al-Ṯurayyā Gazetteer (Romanov & Seydi), after G. Cornu",
+   "tilesRead": 6236,
+   "complete": true,
+   "featuresAtMaxZoom": 2098,
+   "geometry": {
+    "LineString": 2053,
+    "MultiLineString": 45
+   },
+   "temporal": {
+    "no dates": 2098
+   },
+   "properties": [
+    "i",
+    "m"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/towns.pmtiles",
+   "bytes": 1504915,
+   "minZoom": 3,
+   "maxZoom": 10,
+   "bounds": [
+    -25.6699999,
+    28.0999999,
+    59.97,
+    68.9699999
+   ],
+   "layers": [
+    "towns"
+   ],
+   "attribution": "Buringh, European urban population 700–2000 (DANS, CC0)",
+   "tilesRead": 3898,
+   "complete": true,
+   "featuresAtMaxZoom": 2237,
+   "geometry": {
+    "Point": 2237
+   },
+   "temporal": {
+    "no dates": 2237
+   },
+   "properties": [
+    "a",
+    "c",
+    "fx",
+    "i",
+    "n",
+    "p1000",
+    "p1100",
+    "p1200",
+    "p1300",
+    "p1400",
+    "p1500",
+    "p1550",
+    "p1600",
+    "p1650",
+    "p1700",
+    "p1750",
+    "p1800",
+    "p1850",
+    "p1900",
+    "p1950",
+    "p2000",
+    "p700",
+    "p800",
+    "p900",
+    "q"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/viabundus-edges.pmtiles",
+   "bytes": 8791075,
+   "minZoom": 4,
+   "maxZoom": 11,
+   "bounds": [
+    1.613526,
+    48.720509,
+    37.620599,
+    65.860219
+   ],
+   "layers": [
+    "edges"
+   ],
+   "attribution": "Viabundus 2 (CC BY 4.0)",
+   "tilesRead": 9984,
+   "complete": true,
+   "featuresAtMaxZoom": 23145,
+   "geometry": {
+    "LineString": 22593,
+    "MultiLineString": 552
+   },
+   "temporal": {
+    "no dates": 21644,
+    "own dates": 1501,
+    "end only": 173
+   },
+   "properties": [
+    "c",
+    "f",
+    "i",
+    "k",
+    "t"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "public/world/tiles/viabundus-nodes.pmtiles",
+   "bytes": 1567304,
+   "minZoom": 3,
+   "maxZoom": 11,
+   "bounds": [
+    2.12566,
+    48.72051,
+    31.71102,
+    65.8618799
+   ],
+   "layers": [
+    "nodes"
+   ],
+   "attribution": "Viabundus 2 (CC BY 4.0)",
+   "tilesRead": 5131,
+   "complete": true,
+   "featuresAtMaxZoom": 7454,
+   "geometry": {
+    "Point": 7454
+   },
+   "temporal": {
+    "no dates": 272,
+    "own dates": 7182,
+    "end only": 9
+   },
+   "properties": [
+    "f",
+    "i",
+    "l",
+    "n",
+    "t",
+    "tf"
+   ],
+   "flags": {},
+   "visibility": "public"
+  },
+  {
+   "file": "data/private-pack/build/tiles/private-lines.pmtiles",
+   "bytes": 8512146,
+   "minZoom": 4,
+   "maxZoom": 11,
+   "bounds": [
+    15.0867219,
+    49.1815414,
+    23.7951495,
+    54.9135873
+   ],
+   "layers": [
+    "features"
+   ],
+   "attribution": "Atlas Fontium (IH PAN) — private use, not republished",
+   "tilesRead": 2255,
+   "complete": true,
+   "featuresAtMaxZoom": 4,
+   "geometry": {
+    "LineString": 1,
+    "MultiLineString": 1,
+    "Polygon": 1,
+    "MultiPolygon": 1
+   },
+   "temporal": {
+    "evidence period": 4
+   },
+   "properties": [
+    "ef",
+    "et",
+    "k",
+    "w"
+   ],
+   "flags": {},
+   "visibility": "private"
+  },
+  {
+   "file": "data/private-pack/build/tiles/private-sites.pmtiles",
+   "bytes": 16853149,
+   "minZoom": 5,
+   "maxZoom": 11,
+   "bounds": [
+    -6.33333,
+    15.5150599,
+    40.0,
+    67.8632799
+   ],
+   "layers": [
+    "sites"
+   ],
+   "attribution": "Private data pack — used privately in Shelf, not republished",
+   "tilesRead": 14300,
+   "complete": true,
+   "featuresAtMaxZoom": 85739,
+   "geometry": {
+    "Point": 85739
+   },
+   "temporal": {
+    "evidence period": 43162,
+    "no dates": 3783,
+    "own dates": 38794,
+    "end only": 281
+   },
+   "properties": [
+    "dt",
+    "ef",
+    "et",
+    "f",
+    "fb",
+    "fr",
+    "i",
+    "k",
+    "m",
+    "mk",
+    "n",
+    "per",
+    "src",
+    "t",
+    "ty",
+    "u"
+   ],
+   "flags": {},
+   "visibility": "private"
+  }
+ ],
+ "geojson": [
+  {
+   "file": "public/atlas/awmc-inland-water.json",
+   "features": 6393,
+   "geometry": {
+    "Polygon": 6375,
+    "MultiPolygon": 18
+   },
+   "temporal": {
+    "no dates": 6393
+   },
+   "flags": {
+    "invalid polygon": {
+     "count": 32,
+     "examples": [
+      {
+       "id": null,
+       "why": "Self-intersection[30.8058 38.4188]"
+      },
+      {
+       "id": null,
+       "why": "Too few points in geometry component[31.8517 38.9521]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[28.2761 45.3615]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[-0.2461 52.7779]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[12.2333 52.7446]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[23.2494 51.4376]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[23.7072 49.7495]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[-6.1347 34.6683]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[44.413429661181 1.64360685382381]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[72.7658 20.9849]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[79.0586142857143 33.7424]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[-6.60277142857143 38.8636571428571]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[-4.2472 51.6468]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[-3.8358 51.6211]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[19.0636457049428 47.1311482706578]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[31.5577 31.3354]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[28.041 45.0914]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[28.0516 45.1439]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[28.0006 45.3725]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[29.1843 45.1907]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[34.3547 46.2263]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[37.4564 45.1565]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[45 45.3148]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[44.8918 45.2926]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[48.7164 46.0005]"
+      },
+      {
+       "id": null,
+       "why": "Ring Self-intersection[69.4491 37.2976]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[47.9329 40.0463]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[-4.3806089715536 58.2125555798687]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[-4.3806089715536 58.2125555798687]"
+      },
+      {
+       "id": null,
+       "why": "Self-intersection[-3.227 54.256]"
+      },
+      {
+       "id": null,
+       "why": "Too few points in geometry component[4.5024 43.4741]"
+      },
+      {
+       "id": null,
+       "why": "Too few points in geometry component[3.542 43.322]"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "public/atlas/awmc-roads.json",
+   "features": 3165,
+   "geometry": {
+    "LineString": 3054,
+    "MultiLineString": 111
+   },
+   "temporal": {
+    "own dates": 1167,
+    "no dates": 1998
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/awmc-shoreline.json",
+   "features": 9901,
+   "geometry": {
+    "LineString": 9888,
+    "MultiLineString": 13
+   },
+   "temporal": {
+    "own dates": 1211,
+    "no dates": 8690
+   },
+   "flags": {
+    "zero-length line": {
+     "count": 4,
+     "examples": [
+      null,
+      null,
+      null,
+      null
+     ]
+    }
+   }
+  },
+  {
+   "file": "public/atlas/awmc-snapshots.json",
+   "features": 183,
+   "geometry": {
+    "MultiPolygon": 5,
+    "Polygon": 2,
+    "LineString": 176
+   },
+   "temporal": {
+    "own dates": 183
+   },
+   "flags": {
+    "invalid polygon": {
+     "count": 2,
+     "examples": [
+      {
+       "id": "Roman Empire at its greatest extent, 117 CE",
+       "why": "Too few points in geometry component[18.436 28.915]"
+      },
+      {
+       "id": "Roman Empire, 200 CE",
+       "why": "Too few points in geometry component[18.436 28.915]"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "file": "public/atlas/hced-battles.json",
+   "features": 1070,
+   "geometry": {
+    "Point": 1070
+   },
+   "temporal": {
+    "no dates": 1070
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/ne-land.json",
+   "features": 1420,
+   "geometry": {
+    "Polygon": 1419,
+    "MultiPolygon": 1
+   },
+   "temporal": {
+    "no dates": 1420
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/ne-rivers.json",
+   "features": 1201,
+   "geometry": {
+    "MultiLineString": 338,
+    "LineString": 863
+   },
+   "temporal": {
+    "no dates": 1201
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/pleiades-lines.json",
+   "features": 612,
+   "geometry": {
+    "LineString": 612
+   },
+   "temporal": {
+    "own dates": 598,
+    "no dates": 14
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/pleiades-provinces.json",
+   "features": 193,
+   "geometry": {
+    "Polygon": 193
+   },
+   "temporal": {
+    "no dates": 181,
+    "own dates": 12
+   },
+   "flags": {}
+  },
+  {
+   "file": "public/atlas/wikidata-events.json",
+   "features": 11670,
+   "geometry": {
+    "Point": 11670
+   },
+   "temporal": {
+    "no dates": 11670
+   },
+   "flags": {}
+  }
+ ],
+ "seconds": 86
+}
