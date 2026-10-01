@@ -7,7 +7,7 @@
 import 'fake-indexeddb/auto';
 import { featureFilter } from '@maplibre/maplibre-gl-style-spec';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { LAYERS, type LayerCtx } from './catalog';
+import { LAYERS, type LayerCtx, UNDATED_MINZOOM } from './catalog';
 import { cellOf, crc32, getPlace, matchName, nameShard, namesAround, normName, placeConfidence, placesByName, recordFit, temporalSupport } from './gazetteer';
 import { offlineUnique, resolvePlace } from './resolve';
 import { existedIn, timeFit } from './time';
@@ -220,5 +220,53 @@ describe('sources: specialist, aggregator and incidental records of one place', 
     const m = await matchName('Hansestadt', 1150);
     expect(m.place?.gazetteer).toBe('viabundus'); // the specialist still leads…
     expect(m.temporal).toBe('attested'); // …but the place is recorded in 1150, by Wikidata's first mention
+  });
+});
+
+describe('undated and later-recorded sites on the map: kept, but never cluttering earlier dates', () => {
+  const spec = (layer: string, year: number, showUndated: boolean, part: 'pt' | 'undated') =>
+    LAYERS.find((l) => l.id === layer)!.specs({ year, base: '/atlas/', showUndated } as LayerCtx).find((s) => s.id === `${layer}-${part}`) as { filter: unknown; minzoom?: number } | undefined;
+  const drawn = (layer: string, props: Record<string, unknown>, year: number, showUndated: boolean, zoom = 6) => {
+    const hit = (part: 'pt' | 'undated') => {
+      const s = spec(layer, year, showUndated, part);
+      return !!s && zoom >= (s.minzoom ?? 0) && featureFilter(s.filter as never).filter({ zoom } as never, { type: 1, properties: props } as never);
+    };
+    return hit('pt') || hit('undated');
+  };
+  const church = { k: 'monastery', w0: 500, w1: 1650 }; // a Wikidata religious house with no date at all
+  it('a place with no date at all is never on the overview map, at any date', () => {
+    for (const y of [68, 900, 1000, 1100, 1200, 1300, 1400]) {
+      expect(drawn('religious-houses', church, y, true, 6)).toBe(false);
+      expect(drawn('religious-houses', church, y, false, 12)).toBe(false); // and never without "Include undated records"
+    }
+  });
+  it('zoomed in to town level it appears as a grey "?" — only inside the period its dataset covers', () => {
+    expect(spec('religious-houses', 1200, true, 'undated')?.minzoom).toBe(UNDATED_MINZOOM);
+    expect(drawn('religious-houses', church, 1200, true, 10)).toBe(true);
+    expect(drawn('religious-houses', church, 68, true, 10)).toBe(false);
+    expect(spec('religious-houses', 1200, false, 'undated')).toBeUndefined();
+  });
+  it('a church first recorded in 1200 appears 60 years before its first record, not earlier', () => {
+    const later = { ...church, f: 1200, fb: 'first mention' };
+    expect(drawn('religious-houses', later, 1100, true)).toBe(false);
+    expect(drawn('religious-houses', later, 1100, true, 12)).toBe(false);
+    expect(drawn('religious-houses', later, 1140, true)).toBe(true);
+    expect(drawn('religious-houses', later, 1140, false)).toBe(false);
+    expect(drawn('religious-houses', later, 1300, false)).toBe(true);
+  });
+  it('a period from its architectural style: drawn inside it; 60 years before it on request; not earlier', () => {
+    const gothic = { ...church, ef: 1140, per: 'period of its architectural style (Wikidata)' };
+    expect(drawn('religious-houses', gothic, 1300, false)).toBe(true);
+    expect(drawn('religious-houses', gothic, 1100, true)).toBe(true);
+    expect(drawn('religious-houses', gothic, 1000, true)).toBe(false);
+  });
+  it('tiles built before the window existed keep medieval sites off ancient maps (the layer’s own period)', () => {
+    expect(drawn('castles', { k: 'castle' }, 68, true, 12)).toBe(false);
+    expect(drawn('castles', { k: 'castle' }, 1200, true, 12)).toBe(true);
+  });
+  it('a market is not drawn before its first recorded grant', () => {
+    const market = { k: 'market', src: 'mfairs', m: 1227, w0: 1227, w1: 1516 };
+    expect(drawn('medieval-markets', market, 1100, true, 12)).toBe(false);
+    expect(drawn('medieval-markets', market, 1300, true, 12)).toBe(true);
   });
 });

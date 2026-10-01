@@ -23,6 +23,11 @@ const layerFilter = (id: string, year: number, showUndated = false) => {
   const spec = LAYERS.find((l) => l.id === id)!.specs(ctx(year, showUndated)).find((s) => s.type === 'circle')! as { filter: unknown };
   return (props: Record<string, unknown>) => featureFilter(spec.filter as never).filter({ zoom: 8 } as never, { type: 1, properties: props } as never);
 };
+/** The grey "?" layer for sites with no date (drawn only when undated records are included, from town-level zoom). */
+const undatedFilter = (id: string, year: number) => {
+  const spec = LAYERS.find((l) => l.id === id)!.specs(ctx(year, true)).find((s) => s.id === `${id}-undated`)! as { filter: unknown };
+  return (props: Record<string, unknown>) => featureFilter(spec.filter as never).filter({ zoom: 10 } as never, { type: 1, properties: props } as never);
+};
 const evalExpr = (expr: unknown, props: Record<string, unknown>) => {
   const e = expression.createExpression(expr as never);
   if (e.result !== 'success') throw new Error('bad expression');
@@ -108,7 +113,9 @@ describe('site layers follow the recorded dates', () => {
   });
   it('an undated castle is not evidence for any year: hidden unless undated records are asked for', () => {
     expect(layerFilter('castles', 1300)({ k: 'castle' })).toBe(false);
-    expect(layerFilter('castles', 1300, true)({ k: 'castle' })).toBe(true);
+    // Asked for, it is a grey "?" from town-level zoom, never a dot on the overview map.
+    expect(layerFilter('castles', 1300, true)({ k: 'castle' })).toBe(false);
+    expect(undatedFilter('castles', 1300)({ k: 'castle' })).toBe(true);
   });
   it('religious houses and castles stay in their own layers', () => {
     expect(layerFilter('religious-houses', 1300)({ k: 'castle', f: 1000 })).toBe(false);
@@ -175,8 +182,9 @@ describe('what a start date means', () => {
     const first = { k: 'castle', f: 1300, fb: 'first mention' };
     const built = { k: 'castle', f: 1300, fb: 'founded' };
     expect(layerFilter('castles', 1200)(first)).toBe(false);
-    expect(layerFilter('castles', 1200, true)(first)).toBe(true);
-    expect(layerFilter('castles', 1200, true)(built)).toBe(false);
+    expect(layerFilter('castles', 1200, true)(first)).toBe(false); // a century before its first record: not drawn
+    expect(layerFilter('castles', 1250, true)(first)).toBe(true); // within 60 years of it: hollow, on request
+    expect(layerFilter('castles', 1250, true)(built)).toBe(false);
     expect(layerFilter('castles', 1350)(first)).toBe(true);
   });
   it('a house is not drawn after its recorded dissolution, even with unevidenced records on', () => {
@@ -185,8 +193,9 @@ describe('what a start date means', () => {
   it('a site with only an end date is not evidence for any earlier year: not drawn at 3000 BCE, nor offered for it', async () => {
     const endOnly = { k: 'castle', t: 1600 };
     for (const y of [-3000, 117, 1300]) expect(layerFilter('castles', y)(endOnly)).toBe(false);
-    expect(layerFilter('castles', 1300, true)(endOnly)).toBe(true); // shown hollow when unevidenced records are asked for
-    expect(layerFilter('castles', -3000, true)(endOnly)).toBe(false); // never before the layer's own period
+    expect(layerFilter('castles', 1300, true)(endOnly)).toBe(false); // an end says nothing about a beginning:
+    expect(undatedFilter('castles', 1300)(endOnly)).toBe(true); //        like an undated site, a grey "?" when zoomed in
+    expect(undatedFilter('castles', -3000)(endOnly)).toBe(false); // never before the layer's own period
     expect(layerFilter('castles', 1600)(endOnly)).toBe(true);
     const r = rows.find((x) => x[0] === 'wikidata' && x[7] === null && x[8] !== null && (x[8] as number) > 1000)!;
     const p = (await getPlace(`wikidata:${r[1]}`))!;

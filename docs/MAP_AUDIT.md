@@ -123,3 +123,46 @@ symlink out and malformed encoding. (The server listens on 127.0.0.1 by default;
   Machines, Beyond the Tribal Hidage.
 - Mobile: the pack install was verified in a phone-sized Chromium, and earlier on the owner's S21; low-memory phones
   are untested.
+
+## 5. Follow-up: undated records on ancient maps (1 October 2026)
+
+**Problem.** With "Include undated records" on, a map of 68 CE drew 1,958 medieval sites in Poland, 19,318 in Germany,
+33,473 in France and 4,888 in Italy. Two kinds: records with no date at all (mostly Wikidata castles, religious houses,
+cathedrals and dioceses, which the snapshot takes regardless of date), and records first recorded later (a church first
+mentioned in 1200, a DicoTopo commune first attested in 1150), which were drawn hollow at every earlier year back to
+3000 BCE.
+
+**Hidden temporal evidence, audited per dataset** (nothing invented; what is not in the source stays missing):
+
+| Dataset | Undated records | What the source holds | Used? |
+|---|---|---|---|
+| Wikidata snapshot | 39,880 items without inception, first mention, dissolution or start/end | Other dated statements, fetched for those items only (`wikidata_dates.py` → `raw/wikidata-medieval/original/temporal-evidence.json`): 4,087 statements on 3,136 items — architectural style 2,806, P31 start 576, dated events 377, opening 172, time period 106, culture 50 | **Yes**: 826 records get a first attestation (earliest dated event/opening/use — evidence it existed then, never a founding); 1,094 get an evidence period from their style, time period or culture, using only the dates Wikidata records for that style/period (styles with no recorded dates add nothing) |
+| Wikidata descriptions | — | A century or year in about 3 % of descriptions, often of a later rebuilding | No — too ambiguous |
+| EBIDAT | 1,112 ("unbekannt" 1,096, "Älter" 16); end dates already imported | 72 history texts say "erstmals erwähnt <year>", but often of the village, a church or a successor | No — would date the wrong thing |
+| TIB | 693 with geometry (mostly rivers, regions, islands) | No dated relations; scholarly prose covering many periods | No |
+| Markets and fairs (private) | The map tiles lacked the grant year the gazetteer already had | First grant per place | **Yes**: not drawn before its first grant |
+| DicoTopo, Germania Sacra, Nordic, Bridges | Dated by first attestation | — | Already imported; only the display before the first record changed |
+
+**The map rule (revised the same day, at the owner's choice — the problem was at every date, not one):**
+- Records with dates or an evidence period: unchanged.
+- First recorded later, or before an evidence period begins: drawn hollow from **60 years** before that record, never
+  further back (only when "Include undated records" is on).
+- No date at all (or only an end, which says nothing about a beginning): never on the overview map. With "Include
+  undated records" on, they appear as **grey "?" dots from zoom 9 (town level)**, inside their dataset's period.
+- Measured, Poland area, undated records on, overview zoom: 900 — 2,988 → 396; 1100 — 2,675 → 531; 1200 — 2,800 → 869
+  (without undated records: 387, 482, 714). At town zoom the undated places are all still there (1,750–2,970).
+
+The first version of the rule, kept for the record (`sitePoints`, `catalog.ts`; windows written by `with_window` in `sites.py`):
+- Records with dates or an evidence period: unchanged.
+- A record with no evidence at the chosen year — no dates, first recorded later, only an end date, or before its evidence
+  period begins — is drawn only when the reader includes undated records, and then only inside the period its dataset
+  documents itself as covering (the `core` of the dataset registry, e.g. Wikidata 500–1650, DicoTopo 800–1600), as hollow.
+  That window is a display bound, not a date for the record: in lookups the record stays "no dates in the source".
+- A building style dates the building's form, not the place's beginning, so a church listed as Baroque (from 1600) is
+  still shown (hollow, on request) in 1300.
+- Tiles built before this change fall back to the site layers' own period (300–1900).
+
+**Measured** (site layers, all records drawn, "Include undated records" on, 68 CE): Poland 1,958 → 6, Germany
+19,318 → 15, France 33,473 → 31, Italy 4,888 → 88 (those left have dates at or before 68 CE: early fortifications,
+dated shipwrecks). At 1200 CE with undated records on, more is available than before (Poland 2,615 → 2,800); nothing
+was removed. Default views (undated off) are unchanged.

@@ -139,6 +139,7 @@ raw/*/derived-*.json
 !raw/wikidata-medieval/original/settlement.tsv
 !raw/wikidata-medieval/original/siege.names.tsv
 !raw/wikidata-medieval/original/siege.tsv
+!raw/wikidata-medieval/original/temporal-evidence.json
 !raw/wikidata-medieval/original/town.names.tsv
 !raw/wikidata-medieval/original/town.tsv
 !raw/wikidata-medieval/original/university.names.tsv

@@ -537,7 +537,7 @@ checked against its recorded SHA-256.
 | tribal-hidage | 5/5 | ✓ | ✓ | no | — | — | — | raw only |
 | viabundus | 21/21 | ✓ | ✓ | no | atlas-build/world.py | 7488 | viabundus-nodes.pmtiles, viabundus-edges.pmtiles | integrated |
 | western-bohemia-toponyms | 5/5 | ✓ | ✓ | no | atlas-build/regional.py | 839 | medieval-sites.pmtiles | integrated |
-| wikidata-medieval | 26/26 | ✓ | ✓ | no | atlas-build/sites.py | 77836 | medieval-sites.pmtiles | integrated |
+| wikidata-medieval | 27/27 | ✓ | ✓ | no | atlas-build/sites.py | 77836 | medieval-sites.pmtiles | integrated |
 
 <!-- VAULT:END -->
 
