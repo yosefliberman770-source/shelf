@@ -1,0 +1,168 @@
+{
+ "id": "nmrw-wales",
+ "src": "nmrw",
+ "public": true,
+ "enabled": true,
+ "title": "National Monuments Record of Wales (RCAHMW, Coflein)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://coflein.gov.uk/",
+ "describe": "Sites in the National Monuments Record of Wales with the periods the record gives; years from the FISH period thesaurus shared by the national monument records of Britain (stated in each label). Records of unknown, general or only prehistoric date are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "nmrw-wales/original/nmrw.geojson"
+ },
+ "fields": {
+  "id": "nprn",
+  "name": "name",
+  "type": [
+   "site_type"
+  ],
+  "context": [
+   "community",
+   "old_county"
+  ],
+  "kind": {
+   "field": "site_type",
+   "firstToken": true,
+   "map": {
+    "wreck": "wreck",
+    "chapel": "church",
+    "church": "church",
+    "cathedral": "church",
+    "abbey": "monastery",
+    "priory": "monastery",
+    "friary": "monastery",
+    "nunnery": "monastery",
+    "castle": "castle",
+    "motte": "castle",
+    "motte and bailey": "castle",
+    "hillfort": "castle",
+    "fort": "castle",
+    "tower house": "castle",
+    "corn mill": "mill",
+    "water mill": "mill",
+    "watermill": "mill",
+    "windmill": "mill",
+    "woollen mill": "mill",
+    "fulling mill": "mill",
+    "mill": "mill",
+    "quarry": "mine",
+    "mine": "mine",
+    "lead mine": "mine",
+    "copper mine": "mine",
+    "coal mine": "mine",
+    "slate quarry": "mine",
+    "bridge": "bridge",
+    "road": "road",
+    "trackway": "road",
+    "toll house": "road",
+    "harbour": "harbour",
+    "quay": "harbour",
+    "jetty": "harbour",
+    "lighthouse": "lighthouse",
+    "canal": "canal",
+    "railway station": "station",
+    "house": "building",
+    "dwelling": "building",
+    "farmhouse": "building",
+    "farmstead": "building",
+    "barn": "building",
+    "country house": "building",
+    "cottage": "building",
+    "inn": "building",
+    "public house": "building",
+    "deserted rural settlement": "settlement",
+    "settlement": "settlement",
+    "village": "settlement",
+    "town": "settlement",
+    "hamlet": "settlement"
+   },
+   "default": "site"
+  }
+ },
+ "dating": {
+  "mode": "periods",
+  "field": "period",
+  "sep": ";",
+  "label": "FISH period thesaurus",
+  "table": {
+   "roman": [
+    43,
+    410
+   ],
+   "early medieval": [
+    410,
+    1066
+   ],
+   "medieval": [
+    1066,
+    1540
+   ],
+   "post medieval": [
+    1540,
+    1901
+   ],
+   "modern": [
+    1901,
+    2050
+   ],
+   "16th century": [
+    1500,
+    1599
+   ],
+   "17th century": [
+    1600,
+    1699
+   ],
+   "18th century": [
+    1700,
+    1799
+   ],
+   "19th century": [
+    1800,
+    1899
+   ],
+   "20th century": [
+    1900,
+    1999
+   ],
+   "21st century": [
+    2000,
+    2099
+   ],
+   "iron age": [
+    -800,
+    43
+   ],
+   "bronze age": [
+    -2350,
+    -800
+   ],
+   "neolithic": [
+    -4000,
+    -2350
+   ],
+   "mesolithic": [
+    -10000,
+    -4000
+   ],
+   "palaeolithic": [
+    -500000,
+    -10000
+   ],
+   "prehistoric": [
+    -500000,
+    43
+   ]
+  },
+  "ignore": [
+   "unknown",
+   "multiperiod",
+   "general",
+   ""
+  ]
+ },
+ "datingLabel": "periods in the record"
+}

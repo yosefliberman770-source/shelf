@@ -7,10 +7,28 @@ import tiler
 
 def build_cassini_roads(tiles_dir):
     # Roads drawn on dated historical maps: Cassini (France, 1756–1815) and Lutsch (Transylvania, 1751).
+    import generic
     feats = registers.cassini_roads() + registers.lutsch_roads()
-    return tiler.build(os.path.join(tiles_dir, 'cassini-roads.pmtiles'), 'roads', feats, 11, 'Roads on dated historical maps',
-                       'Perret, Gribaudi & Barthelemy, 18th century Cassini roads and cities (Harvard Dataverse, CC0); '
-                       'Lutsch map of Transylvania 1751, roads and mountain paths (Harvard Dataverse, CC BY-NC-SA 4.0)')
+    credits = ['Perret, Gribaudi & Barthelemy, 18th century Cassini roads and cities (Harvard Dataverse, CC0)',
+               'Lutsch map of Transylvania 1751, roads and mountain paths (Harvard Dataverse, CC BY-NC-SA 4.0)']
+    # Line datasets read through spec files (data/historical/specs, "geometry": "lines", public only).
+    for sp in generic.specs(public=True, geometry='lines'):
+        if 'roads-cassini' in (sp.get('layers') or []):
+            feats += generic.line_features(sp)
+            credits.append(f"{sp['title']} ({sp['licence']})")
+    return tiler.build(os.path.join(tiles_dir, 'cassini-roads.pmtiles'), 'roads', feats, 11, 'Roads in dated sources', '; '.join(credits))
+
+
+def build_spec_areas(tiles_dir):
+    """Dated historical territorial units read through spec files ("geometry": "polygons", public only)."""
+    import generic
+    feats, credits = [], []
+    for sp in generic.specs(public=True, geometry='polygons'):
+        feats += generic.area_features(sp)
+        credits.append(f"{sp['title']} ({sp['licence']})")
+    if not feats:
+        return {}
+    return tiler.build(os.path.join(tiles_dir, 'historical-units.pmtiles'), 'units', feats, 10, 'Historical territorial units in dated sources', '; '.join(credits))
 
 
 def build_inscriptions(tiles_dir):

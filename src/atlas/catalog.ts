@@ -95,7 +95,7 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
 const privateTile = (file: string) => privateHas(`tiles/${file}`);
 const PRIVATE_SITES = () => privateTile('private-sites.pmtiles');
 /** The site layers draw the public sites and, where the private pack is loaded, the private ones. */
-const siteSources = () => ['medieval-sites', 'register-sites', ...(PRIVATE_SITES() ? ['private-sites'] : [])];
+const siteSources = () => ['medieval-sites', 'register-sites', 'spec-sites', ...(PRIVATE_SITES() ? ['private-sites'] : [])];
 
 export interface LayerCtx {
   year: HistYear;
@@ -191,8 +191,10 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'hre-towns': (c) => pmtiles(c, 'hre-towns.pmtiles', 'hre', 10),
   // From the private data pack only (licence not verified, or no republishing): never on the public site.
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
-  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas', 'wdextra', ...(Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public)] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
-  'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'arkas', 'wdextra'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'spec-sites': (c) => ({ ...pmtiles(c, 'spec-sites.pmtiles', 'zbiva', 11), attribution: ((Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && !(SPEC_DATASETS[k].layers as string[]).every((l) => ['roads-cassini', 'historical-units'].includes(l))) as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'historical-units': (c) => ({ ...pmtiles(c, 'historical-units.pmtiles', 'halcareas' as DatasetId, 10), attribution: ((Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('historical-units')) as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch', ...(Object.keys(SPEC_DATASETS) as SpecDatasetId[]).filter((k) => SPEC_DATASETS[k].public && (SPEC_DATASETS[k].layers as string[]).includes('roads-cassini'))] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),
   'gs-dioceses': (c) => pmtiles(c, 'gs-dioceses.pmtiles', 'germaniasacra', 9),
@@ -539,8 +541,8 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine', 'wdextra'], defaultOn: true, coverage: SITES,
     hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918) and on the Russian 3-verst map (surveyed 1877–1879); the settlements of the Kingdom of Romania, 1904–1913 (RoHGIS); Icelandic farms in the Jarðabók of 1703; Swedish villages, churches and mills on the land-survey maps of 1630–1655; places named in medieval inquisition registers (1240s–1520s); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date. A place listed in one year is drawn (lighter) within 25 years of it.',
-    sources: ['register-sites'],
-    specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites'] }),
+    sources: ['register-sites', 'spec-sites'],
+    specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites', 'spec-sites'] }),
   },
   {
     id: 'inscriptions', group: 'places', alsoIn: ['economic'], label: 'Latin inscriptions (find-spots, 100–799)', datasets: ['lirelist'], defaultOn: true, coverage: [100, 799],
@@ -729,8 +731,8 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'roads-cassini', group: 'infrastructure', label: 'Roads on dated historical maps (Cassini France 1756–1815, Lutsch Transylvania 1751)', datasets: ['cassini', 'lutsch'], defaultOn: true, coverage: [1726, 1815],
-    hint: 'Roads as drawn on two dated maps. France: the Cassini map (sheets surveyed 1756–1789, published to 1815), digitised by Perret, Gribaudi & Barthelemy — shown only within those years; the dataset does not give each sheet’s year. Transylvania: main roads and mountain paths on the Lutsch map of 1751 — evidence for that year, drawn lighter within 25 years of it. Fainter: marked uncertain in the source.', sources: ['cassini-roads'],
+    id: 'roads-cassini', group: 'infrastructure', label: 'Roads in dated sources (Cassini France, Lutsch Transylvania, medieval Levant)', datasets: ['cassini', 'lutsch'], defaultOn: true, coverage: [650, 1815],
+    hint: 'Roads as a dated source draws them. France: the Cassini map (sheets surveyed 1756–1789, published to 1815), digitised by Perret, Gribaudi & Barthelemy — shown only within those years; the dataset does not give each sheet’s year. Transylvania: main roads and mountain paths on the Lutsch map of 1751 — evidence for that year, drawn lighter within 25 years of it. The Levant: the medieval road network reconstructed by VIA-TARIQ from itineraries, geographers and archaeology, each road shown for the period it is mapped in (650–950, 950–1250, 1250–1350, 1350–1517). Fainter: marked uncertain (conjectured or hypothetical course) in the source.', sources: ['cassini-roads'],
     specs: (c) => {
       const y = c.year;
       const filter = ['any',
@@ -965,6 +967,25 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
+    id: 'historical-units', group: 'political', label: 'Territorial units in dated sources (Low Countries c. 1500)', datasets: [], defaultOn: true, coverage: [1475, 1525],
+    hint: 'Counties, duchies, prince-bishoprics and their districts as a dated source reconstructs them — the Low Countries c. 1500 from the Historical Atlas of the Low Countries (merged from its locality boundaries). A reconstruction for one moment: drawn within 25 years of it, lighter away from it. Where rule over a place was divided or contested the source names several holders; the map draws it with the first.',
+    sources: ['historical-units'],
+    specs: (c) => {
+      const y = c.year;
+      const when = ['any',
+        ['all', ['!', ['has', 'sn']], ['<=', ['get', 'ef'], y], ['>=', ['get', 'et'], y]],
+        ['all', ['has', 'sn'], ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS]]] as FilterSpecification;
+      const lv = (v: string) => ['all', when, ['==', ['get', 'lv'], v]] as FilterSpecification;
+      const fade = ['case', ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.55, 0.9] as ExpressionSpecification;
+      return [
+        { id: 'hunits-district', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('district'), minzoom: 6, paint: { 'line-color': C.province, 'line-width': 0.6, 'line-dasharray': [2, 1.5], 'line-opacity': fade } },
+        { id: 'hunits-county', type: 'line', source: 'historical-units', 'source-layer': 'units', filter: lv('county / duchy / prince-bishopric'), paint: { 'line-color': C.province, 'line-width': 1.8, 'line-opacity': fade } },
+        { id: 'hunits-label', type: 'symbol', source: 'historical-units', 'source-layer': 'units', filter: lv('county / duchy / prince-bishopric'), minzoom: 5,
+          layout: { 'text-field': ['get', 'n'], 'text-size': 12, 'text-font': FONT_ITALIC, 'symbol-placement': 'point' }, paint: { 'text-color': C.province, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': fade } },
+      ];
+    },
+  },
+  {
     id: 'poland-1580-units', group: 'political', label: 'Poland c. 1580: voivodeships, districts, dioceses & parishes (private data)', datasets: ['localonly'], defaultOn: false, coverage: [1500, 1650],
     get unavailableKind() { return privateTile('private-lines.pmtiles') ? undefined : 'licence' as const; },
     get unavailable() { return privateTile('private-lines.pmtiles') ? undefined : 'Needs your private data file (Atlas Fontium has no stated licence to republish).'; },
@@ -1055,7 +1076,7 @@ const LABEL_PRIORITY: Record<string, number> = {
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'historical-units', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
   'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'gazetteer-settlements', 'inscriptions', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

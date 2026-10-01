@@ -584,16 +584,23 @@ def build(rows_only=False):
                                  'Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)')
     reg_zoom = {'cathedral': 6, 'monastery': 7, 'castle': 8, 'fortification': 9, 'settlement': 9, 'church': 9, 'market': 8, 'bridge': 10,
                 'harbour': 9, 'wreck': 10, 'mill': 10, 'mine': 10, 'road': 10, 'site': 11, 'building': 11}
-    rfeats = []
+    rfeats, sfeats = [], []
+    import generic as GEN2
+    spec_srcs = {sp['src'] for sp in GEN2.specs(public=True)}
     for p in register_feats:
         ll = p.pop('_ll')
         with_window(p, registry)
-        rfeats.append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
+        # Spec-driven datasets go to their own tile set (keeps each file well under hosting limits).
+        (sfeats if p.get('src') in spec_srcs else rfeats).append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
+    stats['specSites'] = tiler.build(os.path.join(TILES, 'spec-sites.pmtiles'), 'sites', sfeats, 11, 'Datasets read through spec files',
+                                     '; '.join(f"{sp['title']} ({sp['licence']})" for sp in GEN2.specs(public=True)))
     stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
                                      'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
                                      'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0); Arkas 2.0 Slovenia (CC BY-SA 4.0)')
     from cassini_tiles import build_cassini_roads
     stats['cassiniRoads'] = build_cassini_roads(TILES)
+    from cassini_tiles import build_spec_areas
+    stats['specAreas'] = build_spec_areas(TILES)
     from cassini_tiles import build_inscriptions
     stats['inscriptions'] = build_inscriptions(TILES)
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',

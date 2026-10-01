@@ -8,14 +8,22 @@
   "canmore": 37224,
   "germaniasacra": 2502,
   "nid": 28219,
+  "ceans": 4782,
   "irlsmr": 365,
   "viabundus": 7488,
   "hrreg": 2193,
+  "mjcb": 172,
   "dissiloc": 2668,
   "nokm": 8941,
+  "nmrw": 26590,
+  "scoto": 961,
   "merimee": 9875,
   "cassini": 3334,
+  "woodlands": 186,
   "hre": 2390,
+  "halc": 14576,
+  "lorsch": 1143,
+  "viatariq": 874,
   "bridges1250": 258,
   "ivillaris": 22837,
   "nsh": 764,
@@ -26,23 +34,31 @@
   "sirkd": 9360,
   "tyrolmine": 232,
   "arkas": 733,
+  "zbiva": 476,
   "rohgis": 10020,
   "ottomannfs": 16234,
   "transice": 1476,
   "lvmon": 1371,
+  "inhilldaugar": 140,
+  "gobolitide": 44,
   "wbohemia": 839,
+  "trajansgate": 3,
   "lutsch": 271,
   "tib": 2802,
   "afontium": 26204,
   "darmc": 843,
   "ebidat": 8263,
   "ariadne": 63354,
+  "amcr": 69860,
   "latin1772": 9042,
+  "lcmints": 365,
+  "orkneysaga": 92,
   "ran": 2865,
   "dicotopo": 29140,
   "mfairs": 2371,
   "raa": 5300,
-  "dkff": 10772
+  "dkff": 10772,
+  "eesdelta": 318
  },
  "flags": {
   "canmore": {
@@ -91,6 +107,12 @@
    "outside-box": 4,
    "stacked": 75
   },
+  "nmrw": {
+   "water-near": 121,
+   "wreck-on-land": 28,
+   "water-far": 9,
+   "stacked": 881
+  },
   "generalkarte": {
    "water-near": 81,
    "water-far": 1
@@ -113,6 +135,10 @@
    "water-far": 1,
    "outside-box": 3
   },
+  "halc": {
+   "water-far": 3,
+   "water-near": 36
+  },
   "irlsmr": {
    "water-near": 4
   },
@@ -123,13 +149,22 @@
   "transice": {
    "water-near": 15
   },
+  "mjcb": {
+   "water-near": 4
+  },
   "ottomannfs": {
    "water-near": 4
+  },
+  "woodlands": {
+   "wreck-on-land": 6
   },
   "swegeo": {
    "water-near": 5
   },
   "bridges1250": {
+   "water-near": 2
+  },
+  "lorsch": {
    "water-near": 2
   },
   "hre": {
@@ -141,8 +176,22 @@
   "arkas": {
    "water-near": 4
   },
+  "scoto": {
+   "water-near": 3
+  },
+  "zbiva": {
+   "water-far": 8,
+   "water-near": 9
+  },
+  "viatariq": {
+   "water-near": 4
+  },
   "r3verst": {
    "water-near": 1
+  },
+  "orkneysaga": {
+   "water-near": 22,
+   "water-far": 1
   },
   "tib": {
    "water-near": 35,
@@ -188,8 +237,14 @@
   "nid": {
    "stacked": 8369
   },
+  "ceans": {
+   "stacked": 426
+  },
   "lvmon": {
    "stacked": 75
+  },
+  "amcr": {
+   "stacked": 525
   },
   "ran": {
    "stacked": 43
@@ -207,22 +262,31 @@
   "merimee": 0.0025,
   "cassini": 0.0,
   "ivillaris": 0.0035,
+  "nmrw": 0.0345,
   "generalkarte": 0.0,
   "tyrolmine": 0.0302,
   "viabundus": 0.0,
   "finreg": 0.0,
   "althurayya": 0.0028,
   "germaniasacra": 0.0016,
+  "halc": 0.0002,
   "irlsmr": 0.0,
   "nsh": 0.0013,
   "transice": 0.0,
+  "mjcb": 0.0,
   "ottomannfs": 0.0,
+  "woodlands": 0.0323,
   "swegeo": 0.0,
   "bridges1250": 0.0,
+  "lorsch": 0.0,
   "hre": 0.0,
   "sirkd": 0.0,
   "arkas": 0.0,
+  "scoto": 0.0,
+  "zbiva": 0.0168,
+  "viatariq": 0.0,
   "r3verst": 0.0,
+  "orkneysaga": 0.0109,
   "tib": 0.0021,
   "darmc": 0.1305,
   "mfairs": 0.0,
@@ -234,7 +298,9 @@
   "dicotopo": 0.006,
   "latin1772": 0.0002,
   "nid": 0.2966,
+  "ceans": 0.0891,
   "lvmon": 0.0547,
+  "amcr": 0.0075,
   "ran": 0.015
  },
  "examples": {
@@ -2236,6 +2302,383 @@
     ]
    ]
   },
+  "nmrw": {
+   "water-near": [
+    [
+     "308193:0",
+     "Great Castle Head Beacon (Front)",
+     "lighthouse",
+     -5.11754,
+     51.71123,
+     0.0
+    ],
+    [
+     "34349:0",
+     "Saundersfoot Lighthouse",
+     "lighthouse",
+     -4.69557,
+     51.70971,
+     0.1
+    ],
+    [
+     "518741:0",
+     "Quarry and Loading Berth, New House",
+     "mine",
+     -4.90815,
+     51.78099,
+     0.0
+    ],
+    [
+     "518743:0",
+     "Old Culm Pit, Picton Point",
+     "mine",
+     -4.89534,
+     51.76834,
+     0.0
+    ],
+    [
+     "268163:0",
+     "St Catherine's Fort, St Catherine's Island",
+     "castle",
+     -4.6918,
+     51.67062,
+     0.1
+    ],
+    [
+     "92614:0",
+     "Tenby Castle",
+     "castle",
+     -4.69515,
+     51.6726,
+     0.0
+    ],
+    [
+     "15535:0",
+     "Monkstone Point, New Hedges",
+     "settlement",
+     -4.67833,
+     51.69716,
+     0.1
+    ],
+    [
+     "94698:0",
+     "St Teilo's Church, Llandeilo Talybont",
+     "church",
+     -4.04988,
+     51.70783,
+     0.0
+    ],
+    [
+     "418975:0",
+     "St Catherine's Chapel, Church Site, Tenby",
+     "church",
+     -4.69154,
+     51.67037,
+     0.2
+    ],
+    [
+     "268158:0",
+     "Stack Rock Fort",
+     "castle",
+     -5.09219,
+     51.70254,
+     0.6
+    ],
+    [
+     "524956:0",
+     "Quarry, Parson's Quarry Bay",
+     "mine",
+     -5.11124,
+     51.67245,
+     0.0
+    ],
+    [
+     "515089:0",
+     "Quarry, The Vormit",
+     "mine",
+     -5.17995,
+     51.68464,
+     0.0
+    ],
+    [
+     "519074:0",
+     "Chapel, Limpin Hill, Neyland",
+     "church",
+     -4.94931,
+     51.70531,
+     0.1
+    ],
+    [
+     "544181:0",
+     "Quarries, Ogof Melen",
+     "mine",
+     -5.31283,
+     51.86875,
+     0.0
+    ],
+    [
+     "34221:0",
+     "Lighthouse, Pembrey Old Harbour",
+     "lighthouse",
+     -4.26194,
+     51.67606,
+     0.0
+    ]
+   ],
+   "wreck-on-land": [
+    [
+     "274846:0",
+     "Lune",
+     -5.00934,
+     51.66917,
+     1.3
+    ],
+    [
+     "240423:0",
+     "Unnamed Wreck",
+     -3.89198,
+     52.5764,
+     2.4
+    ],
+    [
+     "240162:0",
+     "Unnamed Wreck",
+     -3.95944,
+     52.46722,
+     4.9
+    ],
+    [
+     "240422:0",
+     "Milo",
+     -3.9053,
+     52.57744,
+     1.6
+    ],
+    [
+     "34378:0",
+     "Swansea Canal Boat at Abercraf",
+     -3.72914,
+     51.79905,
+     13.1
+    ],
+    [
+     "406355:0",
+     "Trebanos Lengthman's Punt , Swansea Canal;Trebannws Lengthman's Punt, Swansea Ca",
+     -3.86605,
+     51.70766,
+     5.1
+    ],
+    [
+     "274507:0",
+     "William Ashburner",
+     -2.6801,
+     51.6287,
+     1.5
+    ],
+    [
+     "274333:0",
+     "Kate",
+     -2.6675,
+     51.643,
+     1.5
+    ],
+    [
+     "800286:0",
+     "Tredunnoc Boat",
+     -2.88777,
+     51.65322,
+     4.0
+    ],
+    [
+     "405163:0",
+     "Neath Canal: Ty'n-yr-Heol Sunken Canal Boat III",
+     -3.78166,
+     51.67417,
+     4.2
+    ],
+    [
+     "34531:0",
+     "Tennant Canal: Victoria, Narrow Boat (2), Aberdulais Basin",
+     -3.77522,
+     51.67975,
+     4.8
+    ],
+    [
+     "273689:0",
+     "Frederick Ritzlaff",
+     -3.18,
+     51.469,
+     1.6
+    ],
+    [
+     "405171:0",
+     "Neath Canal: Sunken Canal Boat at Tonna",
+     -3.77435,
+     51.67968,
+     4.9
+    ],
+    [
+     "405162:0",
+     "Neath Canal: Ty'n-yr-Heol Sunken Canal Boat II",
+     -3.78294,
+     51.67361,
+     4.1
+    ],
+    [
+     "274729:0",
+     "Joseph and Elizabeth",
+     -2.66394,
+     51.62885,
+     1.0
+    ]
+   ],
+   "water-far": [
+    [
+     "240690:0",
+     "The Smalls Lighthouse (1775)",
+     "lighthouse",
+     -5.66985,
+     51.72116,
+     25.9
+    ],
+    [
+     "34350:0",
+     "Smalls Lighthouse",
+     "lighthouse",
+     -5.66938,
+     51.72096,
+     25.9
+    ],
+    [
+     "404206:0",
+     "Grassholm Island Settlement",
+     "settlement",
+     -5.47952,
+     51.7302,
+     11.3
+    ],
+    [
+     "404206:1",
+     "Grassholm Island Settlement",
+     "settlement",
+     -5.47952,
+     51.7302,
+     11.3
+    ],
+    [
+     "126319:0",
+     "South Bishop Lighthouse",
+     "lighthouse",
+     -5.41184,
+     51.85262,
+     4.1
+    ],
+    [
+     "421570:0",
+     "Skerries, Bridge over The Chasm",
+     "bridge",
+     -4.60738,
+     53.42248,
+     2.5
+    ],
+    [
+     "41287:0",
+     "Skerries Lighthouse,Skerries",
+     "lighthouse",
+     -4.6083,
+     53.42117,
+     2.5
+    ],
+    [
+     "301799:0",
+     "Aber Rheidol Castle",
+     "castle",
+     -4.13262,
+     52.39875,
+     2.2
+    ],
+    [
+     "705347:0",
+     "Water Street, Penygroes",
+     "road",
+     -4.26102,
+     52.62386,
+     9.0
+    ]
+   ],
+   "stacked": [
+    [
+     [
+      -5.0058,
+      51.4169
+     ],
+     134
+    ],
+    [
+     [
+      -3.30731,
+      53.3896
+     ],
+     69
+    ],
+    [
+     [
+      -4.6166,
+      53.35
+     ],
+     68
+    ],
+    [
+     [
+      -4.40381,
+      53.0718
+     ],
+     53
+    ],
+    [
+     [
+      -5.1443,
+      51.679
+     ],
+     44
+    ],
+    [
+     [
+      -5.14441,
+      51.6438
+     ],
+     36
+    ],
+    [
+     [
+      -5.1721,
+      51.8136
+     ],
+     36
+    ],
+    [
+     [
+      -5.5284,
+      52.3632
+     ],
+     36
+    ],
+    [
+     [
+      -3.93969,
+      53.5175
+     ],
+     33
+    ],
+    [
+     [
+      -3.5964,
+      51.4118
+     ],
+     33
+    ]
+   ]
+  },
   "generalkarte": {
    "water-near": [
     [
@@ -2904,6 +3347,156 @@
     ]
    ]
   },
+  "halc": {
+   "water-far": [
+    [
+     "EF8520",
+     "Arngast",
+     "settlement",
+     8.18168,
+     53.46641,
+     2.2
+    ],
+    [
+     "EF0810",
+     "Lütje Hörn",
+     "settlement",
+     6.85379,
+     53.59718,
+     2.2
+    ],
+    [
+     "GR9200",
+     "Heffezand",
+     "settlement",
+     6.37856,
+     53.474,
+     2.4
+    ]
+   ],
+   "water-near": [
+    [
+     "HO1210",
+     "Ter Heijde",
+     "settlement",
+     4.14938,
+     52.02959,
+     0.5
+    ],
+    [
+     "HO4210",
+     "Egmond aan Zee",
+     "settlement",
+     4.61827,
+     52.61714,
+     0.1
+    ],
+    [
+     "HO4550",
+     "Callantsoog",
+     "settlement",
+     4.69621,
+     52.86287,
+     0.4
+    ],
+    [
+     "HO4600A",
+     "Petten",
+     "settlement",
+     4.65066,
+     52.76798,
+     0.1
+    ],
+    [
+     "HO5050A",
+     "Huisduinen",
+     "settlement",
+     4.71967,
+     52.96238,
+     0.6
+    ],
+    [
+     "HO5050B",
+     "Den Helder",
+     "settlement",
+     4.74176,
+     52.97253,
+     0.6
+    ],
+    [
+     "HO5070E",
+     "Landerum",
+     "settlement",
+     5.311,
+     53.37921,
+     0.0
+    ],
+    [
+     "EF5500",
+     "Memmertsand",
+     "settlement",
+     6.86381,
+     53.64176,
+     0.1
+    ],
+    [
+     "EF5270B",
+     "Itzendorf",
+     "settlement",
+     7.12701,
+     53.6026,
+     0.1
+    ],
+    [
+     "EF5200A",
+     "Wilhelmsfeld",
+     "settlement",
+     7.21707,
+     53.65717,
+     0.1
+    ],
+    [
+     "EF4240A",
+     "Oosterreide",
+     "settlement",
+     7.11537,
+     53.30962,
+     1.1
+    ],
+    [
+     "EF4230A",
+     "Torum",
+     "settlement",
+     7.21227,
+     53.3223,
+     0.7
+    ],
+    [
+     "EF4230D",
+     "Fletum",
+     "settlement",
+     7.15995,
+     53.32874,
+     0.4
+    ],
+    [
+     "EF4220A",
+     "Utpogum",
+     "settlement",
+     7.23331,
+     53.31768,
+     0.7
+    ],
+    [
+     "GR0260B",
+     "Westerreide",
+     "settlement",
+     7.10835,
+     53.30817,
+     0.6
+    ]
+   ]
+  },
   "irlsmr": {
    "water-near": [
     [
@@ -3196,6 +3789,42 @@
     ]
    ]
   },
+  "mjcb": {
+   "water-near": [
+    [
+     "155:0",
+     "Coron",
+     "church",
+     21.95,
+     36.78333,
+     0.4
+    ],
+    [
+     "155:1",
+     "Coron",
+     "church",
+     21.95,
+     36.78333,
+     0.4
+    ],
+    [
+     "91:0",
+     "Methone",
+     "church",
+     21.7,
+     36.81667,
+     0.3
+    ],
+    [
+     "124:0",
+     "Palaia",
+     "church",
+     33.82612,
+     36.23444,
+     1.6
+    ]
+   ]
+  },
   "ottomannfs": {
    "water-near": [
     [
@@ -3229,6 +3858,52 @@
      28.82707,
      40.38519,
      0.0
+    ]
+   ]
+  },
+  "woodlands": {
+   "wreck-on-land": [
+    [
+     "WASB001:0",
+     "Wasserburg_Einbaum bei Wasserburg",
+     12.22,
+     48.05,
+     187.4
+    ],
+    [
+     "BX-1970-M2:0",
+     "Bevaix_04",
+     6.83,
+     46.93,
+     234.6
+    ],
+    [
+     "MANC002:0",
+     "Manching-Oberstimm",
+     11.46,
+     48.71,
+     250.0
+    ],
+    [
+     "ZWAM001_31:0",
+     "Zwammerdam",
+     4.72,
+     52.11,
+     21.3
+    ],
+    [
+     "ZWS60711:1",
+     "Zwammerdam",
+     4.72,
+     52.11,
+     21.3
+    ],
+    [
+     "WOS70T01:0",
+     "Woerden_02",
+     4.88,
+     52.09,
+     31.0
     ]
    ]
   },
@@ -3293,6 +3968,26 @@
      -2.00957,
      55.76798,
      0.0
+    ]
+   ]
+  },
+  "lorsch": {
+   "water-near": [
+    [
+     "3801:fa~2",
+     "[Forismarische, Forismarsche, Forsmarische, Forsmarsche] (Wüstung)",
+     "settlement",
+     4.74035,
+     52.9855,
+     0.5
+    ],
+    [
+     "3801:fa~3",
+     "[Leunspih] (Wüstung)",
+     "settlement",
+     4.76077,
+     52.9789,
+     1.0
     ]
    ]
   },
@@ -3420,6 +4115,212 @@
     ]
    ]
   },
+  "scoto": {
+   "water-near": [
+    [
+     "0:2936",
+     "Primaro",
+     "settlement",
+     12.28333,
+     44.58333,
+     0.0
+    ],
+    [
+     "1:2936",
+     "Primaro",
+     "settlement",
+     12.28333,
+     44.58333,
+     0.0
+    ],
+    [
+     "3:2936",
+     "Primara",
+     "settlement",
+     12.28333,
+     44.58333,
+     0.0
+    ]
+   ]
+  },
+  "zbiva": {
+   "water-far": [
+    [
+     "10000463",
+     "San Justo (Sv. Just)",
+     "church",
+     13.57759,
+     45.64655,
+     6.3
+    ],
+    [
+     "10000464",
+     "Sv. Marija = S. Maria Assunta",
+     "church",
+     13.57759,
+     45.59998,
+     5.2
+    ],
+    [
+     "10000465",
+     "Sv. Silvester",
+     "church",
+     13.57759,
+     45.64827,
+     6.2
+    ],
+    [
+     "10000474",
+     "0",
+     "settlement",
+     13.57759,
+     45.59994,
+     5.2
+    ],
+    [
+     "10003524",
+     "0",
+     "church",
+     13.57759,
+     45.56117,
+     2.6
+    ],
+    [
+     "10003760",
+     "Sv. Martin",
+     "church",
+     13.57759,
+     45.64467,
+     6.5
+    ],
+    [
+     "10003897",
+     "Sv. Kolomban",
+     "church",
+     13.57759,
+     45.59147,
+     4.6
+    ],
+    [
+     "10004190",
+     "_epan",
+     "church",
+     13.57759,
+     45.6223,
+     6.9
+    ]
+   ],
+   "water-near": [
+    [
+     "10001099",
+     "Sv. Jurij",
+     "church",
+     13.57759,
+     45.52966,
+     0.3
+    ],
+    [
+     "10002913",
+     "cerkev Marijinega vnebovzetja = stolnica",
+     "church",
+     13.57759,
+     45.54814,
+     1.6
+    ],
+    [
+     "10002960",
+     "Bazovi_ka ul. 34 in 36",
+     "settlement",
+     13.57759,
+     45.54896,
+     1.7
+    ],
+    [
+     "10002963",
+     "Velika vrata = Ul. pri Velikih vratih 9 = Trinkova ul. 2",
+     "settlement",
+     13.57759,
+     45.5461,
+     1.5
+    ],
+    [
+     "10002965",
+     "Tovarni_ka ulica (prej Calle S. Filippo Neri. Piazzale S. Tommaso. Trg Sergio Bo",
+     "settlement",
+     13.57759,
+     45.54634,
+     1.5
+    ],
+    [
+     "10002971",
+     "Sabinijeva ulica (notranje staro obzidje)",
+     "castle",
+     13.57759,
+     45.54597,
+     1.5
+    ],
+    [
+     "10003533",
+     "Kreljeva 6 (nekdanja pala_a Baseggio)",
+     "settlement",
+     13.57759,
+     45.54737,
+     1.6
+    ],
+    [
+     "10003749",
+     "Sv. Jurij",
+     "settlement",
+     13.56837,
+     45.52966,
+     0.1
+    ],
+    [
+     "10003922",
+     "Prvomajski trg (nekdaj: Stari trg 1 ali  Trg 1. maja)",
+     "settlement",
+     13.57759,
+     45.52939,
+     0.2
+    ]
+   ]
+  },
+  "viatariq": {
+   "water-near": [
+    [
+     "0:6",
+     "Yaffa",
+     "settlement",
+     34.74993,
+     32.05308,
+     0.1
+    ],
+    [
+     "1:6",
+     "Yaffa",
+     "settlement",
+     34.74993,
+     32.05308,
+     0.1
+    ],
+    [
+     "2:6",
+     "Yaffa",
+     "settlement",
+     34.74993,
+     32.05308,
+     0.1
+    ],
+    [
+     "3:6",
+     "Yaffa",
+     "settlement",
+     34.74993,
+     32.05308,
+     0.1
+    ]
+   ]
+  },
   "r3verst": {
    "water-near": [
     [
@@ -3429,6 +4330,140 @@
      28.46656,
      43.36145,
      0.1
+    ]
+   ]
+  },
+  "orkneysaga": {
+   "water-near": [
+    [
+     "10",
+     "Burra Firth (Borgarfjǫrðr)",
+     "settlement",
+     -0.86769,
+     60.81294,
+     0.2
+    ],
+    [
+     "30",
+     "Gulberwick (Gullberuvík)",
+     "settlement",
+     -1.19912,
+     60.12579,
+     0.2
+    ],
+    [
+     "92",
+     "Yell Sound (Álasund)",
+     "settlement",
+     -1.24845,
+     60.56478,
+     1.2
+    ],
+    [
+     "2",
+     "Barswick (Barðsvík)",
+     "settlement",
+     -2.98201,
+     58.76266,
+     0.1
+    ],
+    [
+     "3",
+     "Bay of Firth (Aurriðafjǫrðr)",
+     "settlement",
+     -3.07544,
+     59.00806,
+     0.2
+    ],
+    [
+     "8",
+     "Brough of Deerness (Dýrnes)",
+     "settlement",
+     -2.70459,
+     58.96438,
+     0.0
+    ],
+    [
+     "19",
+     "Eynhallow Sound (Efjusund)",
+     "settlement",
+     -3.05639,
+     59.12318,
+     0.5
+    ],
+    [
+     "23",
+     "Firth (Fjǫrðr)",
+     "settlement",
+     -3.07529,
+     59.00756,
+     0.2
+    ],
+    [
+     "34",
+     "Hamnavoe (Hafnarvágr)",
+     "settlement",
+     -3.29263,
+     58.96576,
+     0.0
+    ],
+    [
+     "42",
+     "Huip Ness (Hofsnes)",
+     "settlement",
+     -2.62643,
+     59.15271,
+     0.1
+    ],
+    [
+     "56",
+     "Osmondwall (Ásmundarvágr)",
+     "settlement",
+     -3.14405,
+     58.78988,
+     0.1
+    ],
+    [
+     "61",
+     "Pentland Firth (Péttlandsfjǫrðr)",
+     "settlement",
+     -3.11144,
+     58.72577,
+     1.7
+    ],
+    [
+     "62",
+     "Rackwick (Rekavík)",
+     "settlement",
+     -3.34991,
+     58.96406,
+     0.0
+    ],
+    [
+     "65",
+     "Roberry (Rauðabjǫrg)",
+     "settlement",
+     -3.14288,
+     58.78377,
+     0.0
+    ],
+    [
+     "68",
+     "Sandwick (Sandvík)",
+     "settlement",
+     -2.98322,
+     58.78571,
+     0.0
+    ]
+   ],
+   "water-far": [
+    [
+     "84",
+     "Stronsay Firth (Vestfjǫrðr)",
+     "settlement",
+     -2.73247,
+     59.06851,
+     2.6
     ]
    ]
   },
@@ -4932,6 +5967,80 @@
     ]
    ]
   },
+  "ceans": {
+   "stacked": [
+    [
+     [
+      18.12917,
+      48.29479
+     ],
+     54
+    ],
+    [
+     [
+      18.08131,
+      48.32839
+     ],
+     48
+    ],
+    [
+     [
+      18.89333,
+      48.46517
+     ],
+     42
+    ],
+    [
+     [
+      18.08674,
+      48.31848
+     ],
+     36
+    ],
+    [
+     [
+      18.10012,
+      48.32107
+     ],
+     34
+    ],
+    [
+     [
+      18.11566,
+      48.30286
+     ],
+     27
+    ],
+    [
+     [
+      18.06661,
+      48.38519
+     ],
+     21
+    ],
+    [
+     [
+      18.01728,
+      48.29068
+     ],
+     21
+    ],
+    [
+     [
+      18.08661,
+      48.31785
+     ],
+     21
+    ],
+    [
+     [
+      18.19858,
+      47.74526
+     ],
+     21
+    ]
+   ]
+  },
   "lvmon": {
    "stacked": [
     [
@@ -4947,6 +6056,80 @@
       56.968
      ],
      23
+    ]
+   ]
+  },
+  "amcr": {
+   "stacked": [
+    [
+     [
+      13.87169,
+      50.03809
+     ],
+     50
+    ],
+    [
+     [
+      15.80066,
+      49.94369
+     ],
+     35
+    ],
+    [
+     [
+      14.37153,
+      50.16771
+     ],
+     31
+    ],
+    [
+     [
+      16.15491,
+      49.9516
+     ],
+     28
+    ],
+    [
+     [
+      14.24623,
+      50.19314
+     ],
+     26
+    ],
+    [
+     [
+      15.83338,
+      50.2106
+     ],
+     25
+    ],
+    [
+     [
+      14.36775,
+      49.45682
+     ],
+     25
+    ],
+    [
+     [
+      14.47144,
+      50.01928
+     ],
+     24
+    ],
+    [
+     [
+      13.79065,
+      49.9735
+     ],
+     24
+    ],
+    [
+     [
+      12.94221,
+      49.52963
+     ],
+     24
     ]
    ]
   },

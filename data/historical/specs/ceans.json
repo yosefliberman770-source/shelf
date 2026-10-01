@@ -1,0 +1,258 @@
+{
+ "id": "ceans-slovakia",
+ "src": "ceans",
+ "public": true,
+ "enabled": true,
+ "title": "Archaeological sites in the Slovak Republic — harmonized CEANS (Institute of Archaeology SAS; harmonized 2021)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.5708032",
+ "describe": "The Central Evidence of Archaeological Sites in Slovakia, one record per site and dating: a stated century or year where the record gives one, otherwise its Slovak archaeological period code with that period's conventional years (stated in each label). Prehistoric-only records fall outside the atlas. Records dated only to prehistoric periods (Bronze Age, Hallstatt, La Tène, Neolithic, Eneolithic, Palaeolithic) and negative or undatable ones are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "ceans-slovakia/original/CEANS_2021_harmonized.zip",
+  "member": "CEANS_2021_harmonized/CEANS_2021_harmonized.shp",
+  "encoding": "utf-8"
+ },
+ "fields": {
+  "id": "fid",
+  "name": "poloha",
+  "nameFallback": "obec",
+  "type": [
+   "druhnal",
+   "dat_popis"
+  ],
+  "context": [
+   "obec",
+   "kataster"
+  ],
+  "kind": {
+   "field": "druhnal",
+   "map": {
+    "hradisko": "castle",
+    "hrad": "castle",
+    "hrádok": "castle",
+    "sídlisko opevnené": "castle",
+    "opevnené sídlisko": "castle",
+    "sídlisko": "settlement",
+    "osada": "settlement",
+    "zaniknutá dedina": "settlement",
+    "zanik.osada": "settlement",
+    "sídlisko výšinné": "settlement",
+    "výšinné sídlisko": "settlement",
+    "sídlisko nížinné": "settlement",
+    "areál kultový": "church",
+    "kostol": "church",
+    "kláštor": "monastery",
+    "pohrebisko": "site",
+    "mlyn": "mill",
+    "baňa": "mine"
+   },
+   "default": "site"
+  },
+  "approx": {
+   "field": "stlok",
+   "values": [
+    "3",
+    "-1"
+   ]
+  }
+ },
+ "dating": {
+  "mode": "textOrPeriods",
+  "field": "datovanie",
+  "ownLabel": "century or year in the register",
+  "label": "Slovak archaeological period scheme",
+  "table": {
+   "st": [
+    500,
+    1526
+   ],
+   "st-vc": [
+    500,
+    1200
+   ],
+   "st-vr": [
+    1200,
+    1400
+   ],
+   "st-ne": [
+    1400,
+    1526
+   ],
+   "st-ml": [
+    1200,
+    1526
+   ],
+   "st-vc-vr": [
+    500,
+    1400
+   ],
+   "st-nv": [
+    500,
+    1914
+   ],
+   "ma-st": [
+    895,
+    1000
+   ],
+   "oe-vm": [
+    833,
+    906
+   ],
+   "oe-sa": [
+    568,
+    800
+   ],
+   "oe-sm": [
+    895,
+    1000
+   ],
+   "oe-vs": [
+    500,
+    650
+   ],
+   "oe-vs-sm": [
+    500,
+    1000
+   ],
+   "oe-sl": [
+    500,
+    1000
+   ],
+   "d.slovanská": [
+    500,
+    1000
+   ],
+   "d.slovanská-ml.f.": [
+    800,
+    1000
+   ],
+   "d.hradištná": [
+    650,
+    1200
+   ],
+   "d.hradištná-st": [
+    650,
+    850
+   ],
+   "d.hradištná-st-sr": [
+    650,
+    950
+   ],
+   "d.stredohradištná": [
+    800,
+    950
+   ],
+   "d.hradištná-ml": [
+    950,
+    1200
+   ],
+   "d.hradištná-ne": [
+    1050,
+    1200
+   ],
+   "d.poveľkomoravská": [
+    906,
+    1000
+   ],
+   "d.predhradištná": [
+    500,
+    650
+   ],
+   "nv": [
+    1526,
+    1914
+   ],
+   "ri": [
+    1,
+    375
+   ],
+   "ri-st": [
+    1,
+    160
+   ],
+   "ri-ml": [
+    160,
+    375
+   ],
+   "ri-ne": [
+    250,
+    375
+   ],
+   "ri-ml-ne": [
+    160,
+    375
+   ],
+   "ri-pu": [
+    1,
+    180
+   ],
+   "ri-rb": [
+    1,
+    375
+   ],
+   "ri-rp": [
+    1,
+    375
+   ],
+   "ri-pw": [
+    1,
+    375
+   ],
+   "prešovský typ": [
+    1,
+    375
+   ],
+   "sn": [
+    375,
+    568
+   ],
+   "ri-sn": [
+    1,
+    568
+   ],
+   "ha-ri": [
+    -800,
+    375
+   ]
+  },
+  "ignore": [
+   "bz",
+   "lt",
+   "ha",
+   "ne",
+   "en",
+   "pk",
+   "pa",
+   "me",
+   "nx",
+   "negatívny",
+   "en ba",
+   "bz ml",
+   "bz st",
+   "bz sr",
+   "en ne",
+   "en st",
+   "ne ml",
+   "ne st",
+   "ha ne",
+   "lt ne",
+   "lt st",
+   "pa ml",
+   "pa st",
+   "ha st",
+   "bz ne",
+   "pk ml",
+   "pk st",
+   "lt sr",
+   "ne sr",
+   "en sr",
+   "pa sr",
+   "pk sr",
+   "ha sr"
+  ]
+ },
+ "datingLabel": "register dating"
+}

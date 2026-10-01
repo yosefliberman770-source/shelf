@@ -364,8 +364,16 @@ def measure(at, place_dirs):
                         cells.precise[key] += 1
     cas = os.path.join(PUB, 'world', 'tiles', 'cassini-roads.pmtiles')
     if os.path.exists(cas):
+        # Each road with its own dating and source (Cassini 1756–1815, Lutsch 1751 snapshot, spec datasets by period).
         for p, lon, lat in tile_features(cas, 11):
-            cells.add(at(lon, lat), 'Transport', 1756, 1815, 'period-narrow', 'cassini')
+            a_, b_ = p.get('ef', 1756), p.get('et', 1815)
+            cls = 'period-narrow' if (b_ - a_) <= 150 else 'period-broad'
+            cells.add(at(lon, lat), 'Transport', a_, b_, cls, p.get('src', 'cassini'))
+    # Territorial units from spec datasets (data/historical/specs, "geometry": "polygons"): Political, at their dated moment.
+    hu = os.path.join(PUB, 'world', 'tiles', 'historical-units.pmtiles')
+    if os.path.exists(hu):
+        for p, lon, lat in tile_features(hu, 8):
+            cells.add(at(lon, lat), 'Political', p.get('ef'), p.get('et'), 'period-narrow', p.get('src', 'specareas'))
 
     for line in open(os.path.join(CACHE, 'itinere.ndjson'), encoding='utf-8'):
         f = json.loads(line)

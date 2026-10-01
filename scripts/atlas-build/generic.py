@@ -66,7 +66,7 @@ def parse_dating(text) -> tuple[int | None, int | None, str] | None:
     bce = bool(BCE.search(low))
     # centuries: "13th c.", "13th century", "13. Jh.", "XIII. sz.", "XIIIe siècle", "XIII w.", "13. stol." — with an optional part
     cents = []
-    CW = r'(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|siecle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|st\.|vek|век)'
+    CW = r'(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|siecle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)'
     # century ranges: "5th-7th c.", "14-15 c.", "XII-XIII w."
     for m in re.finditer(r'\b(\d{1,2})(?:st|nd|rd|th|\.)?\s*[-–/]\s*(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*' + CW, low):
         a_, b_ = int(m.group(1)), int(m.group(2))
@@ -77,7 +77,7 @@ def parse_dating(text) -> tuple[int | None, int | None, str] | None:
         if a_ and b_ and a_ <= b_:
             cents.append((_century_window(a_, bce)[0], _century_window(b_, bce)[1]))
     for m in re.finditer(r'(?:(early|late|mid|middle|first half|1st half|second half|2nd half|end|beginning)(?:\s+of)?\s+(?:the\s+)?)?'
-                         r'\b(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|st\.|vek|век)', low):
+                         r'\b(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)', low):
         part = (m.group(1) or '').strip() or None
         cents.append(_century_window(int(m.group(2)), bce, part if part in PART else None))
     for m in re.finditer(r'\b([ivxl]{1,6})\.?\s*(?:c\b|c\.|cent|century|jh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|st\.|vek|век|e\b|ème)', low):
@@ -132,6 +132,9 @@ def _rows_table(b, name, read):
     return list(csv.DictReader(io.StringIO(t), delimiter=delim))
 
 
+KEEP_GEOM = False
+
+
 def _geom_point(g):
     """(lon, lat) of a GeoJSON-like or shapely geometry: points as given, other shapes their representative point."""
     from shapely.geometry import shape
@@ -159,7 +162,11 @@ def _gpkg_rows(b, read):
             if blob:
                 flags = blob[3]
                 env = {0: 0, 1: 32, 2: 48, 3: 48, 4: 64}.get((flags >> 1) & 7, 0)
-                pt = _geom_point(wkb.loads(bytes(blob[8 + env:])))
+                g = wkb.loads(bytes(blob[8 + env:]))
+                pt = _geom_point(g)
+                if KEEP_GEOM:
+                    from shapely.geometry import mapping
+                    d['__geom'] = mapping(g)
             d['__pt'] = pt
             out.append(d)
         con.close()
@@ -222,13 +229,17 @@ def read_rows(spec):
         elif e in ('geojson', 'json'):
             d = json.loads(b.decode('utf-8-sig'))
             rows = []
+            crs = crs or ((d.get('crs') or {}).get('properties') or {}).get('name')
             for f in d.get('features') or []:
                 p = dict(f.get('properties') or {})
                 p['__pt'] = _geom_point(f['geometry']) if f.get('geometry') else None
+                if KEEP_GEOM:
+                    p['__geom'] = f.get('geometry')
                 rows.append(p)
         elif e == 'kml':
             rows = []
-            for pm in re.findall(r'<Placemark\b.*?</Placemark>', b.decode('utf-8', 'replace'), re.S):
+            kml = re.sub(r'<!\[CDATA\[(.*?)\]\]>', lambda m: m.group(1).replace('<', '&lt;'), b.decode('utf-8', 'replace'), flags=re.S)
+            for pm in re.findall(r'<Placemark\b.*?</Placemark>', kml, re.S):
                 p = {k: v for k, v in re.findall(r'<SimpleData name="([^"]+)">([^<]*)<', pm)}
                 p.update({k: v for k, v in re.findall(r'<Data name="([^"]+)">\s*<value>([^<]*)<', pm)})
                 nm = re.search(r'<name>(.*?)</name>', pm, re.S)
@@ -243,31 +254,83 @@ def read_rows(spec):
             crs = 'EPSG:4326'
         else:
             rows = _rows_table(b, name, read)
+            if read.get('join'):
+                # attach a second table's fields (e.g. a gazetteer's coordinates) by key
+                j = read['join']
+                jb, jn = _open_bytes(j)
+                jt = {str(r.get(j['key'])).strip(): r for r in _rows_table(jb, jn, j)}
+                for p in rows:
+                    other = jt.get(str(p.get(j['on'])).strip())
+                    if other:
+                        for k, v in other.items():
+                            p.setdefault(k, v)
             lon_f, lat_f = read.get('lon'), read.get('lat')
             for p in rows:
                 try:
                     p['__pt'] = (float(str(p[lon_f]).replace(',', '.')), float(str(p[lat_f]).replace(',', '.')))
                 except (KeyError, TypeError, ValueError):
                     p['__pt'] = None
+                if p['__pt'] is None and read.get('wkbHex') and p.get(read['wkbHex']):
+                    # an area (island, region) given as hex WKB: its representative point, marked approximate
+                    try:
+                        from shapely import wkb
+                        p['__pt'] = _geom_point(wkb.loads(bytes.fromhex(str(p[read['wkbHex']]).strip())))
+                        p['__approx'] = True
+                    except Exception:  # noqa: BLE001
+                        pass
     if crs and not re.search(r'4326|WGS_?1984|WGS 84"?,\s*DATUM\["?D_WGS_1984"?,\s*SPHEROID[^]]*\]\],\s*PRIMEM[^]]*\],\s*UNIT\["?Degree', str(crs), re.I):
         from pyproj import CRS, Transformer
         tr = Transformer.from_crs(CRS.from_user_input(crs), CRS.from_epsg(4326), always_xy=True)
         for p in rows:
             if p.get('__pt'):
                 p['__pt'] = tr.transform(*p['__pt'])
+            if p.get('__geom'):
+                from shapely.geometry import mapping, shape
+                from shapely.ops import transform
+                p['__geom'] = mapping(transform(lambda x, y, z=None: tr.transform(x, y), shape(p['__geom'])))
     return rows
 
 
 # ── spec → register records ───────────────────────────────────────────────
 
+NULLISH = {'', 'no comment', 'n/a', 'na', 'none', 'null', 'unclear', 'unknown', '-', 'nan'}
+
+
+def _val(v):
+    return None if v is None or str(v).strip().lower() in NULLISH else v
+
+
 def _field(p, f):
     if isinstance(f, list):
-        return ' · '.join(str(p.get(x)) for x in f if p.get(x) not in (None, ''))
-    return p.get(f) if f else None
+        return ' · '.join(str(p.get(x)) for x in f if _val(p.get(x)) is not None)
+    return _val(p.get(f)) if f else None
+
+
+def parts(spec):
+    """A spec with "parts" (several files, each with its own read/dating) as one spec per part."""
+    if not spec.get('parts'):
+        return [spec]
+    return [{**spec, **pt, 'fields': {**spec.get('fields', {}), **pt.get('fields', {})}} for pt in spec['parts']]
 
 
 def records(spec):
     """Register records (registers.py schema) from a spec; and counts of what was left out and why."""
+    if spec.get('parts'):
+        from collections import Counter
+        out, skipped, seen = [], Counter(), set()
+        for k, sp in enumerate(parts({k: v for k, v in spec.items()})):
+            sp.pop('parts', None)
+            rs, sk = records(sp)
+            skipped.update(sk)
+            for r in rs:
+                key = (r['name'], r['lon'], r['lat'], r.get('env'), r.get('snap'))
+                if spec.get('dedupe') and key in seen:
+                    skipped['same record in another part'] += 1
+                    continue
+                seen.add(key)
+                r['id'] = f"{k}:{r['id']}"
+                out.append(r)
+        return out, dict(skipped)
     from collections import Counter
     f, dt = spec['fields'], spec['dating']
     out, skipped = [], Counter()
@@ -284,14 +347,89 @@ def records(spec):
         if not name and f.get('nameFallback'):
             name = str(_field(p, f['nameFallback']) or '').strip()
         kf = f.get('kind') or {}
-        kv = str(p.get(kf.get('field')) or '').strip().lower() if isinstance(kf, dict) else ''
+        kv = str(p.get(kf.get('field')) if p.get(kf.get('field')) is not None else '').strip().lower() if isinstance(kf, dict) else ''
+        if isinstance(kf, dict) and kf.get('firstToken'):
+            kv = kv.split(';')[0].strip()
         kind = (kf.get('map') or {}).get(kv, kf.get('default', 'site')) if isinstance(kf, dict) else kf
+        tmap = f.get('typeMap') or {}
+        tparts = [str(tmap.get(k, {}).get(str(p.get(k)), p.get(k))) for k in ([f['type']] if isinstance(f.get('type'), str) else f.get('type') or []) + (f.get('typeExtra') or [])
+                  if p.get(k) not in (None, '')]
         rec = {'src': spec['src'], 'id': str(p.get(f.get('id')) if f.get('id') else i), 'name': (name or spec.get('unnamed', 'Unnamed site'))[:80],
-               'kind': kind, 'lon': round(pt[0], 5), 'lat': round(pt[1], 5), 'ty': str(_field(p, f.get('type')) or kind)[:120],
+               'kind': kind, 'lon': round(pt[0], 5), 'lat': round(pt[1], 5), 'ty': (' · '.join(tparts) or kind)[:120],
                'ctx': [str(_field(p, c)) for c in f.get('context', []) if _field(p, c)][:2], 'names': []}
         ap = f.get('approx')
-        rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values'])
+        rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')
         uncertain = False
+        dt = spec['dating']  # per record (a fallback below may switch this record's mode)
+        if dt['mode'] == 'textOrPeriods':
+            own = str(p.get(dt['field']) or '')
+            pr = parse_dating(own) if not re.fullmatch(r'[A-Za-z\-]+', own.strip()) else None
+            if pr and pr[0] is not None:
+                rec['env'] = (pr[0], pr[1])
+                rec['per'] = f"{own} ({dt.get('ownLabel', 'record dating')})"[:120]
+                out.append(rec)
+                continue
+            dt = dict(dt, mode='periods', field=dt.get('periodField', dt['field']))
+        if dt['mode'] == 'periods':
+            # Named periods (one field, separated), each mapped by the spec's own period table (a stated convention, e.g.
+            # standard Egyptian chronology); separate periods stay separate phases (merged only when overlapping or within 50 years).
+            raw_label = str(p.get(dt['field']) or '')
+            spans = []
+            for part in re.split(dt.get('sep', ';'), raw_label):
+                low = re.sub(r'\s+', ' ', part.lower())
+                unc = '?' in low
+                # every period name of the table found in the text, longest first, without overlaps
+                found, taken = [], []
+                for key in sorted(dt['table'], key=len, reverse=True):
+                    for m in re.finditer(rf'\b{re.escape(key)}\b', low):
+                        if not any(m.start() < e and s_ < m.end() for s_, e in taken):
+                            taken.append((m.start(), m.end()))
+                            found.append(key)
+                rest = re.sub(r'[\W_]+', ' ', ''.join(ch if not any(s_ <= i < e for s_, e in taken) else ' ' for i, ch in enumerate(low))).strip()
+                if rest and rest not in dt.get('ignore', []):
+                    skipped[f'text not in the spec period table: {rest}'] += 1
+                for key in found:
+                    rng = dt['table'][key]
+                    if rng[1] < dt.get('min', 1) or rng[0] > dt.get('max', 1914):
+                        continue
+                    spans.append((rng[0], rng[1], key.capitalize() + (' (uncertain)' if unc else '')))
+            spans.sort()
+            phases = []
+            for a_, b_, n_ in spans:
+                if phases and a_ <= phases[-1][1] + 50:
+                    phases[-1] = (phases[-1][0], max(phases[-1][1], b_), phases[-1][2] + [n_])
+                else:
+                    phases.append((a_, b_, [n_]))
+            if not phases:
+                skipped['no period in the atlas range'] += 1
+                if not spec.get('keepUndated'):
+                    continue
+                out.append(rec)
+                continue
+            for k, (a_, b_, ns) in enumerate(phases):
+                r2 = dict(rec, id=f"{rec['id']}:{k}", env=(a_, b_), per=f"{'; '.join(ns)} ({dt.get('label', 'period table in the spec')}: {a_}–{b_})"[:120])
+                out.append(r2)
+            continue
+        if dt['mode'] == 'firstAttested':
+            # the earliest dated attestation in the field: the place is shown from then on (first attestation ≠ founding)
+            raw_label = str(p.get(dt['field']) or '')
+            cands = []
+            for chunk in re.split(dt.get('sep', r'\n|;'), raw_label):
+                pr = parse_dating(chunk)
+                if pr and pr[0] is not None:
+                    cands.append((pr[0], pr[1], chunk.strip()))
+            if not cands:
+                skipped['no dated attestation'] += 1
+                if not spec.get('keepUndated'):
+                    continue
+                out.append(rec)
+                continue
+            lo, hi, chunk = min(cands)
+            rec['env'] = (lo, None)
+            rec['fa'] = 1
+            rec['per'] = f"first attested {lo}{'–' + str(hi) if hi and hi != lo else ''} ({chunk[:70]})"[:120]
+            out.append(rec)
+            continue
         if dt['mode'] == 'snapshot':
             rec['snap'] = dt['year']
             rec['per'] = dt.get('label') or f"listed in {dt['year']}"
@@ -301,11 +439,17 @@ def records(spec):
         else:
             if dt['mode'] == 'fields':
                 a, b = p.get(dt['from']), p.get(dt.get('to'))
-                pa, pb = parse_dating(a), parse_dating(b) if b not in (None, '') else None
-                raw_label = ' – '.join(str(x) for x in (a, b) if x not in (None, ''))
+                opens = {str(v) for v in dt.get('openValues', [])}
+                if str(a) in opens:
+                    a = None  # the source's code for "unknown"
+                b_open = b not in (None, '') and str(b) in opens
+                pa = parse_dating(a)
+                pb = None if b in (None, '') or b_open else parse_dating(b)
+                raw_label = ' – '.join([str(a)] if a not in (None, '') else []) + (' – (end unknown or continuing)' if b_open else f' – {b}' if b not in (None, '') else '')
                 uncertain = '?' in raw_label
                 lo = pa[0] if pa else None
-                hi = pb[1] if pb else (pa[1] if pa else None)
+                # a stated end that is "unknown/continuing" leaves the end open; no end field at all keeps the start's own span
+                hi = None if b_open else pb[1] if pb else (pa[1] if pa and b in (None, '') else None)
                 if pa and pa[2] == 'from year':
                     hi = pb[1] if pb else None
             else:
@@ -313,6 +457,11 @@ def records(spec):
                 uncertain = '?' in raw_label
                 pr = parse_dating(raw_label)
                 lo, hi = (pr[0], pr[1]) if pr else (None, None)
+            if lo is None and hi is None and dt.get('fallback'):
+                fb = dt['fallback']
+                lo, hi = fb['from'], fb['to']
+                raw_label = fb['label']
+                skipped['no own date: part period used (' + fb['label'][:40] + ')'] += 1
             if lo is None and hi is None:
                 skipped['no date in the record'] += 1
                 if not spec.get('keepUndated'):
@@ -327,13 +476,53 @@ def records(spec):
                 rec['env'] = (lo, hi)
             rec['per'] = f"{raw_label}{' (uncertain in the source)' if uncertain and '?' not in raw_label else ''} ({spec.get('datingLabel', 'source dating')})"[:120]
         out.append(rec)
+    if spec.get('groupBy'):
+        out = _group_phases(out, spec, skipped)
     return out, dict(skipped)
 
 
-def specs(public=None):
+def _group_phases(recs, spec, skipped):
+    """Records of one place (spec "groupBy": the record name + position) merged into phases: dated evidence that overlaps or
+    lies within 50 years is one phase; a gap stays a gap. The labels of the merged evidence are kept (counted)."""
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for r in recs:
+        groups[(r['name'], r['lon'], r['lat'])].append(r)
+    out = []
+    for (name, lon, lat), rs in groups.items():
+        dated = sorted((r for r in rs if r.get('env') and r['env'][0] is not None), key=lambda r: r['env'][0])
+        if spec.get('groupFirstAttested') and dated:
+            # the place from its earliest dated record on (first attestation ≠ founding); later records are counted, not used as ends
+            first, last = dated[0]['env'][0], max(r['env'][1] or r['env'][0] for r in dated)
+            base = dated[0]
+            out.append(dict(base, id=f"{base['id']}:fa", env=(first, None), fa=1, ty=spec.get('groupType', base['ty']),
+                            per=f"first attested {first} ({spec.get('groupNoun', 'record')}; {len(dated)} dated mention{'s' if len(dated) > 1 else ''} {first}–{last})"[:120]))
+            continue
+        phases = []
+        for r in dated:
+            a_, b_ = r['env'][0], r['env'][1] if r['env'][1] is not None else r['env'][0]
+            if phases and a_ <= phases[-1]['to'] + 50:
+                phases[-1]['to'] = max(phases[-1]['to'], b_)
+                phases[-1]['n'] += 1
+                phases[-1]['labels'].add(r['ty'])
+            else:
+                phases.append({'from': a_, 'to': b_, 'n': 1, 'labels': {r['ty']}, 'base': r})
+        for k, ph in enumerate(phases):
+            base = ph['base']
+            out.append(dict(base, id=f"{base['id']}:{k}", env=(ph['from'], ph['to']),
+                            per=f"{spec.get('groupVerb', 'attested by')} {ph['n']} {spec.get('groupNoun', 'dated record')}{'s' if ph['n'] > 1 else ''} ({', '.join(sorted(ph['labels']))[:60]}): {ph['from']}–{ph['to']}"[:120],
+                            ty=spec.get('groupType', base['ty'])))
+        if len(rs) > len(dated):
+            skipped['undated evidence (not used)'] += len(rs) - len(dated)
+    return out
+
+
+def specs(public=None, geometry='points'):
     out = []
     for p in sorted(glob.glob(os.path.join(SPECS, '*.json'))):
         s = json.load(open(p, encoding='utf-8'))
+        if geometry and s.get('geometry', 'points') != geometry:
+            continue
         if s.get('enabled', True) and (public is None or bool(s.get('public')) == public):
             out.append(s)
     return out
@@ -349,10 +538,16 @@ def write_app_module(loaded):
         return json.dumps(s, ensure_ascii=False)
     lines = ['// Generated by scripts/atlas-build/generic.py from data/historical/specs/*.json during the world build. Do not edit by hand.',
              'export const SPEC_DATASETS = {']
-    for s in specs():
-        recs = loaded.get(s['src']) or []
-        ys = [y for r in recs for y in ((r.get('env') or (None, None)) + ((r['snap'], r['snap']) if r.get('snap') else ())) if y is not None]
-        lons, lats = [r['lon'] for r in recs], [r['lat'] for r in recs]
+    for s in specs(geometry=None):
+        recs = loaded.get(s['src']) or (line_features(s) if s.get('geometry') == 'lines' else area_features(s) if s.get('geometry') == 'polygons' else [])
+        if s.get('geometry') in ('lines', 'polygons'):
+            ys = [y for _, p, _ in recs for y in (p.get('ef'), p.get('et')) if y is not None]
+            from shapely.geometry import shape
+            bs = [shape(g).bounds for g, _, _ in recs]
+            lons, lats = [b[0] for b in bs] + [b[2] for b in bs], [b[1] for b in bs] + [b[3] for b in bs]
+        else:
+            ys = [y for r in recs for y in ((r.get('env') or (None, None)) + ((r['snap'], r['snap']) if r.get('snap') else ())) if y is not None]
+            lons, lats = [r['lon'] for r in recs], [r['lat'] for r in recs]
         cov = [min(ys), max(ys)] if ys else [1, 1914]
         box = [round(min(lons), 1), round(min(lats), 1), round(max(lons), 1), round(max(lats), 1)] if recs else [-25, 27, 62, 72]
         lines.append(f"  {s['src']}: {{ name: {q(s['title'])}, license: {q(s['licence'])}, url: {q(s['url'])}, coverage: [{cov[0]}, {cov[1]}] as [number, number], "
@@ -360,3 +555,77 @@ def write_app_module(loaded):
                      f"describe: {q(s.get('describe') or s['title'])}, public: {'true' if s.get('public') else 'false'}, layers: {q(s.get('layers') or ['medieval-archaeology'])} as string[] }},")
     lines += ['} as const;', 'export type SpecDatasetId = keyof typeof SPEC_DATASETS;', '']
     open(APP_MODULE, 'w', encoding='utf-8').write('\n'.join(lines))
+
+
+def line_features(spec):
+    """Dated line features (roads, routes, waterways) for a tile set: (GeoJSON geometry, props, min zoom).
+    Props follow the dated-roads layer: ef/et (the part's period), n (name), k (type), u (1 = position uncertain), src, per."""
+    global KEEP_GEOM
+    out = []
+    for k, sp in enumerate(parts(spec)):
+        KEEP_GEOM = True
+        try:
+            rows = read_rows(sp)
+        finally:
+            KEEP_GEOM = False
+        f, dt = sp.get('fields', {}), sp['dating']
+        unc = f.get('uncertain') or {}
+        for i, p in enumerate(rows):
+            g = p.get('__geom')
+            if not g or g.get('type') not in ('LineString', 'MultiLineString'):
+                continue
+            pr = {'i': f"{spec['src']}:{k}:{p.get(f.get('id')) if f.get('id') else i}", 'src': spec['src'], 'k': str(_field(p, f.get('type')) or 'road')[:40],
+                  'u': 1 if unc and str(p.get(unc['field'])) in unc['values'] else 0, 'per': dt.get('label', '')[:80]}
+            nm = _field(p, f.get('name'))
+            if nm:
+                pr['n'] = str(nm)[:60]
+            for extra in f.get('keep', []):
+                if p.get(extra) not in (None, ''):
+                    pr[extra[:12]] = str(p[extra])[:60]
+            if dt['mode'] == 'envelope':
+                pr['ef'], pr['et'] = dt['from'], dt['to']
+            elif dt['mode'] == 'snapshot':
+                pr['ef'] = pr['et'] = dt['year']
+                pr['sn'] = 1
+            else:
+                continue  # lines are drawn only with their part's own dating
+            out.append((g, pr, f.get('minzoom', 5)))
+    return out
+
+
+def area_features(spec):
+    """Dated areas (historical administrative or political units) for a tile set: (GeoJSON geometry, props, min zoom).
+    With "dissolve": {"field": ..., "level": ...} the source polygons are merged per value of that field (e.g. localities →
+    counties); several dissolve levels may be given. Props: n (unit name), lv (level label), ef/et or sn (the source's dating), src, per."""
+    global KEEP_GEOM
+    from shapely.geometry import mapping, shape
+    from shapely.ops import unary_union
+    out = []
+    for k, sp in enumerate(parts(spec)):
+        KEEP_GEOM = True
+        try:
+            rows = read_rows(sp)
+        finally:
+            KEEP_GEOM = False
+        keep = sp.get('keep')
+        if keep:
+            rows = [p for p in rows if str(p.get(keep['field'])) in keep['values']]
+        dt = sp['dating']
+        date = {'ef': dt['year'], 'et': dt['year'], 'sn': 1} if dt['mode'] == 'snapshot' else {'ef': dt['from'], 'et': dt['to']}
+        names = sp.get('names') or {}
+        for lv in sp.get('dissolve') or []:
+            groups = {}
+            for p in rows:
+                g = p.get('__geom')
+                key = p.get(lv['field'])
+                if not g or key in (None, ''):
+                    continue
+                for v in str(key).split(';')[:1]:  # contested/divided units: the first named holder (the source lists them ';'-separated)
+                    groups.setdefault(v.strip(), []).append(shape(g).buffer(0))
+            for v, geoms in groups.items():
+                u = unary_union(geoms).simplify(lv.get('simplify', 0.0005), preserve_topology=True)
+                if u.is_empty:
+                    continue
+                out.append((mapping(u), {'i': f"{spec['src']}:{lv['field']}:{v}", 'n': names.get(lv['field'], {}).get(v, v)[:60], 'lv': lv['level'],
+                                         'src': spec['src'], 'per': dt.get('label', '')[:80], **date}, lv.get('minzoom', 4)))
+    return out

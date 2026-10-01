@@ -1,6 +1,7 @@
 // The private data pack: datasets Shelf may use privately but must not republish reach the app only through a file
 // the owner loads on their device — never through the public site. These tests build a pack in memory in the same
 // format scripts/atlas-build/private_pack.py writes, and check that the app reads it and that nothing private is public.
+import { SPEC_DATASETS } from './spec-datasets';
 import 'fake-indexeddb/auto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -78,7 +79,7 @@ describe('private data pack', () => {
     const rural = LAYERS.find((l) => l.id === 'rural-settlement')!;
     const castles = LAYERS.find((l) => l.id === 'castles')!;
     expect(rural.unavailable).toBeTruthy();
-    expect(castles.sources).toEqual(['medieval-sites', 'register-sites']);
+    expect(castles.sources).toEqual(['medieval-sites', 'register-sites', 'spec-sites']);
     await openPrivateData(pack({ 'tiles/rural-settlement.pmtiles': new Uint8Array(8), 'tiles/private-sites.pmtiles': new Uint8Array(8) }));
     expect(rural.unavailable).toBeUndefined();
     expect(castles.sources).toContain('private-sites');
@@ -146,7 +147,8 @@ describe('installing a pack on the device', () => {
 });
 
 describe('nothing private reaches the public site', () => {
-  const PRIVATE_SOURCES = ['tib', 'mfairs', 'afontium', 'ran', 'dicotopo', 'raa', 'ebidat', 'darmc', 'dkff', 'ariadne', 'latin1772', 'amcr'];
+  const PRIVATE_SOURCES = ['tib', 'mfairs', 'afontium', 'ran', 'dicotopo', 'raa', 'ebidat', 'darmc', 'dkff', 'ariadne', 'latin1772', 'amcr',
+    ...Object.entries(SPEC_DATASETS).filter(([, d]) => !d.public).map(([k]) => k)];
   it('the public place index holds no record of a private dataset', () => {
     const dir = join(ROOT, 'public/world/places/c');
     const srcs = new Set(readdirSync(dir).flatMap((f) => (JSON.parse(readFileSync(join(dir, f), 'utf8')) as unknown[][]).map((r) => r[0] as string)));

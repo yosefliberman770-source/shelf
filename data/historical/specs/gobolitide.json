@@ -1,0 +1,14 @@
+{
+ "id": "gobolitide", "src": "gobolitide", "public": true, "enabled": true,
+ "title": "Gobolitide (al-Jibāl, southern Jordan) settlement survey dataset, Nabataean to Byzantine (Kopij & Bała 2021)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.5849856",
+ "describe": "Archaeological sites of the Gobolitide microregion in southern Jordan (surveys and the MEGA-Jordan register) with the periods recorded for each; years from the standard Jordanian period scheme.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "gobolitide/original/Dataset-Gobolitide.csv", "delimiter": ";", "lon": "Longitude", "lat": "Latitude", "crs": "EPSG:4326"},
+ "fields": {"id": "Identyfikator", "name": "Name", "context": ["District", "Province"], "type": ["Type"],
+            "kind": {"field": "Type", "map": {"settlement; sherd/flint surface scatter": "settlement", "settlement": "settlement", "tower": "castle", "fort": "castle", "fort?": "castle", "milestone": "road"}, "default": "site"}},
+ "dating": {"mode": "periods", "field": "Chronology", "sep": ";", "label": "standard Jordanian period scheme (MEGA-Jordan)",
+            "table": {"nabatean": [-312, 106], "early roman": [-63, 135], "roman": [-63, 324], "late roman": [135, 324], "byzantine": [324, 636], "islamic": [636, 1918],
+                      "persian": [-539, -332], "iron age": [-1200, -539]}},
+ "datingLabel": "periods recorded in the survey"
+}

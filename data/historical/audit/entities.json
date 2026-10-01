@@ -1,13 +1,17 @@
 {
- "records": 578351,
- "entities": 562706,
- "recordsInMultiSourceEntities": 29056,
- "multiSourceEntities": 13411,
- "largestEntity": 31,
+ "records": 698933,
+ "entities": 677953,
+ "recordsInMultiSourceEntities": 37945,
+ "multiSourceEntities": 16965,
+ "largestEntity": 70,
  "sourcePairs": [
   [
    "rohgis + wdextra",
    2010
+  ],
+  [
+   "dicotopo + halc",
+   1869
   ],
   [
    "rohgis + wikidata",
@@ -16,6 +20,10 @@
   [
    "generalkarte + ottomannfs",
    1128
+  ],
+  [
+   "halc + viabundus",
+   1028
   ],
   [
    "ivillaris + mfairs",
@@ -102,8 +110,16 @@
    177
   ],
   [
+   "ebidat + halc",
+   171
+  ],
+  [
    "dicotopo + dissiloc",
    168
+  ],
+  [
+   "buringh + halc",
+   161
   ],
   [
    "cassini + pleiades",
@@ -116,6 +132,10 @@
   [
    "buringh + dicotopo",
    145
+  ],
+  [
+   "nmrw + wikidata",
+   142
   ],
   [
    "dissiloc + pleiades",
@@ -142,34 +162,16 @@
    114
   ],
   [
-   "dissiloc + mfairs",
-   110
-  ],
-  [
-   "buringh + wikidata",
-   95
-  ],
-  [
-   "buringh + ivillaris",
-   94
-  ],
-  [
-   "ivillaris + wikidata",
-   91
-  ],
-  [
-   "canmore + wdextra",
-   84
-  ],
-  [
-   "generalkarte + wdextra",
-   79
+   "cassini + halc",
+   112
   ]
  ],
  "sameDatasetNearDuplicates": {
   "wdextra": 617,
   "afontium": 4352,
   "canmore": 6099,
+  "viatariq": 1098,
+  "ceans": 12625,
   "wikidata": 1545,
   "generalkarte": 163,
   "nid": 228452,
@@ -179,34 +181,46 @@
   "hrreg": 19,
   "pleiades": 269,
   "ariadne": 59606,
+  "nmrw": 912,
   "nokm": 32022,
+  "scoto": 792,
   "merimee": 57,
+  "mjcb": 69,
   "dicotopo": 355,
+  "woodlands": 25,
   "viabundus": 117,
   "swegeo": 1389,
   "buringh": 4,
+  "halc": 5268,
   "germaniasacra": 330,
+  "lcmints": 187,
   "ivillaris": 498,
   "tib": 21,
   "ottomannfs": 295,
   "sirkd": 82,
   "lvmon": 2,
+  "zbiva": 35,
   "tyrolmine": 16,
   "finreg": 3,
   "cassini": 30,
   "dissiloc": 49,
   "rohgis": 114,
+  "amcr": 3302457,
+  "transice": 33,
+  "raa": 6393,
   "nsh": 9,
   "wbohemia": 32,
   "hre": 2,
-  "transice": 33,
-  "raa": 6393,
   "irlsmr": 2,
+  "inhilldaugar": 7,
+  "lorsch": 4,
+  "gobolitide": 4,
   "bridges1250": 1,
   "latin1772": 43,
   "ran": 69,
   "mfairs": 1,
-  "darmc": 5
+  "darmc": 5,
+  "eesdelta": 1
  },
  "examples": {
   "London": [
@@ -231,7 +245,9 @@
     "buringh:Rome",
     "dissiloc:Roma",
     "dissiloc:Rome",
-    "pleiades:Roma"
+    "lorsch:Rom",
+    "pleiades:Roma",
+    "scoto:Roma"
    ]
   ],
   "York": [
@@ -247,8 +263,10 @@
    [
     "buringh:Koeln",
     "hre:Koeln",
+    "lorsch:Köln",
     "pleiades:Ara Ubiorum/Col. Claudia Ara Agrippinensium",
-    "viabundus:Köln"
+    "viabundus:Köln",
+    "woodlands:Koeln"
    ]
   ],
   "Constantinople": [
@@ -302,6 +320,7 @@
     "buringh:Sofia",
     "dissiloc:Sofia",
     "generalkarte:Sofia",
+    "mjcb:Sofia",
     "ottomannfs:Sofya",
     "pleiades:Serdica"
    ]

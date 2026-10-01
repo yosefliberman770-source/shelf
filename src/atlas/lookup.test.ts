@@ -29,7 +29,8 @@ describe('historical names', () => {
   it('does not guess between datasets: "Rome" is also a Mecklenburg village (Viabundus) when the date is unknown', async () => {
     const m = await matchName('Rome');
     expect(m.status).toBe('ambiguous');
-    expect(m.candidates.map((c) => c.gazetteer).sort()).toEqual(['pleiades', 'viabundus']);
+    // Also a village in the Ardennes (Duchy of Luxembourg) in the Historical Atlas of the Low Countries, c. 1500.
+    expect(m.candidates.map((c) => c.gazetteer).sort()).toEqual(['halc', 'pleiades', 'viabundus']);
   });
   it('keeps different places apart and follows recorded succession', async () => {
     const byz = (await place('Byzantium', 300))!;

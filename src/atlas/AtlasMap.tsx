@@ -655,6 +655,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         caution: 'Inscriptions show that people set up texts here then; the find-spot is where the stone was found, which may not be where it first stood.',
       };
     }
+    case 'spec-sites':
     case 'register-sites': {
       // National registers and historical gazetteers: each record says what its date is.
       const src = str('src') as DatasetId | undefined;

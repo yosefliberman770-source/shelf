@@ -705,6 +705,12 @@
   "sha256": "6af6af82e6ca00bb460444a5d3b9909abfec86edaf4a26a860bf0fce19b4cf5b",
   "downloaded": "2026-09-30"
  },
+ "ees-delta-survey/original/ees_delta_survey.geojson": {
+  "url": "https://services-eu1.arcgis.com/3pnT0aZIJbLTeP2N/arcgis/rest/services/EES_Delta_Survey/FeatureServer/1/query (all features, outSR=4326)",
+  "bytes": 881455,
+  "sha256": "4c4135691f39c9122d919ee6f0da7dfdd57df6a8b822d361f7b19c8f9db1d0c3",
+  "downloaded": "2026-10-01"
+ },
  "engel-hungary/original/Engel2020.zip": {
   "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
   "bytes": 51552337,
@@ -1154,6 +1160,12 @@
   "sha256": "1866e937c412e61b462a265de88cd1ab4d525b2667e6c5352e1685a0a6637422",
   "downloaded": "2026-09-30"
  },
+ "nmrw-wales/original/nmrw.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/NMRW/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 93347256,
+  "sha256": "d52810959fe31b7d38706ba8047bdb22f44508900907d41cdcd45b42d88503ca",
+  "downloaded": "2026-10-01"
+ },
  "nordic-spatial-humanities/original/source-data.zip": {
   "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
   "bytes": 14943058,
@@ -1189,6 +1201,12 @@
   "bytes": 7483,
   "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
   "downloaded": "2026-09-30"
+ },
+ "orkney-saga-names/original/saga_place_names_2025.geojson": {
+  "url": "https://services6.arcgis.com/VgBELOF6mvRyDvT0/arcgis/rest/services/Place_Names_in_the_Saga_of_the_Earls_of_Orkney_2025_WFL1/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 125208,
+  "sha256": "0a27bf4ddb364bab1f0a3dc6acac6995b715e6ecc44ce6b38fac8c8feafd2e65",
+  "downloaded": "2026-10-01"
  },
  "ottoman-nfs-gazetteer/original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx": {
   "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",

@@ -1,0 +1,113 @@
+{
+ "id": "viatariq-sites",
+ "src": "viatariq",
+ "public": true,
+ "enabled": true,
+ "dedupe": true,
+ "title": "VIA-TARIQ: medieval sites on the Levant road network (cities, stations, forts, bridges; Pažout, UAB)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.21981430",
+ "describe": "Cities, settlements, road stations, forts, sanctuaries and bridges of the medieval Levant road network, with their own earliest date and date of abandonment where known.",
+ "layers": [
+  "medieval-archaeology",
+  "gazetteer-settlements"
+ ],
+ "fields": {
+  "id": "Id",
+  "name": "name",
+  "context": [
+   "modernName"
+  ],
+  "kind": {
+   "field": "type",
+   "map": {
+    "city": "settlement",
+    "settlement": "settlement",
+    "station": "building",
+    "fort": "castle",
+    "sanctuary": "church",
+    "bridge": "bridge",
+    "place": "site"
+   },
+   "default": "site"
+  },
+  "type": [
+   "type"
+  ]
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "viatariq-levant/original/early_islamic_sites.geojson"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "minDate",
+    "to": "maxDate",
+    "fallback": {
+     "from": 650,
+     "to": 950,
+     "label": "present in the source's Early Islamic map (650–950)"
+    },
+    "openValues": [
+     "9999"
+    ]
+   }
+  },
+  {
+   "read": {
+    "path": "viatariq-levant/original/middle_islamic_sites.geojson"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "minDate",
+    "to": "maxDate",
+    "fallback": {
+     "from": 950,
+     "to": 1250,
+     "label": "present in the source's Middle Islamic map (950–1250)"
+    },
+    "openValues": [
+     "9999"
+    ]
+   }
+  },
+  {
+   "read": {
+    "path": "viatariq-levant/original/early_mamluk_sites.geojson"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "minDate",
+    "to": "maxDate",
+    "fallback": {
+     "from": 1250,
+     "to": 1350,
+     "label": "present in the source's Early Mamluk map (1250–1350)"
+    },
+    "openValues": [
+     "9999"
+    ]
+   }
+  },
+  {
+   "read": {
+    "path": "viatariq-levant/original/late_mamluk_sites.geojson"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "minDate",
+    "to": "maxDate",
+    "fallback": {
+     "from": 1350,
+     "to": 1517,
+     "label": "present in the source's Late Mamluk map (1350–1517)"
+    },
+    "openValues": [
+     "9999"
+    ]
+   }
+  }
+ ],
+ "datingLabel": "the site's own earliest / abandonment date in VIA-TARIQ"
+}

@@ -76,7 +76,7 @@ CATS = {
     'Names': r"place-?name|toponym|ortsnam|gazetteer|nom de lieu|nazwy miejsc|helynév|топоним|dictionnaire topographique|onomast|exonym",
     'Events': r"battle|war\b|wars\b|siege|event|conflict|revolt|rebellion|treaty",
 }
-OUTSIDE = r"\b(?:america|united states|u\.s\.|canada|canadian|massachusetts|michigan|new york|virginia|california|texas|mexico|brazil|argentin|chile|peru|india|china|chinese|japan|korea|australia|new zealand|indonesia|philippin|kenya|nigeria|south africa|ontario|quebec|nova scotia|prince edward)"
+OUTSIDE = r"\b(?:new south wales|thailand|iraq|assyria|mesopotamia|iran|afghanistan|vietnam|cambodia|america|united states|u\.s\.|canada|canadian|massachusetts|michigan|new york|virginia|california|texas|mexico|brazil|argentin|chile|peru|india|china|chinese|japan|korea|australia|new zealand|indonesia|philippin|kenya|nigeria|south africa|ontario|quebec|nova scotia|prince edward)"
 NEGATIVE = r"genom|protein|cell line|rna-seq|clinical|patient|covid|sars-cov|neural network training|tumou?r|mouse|mice|drosophila|enzyme|catalys|" \
            r"battery|lithium|polymer|nanopart|alloy|quantum|semiconductor|finite element|elastomer|students?' |questionnaire|survey of teachers|" \
            r"climate model|cmip|era5|precipitation forecast|satellite altimetry|lidar point cloud of forest|traffic accident|real estate|electricity|" \
@@ -125,13 +125,43 @@ def periods(text):
     return sorted(c for c in cs if 200 <= c <= 1900)
 
 
+ISO3 = {'FRA': 'France', 'DEU': 'Germany', 'ITA': 'Italy', 'ESP': 'Spain', 'PRT': 'Portugal', 'GBR': 'England', 'IRL': 'Ireland', 'NLD': 'Low Countries',
+        'BEL': 'Low Countries', 'LUX': 'Low Countries', 'DNK': 'Scandinavia', 'SWE': 'Scandinavia', 'NOR': 'Scandinavia', 'FIN': 'Finland & Iceland',
+        'ISL': 'Finland & Iceland', 'POL': 'Poland', 'CZE': 'Czechia & Slovakia', 'SVK': 'Czechia & Slovakia', 'HUN': 'Hungary', 'ROU': 'Romania & Moldova',
+        'MDA': 'Romania & Moldova', 'BGR': 'Balkans', 'SRB': 'Balkans', 'HRV': 'Balkans', 'SVN': 'Balkans', 'BIH': 'Balkans', 'MKD': 'Balkans', 'ALB': 'Balkans',
+        'MNE': 'Balkans', 'XKX': 'Balkans', 'GRC': 'Greece & Cyprus', 'CYP': 'Greece & Cyprus', 'EST': 'Baltic', 'LVA': 'Baltic', 'LTU': 'Baltic',
+        'UKR': 'East Slavic', 'BLR': 'East Slavic', 'RUS': 'East Slavic', 'TUR': 'Anatolia & Caucasus', 'GEO': 'Anatolia & Caucasus', 'ARM': 'Anatolia & Caucasus',
+        'AZE': 'Anatolia & Caucasus', 'ISR': 'Levant, Egypt & Maghreb', 'LBN': 'Levant, Egypt & Maghreb', 'JOR': 'Levant, Egypt & Maghreb', 'SYR': 'Levant, Egypt & Maghreb',
+        'EGY': 'Levant, Egypt & Maghreb', 'MAR': 'Levant, Egypt & Maghreb', 'DZA': 'Levant, Egypt & Maghreb', 'TUN': 'Levant, Egypt & Maghreb', 'LBY': 'Levant, Egypt & Maghreb',
+        'AUT': 'Austria & Switzerland', 'CHE': 'Austria & Switzerland', 'EEC': 'Europe-wide', 'AAA': 'Europe-wide'}
+
+
+def classify_repository(c):
+    """A research-data repository (re3data): an institution that may hold many more sources — kept when it covers history,
+    archaeology, geography or the humanities in a European/Mediterranean country."""
+    text = (c['title'] + ' ' + c.get('description', '') + ' ' + ' '.join(c.get('keywords', []))).lower()
+    regions = sorted({ISO3[k] for k in c.get('keywords', []) if k in ISO3})
+    topical = bool(re.search(r'\b(10[0-9] |history|histor|archaeolog|archäolog|geograph|humanities|cultural heritage|heritage|map|cartograph|place.?name|toponym)', text))
+    c['relevance'] = (40 if topical else 10) + (25 if regions else 0) + min(20, len(set(re.findall(HIST, text))) * 5)
+    c['regions'], c['categories'], c['periods'] = regions, ['Names'] if re.search(r'place.?name|toponym|gazetteer', text) else [], []
+    c['accessClass'] = 'G' if c['relevance'] >= 25 else 'I'
+    return c
+
+
 def classify(c):
     """Relevance and the A–I access class, from the candidate's own metadata."""
+    if c['channel'] == 're3data':
+        return classify_repository(c)
     text = f"{c['title']} {c.get('description', '')} {' '.join(c.get('keywords', []))}"
     low = text.lower()
     h = len(set(re.findall(HIST, low)))
     g = len(set(re.findall(GEO, low))) + (2 if c.get('bbox') else 0)
-    regions = [r for r, rx in EUROPE.items() if re.search(rf'\b(?:{rx})', low)]
+    # A region named in the title counts; one named only in the description must be named at least twice
+    # (a single passing mention — "a cohort from Syria" on Hadrian's Wall — does not make a dataset about it).
+    tlow = (c['title'] + ' ' + ' '.join(k for k in c.get('keywords', []) if isinstance(k, str))).lower()
+    regions = [r for r, rx in EUROPE.items() if re.search(rf'\b(?:{rx})', tlow)]
+    if not regions:
+        regions = [r for r, rx in EUROPE.items() if len(re.findall(rf'\b(?:{rx})', low)) >= 2]
     if c.get('bbox'):
         w, s, e, n = c['bbox']
         if e >= -25 and w <= 60 and n >= 28 and s <= 72:
@@ -325,7 +355,7 @@ def from_ogm(base):
 
 UNIVERSE = os.path.join(ROOT, 'scripts', 'atlas-build', '.cache', 'universe')
 UNI_CHANNEL = {'datacite': 'datacite', 'openaire': 'openaire', 'europa': 'data.europa.eu', 'zenodo': 'zenodo', 'arcgis': 'arcgis-hub',
-               'pangaea': 'pangaea', 'europeana': 'europeana-maps', 'rumsey': 'rumsey-maps', 'dataverse': 'dataverse', 're3data': 're3data', 'ogm': 'ogm', 'chains': 'discovery-chain'}
+               'pangaea': 'pangaea', 'europeana': 'europeana-maps', 'rumsey': 'rumsey-maps', 'dataverse': 'dataverse', 're3data': 're3data', 'ogm': 'ogm', 'chains': 'discovery-chain', 'ariadnecoll': 'ariadne-collections'}
 
 
 def from_universe():

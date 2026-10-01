@@ -1072,5 +1072,217 @@
     "path": "original/urbanspatial-hist-urban-pop-3700bc-ad2000-xlsx.xlsx"
    }
   ]
+ },
+ {
+  "id": "trajans-gate",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/17579442/files/tgp.zip/content",
+    "path": "original/tgp.zip"
+   }
+  ]
+ },
+ {
+  "id": "zbiva",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_data.xlsx/content",
+    "path": "original/20211206_Zbiva_v4_selection_data.xlsx"
+   },
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_data.csv/content",
+    "path": "original/20211206_Zbiva_v4_selection_data.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_metadata.docx/content",
+    "path": "original/20211206_Zbiva_v4_selection_metadata.docx"
+   }
+  ]
+ },
+ {
+  "id": "viatariq-levant",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/readme.md/content",
+    "path": "original/readme.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/bibliography.md/content",
+    "path": "original/bibliography.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_roads.geojson/content",
+    "path": "original/early_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_sites.geojson/content",
+    "path": "original/early_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_roads.geojson/content",
+    "path": "original/middle_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_sites.geojson/content",
+    "path": "original/middle_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_roads.geojson/content",
+    "path": "original/early_mamluk_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_sites.geojson/content",
+    "path": "original/early_mamluk_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_roads.geojson/content",
+    "path": "original/late_mamluk_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_sites.geojson/content",
+    "path": "original/late_mamluk_sites.geojson"
+   }
+  ]
+ },
+ {
+  "id": "ees-delta-survey",
+  "local_only": true,
+  "note": "Snapshot of the EES ArcGIS layer by scripts/historical-data/fetch_arcgis.py; reuse needs the EES's permission → private pack.",
+  "files": []
+ },
+ {
+  "id": "amcr-czechia",
+  "local_only": true,
+  "note": "OAI-PMH harvest by scripts/historical-data/fetch_oai.py (api.aiscr.cz, CC BY-NC 4.0) → private pack.",
+  "files": []
+ },
+ {
+  "id": "gobolitide",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5849856/files/Dataset-Gobolitide.csv/content",
+    "path": "original/Dataset-Gobolitide.csv"
+   }
+  ]
+ },
+ {
+  "id": "mjcb-byzantine-jewry",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_attribute.csv/content",
+    "path": "original/mjcb_attribute.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_gazetteer.csv/content",
+    "path": "original/mjcb_gazetteer.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_bibliography.txt/content",
+    "path": "original/mjcb_bibliography.txt"
+   }
+  ]
+ },
+ {
+  "id": "inhilldaugar",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21157502/files/Inhilldaugar%20-%20database.csv/content",
+    "path": "original/Inhilldaugar - database.csv"
+   }
+  ]
+ },
+ {
+  "id": "scoto-itineraries",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1650.csv/content",
+    "path": "original/i_SF1650.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1675_01.csv/content",
+    "path": "original/i_SF1675_01.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1675_02.csv/content",
+    "path": "original/i_SF1675_02.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1700.csv/content",
+    "path": "original/i_SF1700.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/README_v1.2.txt/content",
+    "path": "original/README_v1.2.txt"
+   }
+  ]
+ },
+ {
+  "id": "woodlands-antiquity",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/18370269/files/dataset_Woodlands_of_Antiquity_v2.xlsx/content",
+    "path": "original/dataset_Woodlands_of_Antiquity_v2.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "orkney-saga-names",
+  "local_only": true,
+  "note": "ArcGIS snapshot by fetch_arcgis.py; no licence stated → private pack.",
+  "files": []
+ },
+ {
+  "id": "ceans-slovakia",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5708033/files/CEANS_2021_harmonized.zip/content",
+    "path": "original/CEANS_2021_harmonized.zip"
+   }
+  ]
+ },
+ {
+  "id": "nmrw-wales",
+  "note": "ArcGIS snapshot by fetch_arcgis.py (RCAHMW, OGL v3.0).",
+  "files": []
+ },
+ {
+  "id": "lc-mints",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.nl/api/access/datafile/572795",
+    "path": "original/Mint houses.csv"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/572800",
+    "path": "original/Mint authorities.geojson"
+   }
+  ]
+ },
+ {
+  "id": "lorsch-codex",
+  "files": [
+   {
+    "url": "https://heidata.uni-heidelberg.de/api/access/datafile/552",
+    "path": "original/LorscherCodex.kml"
+   }
+  ]
+ },
+ {
+  "id": "halc-low-countries",
+  "files": [
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639017",
+    "path": "original/HALC Localities.gpkg"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639014",
+    "path": "original/HALC 1500.gpkg"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639016",
+    "path": "original/HALC Codebook.xlsx"
+   }
+  ]
  }
 ]

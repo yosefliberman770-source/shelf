@@ -1,0 +1,73 @@
+{
+ "id": "zbiva",
+ "src": "zbiva",
+ "public": true,
+ "enabled": true,
+ "title": "Zbiva, Early Medieval Data Set for the Eastern Alps (ZRC SAZU), published subset",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.5761811",
+ "describe": "Early medieval archaeological sites of Slovenia, Austria, NW Croatia and NE Italy, each with its earliest and latest possible date and how it was dated. Names are as published; the published files replaced the letters Š/Č/Ž with an underscore, which is kept rather than guessed.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "zbiva/original/20211206_Zbiva_v4_selection_data.xlsx",
+  "lon": "Lon",
+  "lat": "Lat",
+  "crs": "EPSG:4326"
+ },
+ "fields": {
+  "id": "ID",
+  "name": "Name",
+  "kind": {
+   "field": "Sitetype",
+   "map": {
+    "1": "site",
+    "2": "site",
+    "3": "church",
+    "4": "castle",
+    "5": "settlement",
+    "6": "hoard",
+    "7": "site",
+    "8": "settlement"
+   },
+   "default": "site"
+  },
+  "type": [
+   "Sitetype"
+  ],
+  "typeMap": {
+   "Sitetype": {
+    "1": "burial site",
+    "2": "stray find",
+    "3": "cult site / church",
+    "4": "castle / fort",
+    "5": "settlement",
+    "6": "hoard",
+    "7": "other site",
+    "8": "urban settlement"
+   },
+   "Datetype": {
+    "0": "dating source not recorded",
+    "1": "dated by radiometric method",
+    "2": "dated by artefact typology",
+    "3": "dated after peer-reviewed publication"
+   }
+  },
+  "typeExtra": [
+   "Datetype"
+  ],
+  "approx": {
+   "field": "Loconf",
+   "values": [
+    "1"
+   ]
+  }
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "Datefrom",
+  "to": "Dateuntl"
+ },
+ "datingLabel": "earliest–latest possible date in Zbiva"
+}

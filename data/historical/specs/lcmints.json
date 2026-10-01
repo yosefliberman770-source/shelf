@@ -1,0 +1,40 @@
+{
+ "id": "lc-mint-houses",
+ "src": "lcmints",
+ "public": false,
+ "enabled": true,
+ "groupBy": "place",
+ "title": "Mint Houses of the Low Countries, with years of production (IISH)",
+ "licence": "CC BY-NC-SA 4.0 (private use)",
+ "url": "https://doi.org/10.34894/1NWHJB",
+ "describe": "Every known mint of (or for) the Low Countries with the years it struck coins, from the coin-production dataset of the IISH and the standard catalogues; separate production periods stay separate.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "lc-mints/original/Mint houses.csv",
+  "lon": "X",
+  "lat": "Y",
+  "crs": "EPSG:4326"
+ },
+ "fields": {
+  "id": "ID",
+  "name": "MINT",
+  "kind": "mine",
+  "type": [
+   "AUTHORITY"
+  ],
+  "context": [
+   "AUTHORITY"
+  ]
+ },
+ "groupType": "mint",
+ "groupVerb": "striking coins:",
+ "groupNoun": "production period",
+ "dating": {
+  "mode": "fields",
+  "from": "DATEfrom",
+  "to": "DATEto"
+ },
+ "datingLabel": "years of coin production"
+}

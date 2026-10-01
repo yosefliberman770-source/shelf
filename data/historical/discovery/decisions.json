@@ -461,10 +461,10 @@
    "match": [
     "10.5281/zenodo.17579442"
    ],
-   "status": "evaluated",
+   "status": "integrated",
    "region": "Bulgaria",
    "note": "Inspected 2026-10-01 (tgp.zip, CC BY 4.0, kept in the raw vault): 15 sites (inns, villages, a fortress) dated by century, several marked uncertain (?), plus an undated Ottoman road trace Ihtiman–Plovdiv. Too small to change any coverage cell; not integrated for now.",
-   "state": "data-inspected"
+   "state": "integrated"
   },
   {
    "title": "AMCR — Archaeological Map of the Czech Republic (Archeologický informační systém ČR)",
@@ -473,11 +473,507 @@
     "aiscr.cz",
     "10.60585/"
    ],
-   "status": "acquired",
-   "state": "acquisition-attempted",
+   "status": "integrated",
+   "state": "integrated",
    "region": "Czechia",
    "dataset": "amcr-czechia",
-   "note": "Found by the automated investigation (92 of its document records surfaced as candidates). Open OAI-PMH API, CC BY-NC 4.0 → private pack. 11,042 sites and 236,259 fieldwork events, each split into components with an AMCR period whose years come from its PeriodO-linked vocabulary (e.g. Early Middle Hillfort Period 801–850); 268,599 spatial units (PIAN) with geometry; 18,376 individual finds. Harvest started 2026-10-01 (fetch_oai.py, resumable)."
+   "note": "Found by the automated investigation (92 of its document records surfaced as candidates). Open OAI-PMH API, CC BY-NC 4.0 → private pack. 11,042 sites and 236,259 fieldwork events, each split into components with an AMCR period whose years come from its PeriodO-linked vocabulary (e.g. Early Middle Hillfort Period 801–850); 268,599 spatial units (PIAN) with geometry; 18,376 individual finds. Harvest started 2026-10-01 (fetch_oai.py, resumable). Harvest completed 2026-10-01: 69,860 dated phases (private pack); 34,305 restricted records and 184,788 negative units left out."
+  },
+  {
+   "title": "A database for Spondylus gaederopus during the Neolithic of Europe",
+   "match": [
+    "10.5281/zenodo.2840332",
+    "10.5281/zenodo.2840333"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Europe-wide",
+   "note": "Automated investigation 2026-10-01, reviewed: Neolithic artefact finds only — outside 1–1914."
+  },
+  {
+   "title": "Mapping smallpox cases and vaccination efforts in New South Wales",
+   "match": [
+    "10.6084/m9.figshare.29881058"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Australia",
+   "note": "Automated investigation 2026-10-01, reviewed: New South Wales, Australia (matched \"Wales\" in metadata)."
+  },
+  {
+   "title": "Thailand Canonical Administrative-Names Reference",
+   "match": [
+    "10.5281/zenodo.20050035"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Thailand",
+   "note": "Automated investigation 2026-10-01, reviewed: Outside the atlas area."
+  },
+  {
+   "title": "Villages to empire (Assyrian governance)",
+   "match": [
+    "10.5281/zenodo.15111789"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Mesopotamia",
+   "note": "Automated investigation 2026-10-01, reviewed: Northern Mesopotamia, Iron Age — outside the atlas area."
+  },
+  {
+   "title": "Where Went UK Churches: converted churches",
+   "match": [
+    "10.7910/dvn/4an2fl"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "England",
+   "note": "Automated investigation 2026-10-01, reviewed: Dates are modern conversion years, not the churches' history."
+  },
+  {
+   "title": "N Italy Zooarchaeological Dataset",
+   "match": [
+    "10.5281/zenodo.6917159"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Italy",
+   "note": "Automated investigation 2026-10-01, reviewed: Bronze Age faunal assemblages — outside 1–1914."
+  },
+  {
+   "title": "Historical Place Gazetteer and Historical Mine Register, Tyrol (duplicate of integrated)",
+   "match": [
+    "10.5281/zenodo.6275762"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Austria",
+   "note": "Automated investigation 2026-10-01, reviewed: Already integrated (tyrolmine)."
+  },
+  {
+   "title": "Ottoman NFS gazetteer population file (duplicate of integrated)",
+   "match": [
+    "10.5281/zenodo.7351936"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Balkans/Anatolia",
+   "note": "Automated investigation 2026-10-01, reviewed: Already integrated (ottomannfs)."
+  },
+  {
+   "title": "Bosworth Islamic Dynasties (Islamic Civilization Atlas Dataset) — same data as the Islamic History Atlas v7.5",
+   "match": [
+    "10.5281/zenodo.18818238",
+    "10.5281/zenodo.18818237"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Levant/Maghreb/Anatolia",
+   "note": "Automated investigation 2026-10-01, reviewed: Same table as Atlas of Islamic History v7.5.0.0 (zenodo.19183844)."
+  },
+  {
+   "title": "İslam Tarih Atlası / Atlas of Islamic History (v7.x)",
+   "match": [
+    "10.5281/zenodo.19183844",
+    "10.5281/zenodo.19312622"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Levant, Egypt & Maghreb; Anatolia",
+   "note": "Data inspected 2026-10-01: a derived web-app compilation. Its Yāqūt layer is geocoded by an AI model (\"enriched via Claude API\"), narratives are AI-completed, and its mint list mixes ancient and modern mints (e.g. Greek Haluntium, modern A Coruña) under \"Islamic mints\". Not used as a source; its underlying sources are followed instead (Bosworth, Nomisma, Hamburg Islamic Coin Corpus, al-Thurayyā — the last already integrated)."
+  },
+  {
+   "title": "Hamburg Islamic Coin Corpus (HICC) — dated emissions per mint",
+   "url": "https://www.aai.uni-hamburg.de/voror/forschung/numismatik.html",
+   "match": [
+    "www.aai.uni-hamburg.de"
+   ],
+   "status": "discovered",
+   "state": "catalogue-only",
+   "region": "Mediterranean",
+   "note": "Lead from the discovery chain of the Islamic History Atlas: coins with mint and year would date each mint's activity from emissions. Not yet inspected."
+  },
+  {
+   "title": "Nomisma.org mints (linked open data, CC BY)",
+   "url": "https://nomisma.org/",
+   "match": [
+    "nomisma.org"
+   ],
+   "status": "discovered",
+   "state": "catalogue-only",
+   "region": "Mediterranean",
+   "note": "Lead from the same chain: mint places with coordinates and identifiers; dating would come from coin corpora (OCRE, CRRO, HICC). Not yet inspected."
+  },
+  {
+   "title": "Zbiva, Early Medieval Data Set for the Eastern Alps (subset)",
+   "match": [
+    "10.5281/zenodo.5761811"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Slovenia, Austria, Croatia, NE Italy",
+   "note": "1,104 sites via spec (generic loader): own earliest–latest dates, dating method and confidence kept; names as published (Š/Č/Ž lost in the source files, not restored by guess). Chain lead: the full online Zbiva database (zbiva.zrc-sazu.si).",
+   "dataset": "zbiva"
+  },
+  {
+   "title": "VIA-TARIQ: Medieval road system in the Levant (roads and sites)",
+   "match": [
+    "10.5281/zenodo.21981430"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "note": "2,372 road segments drawn per period (650–950, 950–1250, 1250–1350, 1350–1517) with certainty; 1,065 sites with own dates (9999 = unknown/continuing kept open), else the period of the map they are in.",
+   "dataset": "viatariq"
+  },
+  {
+   "title": "Egypt Exploration Society Delta Survey sites",
+   "match": [
+    "EES_Delta_Survey",
+    "Egypt_Exploration_Society_Delta_Survey"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Egypt",
+   "note": "782 sites (current ArcGIS layer snapshot); periods → years by standard Egyptian chronology stated in each label; private pack (reuse needs EES permission).",
+   "dataset": "eesdelta"
+  },
+  {
+   "title": "Mapping Jewish Communities of the Byzantine Empire",
+   "match": [
+    "10.5281/zenodo.7575860"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Greece, Anatolia, S Italy, Balkans",
+   "note": "176 attested phases from dated evidence joined to the gazetteer; island-level evidence placed at the island (approximate); 33 evidence rows the source could not locate left out.",
+   "dataset": "mjcb"
+  },
+  {
+   "title": "Gobolitide (al-Jibal) microregion settlement dataset",
+   "match": [
+    "10.5281/zenodo.5849856"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "note": "900 dated site phases; periods → years by the standard Jordanian (MEGA-Jordan) scheme, stated in labels.",
+   "dataset": "gobolitide"
+  },
+  {
+   "title": "Place-names in the Saga of the Earls of Orkney (Nottingham, 2025)",
+   "match": [
+    "Place_Names_in_the_Saga_of_the_Earls_of_Orkney"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Scotland",
+   "note": "92 names shown from their earliest saga-manuscript attestation (first attestation ≠ founding); no licence stated → private pack.",
+   "dataset": "orkneysaga"
+  },
+  {
+   "title": "MobileGIS in archaeological prospection in Tunisia (MR3)",
+   "match": [
+    "10.5281/zenodo.12601441"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Maghreb",
+   "note": "Survey of finds inside one rural site — not atlas-scale."
+  },
+  {
+   "title": "HMAP Dataset 19: Pärnu City Customs Records",
+   "match": [
+    "10.6084/m9.figshare.22752623"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-spatial",
+   "region": "Estonia",
+   "note": "Customs time series for one port (Pärnu); no further places."
+  },
+  {
+   "title": "Zbiva full database (zbiva.zrc-sazu.si) — sites, graves, artefacts",
+   "url": "https://zbiva.zrc-sazu.si/",
+   "match": [
+    "zbiva.zrc-sazu.si"
+   ],
+   "status": "blocked",
+   "state": "blocked",
+   "region": "Slovenia, Austria, Croatia, NE Italy",
+   "note": "Chain lead from the Zbiva subset (integrated). 2026-10-01: the host resets the TLS connection from this machine (curl error 35, http and https). Retry from another network or ask ZRC SAZU for an export; the published subset is in use meanwhile."
+  },
+  {
+   "title": "INHILLDAUGAR: annotated place-names along the Daugava (Latvia)",
+   "match": [
+    "10.5281/zenodo.21157502"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Latvia",
+   "note": "516 of 10,098 names carry a documented attestation century (13th–19th c.; sources such as the 1557 register, Mellin 1798) and are shown from it as first attestations; the rest (linguistic \"early/late\" only, or unclear) stay undated.",
+   "dataset": "inhilldaugar"
+  },
+  {
+   "title": "Francesco Scoto's Italian travel manuals 1650–1700 (EMDigIt)",
+   "match": [
+    "10.5281/zenodo.19909380",
+    "10.5281/zenodo.22939426"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Italy",
+   "note": "972 place listings as snapshots of the 1650, 1675 (two editions) and 1700 editions; uncertain identifications marked approximate.",
+   "dataset": "scoto"
+  },
+  {
+   "title": "Woodlands of Antiquity: dendroarchaeological dataset",
+   "match": [
+    "10.5281/zenodo.17090406",
+    "10.5281/zenodo.18370269"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Germany, France, Switzerland, Low Countries",
+   "note": "592 site phases from 3,392 exact felling dates; 13,058 post-quem and 3,947 interval dates not used (no construction year).",
+   "dataset": "woodlands"
+  },
+  {
+   "title": "Historical GIS and Guidebooks: Czechoslovak Tourist Attractions",
+   "match": [
+    "10.5281/zenodo.7418864"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Czechia",
+   "note": "A 1928 guidebook — after the atlas period (≤1914)."
+  },
+  {
+   "title": "AIDA Archive of Italian radiocarbon dates",
+   "match": [
+    "10.5281/zenodo.5156103"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Italy",
+   "note": "Overwhelmingly prehistoric radiocarbon samples."
+  },
+  {
+   "title": "Energy consumption dataset (year built)",
+   "match": [
+    "10.5281/zenodo.18301550"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "—",
+   "note": "Modern buildings energy certificates."
+  },
+  {
+   "title": "Historic Cantrefs and Commotes of Wales c. 1543 (ArcGIS)",
+   "match": [
+    "Historic_Cantrefs_of_Wales",
+    "Historic_Commotes_of_Wales"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Wales",
+   "note": "Automated investigation 2026-10-01, reviewed: Political units (polygons) as reconstructed for c. 1543 — needs the boundary-polygon path (queued for the generic polygon loader)."
+  },
+  {
+   "title": "Historical Atlas of the Low Countries (1350–1800), DataverseNL",
+   "match": [
+    "10.34894/btkfhv"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Low Countries",
+   "note": "Automated investigation 2026-10-01, reviewed: 350 dated features (TIME_START/END) — political units; needs the polygon path (queued)."
+  },
+  {
+   "title": "Arab conquest of the Maghreb (ArcGIS events)",
+   "match": [
+    "ArabConquestOfMaghreb"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Maghreb",
+   "note": "Automated investigation 2026-10-01, reviewed: 29 dated campaign events 643–710s; small; queued for an events spec."
+  },
+  {
+   "title": "Early Medieval Belfast (ArcGIS)",
+   "match": [
+    "Early_Medieval_Belfast"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Ireland",
+   "note": "Automated investigation 2026-10-01, reviewed: 205 sites with period label \"Early Medieval (c.500–c.1100)\"; queued."
+  },
+  {
+   "title": "Archaeological Sites in Slovak Republic — Harmonized Dataset (CEANS 2021)",
+   "match": [
+    "10.5281/zenodo.5708032",
+    "10.5281/zenodo.5708033"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Slovakia",
+   "dataset": "ceans",
+   "note": "Found by investigation batch 2. 16,586 dated records: 6,742 with their own century/year, the rest by Slovak period code with conventional years stated in each label; prehistoric-only, negative and undatable records left out; cadastre-centre positions marked approximate."
+  },
+  {
+   "title": "Strucke C14 Sweden",
+   "match": [
+    "10.5281/zenodo.21932353"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Sweden",
+   "note": "Investigation batch 2, reviewed: Radiocarbon dates, overwhelmingly prehistoric."
+  },
+  {
+   "title": "Greek migration / diaspora maps (ArcGIS)",
+   "match": [
+    "GreekMigration_Embarkation",
+    "Composite_Migration_Map_of_the_Greek_Diaspora"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Greece",
+   "note": "Investigation batch 2, reviewed: 20th-century emigration records."
+  },
+  {
+   "title": "John Pendlebury's trips in Crete (ArcGIS)",
+   "match": [
+    "Pendlebury"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Greece",
+   "note": "Investigation batch 2, reviewed: 1930s travel itinerary."
+  },
+  {
+   "title": "HMAP Russian herring",
+   "match": [
+    "10.6084/m9.figshare.29180390"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-spatial",
+   "region": "East Slavic",
+   "note": "Investigation batch 2, reviewed: Catch/trade series without place geometry."
+  },
+  {
+   "title": "National Monuments Record of Wales (RCAHMW, NMRW)",
+   "match": [
+    "NMRW/FeatureServer",
+    "coflein.gov.uk"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "Found by investigation batch 2. 121,770 records snapshot (OGL v3.0); 107,389 dated phases via the FISH period thesaurus (years stated in labels); unknown/general/prehistoric-only left out.",
+   "dataset": "nmrw"
+  },
+  {
+   "title": "Georeferencing of the Lorscher Codex (UB Heidelberg)",
+   "match": [
+    "10.11588/data/10063"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Germany",
+   "note": "1,145 places shown from their earliest Lorsch charter (first attestation, not founding); 169 placemarks without a year left out.",
+   "dataset": "lorsch"
+  },
+  {
+   "title": "Mint Houses of the Low Countries (IISH)",
+   "match": [
+    "10.34894/1nwhjb"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "365 production phases from active years; CC BY-NC-SA → private pack.",
+   "dataset": "lcmints"
+  },
+  {
+   "title": "Mint Authorities of the Low Countries (IISH)",
+   "match": [
+    "10.34894/pb9at3"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Low Countries",
+   "note": "Dated polygons of coin-issuing authorities from the 12th c.; CC BY-NC-SA → needs a private polygon path (queued)."
+  },
+  {
+   "title": "Hierokles places (ArcGIS) — Synekdemos (c. 527)",
+   "match": [
+    "hierokles_places"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Greece, Anatolia, Balkans, Levant",
+   "note": "Investigation batch 2: 918 places of the 6th-c. list of cities of the Eastern Roman Empire — a dated snapshot; next cycle (check licence and identifications)."
+  },
+  {
+   "title": "EMDigIt Core Italian Itinerary Waypoints (ArcGIS)",
+   "match": [
+    "Early_Modern_Digital_Itineraries_(EMDigIt)"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Italy",
+   "note": "Investigation batch 2: 3,782 waypoints with min/max dates; extends Scoto; next cycle."
+  },
+  {
+   "title": "Fortresses between Damascus and Medina (Hajj route; after Petersen)",
+   "match": [
+    "Fortresses_between_Damascus_and_Medina"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Levant",
+   "note": "Investigation batch 2: 27 Ottoman Hajj-route forts with dates from primary sources; next cycle."
+  },
+  {
+   "title": "Georeferenced database of Medieval military and religious sites in Northern Italy",
+   "match": [
+    "10.17632/268xx6ddf4"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Italy",
+   "note": "Investigation batch 2: 84 sites with year/century; next cycle."
+  },
+  {
+   "title": "Historic Civil Parishes of Wales (OS 1st/2nd edition, ArcGIS)",
+   "match": [
+    "Historic_Civil_Parishes_of_Wales"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Wales",
+   "note": "Investigation batch 2: Parish polygons as on the 19th-c. OS editions; polygon path exists now — next cycle."
+  },
+  {
+   "title": "Agglomérations, vestiges du VIIIe s AEC au XVe s EC dans le monde romain (Nakala)",
+   "match": [
+    "10.34847/nkl.4678112k"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Europe-wide",
+   "note": "Investigation batch 2: Settlement remains with start/end periods (sample: 49% dated); next cycle."
+  },
+  {
+   "title": "Hillforts in Latvia along Daugava (Nakala)",
+   "match": [
+    "10.34847/nkl.aecdrl48"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Latvia",
+   "note": "Investigation batch 2: 21 hillforts with start/end periods; small; next cycle together with INHILLDAUGAR follow-ups."
   }
  ]
 }
