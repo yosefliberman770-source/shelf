@@ -147,7 +147,82 @@
    "notes": "Outlines of Dutch polders (or the municipalities that are the polder), fetched via Nominatim. The dates of draining and of the lakes’ extent are Shelf’s, from standard histories, and are approximate.",
    "retrieved": "2026-10-01",
    "counts": {
-    "features": 8
+    "features": 11
+   }
+  },
+  {
+   "id": "osmland",
+   "name": "OpenStreetMap land polygons (simplified)",
+   "url": "https://osmdata.openstreetmap.de/data/land-polygons.html",
+   "license": "ODbL 1.0",
+   "licenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+   "commercial": true,
+   "shareAlike": true,
+   "attribution": "© OpenStreetMap contributors (ODbL)",
+   "files": [
+    "../world/tiles/osm-land.pmtiles",
+    "../world/tiles/osm-water.pmtiles"
+   ],
+   "notes": "Today’s land and sea of Europe, simplified, to zoom 8. Drawn only when the detailed OpenFreeMap tiles cannot load.",
+   "retrieved": "2026-10-01",
+   "counts": {
+    "land": {
+     "land": {
+      "polygons": 16006,
+      "tiles": 3775,
+      "rejected": []
+     },
+     "sea": {
+      "polygons": 1313,
+      "tiles": 3896,
+      "rejected": []
+     }
+    },
+    "sea": {
+     "polygons": 1313,
+     "tiles": 3896,
+     "rejected": []
+    }
+   }
+  },
+  {
+   "id": "hydrolakes",
+   "name": "HydroLAKES v1.0 (HydroSHEDS) reservoirs, dated from Wikidata",
+   "url": "https://www.hydrosheds.org/products/hydrolakes",
+   "license": "CC BY 4.0",
+   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "HydroLAKES v1.0, Messager et al. 2016 (CC BY 4.0); dam dates from Wikidata (CC0)",
+   "files": [
+    "../world/tiles/reservoirs.pmtiles"
+   ],
+   "notes": "Reservoirs of Europe, drawn as land before their dam. The year is the earliest inception/opening date of a Wikidata dam or reservoir within 3 km of the outlet; reservoirs with none are drawn as land before 1800 (assumed).",
+   "retrieved": "2026-10-01",
+   "counts": {
+    "reservoirs": 1411,
+    "dated": 276,
+    "tiles": 4008,
+    "rejected": []
+   }
+  },
+  {
+   "id": "physlabels",
+   "name": "Mountain ranges and plains (Natural Earth); peaks (Wikidata)",
+   "url": "https://www.naturalearthdata.com/",
+   "license": "Public domain / CC0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "commercial": true,
+   "shareAlike": false,
+   "attribution": "Made with Natural Earth; peaks from Wikidata (CC0)",
+   "files": [
+    "physical-labels.json"
+   ],
+   "notes": "Today’s names of mountain ranges, plateaus, plains and deltas, and of peaks with a recorded prominence of at least 300 m (named from zoom 7 for 2,000 m to zoom 10 for 300 m).",
+   "retrieved": "2026-10-01",
+   "counts": {
+    "regions": 92,
+    "peaks": 2941
    }
   }
  ]

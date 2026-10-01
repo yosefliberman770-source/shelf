@@ -15,7 +15,7 @@ export const UNAVAILABLE_LABEL: Record<UnavailableKind, string> = {
   'not-integrated': 'not added to Shelf yet',
 };
 
-export type GroupId = 'places' | 'physical' | 'infrastructure' | 'political' | 'military' | 'economic';
+export type GroupId = 'places' | 'physical' | 'infrastructure' | 'political' | 'military' | 'economic' | 'modern';
 export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'places', label: 'Places' },
   { id: 'physical', label: 'Physical geography' },
@@ -23,10 +23,11 @@ export const GROUPS: { id: GroupId; label: string }[] = [
   { id: 'political', label: 'Political' },
   { id: 'military', label: 'Military' },
   { id: 'economic', label: 'Economic & cultural' },
+  { id: 'modern', label: 'Modern reference (today)' },
 ];
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
-  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm';
+  | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -38,6 +39,8 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   ohm: { name: 'OpenHistoricalMap', url: 'https://www.openhistoricalmap.org/copyright', license: 'CC0' },
   terrain: { name: 'Mapterhorn terrain (Copernicus GLO-30 and national elevation models; fallback: Mapzen/AWS Terrain Tiles)', url: 'https://mapterhorn.com/attribution', license: 'open data, see sources' },
   hydrosheds: { name: 'HydroRIVERS v1.0 (Lehner & Grill 2013, HydroSHEDS)', url: 'https://www.hydrosheds.org/products/hydrorivers', license: 'CC BY 4.0' },
+  hydrolakes: { name: 'HydroLAKES v1.0 (Messager et al. 2016); dam dates from Wikidata', url: 'https://www.hydrosheds.org/products/hydrolakes', license: 'CC BY 4.0' },
+  physlabels: { name: 'Natural Earth (ranges, plains); Wikidata (peaks)', url: 'https://www.naturalearthdata.com/', license: 'public domain / CC0' },
   osm: { name: 'OpenStreetMap contributors', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
   openfreemap: { name: 'OpenFreeMap © OpenMapTiles, data from OpenStreetMap', url: 'https://www.openstreetmap.org/copyright', license: 'ODbL' },
   itinere: { name: 'Itiner-e (Brughmans et al. 2024)', url: 'https://itiner-e.org/', license: 'CC BY 4.0' },
@@ -111,7 +114,7 @@ export interface AtlasLayerDef {
 // ── Palette (muted, map-like; works on the parchment base) ────────────────
 const C = {
   settlement: '#7a4a1e', city: '#5b2c0f', town: '#7a4a1e', village: '#9c7a57', port: '#1f6f8b', fort: '#8b2e2e', arch: '#8a7d5a',
-  river: '#4f8fb3', riverNet: '#3b7ca6', sea: '#cddde4', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
+  river: '#4f8fb3', riverNet: '#3b7ca6', sea: '#cddde4', land: '#efe7d4', modern: '#77727e', lake: '#9cc3d6', mountain: '#6d5a44', pass: '#a0522d', coast: '#5f7f8f', ancientCoast: '#1d4e66',
   road: '#9b2226', roadOhm: '#bb6a2b', bridge: '#444444',
   empire: '#b03a2e', kingdom: '#2e7d32', republic: '#1565c0', otherState: '#7b6a58', province: '#6d4c41', territory: '#8e44ad', border: '#5d4037',
   battle: '#c62828', siege: '#6a1b9a', campaign: '#ef6c00', war: '#000000',
@@ -174,6 +177,10 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'awmc-inland-water': (c) => ({ type: 'geojson', data: c.base + 'awmc-inland-water.json', attribution: credit('awmc') }),
   'awmc-snapshots': (c) => ({ type: 'geojson', data: c.base + 'awmc-snapshots.json', attribution: credit('awmc') }),
   'wikidata-events': (c) => ({ type: 'geojson', data: c.base + 'wikidata-events.json', attribution: credit('wikidata') }),
+  'physical-labels': (c) => ({ type: 'geojson', data: c.base + 'physical-labels.json', attribution: credit('physlabels') }),
+  reservoirs: (c) => pmtiles(c, 'reservoirs.pmtiles', 'hydrolakes', 10),
+  'osm-land': (c) => pmtiles(c, 'osm-land.pmtiles', 'osm', 8),
+  'osm-water': (c) => pmtiles(c, 'osm-water.pmtiles', 'osm', 8),
   'physical-change': (c) => ({ type: 'geojson', data: c.base + 'physical-change.json', attribution: credit('osm') }),
   'ne-rivers': (c) => ({ type: 'geojson', data: c.base + 'ne-rivers.json', attribution: credit('naturalearth') }),
   // Borders are split into time slices; the map swaps the file as the year moves.
@@ -185,6 +192,8 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   terrain: () => (terrainFallback
     ? { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 12, attribution: credit('terrain') }
     : { type: 'raster-dem', tiles: ['https://tiles.mapterhorn.com/{z}/{x}/{y}.webp'], encoding: 'terrarium', tileSize: 512, maxzoom: 12, attribution: credit('terrain') }),
+  // Sea depth: the older AWS tiles include the sea floor (Mapterhorn does not); low zoom is enough for depth bands.
+  bathymetry: () => ({ type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 6, attribution: credit('terrain') }),
   // Modern rivers by size, for zoomed-out views (see docs/BASE_MAP.md).
   hydrorivers: (c) => pmtiles(c, 'hydrorivers.pmtiles', 'hydrosheds', 8),
   // OpenStreetMap water, waterways and water names (free, no key). Also in the base style.
@@ -512,7 +521,17 @@ export const LAYERS: AtlasLayerDef[] = [
     id: 'terrain', group: 'physical', label: 'Terrain', datasets: ['terrain'], defaultOn: true,
     hint: 'Shaded relief from modern elevation data. Mountains haven’t moved much; coastlines and rivers have.', sources: ['terrain'],
     // Neutral grey shadows read as landform rather than as a colour; the "igor" method keeps ridges crisp without a plastic look.
-    specs: () => [{ id: 'terrain-hillshade', type: 'hillshade', source: 'terrain', paint: { 'hillshade-method': 'igor', 'hillshade-exaggeration': ['interpolate', ['linear'], ['zoom'], 3, 0.55, 8, 0.45, 12, 0.35], 'hillshade-shadow-color': '#4a4744', 'hillshade-highlight-color': 'rgba(255,255,255,0.5)', 'hillshade-accent-color': '#4a4744' } }],
+    specs: () => [
+      // Zoomed out, a light tint by height (lowland, upland, mountain), fading out by zoom 10.
+      { id: 'terrain-tint', type: 'color-relief', source: 'terrain', maxzoom: 10, paint: { 'color-relief-opacity': ['interpolate', ['linear'], ['zoom'], 3, 1, 7, 0.7, 10, 0] as ExpressionSpecification,
+        'color-relief-color': ['interpolate', ['linear'], ['elevation'], 0, 'rgba(110,140,90,0.10)', 300, 'rgba(110,140,90,0)', 700, 'rgba(150,115,75,0.07)', 1500, 'rgba(130,105,85,0.14)', 2500, 'rgba(235,235,240,0.30)'] as ExpressionSpecification } } as LayerSpecification,
+      { id: 'terrain-hillshade', type: 'hillshade', source: 'terrain', paint: { 'hillshade-method': 'igor', 'hillshade-exaggeration': ['interpolate', ['linear'], ['zoom'], 3, 0.55, 8, 0.45, 12, 0.35], 'hillshade-shadow-color': '#4a4744', 'hillshade-highlight-color': 'rgba(255,255,255,0.5)', 'hillshade-accent-color': '#4a4744' } }],
+  },
+  {
+    id: 'sea-depth', group: 'physical', label: 'Sea depth', datasets: ['terrain'], defaultOn: true,
+    hint: 'Deeper sea is drawn darker (bands from 500 m down), from elevation data that includes the sea floor (Mapzen/AWS). Shallow coastal shelves are not shaded.', sources: ['bathymetry'],
+    specs: () => [{ id: 'sea-depth-fill', type: 'color-relief', source: 'bathymetry', paint: { 'color-relief-opacity': ['interpolate', ['linear'], ['zoom'], 3, 1, 9, 0.6, 12, 0.3] as ExpressionSpecification,
+      'color-relief-color': ['interpolate', ['linear'], ['elevation'], -6000, 'rgba(40,85,125,0.30)', -3000, 'rgba(40,85,125,0.22)', -1500, 'rgba(50,95,135,0.14)', -500, 'rgba(60,105,145,0.07)', -450, 'rgba(60,105,145,0)'] as ExpressionSpecification } } as LayerSpecification],
   },
   {
     id: 'coast-modern', group: 'physical', label: 'Coastlines (modern)', datasets: ['naturalearth'], defaultOn: false,
@@ -548,7 +567,7 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'water-change', group: 'physical', label: 'Reclaimed land (as water before)', datasets: ['osm'], defaultOn: true,
-    hint: 'Land made from sea or lakes — the Zuiderzee polders (Flevoland, 1942–1968), the Haarlemmermeer (1852), the Beemster and Schermer (17th century) — is drawn as water in the years it was water. Outlines and early extents are approximate; before the dates given, today’s land is shown.',
+    hint: 'Land made from sea or lakes — the Zuiderzee polders (Flevoland, 1942–1968), the Haarlemmermeer (1852), the Beemster, Purmer and Schermer (17th century), Venice’s Tronchetto (c. 1960) — is drawn as water in the years it was water. Outlines and early extents are approximate; before the dates given, today’s land is shown.',
     sources: ['physical-change'],
     specs: (c) => {
       const filter = ['all', ['==', ['get', 'k'], 'became-land'], ['<=', ['get', 'f'], c.year], ['<', c.year, ['get', 'y']]] as FilterSpecification;
@@ -557,6 +576,46 @@ export const LAYERS: AtlasLayerDef[] = [
         { id: 'water-change-line', type: 'line', source: 'physical-change', minzoom: 7, filter, paint: { 'line-color': C.coast, 'line-width': 0.8, 'line-dasharray': [3, 3], 'line-opacity': 0.45 } },
       ];
     },
+  },
+  {
+    id: 'reservoirs-past', group: 'physical', label: 'Reservoirs only after their dams', datasets: ['hydrolakes'], defaultOn: true,
+    hint: 'Reservoirs (dammed lakes) are drawn as the land they flooded until their dam was built. Dates from Wikidata; reservoirs with no recorded date are treated as built after 1800 (assumed).', sources: ['reservoirs'],
+    specs: (c) => {
+      const filter = ['<', c.year, ['get', 'y']] as FilterSpecification;
+      return [
+        { id: 'reservoirs-past-fill', type: 'fill', source: 'reservoirs', 'source-layer': 'reservoirs', filter, paint: { 'fill-color': C.land, 'fill-opacity': 0.88 } },
+        { id: 'reservoirs-past-line', type: 'line', source: 'reservoirs', 'source-layer': 'reservoirs', minzoom: 8, filter, paint: { 'line-color': C.coast, 'line-width': 0.7, 'line-dasharray': [2, 3], 'line-opacity': 0.5 } },
+      ];
+    },
+  },
+  {
+    id: 'mountain-names', group: 'physical', label: 'Mountain ranges & peaks (names)', datasets: ['physlabels'], defaultOn: true,
+    hint: 'Today’s names of mountain ranges, plateaus, plains and deltas (Natural Earth), and of peaks by how far they rise above their surroundings (Wikidata).', sources: ['physical-labels'],
+    specs: () => [
+      { id: 'mountain-names-region', type: 'symbol', source: 'physical-labels', filter: ['all', ['!=', ['get', 'k'], 'peak'], ['<=', ['get', 'z'], ['zoom']]] as FilterSpecification,
+        layout: { 'text-field': ['upcase', ['get', 'n']], 'text-font': FONT, 'text-size': ['interpolate', ['linear'], ['zoom'], 3, 9.5, 8, 12] as ExpressionSpecification, 'text-letter-spacing': 0.25, 'text-max-width': 8 },
+        paint: { 'text-color': ['match', ['get', 'k'], 'range', '#6b5d4f', 'plateau', '#6b5d4f', '#7a6f5f'] as ExpressionSpecification, 'text-halo-color': C.halo, 'text-halo-width': 1.2, 'text-opacity': 0.85 } },
+      { id: 'mountain-names-peak', type: 'symbol', source: 'physical-labels', minzoom: 7, filter: ['all', ['==', ['get', 'k'], 'peak'], ['<=', ['get', 'z'], ['zoom']]] as FilterSpecification,
+        layout: { 'text-field': ['case', ['has', 'e'], ['concat', '▲ ', ['get', 'n'], '\n', ['to-string', ['get', 'e']], ' m'], ['concat', '▲ ', ['get', 'n']]] as ExpressionSpecification, 'text-font': FONT, 'text-size': 10, 'symbol-sort-key': ['-', 0, ['get', 'p']] as ExpressionSpecification },
+        paint: { 'text-color': '#5e5246', 'text-halo-color': C.halo, 'text-halo-width': 1.2 } },
+    ],
+  },
+  {
+    id: 'modern-names', group: 'modern', label: 'Today’s place names', datasets: ['openfreemap'], defaultOn: false,
+    hint: 'Names of cities, towns and villages as they are today, in grey, for orientation only — they say nothing about whether a place existed at the year shown. Historical names always take precedence.', sources: ['ofm'],
+    specs: () => (['city', 'town', 'village'] as const).map((cls, i) => ({
+      id: `modern-names-${cls}`, type: 'symbol', source: 'ofm', 'source-layer': 'place', minzoom: [4, 8, 11][i],
+      filter: (cls === 'city' ? ['all', ['==', ['get', 'class'], 'city'], ['<=', ['coalesce', ['get', 'rank'], 10], ['step', ['zoom'], 3, 6, 6, 7, 10]]] : ['==', ['get', 'class'], cls]) as FilterSpecification,
+      layout: { 'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']], 'text-font': FONT, 'text-size': [11, 10, 9.5][i], 'text-padding': 6, 'symbol-sort-key': ['coalesce', ['get', 'rank'], 99] as ExpressionSpecification },
+      paint: { 'text-color': C.modern, 'text-halo-color': C.halo, 'text-halo-width': 1.2 },
+    }) as LayerSpecification),
+  },
+  {
+    id: 'modern-roads', group: 'modern', label: 'Today’s main roads', datasets: ['openfreemap'], defaultOn: false,
+    hint: 'Motorways and main roads as they are today, thin and grey, for orientation only.', sources: ['ofm'],
+    specs: () => [{ id: 'modern-roads-line', type: 'line', source: 'ofm', 'source-layer': 'transportation', minzoom: 6,
+      filter: ['step', ['zoom'], ['in', ['get', 'class'], ['literal', ['motorway', 'trunk']]], 9, ['in', ['get', 'class'], ['literal', ['motorway', 'trunk', 'primary']]]] as FilterSpecification,
+      layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#9a97a0', 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.5, 12, 1.6] as ExpressionSpecification, 'line-opacity': 0.7 } }],
   },
   {
     id: 'water-names', group: 'physical', label: 'Seas & lakes (names)', datasets: ['openfreemap'], defaultOn: true,
@@ -916,12 +975,12 @@ const LABEL_PRIORITY: Record<string, number> = {
   domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
   // Modern base-map names: river names keep the middle rank they always had (below towns, kingdoms and battles);
   // sea and lake names give way to every historical label.
-  'water-names': 20,
+  'water-names': 20, 'mountain-names': 22, 'modern-names': 10,
 };
 /** Sort key for a layer's labels (priority, then draw order). */
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
-export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'inland-navigation', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'trade-routes',
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-settlements', 'religious-houses', 'castles', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;

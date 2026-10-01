@@ -51,11 +51,11 @@ describe('atlas years', () => {
 
 describe('atlas layer catalog', () => {
   const ctx: LayerCtx = { year: -218, base: '/atlas/', eventWindow: 0 };
-  it('has six groups, unique ids and a draw order for every layer', () => {
+  it('has seven groups, unique ids and a draw order for every layer', () => {
     const ids = LAYERS.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const l of LAYERS) if (!l.unavailable) expect(DRAW_ORDER).toContain(l.id);
-    expect(new Set(LAYERS.map((l) => l.group)).size).toBe(6);
+    expect(new Set(LAYERS.map((l) => l.group)).size).toBe(7);
     expect(DEFAULT_LAYERS.length).toBeGreaterThan(0);
   });
   it('credits a dataset for every available layer', () => {
@@ -83,9 +83,21 @@ describe('atlas layer catalog', () => {
 describe('base map', () => {
   const ctx: LayerCtx = { year: 1300, base: '/atlas/', eventWindow: 0 };
   const all = LAYERS.filter((l) => !l.unavailable).flatMap((l) => l.specs(ctx)) as { id: string; source?: string; 'source-layer'?: string }[];
-  it('takes only water from the modern map — no modern borders, roads or places', () => {
-    const used = new Set(all.filter((l) => l.source === 'ofm').map((l) => l['source-layer']));
-    expect([...used].sort()).toEqual(['water_name', 'waterway']);
+  it('takes only water from the modern map by default — modern places and roads only in the Modern group, off by default, and never borders', () => {
+    const on = LAYERS.filter((l) => !l.unavailable && l.group !== 'modern').flatMap((l) => l.specs(ctx)) as typeof all;
+    expect([...new Set(on.filter((l) => l.source === 'ofm').map((l) => l['source-layer']))].sort()).toEqual(['water_name', 'waterway']);
+    for (const l of LAYERS.filter((x) => x.group === 'modern')) expect(l.defaultOn, l.id).toBe(false);
+    expect(all.some((l) => l['source-layer'] === 'boundary')).toBe(false);
+    expect(labelKey('modern-names')).toBeLessThan(labelKey('villages'));
+  });
+  it('draws a reservoir as land before its dam, and names peaks by prominence', () => {
+    const f = (year: number) => (LAYERS.find((l) => l.id === 'reservoirs-past')!.specs({ ...ctx, year })[0] as { filter: unknown }).filter;
+    expect(matches(f(1950), { y: 1960 }, 'Polygon')).toBe(true);
+    expect(matches(f(1960), { y: 1960 }, 'Polygon')).toBe(false);
+    const labels = pack<{ features: { properties: { k: string; n: string; z: number; p?: number } }[] }>('physical-labels.json').features.map((x) => x.properties);
+    expect(labels.find((p) => p.k === 'range' && /Alps/.test(p.n))).toBeDefined();
+    const blanc = labels.find((p) => p.n === 'Mont Blanc');
+    expect(blanc).toMatchObject({ k: 'peak', z: 7 });
   });
   it('lets historical labels win over modern river and sea names (villages over sea names)', () => {
     for (const id of ['cities', 'towns', 'kingdoms', 'battles']) {
@@ -146,7 +158,7 @@ describe('atlas data packs', () => {
   });
   it('ships vector tiles for the heavy layers and no whole-world files', () => {
     const tiles = readdirSync(join(PACK, '../world/tiles'));
-    for (const t of ['hydrorivers.pmtiles', 'pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles', 'domesday.pmtiles', 'gough.pmtiles', 'navigation.pmtiles']) expect(tiles).toContain(t);
+    for (const t of ['hydrorivers.pmtiles', 'reservoirs.pmtiles', 'osm-land.pmtiles', 'osm-water.pmtiles', 'pleiades.pmtiles', 'itinere.pmtiles', 'viabundus-edges.pmtiles', 'viabundus-nodes.pmtiles', 'thurayya-places.pmtiles', 'thurayya-routes.pmtiles', 'domesday.pmtiles', 'gough.pmtiles', 'navigation.pmtiles']) expect(tiles).toContain(t);
     expect(readdirSync(PACK)).not.toContain('pleiades-places.json');
     expect(readdirSync(PACK)).not.toContain('pleiades-gazetteer.json');
   });
