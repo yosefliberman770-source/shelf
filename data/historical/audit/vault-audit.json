@@ -555,7 +555,7 @@
   "localOnly": true,
   "localFilesInGit": [],
   "processedBy": "atlas-build/regional.py \u2192 private data pack",
-  "placeIndexRows": 2809,
+  "placeIndexRows": 2802,
   "tiles": [
    "private-sites.pmtiles"
   ],

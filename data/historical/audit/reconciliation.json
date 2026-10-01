@@ -25,7 +25,9 @@
   "why": "Live lookups through Shelf server proxy (token server-side). /api/datasets/ lists 102 public datasets incl. Poland 16c (24,498), Russian towns 14c (282), Old World Trade (4,117); per-dataset export endpoints returned 404.",
   "next": "Request per-dataset exports (poland16c) from contributors; keep live lookups.",
   "evidence": "2026-09-30 GET /api/datasets/ 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 2,
@@ -53,7 +55,9 @@
   "why": "Only polity-outline source: one outline per period, no claims/vassalage; used for borders and polity names.",
   "next": "Keep; supplement with regional boundary datasets (HRE, Hungary, Poland) where they exist.",
   "evidence": "integrated since earlier sessions",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 3,
@@ -86,7 +90,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Pelagios is a network and a data format, not a dataset."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 4,
@@ -114,7 +120,9 @@
   "why": "Roman-period gazetteer based on Barrington — same basis as Pleiades/AWMC already integrated. GeoJSON API works per id (imperium.ahlfeldt.se/api/geojson.php?id=…); full dump URL (dare.ht.lu.se/export_pelagios3.ttl.gz) did not respond; Klokan mirror places_subsites.geojson (0.6 MB) reachable.",
   "next": "Cross-check Pleiades coordinates only if a conflict arises; no integration.",
   "evidence": "2026-10-01 api 200; dump no response; klokan mirror 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 5,
@@ -131,9 +139,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "per dataset: shipwrecks CC0; roads/ports/hoards/Anglo-Saxon settlements: \"limited information\" — licence not verified",
   "licenceState": "not verified",
@@ -142,7 +150,14 @@
   "why": "Harvard Dataverse holds 12 DARMC datasets (first pass wrongly recorded DARMC as unreachable). Medieval-relevant: Carolingian coin hoards 751–987 (Coupland 2013), rural Anglo-Saxon settlements (Keil & Hamerow 2014), shipwrecks AD 1–1500. Roman road network 2008 is superseded by Itiner-e (2024).",
   "next": "Acquire hoards + Anglo-Saxon settlements as local-only (licence not verified); shipwrecks (CC0).",
   "evidence": "2026-10-01 Dataverse API: licence fields read per dataset",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "darmc"
+   ],
+   "note": "Its entry names the DARMC datasets on Harvard Dataverse: shipwrecks, Carolingian hoards and Anglo-Saxon settlements were acquired and integrated (private data)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 6,
@@ -175,7 +190,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "pastplace.org and visionofbritain.org.uk still do not respond; GB only and mostly 19th-c."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 7,
@@ -203,7 +220,9 @@
   "why": "Modern gazetteer; value for Shelf is alternateNamesV2 (English/exonym names with language codes) to fill English names where Wikidata lacks them. Not historical.",
   "next": "Acquire alternateNames for European countries; use only for modern English exonyms, never as historical names.",
   "evidence": "2026-10-01 dump index + readme 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 8,
@@ -231,7 +250,9 @@
   "why": "Snapshot of 118,500 items (sites + towns) via QLever. Audited in this pass: see Wikidata quality section — not a substitute for Germania Sacra, Buringh, Viabundus or Pleiades.",
   "next": "Treat as cross-linking/enrichment; prefer specialised sources where present.",
   "evidence": "2026-09-30 snapshot",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 9,
@@ -259,7 +280,9 @@
   "why": "SPARQL endpoint and full.zip dump both returned 403 from this environment.",
   "next": "Reach through WHG (which reconciles to TGN).",
   "evidence": "2026-10-01 403",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 10,
@@ -287,7 +310,9 @@
   "why": "Live vector tiles; dated features only; sparse before 1500. Labels fixed to English/Latin script in an earlier pass.",
   "next": "Keep live.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 11,
@@ -315,7 +340,9 @@
   "why": "Period definitions (7.8 MB). Held raw; not used by the app.",
   "next": "Use to label periods per region in the UI (e.g. what \"Late Antique\" means for Iberia).",
   "evidence": "2026-09-30 downloaded",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 12,
@@ -343,7 +370,9 @@
   "why": "Cultural-heritage object aggregator (API works with demo key; 3,152 hits for Cluny). Objects, not geography.",
   "next": "None for geography.",
   "evidence": "2026-10-01 API 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 13,
@@ -376,7 +405,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "ARIADNE is an aggregator; the national registers it points to were pursued directly (RAN, Denmark, Norway, Sweden)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 14,
@@ -404,7 +435,9 @@
   "why": "Source of Domesday, Gough, inland navigation, bridges, Tribal Hidage; also holds Where Power Lies, Mapping the Medieval Townscape, Whittlewood, MSRG reports (see those rows).",
   "next": "Acquire the England datasets listed under 44–51 that have GIS.",
   "evidence": "earlier sessions",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 15,
@@ -432,7 +465,9 @@
   "why": "search.json API works (Roma → 36 hits). Mostly Mediterranean archaeology; overlaps Pleiades.",
   "next": "None.",
   "evidence": "2026-10-01 API 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 16,
@@ -465,7 +500,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Museum objects, not places; behind an Anubis bot check."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 17,
@@ -493,7 +530,9 @@
   "why": "Core ancient gazetteer (34,458 records); late-antique tail reaches 640.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 18,
@@ -521,7 +560,9 @@
   "why": "Roman roads (2024, high resolution).",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 19,
@@ -549,7 +590,9 @@
   "why": "Early Islamic world places and routes (9th–10th c.), incl. al-Andalus.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 20,
@@ -582,7 +625,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Nomisma mints are overwhelmingly ancient; medieval economy came instead from dated coin hoards (Denmark, Carolingian hoards)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 21,
@@ -610,7 +655,9 @@
   "why": "GeoJSON of places (5.6 MB, 2025-11-20) with text citations; ancient Greek world; overlaps Pleiades.",
   "next": "Optional: link out from Pleiades places.",
   "evidence": "2026-10-01 TT-downloads page read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 22,
@@ -643,7 +690,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Egypt-centred ancient places; server refuses requests (403)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 23,
@@ -676,7 +725,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Texts database, not geography."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 24,
@@ -709,7 +760,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Roman sites without a bulk export; Pleiades and Itiner-e already cover them."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 25,
@@ -737,7 +790,9 @@
   "why": "Latin inscriptions with find-spot geography (GeoJSON dump, daily). Roman epigraphy; not medieval.",
   "next": "None for medieval scope.",
   "evidence": "2026-10-01 README read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 26,
@@ -770,7 +825,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Epigraphic search interface; no geodata export."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 27,
@@ -803,7 +860,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Epigraphic database; no bulk geodata."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 28,
@@ -836,7 +895,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Network of epigraphic databases; no geodata of its own."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 29,
@@ -869,7 +930,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "A modelled route network c. 200 CE, not attested routes."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 30,
@@ -897,7 +960,9 @@
   "why": "Roads, shorelines, inland water for the ancient world.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 31,
@@ -925,7 +990,9 @@
   "why": "Pleiades GIS exports and AWMC Barrington-derived layers — both integrated.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 32,
@@ -953,7 +1020,9 @@
   "why": "\"Pelagios Digital Map of the Roman Empire\" is DARE (see row 3).",
   "next": "See DARE.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 33,
@@ -986,7 +1055,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Maps and articles only; Roman Britain roads are in Itiner-e."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 34,
@@ -1019,7 +1090,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Roman roads of Britain are in Itiner-e (integrated)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 35,
@@ -1052,7 +1125,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Per-segment web pages, no bulk data; attested Roman roads are in Itiner-e."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 36,
@@ -1085,7 +1160,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Route planner without a data endpoint."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 37,
@@ -1113,7 +1190,9 @@
   "why": "AWMC/Pleiades are the legal Barrington-derived resources — integrated.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 38,
@@ -1141,7 +1220,9 @@
   "why": "Northern Europe 1350–1650 towns, roads, waterways, tolls, fairs — the strongest medieval route dataset Shelf has.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 39,
@@ -1174,7 +1255,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Skipped at the owner's request (1900 names)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 40,
@@ -1202,7 +1285,9 @@
   "why": "Key to English Place-Names: dated early spellings per English place; no bulk export.",
   "next": "Live link-out per place.",
   "evidence": "earlier audit",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 41,
@@ -1235,7 +1320,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "PASE records people, not places; its terms forbid copying. Link-out only."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 42,
@@ -1268,7 +1355,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Open Domesday (non-commercial) would add per-manor detail, but Domesday England is already mapped (shires, hundreds); low marginal value."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 43,
@@ -1296,7 +1385,9 @@
   "why": "Domesday shires/hundreds (Brookes 2020).",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 44,
@@ -1324,7 +1415,9 @@
   "why": "Burial census 450–650 (sites with coordinates); no kingdom polygons.",
   "next": "Could become an early-medieval burial-sites layer; low priority.",
   "evidence": "raw vault",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 45,
@@ -1352,7 +1445,9 @@
   "why": "IPM calendar TEI-XML vols 18–26 (1399–1447) and an EATS entity file; no coordinates stated — places are names in texts.",
   "next": "Check eats_entities for place identifiers; otherwise text-only (people/land tenure), not a map layer.",
   "evidence": "2026-10-01 CKAN page read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 46,
@@ -1385,7 +1480,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "ADS blocks automated downloads; the owner can download the 13 new towns of Edward I by hand. Town-plan detail only."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 47,
@@ -1418,7 +1515,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "A handful of Midland parishes — too local for the atlas."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 48,
@@ -1446,7 +1545,9 @@
   "why": "Atlas of Rural Settlement: provinces, sub-provinces, local regions and nucleations — characterisation, not a dated map.",
   "next": "Keep local-only.",
   "evidence": "integrated in local builds only",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 49,
@@ -1474,7 +1575,9 @@
   "why": "Where Power Lies (Newcastle 2022–24): elite centres c. 800–1200, 24 GIS objects + 1 CSV; first-pass never looked.",
   "next": "Owner downloads the ADS ZIPs by hand (ADS blocks automated access); then integrate as a lordly-centres layer.",
   "evidence": "2026-10-01 ADS metadata 1007107 read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 50,
@@ -1507,7 +1610,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "The deserted-village gazetteers are publications and an archive, not open data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 51,
@@ -1524,9 +1629,9 @@
    "geography assessed": false,
    "time assessed": false,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "licence unspecified on SAS-Space (\"UNSPECIFIED\")",
   "licenceState": "not verified",
@@ -1535,7 +1640,14 @@
   "why": "Letters, Gazetteer of Markets and Fairs in England and Wales to 1516: 2,254 English and 141 Welsh places, 2,604 markets, 2,934 fairs with OS grid refs, grant year, first record, type, borough, mint, 1334 valuation. MFEngland.txt downloaded and read (5,235 rows). Bogart/Satchell town datasets are c. 1563–1911 (early modern).",
   "next": "Acquire (local-only: licence unspecified) and integrate as markets & fairs layer for England/Wales.",
   "evidence": "2026-10-01 SAS-Space 106 files 200",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "markets-fairs"
+   ],
+   "note": "Its entry names Letters’ Gazetteer of Markets and Fairs to 1516: acquired and integrated (private data)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 52,
@@ -1568,7 +1680,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "PDF town maps, not GIS."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 53,
@@ -1596,7 +1710,9 @@
   "why": "Gough Map GIS.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 54,
@@ -1624,7 +1740,9 @@
   "why": "Inland navigation before 1348.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 55,
@@ -1652,7 +1770,9 @@
   "why": "Bridges to c.1250 downloaded in the first vault pass but NOT integrated — the first report glossed over this.",
   "next": "Integrate as a bridges/fords layer (England).",
   "evidence": "raw vault",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 56,
@@ -1680,7 +1800,9 @@
   "why": "Battlefields, parks, wrecks, World Heritage gpkgs in the vault, NOT integrated; the more useful Scheduled Monuments (~20,000, incl. castles, abbeys, deserted villages; OGL) was not downloaded.",
   "next": "Download Scheduled Monuments; integrate battlefields and monuments.",
   "evidence": "2026-10-01 HE hub 200; data.gov.uk OGL",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 57,
@@ -1708,7 +1830,9 @@
   "why": "Living with Machines: 19th-century map annotations; 5.1 GB in the vault; not medieval.",
   "next": "Keep raw; not a medieval source.",
   "evidence": "raw vault",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 58,
@@ -1741,7 +1865,9 @@
    "outcome": "recovered",
    "datasets": "dicotopo",
    "note": "DicoTopo (CC BY-NC-ND): bulk XML from the project repository — 22,366 communes with dated first attestation and 6,774 dated castles, churches and religious houses; private use only."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 59,
@@ -1769,7 +1895,9 @@
   "why": "\"Des chefs-lieux de Cassini aux communes de France (1756–1999)\": geolocated cities, towns, villages and abbeys on the Cassini map (c. 1756–89) — the only France-wide settlement layer with historical names found. No open France-wide *medieval* settlement dataset found (regional: IMAGE Grand-Est, BDA, Franche-Comté deserted sites — not downloadable in bulk).",
   "next": "Owner-assisted download from didomena (bot-blocked) or Dataverse mirror; integrate as \"France c. 1760 (Cassini)\" layer with its own date.",
   "evidence": "2026-10-01 search + 2026-09-30 didomena 403",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 60,
@@ -1797,7 +1925,9 @@
   "why": "Perret et al. \"18th century Cassini roads and cities\" — France-wide road graph (edges/nodes) and cities from the Cassini map; plus a full GIS reconstruction of one sheet (No. 52). 18th-century, not medieval.",
   "next": "Acquire; show only for c. 1700–1815 and say so; use as the France road network for early-modern dates.",
   "evidence": "2026-10-01 Dataverse API read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 61,
@@ -1825,7 +1955,9 @@
   "why": "Gay, Gobbi & Goni (2024): bailliages and sénéchaussées of 1789 after Brette (1904), shapefiles + points + tables. Late Ancien Régime, not medieval; the only open France-wide jurisdiction polygons found. No open medieval French county/duchy polygons found.",
   "next": "Acquire; show 1770–1790 only.",
   "evidence": "2026-10-01 Dataverse API read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 62,
@@ -1858,7 +1990,9 @@
    "outcome": "recovered",
    "datasets": "dicotopo",
    "note": "No France-wide medieval town dataset exists, but DicoTopo now gives 22,366 French communes their first dated attestation (private data)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 63,
@@ -1886,7 +2020,9 @@
   "why": "Latin dioceses 1592–1789 GeoJSON (27 MB; seats georeferenced; sources: Wikipedia, Tihon, EarthWorks) — early modern, compiled; Ménestrel lists shapefiles (licence not verified). Germania Sacra covers only the Empire.",
   "next": "Acquire dioc-ses (label 1592–1789, compiled from secondary sources); check Ménestrel licence.",
   "evidence": "2026-10-01 README read; HEAD 27 MB",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 64,
@@ -1903,9 +2039,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": true,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "Licence Ouverte 2.0 (data.gouv.fr, Ministère de la Culture)",
   "licenceState": "confirmed",
@@ -1914,7 +2050,14 @@
   "why": "Mérimée \"Immeubles protégés MH\": ~46k protected buildings with type (château, abbaye, église, halle…), century of main construction campaign, WGS84 coordinates — a dedicated national register, not in Wikidata form. Also \"Châteaux de France — recensement consolidé\" (ODbL; 10,602; merges Wikidata+Mérimée+OSM — derivative, lower value).",
   "next": "Acquire Mérimée CSV (100 MB, not committed); integrate castles/abbeys/churches/halls with century dating as construction-century (not founding).",
   "evidence": "2026-10-01 data.gouv API + CSV header read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "merimee"
+   ],
+   "note": "Its entry names Mérimée: acquired and integrated (castles, religious buildings, bridges, market halls)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 65,
@@ -1942,7 +2085,9 @@
   "why": "No open medieval French road dataset found. Earliest France-wide road networks are Cassini (c. 1760) and routes de poste 1792; Viabundus reaches only NE France.",
   "next": "Use Cassini roads for 1700–1815; document the medieval gap.",
   "evidence": "2026-10-01 search + Dataverse",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 66,
@@ -1975,7 +2120,9 @@
    "outcome": "recovered",
    "datasets": "dicotopo",
    "note": "Patriarche is not public. DicoTopo (non-commercial, no derivatives — private use) adds 6,774 dated castles, churches and religious houses located by commune."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 67,
@@ -2008,7 +2155,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Georeferenced map tiles, not data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 68,
@@ -2041,7 +2190,9 @@
    "outcome": "recovered",
    "datasets": "dicotopo",
    "note": "Regional datasets are PDFs or databases without export; DicoTopo covers 53 départements with dated name forms (private data)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 69,
@@ -2069,7 +2220,9 @@
   "why": "German historical gazetteers exist per Land with dated first mentions: Historisches Ortsverzeichnis von Sachsen (~6,000 places, first mentions with source citations, hov.isgv.de), LAGIS Historisches Ortslexikon Hessen (first mentions, WGS84), GOV (~1.2M, dated administrative membership). None offers a verified bulk download.",
   "next": "Ask ISGV / LAGIS for exports; retry GOV via a browser session.",
   "evidence": "2026-10-01 search",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 70,
@@ -2086,9 +2239,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC0 (Princes and Townspeople); CC BY-SA 3.0 (Germania Sacra)",
   "licenceState": "confirmed",
@@ -2097,7 +2250,14 @@
   "why": "Princes and Townspeople (Bogucka, Cantoni, Weigand; Harvard Dataverse, 6 parts, all CC0): the ~2,400 towns of the Deutsches Städtebuch with locations, town-charter dates, market-right dates, construction activity and conflict incidents. First pass missed it entirely. Village-level medieval settlement data for Germany exists only per Land (see 68) or via Wikidata first mentions.",
   "next": "Acquire all six parts; integrate towns with charter/market dates.",
   "evidence": "2026-10-01 Dataverse API: 6 datasets, licence CC0 each",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "princes-townspeople"
+   ],
+   "note": "Its entry names Princes and Townspeople: acquired and integrated (hre towns)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 71,
@@ -2114,9 +2274,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": true,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "Western Bohemia toponyms: CC BY 4.0 (Zenodo); others not verified",
   "licenceState": "not verified",
@@ -2125,7 +2285,14 @@
   "why": "Dated historical name forms exist per region: HOV Sachsen and LAGIS Hessen (online only); Western Bohemia toponyms to 1500 (Zenodo 21479034, CSV, 459 KB). No Germany-wide historical Ortsnamen dataset found.",
   "next": "Acquire Western Bohemia; request exports for Saxony/Hesse.",
   "evidence": "2026-10-01 Zenodo API",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "western-bohemia-toponyms"
+   ],
+   "note": "Its entry names the Western Bohemia toponyms: acquired and integrated."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 72,
@@ -2142,9 +2309,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC0 (Princes and Townspeople part 2)",
   "licenceState": "confirmed",
@@ -2153,7 +2320,14 @@
   "why": "Princes and Townspeople part 2 \"Territorial histories\": for each town, the polity and dynasty it belonged to over time (cities_polities 45 MB, cities_dynasties 25 MB, territories_all). This is dated political *control* at town level — no HRE territory polygons, but a far better control record than Cliopatria for the Empire. Euratlas polygons exist but are commercial.",
   "next": "Acquire; attach \"belonged to (year range)\" to towns and use for political context lookups.",
   "evidence": "2026-10-01 Dataverse",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "princes-townspeople"
+   ],
+   "note": "Its entry names P&T part 2 (territorial histories): integrated as each town’s ruling territory per year."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 73,
@@ -2181,7 +2355,9 @@
   "why": "Duchies/counties/prince-bishoprics as town-level membership (P&T part 2); diocese polygons (Germania Sacra, 67, undated). No open polygons of HRE territories found.",
   "next": "As 71.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 74,
@@ -2198,9 +2374,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC0",
   "licenceState": "confirmed",
@@ -2209,7 +2385,14 @@
   "why": "Princes and Townspeople parts 1 (locations, borders 2019), 3 (town charters), 4 (markets). Buringh has 249 German towns.",
   "next": "Acquire and integrate (see 69).",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "princes-townspeople"
+   ],
+   "note": "Its entry names P&T parts 1, 3 and 4: integrated (locations, charters, market grants)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 75,
@@ -2242,7 +2425,9 @@
    "outcome": "recovered",
    "datasets": "ebidat",
    "note": "EBIDAT has no bulk export, but each castle page is public: all castles were snapshotted (dating begin/end, type, function, condition, position) — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 76,
@@ -2270,7 +2455,9 @@
   "why": "Viabundus covers northern Germany (1350–1650). No open dataset of medieval roads for southern Germany found.",
   "next": "Document gap.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 77,
@@ -2298,7 +2485,9 @@
   "why": "Germania Sacra — integrated (7,473 locations; merged with Wikidata for 4,745).",
   "next": "Keep; add GS order-tenure dates to the place history panel.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 78,
@@ -2331,7 +2520,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Printed/online historical atlases: maps, not data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 79,
@@ -2359,7 +2550,9 @@
   "why": "HistoGIS (ACDH, Vienna): administrative units of the Habsburg lands mostly 19th c.; queried live. No open medieval Austrian GIS found (Historisches Ortslexikon Österreich is published PDFs).",
   "next": "Keep live; document medieval gap.",
   "evidence": "earlier audit",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 80,
@@ -2387,7 +2580,9 @@
   "why": "Swiss open data is municipal from 1848; HLS (historical lexicon) is text. No medieval Swiss GIS found.",
   "next": "None.",
   "evidence": "2026-10-01 search",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 81,
@@ -2404,9 +2599,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": true,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC BY 4.0 (both Zenodo records)",
   "licenceState": "confirmed",
@@ -2415,7 +2610,14 @@
   "why": "Western Bohemia place names attested to 1500 (Zenodo 21479034); CZ_Retro medieval/early-modern settlement density rasters (Zenodo 3367364, 241 MB, rasters not points); Historický lexikon obcí 1869–2005 (modern). Wikidata has 9,400 Czech settlements with first mentions (largest in Europe).",
   "next": "Acquire Western Bohemia names; CZ_Retro not needed (raster).",
   "evidence": "2026-10-01 Zenodo API",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "western-bohemia-toponyms"
+   ],
+   "note": "Its entry names the Western Bohemia place names to 1500: acquired and integrated."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 82,
@@ -2443,7 +2645,9 @@
   "why": "Imperial cities: P&T territorial histories record imperial status per town and period.",
   "next": "As 71.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 83,
@@ -2476,7 +2680,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Malanima's Italian urban population is published as PDF tables; Buringh already has 394 Italian towns. Transcribing would be a cross-check only."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 84,
@@ -2509,7 +2715,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval communes exists as data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 85,
@@ -2542,7 +2750,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No city-state territory polygons exist as data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 86,
@@ -2570,7 +2780,9 @@
   "why": "Papal States exist as a Cliopatria polity outline; no specialist dataset found.",
   "next": "Keep Cliopatria.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 87,
@@ -2598,7 +2810,9 @@
   "why": "Lombard, Frankish, Norman and Sicilian polities as Cliopatria outlines only; the southern-Italy fiscal GIS (mid-15th c., research paper) is not published.",
   "next": "Document gap.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 88,
@@ -2631,7 +2845,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No medieval Italian road network exists as data (modern pilgrim trails are not history)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 89,
@@ -2664,7 +2880,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Regional castle atlases are not downloadable; EBIDAT and Wikidata cover what exists."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 90,
@@ -2697,7 +2915,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No digital Monasticon Italiae."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 91,
@@ -2730,7 +2950,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Only present-day diocese boundaries exist."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 92,
@@ -2758,7 +2980,9 @@
   "why": "Ports: Pleiades (ancient), DARMC ancient ports (licence not verified). No medieval Mediterranean port dataset found.",
   "next": "Document gap.",
   "evidence": "—",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 93,
@@ -2786,7 +3010,9 @@
   "why": "Buringh (394 Italian towns); Malanima (PDF).",
   "next": "See 82.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 94,
@@ -2819,7 +3045,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Regional geoportals, mostly ancient, no bulk export."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 95,
@@ -2852,7 +3080,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No open data behind Italian historical atlases."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 96,
@@ -2880,7 +3110,9 @@
   "why": "Early-modern travel-manual geodataset (Scoto, 1650–1700, CC BY 4.0) — routes/places of 17th-c. Italy; Southern Umbria heritage datasets (Zenodo). Nothing medieval region-wide.",
   "next": "Optional early-modern routes layer.",
   "evidence": "2026-10-01 Zenodo API",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 97,
@@ -2913,7 +3145,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 98,
@@ -2946,7 +3180,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 99,
@@ -2979,7 +3215,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 100,
@@ -3012,7 +3250,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 101,
@@ -3045,7 +3285,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 102,
@@ -3078,7 +3320,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 103,
@@ -3111,7 +3355,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 104,
@@ -3144,7 +3390,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 105,
@@ -3172,7 +3420,9 @@
   "why": "al-Ṯurayyā covers al-Andalus towns, regions and routes (9th–10th c., after Cornu) — integrated. \"Cartography of al-Andalus landscape\" (J. Archaeol. Sci. 2022) is a research paper, data not found.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 106,
@@ -3205,7 +3455,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No taifa boundary data exists."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 107,
@@ -3238,7 +3490,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 108,
@@ -3271,7 +3525,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 109,
@@ -3304,7 +3560,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No GIS of medieval Iberian kingdoms, counties or marches exists as data; Cliopatria outlines remain the only polity source."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 110,
@@ -3332,7 +3590,9 @@
   "why": "Buringh has 262 Spanish and 49 Portuguese towns; Villuga 1546 route gazetteer (Idaho State GIHL, \"may be downloaded without charge\" — not tested, licence not verified).",
   "next": "Test the Villuga gazetteer download.",
   "evidence": "2026-10-01 search",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 111,
@@ -3365,7 +3625,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Regional heritage registers (Catalonia, Aragón) not yet downloaded — next wave; Wikidata covers Iberian castles meanwhile."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 112,
@@ -3398,7 +3660,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "As 111."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 113,
@@ -3431,7 +3695,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Villuga 1546 exists only as a web gazetteer; no data file could be located."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 114,
@@ -3459,7 +3725,9 @@
   "why": "CNIG/IGN Caminos de Santiago tracks (CC BY 4.0) are modern waymarked routes recorded by pilgrims — not historical reconstructions; poor fit as medieval evidence.",
   "next": "Optional, labelled \"modern waymarked route\".",
   "evidence": "2026-10-01 search",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 115,
@@ -3492,7 +3760,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No Iberian monastery dataset exists."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 116,
@@ -3525,7 +3795,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No historical Iberian diocese GIS exists."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 117,
@@ -3558,7 +3830,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "As 113."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 118,
@@ -3591,7 +3865,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Regional archaeological inventories without bulk export."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 119,
@@ -3624,7 +3900,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "As 111."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 120,
@@ -3652,7 +3930,9 @@
   "why": "Fund og Fortidsminder: national register of ancient monuments (GeoPackage FF.zip, 109 MB, updated daily; also SHP/CSV per municipality).",
   "next": "Acquired local-only (raw vault, not in git); integrate medieval churches/castles/deserted villages once the licence is confirmed.",
   "evidence": "2026-10-01 FF.zip 200 (109,119,092 bytes); download page read",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 121,
@@ -3669,9 +3949,9 @@
    "geography assessed": false,
    "time assessed": false,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "NLOD reported (not verified from files)",
   "licenceState": "not verified",
@@ -3680,7 +3960,14 @@
   "why": "Kulturminnesøk/Askeladden (GeoJSON API, ~170k); Norske stadnamn open place-name database (Rygh farm names, 1886 cadastre, historical forms).",
   "next": "Acquire medieval subset; test Norske stadnamn download.",
   "evidence": "2026-10-01 search",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "norway-kulturminner"
+   ],
+   "note": "Its entry names Kulturminnesøk/Askeladden: the medieval subset was acquired and integrated."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 122,
@@ -3713,7 +4000,9 @@
    "outcome": "recovered",
    "datasets": "sweden-lamningar",
    "note": "Riksantikvarieämbetet publishes all ancient remains as one GeoPackage (pub.raa.se); downloaded and filtered to Iron Age / medieval remains (private data)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 123,
@@ -3730,9 +4019,9 @@
    "geography assessed": false,
    "time assessed": false,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC BY 4.0 (avoindata.fi)",
   "licenceState": "confirmed",
@@ -3741,7 +4030,14 @@
   "why": "Finnish Heritage Agency register of ancient monuments (Muinaisjäännösrekisteri): file download service, CC BY 4.0; includes medieval churches, castles, villages.",
   "next": "Acquire; filter medieval.",
   "evidence": "2026-10-01 avoindata API",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "finland-heritage"
+   ],
+   "note": "Its entry names the Finnish register of ancient monuments: acquired and integrated."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 124,
@@ -3774,7 +4070,9 @@
    "outcome": "recovered",
    "datasets": "nordic-spatial-humanities",
    "note": "The Icelandic Saga Map places come with the Nordic Spatial Humanities release (CC BY 4.0) — public."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 125,
@@ -3807,7 +4105,9 @@
    "outcome": "recovered",
    "datasets": "norway-kulturminner, dk-fund-og-fortidsminder, sweden-lamningar",
    "note": "Settlement remains from the Norwegian (public), Danish and Swedish (private) registers."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 126,
@@ -3840,7 +4140,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No medieval herred/härad boundaries exist as open GIS."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 127,
@@ -3873,7 +4175,9 @@
    "outcome": "acquired",
    "datasets": "nordic-spatial-humanities",
    "note": "Norwegian place-name database comes inside the Nordic release (710,000 names, no coordinates) — not integrated."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 128,
@@ -3906,7 +4210,9 @@
    "outcome": "recovered",
    "datasets": "nordic-spatial-humanities",
    "note": "Old Norse place forms from the sagas and chronicles (Nordic release)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 129,
@@ -3939,7 +4245,9 @@
    "outcome": "recovered",
    "datasets": "nordic-spatial-humanities, norway-kulturminner, dk-fund-og-fortidsminder",
    "note": "Nordic parish churches with first attestation; Norwegian and Danish medieval churches and churchyards."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 130,
@@ -3967,7 +4275,9 @@
   "why": "Wikidata monasteries only (Scandinavia 76–83 in 1200–1500 counts); registers add sites.",
   "next": "As 119–122.",
   "evidence": "—",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 131,
@@ -4000,7 +4310,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No royal-sites dataset exists."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 132,
@@ -4028,7 +4340,9 @@
   "why": "Viabundus covers Scandinavian land and sea routes 1350–1650; nothing open for Viking-age routes.",
   "next": "Document gap before 1350.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 133,
@@ -4056,7 +4370,9 @@
   "why": "Viabundus harbours; Wikidata.",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 134,
@@ -4089,7 +4405,9 @@
    "outcome": "recovered",
    "datasets": "norway-kulturminner, dk-fund-og-fortidsminder, sweden-lamningar, ran-romania",
    "note": "National registers."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 135,
@@ -4122,7 +4440,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Scanned maps, not data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 136,
@@ -4155,7 +4475,9 @@
    "outcome": "recovered",
    "datasets": "atlas-fontium-poland",
    "note": "All 11 layers acquired; settlements and parish seats integrated in the private pack (1550–1600). Districts, roads, rivers and forests are in the vault, not yet drawn."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 137,
@@ -4183,7 +4505,9 @@
   "why": "See 80; P&T includes Bohemian towns of the Deutsches Städtebuch? (to verify in data).",
   "next": "As 80.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 138,
@@ -4216,7 +4540,9 @@
    "outcome": "acquired",
    "datasets": "engel-hungary",
    "note": "Engel's atlas was downloaded (vault), but its database is encrypted inside a Windows GIS program whose only export is attribute tables without coordinates. Breaking the encryption is not an option."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 139,
@@ -4249,7 +4575,9 @@
    "outcome": "recovered",
    "datasets": "tib-maps-of-power, ebidat",
    "note": "TIB churches in Slovakia and EBIDAT Slovak castles — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 140,
@@ -4282,7 +4610,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "The Croatian register has no bulk download; EBIDAT and Wikidata cover castles."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 141,
@@ -4310,7 +4640,9 @@
   "why": "Serbia: Maps of Power (TIB) covers medieval Serbian lands in part; no open national register download found.",
   "next": "See 146.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 142,
@@ -4343,7 +4675,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Only a 1953 printed list of Bosnian fortresses."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 143,
@@ -4376,7 +4710,9 @@
    "outcome": "recovered",
    "datasets": "tib-maps-of-power",
    "note": "TIB places of Bulgaria (Thrace, Macedonia volumes) — private data; only 23 by 1399, so Bulgaria stays weak."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 144,
@@ -4409,7 +4745,9 @@
    "outcome": "recovered",
    "datasets": "ran-romania",
    "note": "RAN: 2,865 migration-period and medieval sites with positions, from the register's own site and map service — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 145,
@@ -4442,7 +4780,9 @@
    "outcome": "recovered",
    "datasets": "ran-romania",
    "note": "RAN downloaded from the register's own site and map service (data.gov.ro still unreachable) — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 146,
@@ -4475,7 +4815,9 @@
    "outcome": "recovered",
    "datasets": "ran-romania",
    "note": "As 145 (Romanian Moldavia; the Republic of Moldova is not covered)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 147,
@@ -4492,9 +4834,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "licence not verified (API content; images CC BY 4.0)",
   "licenceState": "not verified",
@@ -4503,7 +4845,14 @@
   "why": "TIB \"Maps of Power\" OpenAtlas API (ÖAW): 5,522 places, 4,947 with geometry, dated timespans (earliest/latest), types (urban/rural settlement, fortification, church…), TIB volume, Linked Places format. First pass wrongly said \"no open coordinates found\".",
   "next": "Acquire full snapshot (local-only until licence confirmed) and integrate as Byzantine/Balkan places with attestation dates.",
   "evidence": "2026-10-01 API 200 (system_class_count, place LP)",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "tib-maps-of-power"
+   ],
+   "note": "Its entry names TIB Maps of Power: acquired and integrated (private data)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 148,
@@ -4536,7 +4885,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "The Greek Archaeological Cadastre is a single-page app with per-site data only; no bulk route found."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 149,
@@ -4569,7 +4920,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "No open Rus' archaeological or town dataset."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 150,
@@ -4602,7 +4955,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "As 149."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 151,
@@ -4635,7 +4990,9 @@
    "outcome": "not recovered",
    "datasets": "ebidat",
    "note": "Estonia's register refuses automated requests (403); Latvia is partly covered by EBIDAT castles (private data)."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 152,
@@ -4663,7 +5020,9 @@
   "why": "Russian towns of the late 14th c. (WHG, 282, histgeo.nextgis.com); Cliopatria Rus' principalities.",
   "next": "Use via WHG; check nextgis source licence.",
   "evidence": "2026-09-30 WHG",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 153,
@@ -4696,7 +5055,9 @@
    "outcome": "recovered",
    "datasets": "ran-romania, atlas-fontium-poland",
    "note": "RAN (Romania) and Atlas Fontium (Poland) — private data; Engel (Hungary) remains locked."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 154,
@@ -4729,7 +5090,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "GOV is behind a bot check; TIB (private data) covers the Byzantine Balkans."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 155,
@@ -4762,7 +5125,9 @@
    "outcome": "not recovered",
    "datasets": "",
    "note": "Engel's 1490s landholding maps are locked in the encrypted program; Atlas Fontium districts (1580) are in the private pack as raw data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 156,
@@ -4790,7 +5155,9 @@
   "why": "Administrative divisions: Atlas Fontium (Poland 16th c.), HistoGIS (Habsburg 19th c.), Engel (Hungarian counties c. 1500).",
   "next": "See 135/137.",
   "evidence": "—",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 157,
@@ -4823,7 +5190,9 @@
    "outcome": "recovered",
    "datasets": "ebidat, tib-maps-of-power",
    "note": "EBIDAT castles (incl. Hungary, Slovakia, Czechia, Latvia) and TIB fortifications — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 158,
@@ -4856,7 +5225,9 @@
    "outcome": "recovered",
    "datasets": "ebidat, tib-maps-of-power",
    "note": "As 157."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 159,
@@ -4889,7 +5260,9 @@
    "outcome": "recovered",
    "datasets": "tib-maps-of-power",
    "note": "TIB monasteries of the Byzantine Balkans — private data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 160,
@@ -4906,9 +5279,9 @@
    "geography assessed": false,
    "time assessed": false,
    "names assessed": false,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "licence not verified",
   "licenceState": "not verified",
@@ -4917,7 +5290,14 @@
   "why": "Churches: Maps of Power (dated church attestations incl. Slovakia, Macedonia, Greece).",
   "next": "See 146.",
   "evidence": "2026-10-01 API",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "tib-maps-of-power"
+   ],
+   "note": "Its entry names Maps of Power church attestations: integrated (private data)."
+  },
+  "testedBeforeRecovery": true
  },
  {
   "n": 161,
@@ -4945,7 +5325,9 @@
   "why": "Roads: Viabundus reaches Poland/Baltic/Bohemia (1350–1650); Atlas Fontium roads (16th c., licence n/s); Roman roads in the Balkans (Itiner-e). Nothing open for medieval Balkan/Hungarian roads found.",
   "next": "Document gap.",
   "evidence": "—",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 162,
@@ -4973,7 +5355,9 @@
   "why": "Old World Trade (Ciolek, 4,117 records, via WHG); Viabundus.",
   "next": "Via WHG.",
   "evidence": "2026-09-30 WHG",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 163,
@@ -5001,7 +5385,9 @@
   "why": "National archaeological registers (see rows 122, 143, 150).",
   "next": "Acquire those.",
   "evidence": "—",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 164,
@@ -5034,7 +5420,9 @@
    "outcome": "not useful",
    "datasets": "",
    "note": "Scanned maps, not data."
-  }
+  },
+  "integratedLater": null,
+  "testedBeforeRecovery": false
  },
  {
   "n": 165,
@@ -5062,7 +5450,9 @@
   "why": "Buringh towns (Russia 185, Ukraine 72, Poland 70, Hungary 47, Romania 39, Bulgaria 21 in 1300 rows).",
   "next": "Keep.",
   "evidence": "integrated",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": null,
+  "testedBeforeRecovery": true
  },
  {
   "n": 166,
@@ -5079,9 +5469,9 @@
    "geography assessed": true,
    "time assessed": true,
    "names assessed": true,
-   "suitable for Shelf": false,
-   "acquired": false,
-   "integrated": false
+   "suitable for Shelf": true,
+   "acquired": true,
+   "integrated": true
   },
   "licence": "CC BY 4.0 (Western Bohemia); others per source",
   "licenceState": "per source (see the rows it points to)",
@@ -5090,6 +5480,14 @@
   "why": "Western Bohemia toponyms; Maps of Power names (multilingual); Engel (Hungarian/Latin names).",
   "next": "Acquire Western Bohemia + Maps of Power.",
   "evidence": "2026-10-01",
-  "recovery": null
+  "recovery": null,
+  "integratedLater": {
+   "vault": [
+    "western-bohemia-toponyms",
+    "tib-maps-of-power"
+   ],
+   "note": "Its entry names Western Bohemia toponyms and Maps of Power names: both integrated (Engel remains locked)."
+  },
+  "testedBeforeRecovery": true
  }
 ]
