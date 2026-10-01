@@ -209,7 +209,7 @@ def representative(g):
         return (c[0], c[1]) if c else (None, None)
 
 
-REGISTER_SRCS = {'canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd'}
+REGISTER_SRCS = {'canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'}
 
 
 def measure(at, place_dirs):
@@ -343,7 +343,7 @@ def measure(at, place_dirs):
             region = at(lon, lat)
             precise = not p.get('u')
             cells.add(region, cat, a, b, cls, p.get('src', 'registers'), precise)
-            if k == 'settlement' and p.get('src') in ('ivillaris', 'ottomannfs', 'generalkarte', 'lutsch'):
+            if k == 'settlement' and p.get('src') in ('ivillaris', 'ottomannfs', 'generalkarte', 'lutsch', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'):
                 cells.add(region, 'Names', a, b, cls, p.get('src'), precise)  # each is a historically attested place-name form
     ins = os.path.join(PUB, 'world', 'tiles', 'inscriptions.pmtiles')
     if os.path.exists(ins):

@@ -292,6 +292,15 @@ def main():
         ('Lutsch map 1751', 'Snapshot 1751', '—'),
         ('LIST inscriptions', 'Per find-spot per century, only inscriptions dated within ≤150 years', 'Broadly dated inscriptions (40,641) excluded'),
         ('Slovenia RKD', 'Register dating: construction period for buildings (open end), union of named periods for sites', 'Prehistoric-only and post-1914 records left out'),
+        ('Latvia monuments list', 'List dating (centuries and parts, years, Latvian archaeological periods)', 'No coordinates in the list: placed at town/village/parish, marked approximate'),
+        ('Croatia register', "Register dating 'A do B' (centuries, years, BCE)", "Ambiguous 'NN. god.' not used; placed at the named settlement"),
+        ('Russian 3-verst map (Balkans)', 'Envelope 1877–1879 (survey)', 'Not projected before or after; swapped columns corrected'),
+        ('RoHGIS Romania', 'Envelope 1904–1913 (existing between two laws)', '—'),
+        ('TransIce Iceland', 'Farms: 1703 snapshot (Jarðabók); shielings: first mention → abandonment', 'Farms without a 1703 entry undated'),
+        ('DISSILOC', "Attested in the register's years (from the edition title)", 'Stettin register (no date in its title) undated'),
+        ('Swedish geometrical maps', 'Envelope 1630–1655 (the maps it is drawn on)', "Each map's own year not in the dataset"),
+        ('Tyrol mining documents', "Attested in the document's years", '226 places not localised by the source'),
+        ('Lutsch roads', 'Snapshot 1751', '—'),
     ]))
     w('')
     w('Display rules added: a snapshot is drawn at full strength in its year and lighter within ±25 years (a display allowance, stated in the popup, not a claim); '
@@ -363,18 +372,18 @@ def main():
     # ── Q/R/S ──
     w('## Q. Immediate acquisition plan (next pass, days)')
     w('')
-    w('1. Lutsch roads and mountain paths (Harvard Dataverse, 1751 snapshot) — same author as the integrated places; Romania transport cells.')
-    w('2. HGIS Germany boundaries 1820–1914 (Harvard, Public) — dated boundary snapshots for Germany\'s Political cells 1800–1900.')
-    w('3. The highest-ranked class-A leads in D for the weakest region × category pairs (Iceland, Baltic, Slovenia/Croatia/Bosnia, Egypt/Maghreb 700–1900).')
-    w('4. Estonia and Lithuania heritage registers (403 from this machine) — try their open-data portal mirrors or ask the user to download them on the phone.')
+    w('1. HGIS Germany boundaries 1820–1914 (Harvard, catalogue says Public; non-commercial academic licence → private pack). Harvard returned 429 to this machine all night; download it from the phone/laptop or retry from another network.')
+    w('2. Estonia and Lithuania heritage registers: their sites block automated access — export them by hand in a browser (both offer CSV/Excel views) and drop the files into the raw vault.')
+    w('3. World Historical Gazetteer datasets for weak regions (List of Russian towns, late 14th c.; Benjamin of Tudela; Heritage Gazetteer of Libya; Usaybia places): WHG now refuses bots; a free WHG account token would let the build read them.')
+    w('4. The highest-ranked class-A leads in D for Egypt, the Maghreb, the Levant and Cyprus after 1000 — still the weakest areas.')
     w('5. Re-run `coverage_centuries.py` and this report after each integration.')
     w('')
     w('## R. Medium-term plan (weeks)')
     w('')
-    w('1. Historical map overlays from the public Harvard/LoC georeferenced scans (snapshot years, bbox), behind a layer that is off by default.')
+    w('1. Historical map overlays: done for 1,052 public georeferenced Harvard/NYU layers (map archive → overlay). Next: check each holder’s server allows browser loading (CORS) from the phone; add LoC and Rumsey georeferences via Allmaps as they appear.')
     w('2. Entity layer as in O: store joins as claims; use them to pick the label for a year from dated name forms.')
-    w('3. Digitise the Galicia railway maps and similar class-E sources only where no structured alternative exists.')
-    w('4. Ottoman tax registers beyond the NFS gazetteer; Byzantine (TIB) and crusader-period sources for the Levant 1000–1300.')
+    w('3. Link the Swedish younger geometrical maps (1680–1700) transcriptions to places (they have map ids, no coordinates).')
+    w('4. Ottoman tax registers beyond the NFS gazetteer (e.g. Hanley\'s 1530 names) — only with a reliable identification method, never by guessing a modern namesake.')
     w('')
     w('## S. Long-term plan')
     w('')

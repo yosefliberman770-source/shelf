@@ -667,6 +667,8 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         : ef !== undefined || et !== undefined ? `${per ?? 'Period named by the record'}: ${range(ef, et)}${num('cw') ? ' (from the start of the recorded construction window)' : ''}`
         : 'No date recorded in the source');
       if (src === 'nid') lines.push('Placed at its village or town (the register gives no coordinates)');
+      if (src === 'hrreg') lines.push('Placed at its settlement (the register names the place, not coordinates)');
+      if (src === 'lvmon') lines.push('Placed at its town, village or parish (the list gives an address, not coordinates)');
       return {
         title: str('n') ?? 'Site', lines,
         pick: pt && src ? { key: `${src}:${(str('i') ?? '').split(':').slice(1).join(':')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined,

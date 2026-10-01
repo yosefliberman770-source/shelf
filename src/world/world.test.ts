@@ -79,3 +79,20 @@ describe('overlaying an original map', () => {
     expect(overlayFor({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps }).ok).toBe(true);
   });
 });
+
+describe('georeferenced layers from university map libraries (WMS)', () => {
+  it('asks for the layer’s own extent in Web Mercator and places the image on those corners', async () => {
+    const { wmsImage } = await import('./maps');
+    const r = wmsImage({ url: 'https://example.org/wms', layer: 'lib:MAP_1721', bbox: [-1.8, 45.96, -0.81, 46.47] }, 800);
+    const p = new URL(r.url).searchParams;
+    expect(p.get('srs')).toBe('EPSG:3857');
+    expect(p.get('layers')).toBe('lib:MAP_1721');
+    expect(Number(p.get('width'))).toBe(800);
+    expect(r.coordinates).toEqual([[-1.8, 46.47], [-0.81, 46.47], [-0.81, 45.96], [-1.8, 45.96]]);
+    const [x0, y0, x1, y1] = p.get('bbox')!.split(',').map(Number);
+    expect(x0).toBeLessThan(x1);
+    expect(y0).toBeLessThan(y1);
+    // Height follows the Mercator aspect ratio of the box.
+    expect(Number(p.get('height'))).toBe(Math.round((800 * (y1 - y0)) / (x1 - x0)));
+  });
+});

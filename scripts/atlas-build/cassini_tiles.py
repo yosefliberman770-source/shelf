@@ -6,9 +6,11 @@ import tiler
 
 
 def build_cassini_roads(tiles_dir):
-    feats = registers.cassini_roads()
-    return tiler.build(os.path.join(tiles_dir, 'cassini-roads.pmtiles'), 'roads', feats, 11, 'Roads on the Cassini map of France',
-                       'Perret, Gribaudi & Barthelemy, 18th century Cassini roads and cities (Harvard Dataverse, CC0)')
+    # Roads drawn on dated historical maps: Cassini (France, 1756–1815) and Lutsch (Transylvania, 1751).
+    feats = registers.cassini_roads() + registers.lutsch_roads()
+    return tiler.build(os.path.join(tiles_dir, 'cassini-roads.pmtiles'), 'roads', feats, 11, 'Roads on dated historical maps',
+                       'Perret, Gribaudi & Barthelemy, 18th century Cassini roads and cities (Harvard Dataverse, CC0); '
+                       'Lutsch map of Transylvania 1751, roads and mountain paths (Harvard Dataverse, CC BY-NC-SA 4.0)')
 
 
 def build_inscriptions(tiles_dir):

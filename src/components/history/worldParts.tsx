@@ -17,7 +17,7 @@ import { EVIDENCE, explainEmpty } from '../../world/evidence';
 import { formatDate } from '../../world/histdate';
 import { type ChgisPlace, type HistogisUnit, histogisWhereWas } from '../../world/live';
 import { politiesAt, polityDisplayName } from '../../atlas/context';
-import { findGeoref, type Georef, georefExtentKm, type HistMap, imageLimits, mapDateLabel, type Overlay, overlayFor, scanInfo, type ScanInfo, searchMaps, viewerUrl } from '../../world/maps';
+import { findGeoref, type Georef, georefExtentKm, type HistMap, imageLimits, mapDateLabel, type Overlay, overlayFor, scanInfo, type ScanInfo, searchMaps, viewerUrl, wmsImage, wmsOverlay } from '../../world/maps';
 import type { ZoomState } from './DeepZoom';
 import { SOURCES, TIER_LABEL } from '../../world/registry';
 import { selectSources } from '../../world/select';
@@ -73,6 +73,12 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
   };
   const overlay = async (m: HistMap) => {
     setChecking((c) => ({ ...c, [m.id]: 'checking' }));
+    const w = wmsOverlay(m);
+    if (w) {
+      setChecking((c) => ({ ...c, [m.id]: 'ok' }));
+      if (!overlays.some((x) => x.id === m.id)) setOverlays([...overlays, { id: m.id.replace(/[^a-z0-9]/gi, '_'), map: m, overlay: w, opacity: 0.75 }].slice(-2));
+      return;
+    }
     const g = await findGeoref(m);
     if (!g) { setChecking((c) => ({ ...c, [m.id]: 'none' })); return; }
     const r = overlayFor(g, await imageLimits(g.imageService));
@@ -97,7 +103,7 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
         <div className="row wrap gap-4 tiny">
           {SUBJECTS.map((s) => <button type="button" key={s.id} className={`chip ${subject === s.id ? 'on' : ''}`} style={{ minHeight: 24, fontSize: 11 }} onClick={() => setSubject(s.id)}>{s.label}</button>)}
         </div>
-        <label className="row small" style={{ gap: 6 }}><input type="checkbox" checked={here} onChange={(e) => setHere(e.target.checked)} /> Include maps someone has georeferenced for this map area (Allmaps)</label>
+        <label className="row small" style={{ gap: 6 }}><input type="checkbox" checked={here} onChange={(e) => setHere(e.target.checked)} /> Include maps georeferenced for this map area (Allmaps, university map libraries)</label>
       </form>
 
       {overlays.length > 0 && (
@@ -144,7 +150,7 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
           </div>
         </>
       )}
-      <div className="tiny faint">Library of Congress, David Rumsey Map Collection (CC BY-NC-SA) and georeferences from Allmaps. Rights stay with each collection — see the record.</div>
+      <div className="tiny faint">Library of Congress, David Rumsey Map Collection (CC BY-NC-SA), georeferences from Allmaps, and public georeferenced layers of university map libraries (mostly the Harvard Map Collection). Rights stay with each collection — see the record.</div>
       {view && <MapViewer map={view} onClose={() => setView(null)} />}
     </div>
   );
@@ -152,6 +158,7 @@ export function MapArchivePanel({ at, year, bbox, overlays, setOverlays }: {
 
 /** Full-screen viewer for one original map: pinch or buttons to zoom, drag to pan. */
 const DeepZoom = lazy(() => import('./DeepZoom'));
+const georefExtentKmBox = (b: [number, number, number, number]) => Math.hypot((b[2] - b[0]) * 111.32 * Math.cos((((b[1] + b[3]) / 2) * Math.PI) / 180), (b[3] - b[1]) * 110.57);
 
 export function MapViewer({ map, onClose }: { map: HistMap; onClose: () => void }) {
   const [scan, setScan] = useState<ScanInfo | null | undefined>(undefined);
@@ -166,7 +173,8 @@ export function MapViewer({ map, onClose }: { map: HistMap; onClose: () => void 
     return () => { dead = true; };
   }, [map.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const useDeep = !!map.iiif && !!scan?.tiled && deep === 'try';
-  const georefLine = georef === undefined ? 'checking whether it has been georeferenced…'
+  const georefLine = map.wms ? `georeferenced by ${map.holder || 'its library'} — it can be laid over the map (covers about ${Math.round(georefExtentKmBox(map.wms.bbox))} km)`
+    : georef === undefined ? 'checking whether it has been georeferenced…'
     : georef === null ? 'not georeferenced — it can be viewed, but not laid over the map'
     : `georeferenced in Allmaps with ${georef.gcps.length} control points, covering ${georefExtentKm(georef) < 1 ? 'less than 1 km (a building or street plan)' : `about ${Math.round(georefExtentKm(georef))} km`}`;
   return (
@@ -213,7 +221,7 @@ function FlatViewer({ map }: { map: HistMap }) {
   const pts = useRef(new Map<number, [number, number]>());
   const last = useRef<{ d?: number; c?: [number, number] }>({});
   const [src, setSrc] = useState<string | undefined>(map.thumb);
-  useEffect(() => { if (map.iiif) viewerUrl(map.iiif).then(setSrc).catch(() => {}); }, [map.iiif]);
+  useEffect(() => { if (map.iiif) viewerUrl(map.iiif).then(setSrc).catch(() => {}); else if (map.wms) setSrc(wmsImage(map.wms, 2000, false).url); }, [map.iiif, map.wms]);
   const clamp = (v: number) => Math.max(1, Math.min(maxZ, v));
   const onMove = (e: React.PointerEvent) => {
     if (!pts.current.has(e.pointerId)) return;

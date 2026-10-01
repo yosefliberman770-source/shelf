@@ -28,7 +28,7 @@ export const GROUPS: { id: GroupId; label: string }[] = [
 
 export type DatasetId = 'pleiades' | 'awmc' | 'cliopatria' | 'wikidata' | 'naturalearth' | 'ohm' | 'terrain' | 'itinere' | 'viabundus' | 'althurayya'
   | 'domesday' | 'gough' | 'navigation' | 'ruralsettlement' | 'germaniasacra' | 'buringh' | 'hced' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250' | 'nsh' | 'nokm' | 'localonly' | 'hydrosheds' | 'openfreemap' | 'osm' | 'hydrolakes' | 'physlabels'
-  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lirelist';
+  | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'lirelist';
 
 /** How each dataset is credited on the map. Full licences are in public/atlas/manifest.json. */
 export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; license: string }> = {
@@ -49,6 +49,14 @@ export const DATASET_CREDIT: Record<DatasetId, { name: string; url: string; lice
   generalkarte: { name: 'Gazetteer of the Generalkarte von Mitteleuropa, Balkans (Boykov)', url: 'https://doi.org/10.5281/zenodo.8409506', license: 'CC BY 4.0' },
   cassini: { name: '18th-century Cassini roads and cities (Perret, Gribaudi & Barthelemy)', url: 'https://doi.org/10.7910/DVN/28674', license: 'CC0' },
   sirkd: { name: 'Slovenian register of immovable cultural heritage (RKD)', url: 'https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine', license: 'CC BY 4.0 (OPSI open data)' },
+  lvmon: { name: 'Latvia: list of state-protected immovable monuments (National Heritage Board)', url: 'https://data.gov.lv/dati/dataset/valsts-aizsargajamo-nekustamo-piemineklu-saraksts', license: 'CC0 1.0' },
+  hrreg: { name: 'Croatia: Register of cultural goods (Ministry of Culture and Media)', url: 'https://data.gov.hr/ckan/dataset/registar-kulturnih-dobara', license: 'Open Licence (Republic of Croatia)' },
+  r3verst: { name: 'Places on the Russian 3-verst military map of the Balkans (Boykov gazetteer)', url: 'https://doi.org/10.5281/zenodo.8411078', license: 'CC BY 4.0' },
+  rohgis: { name: 'RoHGIS: settlements of the Kingdom of Romania, 1904–1913', url: 'https://doi.org/10.5281/zenodo.15613857', license: 'CC BY 4.0' },
+  transice: { name: 'TransIce: shielings and farms of Iceland (Institute of Archaeology, Iceland)', url: 'https://doi.org/10.5281/zenodo.17537206', license: 'CC BY 4.0' },
+  dissiloc: { name: 'DISSILOC: places named in medieval inquisition registers (DISSINET, Masaryk University)', url: 'https://doi.org/10.5281/zenodo.21031406', license: 'CC BY-SA 4.0' },
+  swegeo: { name: 'Sweden: the older geometrical maps, 1630–1655 (Vitterhetsakademien, Riksarkivet)', url: 'https://doi.org/10.5281/zenodo.15121019', license: 'CC BY 4.0' },
+  tyrolmine: { name: 'Places in Tyrolean mining documents, 15th–16th c. (Univ. Innsbruck)', url: 'https://doi.org/10.5281/zenodo.6368451', license: 'CC BY 4.0' },
   lutsch: { name: 'Features of the Lutsch map of Transylvania, 1751', url: 'https://doi.org/10.7910/DVN/ETORPU', license: 'CC BY-NC-SA 4.0' },
   hydrolakes: { name: 'HydroLAKES v1.0 (Messager et al. 2016); dam dates from Wikidata', url: 'https://www.hydrosheds.org/products/hydrolakes', license: 'CC BY 4.0' },
   physlabels: { name: 'Natural Earth (ranges, plains); Wikidata (peaks)', url: 'https://www.naturalearthdata.com/', license: 'public domain / CC0' },
@@ -178,8 +186,8 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'hre-towns': (c) => pmtiles(c, 'hre-towns.pmtiles', 'hre', 10),
   // From the private data pack only (licence not verified, or no republishing): never on the public site.
   'private-sites': (c) => pmtiles(c, 'private-sites.pmtiles', 'localonly', 11),
-  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
-  'cassini-roads': (c) => pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11),
+  'register-sites': (c) => ({ ...pmtiles(c, 'registers.pmtiles', 'canmore', 11), attribution: (['canmore', 'irlsmr', 'nid', 'ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
+  'cassini-roads': (c) => ({ ...pmtiles(c, 'cassini-roads.pmtiles', 'cassini', 11), attribution: (['cassini', 'lutsch'] as DatasetId[]).map(credit).join('; ') } as SourceSpecification),
   inscriptions: (c) => pmtiles(c, 'inscriptions.pmtiles', 'lirelist', 10),
   'private-lines': (c) => pmtiles(c, 'private-lines.pmtiles', 'localonly', 11),
   'gs-dioceses': (c) => pmtiles(c, 'gs-dioceses.pmtiles', 'germaniasacra', 9),
@@ -524,8 +532,8 @@ export const LAYERS: AtlasLayerDef[] = [
     specs: (c) => sitePoints('dated-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4 }),
   },
   {
-    id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd'], defaultOn: true, coverage: SITES,
-    hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date. A place listed in one year is drawn (lighter) within 25 years of it.',
+    id: 'gazetteer-settlements', group: 'places', label: 'Settlements in historical gazetteers & registers', datasets: ['ivillaris', 'ottomannfs', 'generalkarte', 'cassini', 'lutsch', 'canmore', 'nid', 'sirkd', 'lvmon', 'hrreg', 'r3verst', 'rohgis', 'transice', 'dissiloc', 'swegeo', 'tyrolmine'], defaultOn: true, coverage: SITES,
+    hint: 'Places listed in dated historical sources, each shown for the year or period its source gives — never earlier: England and Wales in Index Villaris (1680); the Ottoman Empire’s population registers (1830–1849, each place in its register’s year); the Balkans on the Austro-Hungarian Generalkarte (sheet editions c. 1880–1918) and on the Russian 3-verst map (surveyed 1877–1879); the settlements of the Kingdom of Romania, 1904–1913 (RoHGIS); Icelandic farms in the Jarðabók of 1703; Swedish villages, churches and mills on the land-survey maps of 1630–1655; places named in medieval inquisition registers (1240s–1520s); France on the Cassini map (surveyed 1756–1789); Transylvania on the Lutsch map (1751); Scottish settlements by the period Canmore assigns; Polish manors and town layouts by their recorded construction date. A place listed in one year is drawn (lighter) within 25 years of it.',
     sources: ['register-sites'],
     specs: (c) => sitePoints('gazetteer-settlements', ['settlement'], C.village, c, { labelZoom: 9, radius: 2.4, sources: ['register-sites'] }),
   },
@@ -716,12 +724,16 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'roads-cassini', group: 'infrastructure', label: 'Roads on the Cassini map (France, c. 1756–1815)', datasets: ['cassini'], defaultOn: true, coverage: [1756, 1815],
-    hint: 'The road network of France as drawn on the Cassini map (sheets surveyed 1756–1789, published to 1815), digitised by Perret, Gribaudi & Barthelemy. Shown only within those years; the dataset does not give each sheet’s year. Fainter: marked uncertain in the source.', sources: ['cassini-roads'],
+    id: 'roads-cassini', group: 'infrastructure', label: 'Roads on dated historical maps (Cassini France 1756–1815, Lutsch Transylvania 1751)', datasets: ['cassini', 'lutsch'], defaultOn: true, coverage: [1726, 1815],
+    hint: 'Roads as drawn on two dated maps. France: the Cassini map (sheets surveyed 1756–1789, published to 1815), digitised by Perret, Gribaudi & Barthelemy — shown only within those years; the dataset does not give each sheet’s year. Transylvania: main roads and mountain paths on the Lutsch map of 1751 — evidence for that year, drawn lighter within 25 years of it. Fainter: marked uncertain in the source.', sources: ['cassini-roads'],
     specs: (c) => {
-      const filter = inWindow(c.year, [1756, 1815]);
+      const y = c.year;
+      const filter = ['any',
+        ['all', ['!', ['has', 'sn']], ['<=', ['get', 'ef'], y], ['>=', ['get', 'et'], y]],
+        ['all', ['has', 'sn'], ['<=', ['abs', ['-', ['get', 'ef'], y]], SNAPSHOT_YEARS]]] as FilterSpecification;
       return [{ id: 'roads-cassini-line', type: 'line', source: 'cassini-roads', 'source-layer': 'roads', filter,
-        paint: { 'line-color': '#8d5524', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 10, 1.8], 'line-opacity': ['case', ['==', ['get', 'u'], 1], 0.45, 0.8] } }];
+        paint: { 'line-color': '#8d5524', 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 10, 1.8],
+          'line-opacity': ['case', ['==', ['get', 'u'], 1], 0.45, ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.5, 0.8] } }];
     },
   },
   {

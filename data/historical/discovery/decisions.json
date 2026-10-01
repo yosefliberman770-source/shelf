@@ -1,19 +1,333 @@
 {
  "_comment": "Outcome of the 2026-10 discovery pass for inspected candidates. 'match' lists exact lower-case fragments of a candidate's DOI or URL (never a bare word of a title). A decision no harvested candidate matches is added to the inventory as a 'direct-search' candidate. inventory.py applies these as the candidate's status.",
  "decisions": [
-  {"title": "Canmore — National Record of the Historic Environment (points)", "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip", "match": ["canmore_points.zip", "property:p718"], "status": "integrated", "dataset": "canmore-scotland", "region": "Scotland", "note": "174,054 records dated from ScAPA periods, centuries or years; undated generic records stay out of the index."},
-  {"title": "Archaeological Survey of Ireland — Sites and Monuments Record", "url": "https://www.archaeology.ie/", "match": ["archaeology.ie"], "status": "integrated", "dataset": "ireland-smr", "region": "Ireland", "note": "56,074 records; dated only where the monument class itself names a period (3,575)."},
-  {"title": "Rejestr zabytków nieruchomych (NID, dane.gov.pl)", "url": "https://dane.gov.pl/", "match": ["dane.gov.pl/pl/dataset/1130"], "status": "integrated", "dataset": "poland-nid-register", "region": "Poland", "note": "Construction windows parsed from 'chronologia'; placed at locality level (the register has no coordinates)."},
-  {"title": "Index Villaris 1680 (John Adams), digital edition", "match": ["indexvillaris"], "status": "integrated", "dataset": "index-villaris-1680", "region": "England", "note": "Snapshot 1680 — listed in that year; beginning and end unknown."},
-  {"title": "Ottoman natural features and settlements gazetteer (NFS)", "match": [], "status": "integrated", "dataset": "ottoman-nfs-gazetteer", "region": "Balkans, Anatolia", "note": "Snapshot per tax register (hijri → CE)."},
-  {"title": "Gazetteer_Generalkarte von Mitteleuropa", "match": ["10.5281/zenodo.8409506"], "status": "integrated", "dataset": "generalkarte-gazetteer", "region": "Central & SE Europe", "note": "Envelope 1880–1918; lat/lon columns swapped in the source, corrected."},
-  {"title": "The 18th century Cassini roads and cities dataset", "match": ["10.7910/dvn/28674"], "status": "integrated", "dataset": "cassini-roads-cities", "region": "France", "note": "Places and roads, envelope 1756–1815."},
-  {"title": "Settlements … on the Lutsch map of Transylvania (1751)", "match": ["10.7910/dvn/etorpu"], "status": "integrated", "dataset": "lutsch-transylvania-1751", "region": "Romania", "note": "Snapshot 1751."},
-  {"title": "Main roads and mountain paths on the Lutsch map of Transylvania", "match": ["10.7910/dvn/2hlxc3"], "status": "evaluated", "region": "Romania", "note": "Usable (1751 snapshot); next wave."},
-  {"title": "LIST — Latin Inscriptions in Space and Time v1.2", "match": ["latin inscriptions in space"], "status": "integrated", "dataset": "list-latin-inscriptions", "region": "Roman Empire", "note": "Per find-spot and century, only inscriptions dated to ≤150 years."},
-  {"title": "Register nepremične kulturne dediščine (RKD), Slovenia", "url": "https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine", "match": ["6b5bf6d9-d3bd-4231-95ac-3863b6d70c56", "register-nepremicne-kulturne-dediscine"], "status": "integrated", "dataset": "slovenia-rkd-register", "region": "Slovenia", "note": "Register dating per record: construction period for buildings, period of use for sites."},
-  {"title": "Engel Pál, Magyarország a középkor végén (2020)", "match": [], "status": "blocked", "dataset": "engel-hungary", "region": "Hungary", "note": "Database encrypted inside a Windows GIS program; needs the institute's cooperation."},
-  {"title": "Euratlas Periodical Historical Atlas (Harvard Geospatial Library copy)", "match": ["harvard-euratlas", "euratlas"], "status": "blocked", "region": "Europe", "note": "Harvard copy is Restricted; a commercial licence exists — not bought without the user."},
-  {"title": "Epigraphic Database Heidelberg (site)", "url": "https://edh.ub.uni-heidelberg.de/", "match": ["edh.ub.uni-heidelberg.de"], "status": "evaluated", "region": "Roman Empire", "note": "Site behind a bot wall; its content reached through LIST (EDH + EDCS)."}
+  {
+   "title": "Canmore — National Record of the Historic Environment (points)",
+   "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+   "match": [
+    "canmore_points.zip",
+    "property:p718"
+   ],
+   "status": "integrated",
+   "dataset": "canmore-scotland",
+   "region": "Scotland",
+   "note": "174,054 records dated from ScAPA periods, centuries or years; undated generic records stay out of the index."
+  },
+  {
+   "title": "Archaeological Survey of Ireland — Sites and Monuments Record",
+   "url": "https://www.archaeology.ie/",
+   "match": [
+    "archaeology.ie"
+   ],
+   "status": "integrated",
+   "dataset": "ireland-smr",
+   "region": "Ireland",
+   "note": "56,074 records; dated only where the monument class itself names a period (3,575)."
+  },
+  {
+   "title": "Rejestr zabytków nieruchomych (NID, dane.gov.pl)",
+   "url": "https://dane.gov.pl/",
+   "match": [
+    "dane.gov.pl/pl/dataset/1130"
+   ],
+   "status": "integrated",
+   "dataset": "poland-nid-register",
+   "region": "Poland",
+   "note": "Construction windows parsed from 'chronologia'; placed at locality level (the register has no coordinates)."
+  },
+  {
+   "title": "Index Villaris 1680 (John Adams), digital edition",
+   "match": [
+    "indexvillaris"
+   ],
+   "status": "integrated",
+   "dataset": "index-villaris-1680",
+   "region": "England",
+   "note": "Snapshot 1680 — listed in that year; beginning and end unknown."
+  },
+  {
+   "title": "Ottoman natural features and settlements gazetteer (NFS)",
+   "match": [],
+   "status": "integrated",
+   "dataset": "ottoman-nfs-gazetteer",
+   "region": "Balkans, Anatolia",
+   "note": "Snapshot per tax register (hijri → CE)."
+  },
+  {
+   "title": "Gazetteer_Generalkarte von Mitteleuropa",
+   "match": [
+    "10.5281/zenodo.8409506"
+   ],
+   "status": "integrated",
+   "dataset": "generalkarte-gazetteer",
+   "region": "Central & SE Europe",
+   "note": "Envelope 1880–1918; lat/lon columns swapped in the source, corrected."
+  },
+  {
+   "title": "The 18th century Cassini roads and cities dataset",
+   "match": [
+    "10.7910/dvn/28674"
+   ],
+   "status": "integrated",
+   "dataset": "cassini-roads-cities",
+   "region": "France",
+   "note": "Places and roads, envelope 1756–1815."
+  },
+  {
+   "title": "Settlements … on the Lutsch map of Transylvania (1751)",
+   "match": [
+    "10.7910/dvn/etorpu"
+   ],
+   "status": "integrated",
+   "dataset": "lutsch-transylvania-1751",
+   "region": "Romania",
+   "note": "Snapshot 1751."
+  },
+  {
+   "title": "LIST — Latin Inscriptions in Space and Time v1.2",
+   "match": [
+    "latin inscriptions in space"
+   ],
+   "status": "integrated",
+   "dataset": "list-latin-inscriptions",
+   "region": "Roman Empire",
+   "note": "Per find-spot and century, only inscriptions dated to ≤150 years."
+  },
+  {
+   "title": "Register nepremične kulturne dediščine (RKD), Slovenia",
+   "url": "https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine",
+   "match": [
+    "6b5bf6d9-d3bd-4231-95ac-3863b6d70c56",
+    "register-nepremicne-kulturne-dediscine"
+   ],
+   "status": "integrated",
+   "dataset": "slovenia-rkd-register",
+   "region": "Slovenia",
+   "note": "Register dating per record: construction period for buildings, period of use for sites."
+  },
+  {
+   "title": "Engel Pál, Magyarország a középkor végén (2020)",
+   "match": [],
+   "status": "blocked",
+   "dataset": "engel-hungary",
+   "region": "Hungary",
+   "note": "Database encrypted inside a Windows GIS program; needs the institute's cooperation."
+  },
+  {
+   "title": "Euratlas Periodical Historical Atlas (Harvard Geospatial Library copy)",
+   "match": [
+    "harvard-euratlas",
+    "euratlas"
+   ],
+   "status": "blocked",
+   "region": "Europe",
+   "note": "Harvard copy is Restricted; a commercial licence exists — not bought without the user."
+  },
+  {
+   "title": "Epigraphic Database Heidelberg (site)",
+   "url": "https://edh.ub.uni-heidelberg.de/",
+   "match": [
+    "edh.ub.uni-heidelberg.de"
+   ],
+   "status": "evaluated",
+   "region": "Roman Empire",
+   "note": "Site behind a bot wall; its content reached through LIST (EDH + EDCS)."
+  },
+  {
+   "title": "Main roads and mountain paths on the Lutsch map of Transylvania (1751)",
+   "match": [
+    "10.7910/dvn/2hlxc3"
+   ],
+   "status": "integrated",
+   "dataset": "lutsch-roads-1751",
+   "region": "Romania",
+   "note": "43 roads/paths, snapshot 1751, in the dated-map roads layer."
+  },
+  {
+   "title": "Latvia: list of state-protected immovable monuments",
+   "url": "https://data.gov.lv/dati/dataset/valsts-aizsargajamo-nekustamo-piemineklu-saraksts",
+   "match": [
+    "valsts-aizsargajamo-nekustamo-piemineklu-saraksts"
+   ],
+   "status": "integrated",
+   "dataset": "latvia-monuments",
+   "region": "Latvia",
+   "note": "List dating per record (centuries, years, archaeological periods); placed at town/village/parish via GeoNames (no coordinates in the list). CC0."
+  },
+  {
+   "title": "Croatia: Register of cultural goods",
+   "url": "https://data.gov.hr/ckan/dataset/registar-kulturnih-dobara",
+   "match": [
+    "c0410787-33b1-4299-b92c-9bbf38dd8bbf",
+    "registar-kulturnih-dobara"
+   ],
+   "status": "integrated",
+   "dataset": "croatia-cultural-goods",
+   "region": "Croatia",
+   "note": "Register dating per record ('A do B'); placed at the named settlement via GeoNames. Open Licence (HR)."
+  },
+  {
+   "title": "Czechia: Památkový katalog open data (KP / NKP lists)",
+   "url": "https://www.pamatkovykatalog.cz/opendata/npu_opendata_KP.csv",
+   "match": [
+    "pamatkovykatalog.cz/opendata"
+   ],
+   "status": "evaluated",
+   "region": "Czechia",
+   "note": "No dating field and no coordinates; dates appear only in free-text annotations — not used, to avoid inventing dates."
+  },
+  {
+   "title": "Portugal: SRUP Imóveis Classificados (DGT WFS)",
+   "url": "https://dados.gov.pt/pt/datasets/srup-imoveis-classificados/",
+   "match": [
+    "srup-imoveis-classificados"
+   ],
+   "status": "evaluated",
+   "region": "Portugal",
+   "note": "Coordinates but only the date of the protection decree, not of the building — no usable historical dating."
+  },
+  {
+   "title": "Estonia (register.muinas.ee) and Lithuania (kvr.kpd.lt) heritage registers",
+   "match": [
+    "register.muinas.ee",
+    "kvr.kpd.lt"
+   ],
+   "status": "blocked",
+   "region": "Estonia, Lithuania",
+   "note": "Bot wall (403) from this machine; no bulk dataset found on andmed.eesti.ee or data.gov.lt."
+  },
+  {
+   "title": "German Historical GIS (HGIS Germany) boundaries 1820–1914 (Harvard Geospatial Library)",
+   "match": [
+    "harvard-ghgis"
+   ],
+   "status": "blocked",
+   "region": "Germany",
+   "note": "Public in the catalogue but Harvard returns 429 to this machine; licence is non-commercial academic → private pack once downloaded."
+  },
+  {
+   "title": "Gazetteer_Russian-3verst_map (Boykov) — Balkans",
+   "match": [
+    "10.5281/zenodo.8411078",
+    "10.5281/zenodo.8411077"
+   ],
+   "status": "integrated",
+   "dataset": "russian-3verst-gazetteer",
+   "region": "Bulgaria",
+   "note": "Envelope 1877–1879 (survey); lat/lon columns exchanged in the source, corrected."
+  },
+  {
+   "title": "RoHGIS. Settlements in the Kingdom of Romania (1904-1913)",
+   "match": [
+    "10.5281/zenodo.15613857"
+   ],
+   "status": "integrated",
+   "dataset": "rohgis-settlements-1904-1913",
+   "region": "Romania",
+   "note": "Every settlement existing 1904–1913."
+  },
+  {
+   "title": "Rise and fall of transhumance in Iceland: Shielings and related sites (TransIce)",
+   "match": [
+    "10.5281/zenodo.17537206"
+   ],
+   "status": "integrated",
+   "dataset": "transice-iceland",
+   "region": "Iceland",
+   "note": "Farms: 1703 snapshot (Jarðabók); shielings: first mention / abandonment years."
+  },
+  {
+   "title": "DISSILOC: places in medieval inquisition registers",
+   "match": [
+    "10.5281/zenodo.21031406"
+   ],
+   "status": "integrated",
+   "dataset": "dissiloc-inquisition-places",
+   "region": "France, Italy, England, Bohemia",
+   "note": "Attested in register years taken from each edition title; Stettin register undated."
+  },
+  {
+   "title": "Sweden: older geometrical maps 1630–1655",
+   "match": [
+    "10.5281/zenodo.15121019"
+   ],
+   "status": "integrated",
+   "dataset": "sweden-geometric-maps-1630-1655",
+   "region": "Sweden",
+   "note": "Settlement units, churches, mills drawn on the 1630–1655 maps; shown for that survey window."
+  },
+  {
+   "title": "Sweden: younger geometrical maps 1680–1700",
+   "match": [
+    "10.5281/zenodo.15118501"
+   ],
+   "status": "acquired",
+   "dataset": "sweden-geometric-maps-1680-1700",
+   "region": "Sweden",
+   "note": "HTML transcriptions without coordinates — would need linking to places first."
+  },
+  {
+   "title": "Historical Place Gazetteer and Mine Register, Tyrol 15th–16th c.",
+   "match": [
+    "10.5281/zenodo.6368451"
+   ],
+   "status": "integrated",
+   "dataset": "tyrol-mining-gazetteer",
+   "region": "Austria",
+   "note": "Attested in document years (Hs. 37 1460–1463; Hs. 1587 c. 1515)."
+  },
+  {
+   "title": "Ottoman Gazetteer (Hanley), incl. 1530 place names",
+   "match": [
+    "10.5281/zenodo.4660216"
+   ],
+   "status": "evaluated",
+   "region": "Ottoman Empire",
+   "note": "1530 register names without coordinates; CC BY-NC. Geocoding Ottoman names to modern places would be guesswork."
+  },
+  {
+   "title": "World Historical Gazetteer contributed datasets (e.g. List of Russian towns late 14c, Benjamin of Tudela, Heritage Gazetteer of Libya)",
+   "match": [
+    "whgazetteer.org/datasets"
+   ],
+   "status": "blocked",
+   "region": "various",
+   "note": "WHG now answers 'Bot access denied'; no WHG token in this environment."
+  },
+  {
+   "title": "Syria town database (2004 census)",
+   "match": [
+    "10.7910/dvn/yqq07l"
+   ],
+   "status": "evaluated",
+   "region": "Levant",
+   "note": "Modern census — not historical."
+  },
+  {
+   "title": "Replication Data for: Warfare and Welfare in Colonial Algeria",
+   "match": [
+    "10.7910/dvn/na5vf4"
+   ],
+   "status": "evaluated",
+   "region": "Maghreb",
+   "note": "Aggregate tables, no places."
+  },
+  {
+   "title": "Portugal population 1527–1864 (Palma, Reis, Zhang)",
+   "match": [
+    "10.5281/zenodo.8010054"
+   ],
+   "status": "evaluated",
+   "region": "Portugal",
+   "note": "Regional population tables; would need historical region polygons."
+  },
+  {
+   "title": "Public georeferenced historical maps (Harvard Geospatial Library and other OpenGeoMetadata catalogues)",
+   "match": [],
+   "status": "integrated",
+   "dataset": "public/world/maps/georef-index.json",
+   "region": "Europe",
+   "note": "1,052 public georeferenced scans indexed (year, extent, WMS) and offered as overlays in the map archive."
+  }
  ]
 }

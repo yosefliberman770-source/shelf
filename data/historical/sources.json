@@ -807,6 +807,10 @@
    {
     "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
     "path": "original/IndexVillaris1680-v2.0.4.zip"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/GB.zip",
+    "path": "original/geonames-GB.zip"
    }
   ]
  },
@@ -901,6 +905,144 @@
    {
     "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
     "path": "original/rnpd.csv"
+   }
+  ]
+ },
+ {
+  "id": "lutsch-roads-1751",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208060?format=original",
+    "path": "original/ROADS LUTSCH.cpg"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208059?format=original",
+    "path": "original/ROADS LUTSCH.dbf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208063?format=original",
+    "path": "original/ROADS LUTSCH.prj"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208062?format=original",
+    "path": "original/ROADS LUTSCH.shp"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208061?format=original",
+    "path": "original/ROADS LUTSCH.shx"
+   }
+  ]
+ },
+ {
+  "id": "latvia-monuments",
+  "files": [
+   {
+    "url": "https://data.gov.lv/dati/dataset/79e7246f-57cc-41fc-9a10-96521422359c/resource/25583e4e-ca54-430e-b275-b38057a5ee70/download/saraksts.csv",
+    "path": "original/saraksts.csv"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/LV.zip",
+    "path": "original/geonames-LV.zip"
+   }
+  ]
+ },
+ {
+  "id": "croatia-cultural-goods",
+  "files": [
+   {
+    "url": "https://data.gov.hr/ckan/dataset/c0410787-33b1-4299-b92c-9bbf38dd8bbf/resource/c9a9bce6-1b70-45ec-b2cf-d3f93bca7a02/download/data.json",
+    "path": "original/data.json"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/HR.zip",
+    "path": "original/geonames-HR.zip"
+   }
+  ]
+ },
+ {
+  "id": "russian-3verst-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
+    "path": "original/Russian_3verst.csv"
+   }
+  ]
+ },
+ {
+  "id": "rohgis-settlements-1904-1913",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/15613857/files/rohgis_setro_0413.csv?download=1",
+    "path": "original/rohgis_setro_0413.csv"
+   }
+  ]
+ },
+ {
+  "id": "transice-iceland",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/17537206/files/TransIce_dataset_WP1.zip/content",
+    "path": "original/TransIce_dataset_WP1.zip"
+   }
+  ]
+ },
+ {
+  "id": "dissiloc-inquisition-places",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21031406/files/dissiloc.tsv/content",
+    "path": "original/dissiloc.tsv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21031406/files/README.md/content",
+    "path": "original/README.md"
+   }
+  ]
+ },
+ {
+  "id": "sweden-geometric-maps-1630-1655",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Basic_settlement_unit_v1.0.csv/content",
+    "path": "original/Basic_settlement_unit_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-church_v1.0.csv/content",
+    "path": "original/Map_object-church_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-watermill_v1.0.csv/content",
+    "path": "original/Map_object-watermill_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-windmill_v1.0.csv/content",
+    "path": "original/Map_object-windmill_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-industry_v1.0.csv/content",
+    "path": "original/Map_object-industry_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-ancient_monument_v1.0.csv/content",
+    "path": "original/Map_object-ancient_monument_v1.0.csv"
+   }
+  ]
+ },
+ {
+  "id": "sweden-geometric-maps-1680-1700",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/15118501/files/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip/content",
+    "path": "original/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip"
+   }
+  ]
+ },
+ {
+  "id": "tyrol-mining-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/6368451/files/historical_place_gazetteer_tyrol_links_202203.csv/content",
+    "path": "original/historical_place_gazetteer_tyrol_links_202203.csv"
    }
   ]
  }

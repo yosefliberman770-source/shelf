@@ -5,6 +5,8 @@
 //   Library of Congress  loc.gov JSON search, IIIF images
 //   David Rumsey         LUNA search JSON, IIIF manifests
 //   Allmaps              georeferences (control points) for IIIF maps, searchable by area
+//   University GIS       public georeferenced map layers (Harvard Geospatial Library and others), served
+//                        as WMS — a static index built from their OpenGeoMetadata catalogues
 //
 // An original map shows what its maker knew, believed and chose to show, in
 // the conventions of its time. The app always labels it that way.
@@ -12,11 +14,12 @@ import { yearLabel } from '../atlas/time';
 import { type HistDate, parseDate, UNKNOWN_DATE } from './histdate';
 import { cachedJSON } from './live';
 
-export type MapCollection = 'loc' | 'rumsey' | 'allmaps';
+export type MapCollection = 'loc' | 'rumsey' | 'allmaps' | 'gis';
 export const COLLECTION: Record<MapCollection, { name: string; rights: string; url: string }> = {
   loc: { name: 'Library of Congress, Geography and Map Division', rights: 'See the item record (many maps have no known restrictions)', url: 'https://www.loc.gov/maps/' },
   rumsey: { name: 'David Rumsey Map Collection, Stanford Libraries', rights: 'CC BY-NC-SA 3.0 (David Rumsey Map Collection terms)', url: 'https://www.davidrumsey.com/' },
   allmaps: { name: 'Georeferenced via Allmaps', rights: 'Image rights as in the holding collection', url: 'https://allmaps.org/' },
+  gis: { name: 'University map libraries (georeferenced layers)', rights: 'Public layers; see the record for the holder’s terms', url: 'https://hgl.harvard.edu/' },
 };
 
 export interface HistMap {
@@ -42,6 +45,8 @@ export interface HistMap {
   sheets?: number;
   /** Present-day countries the catalogue record says the map shows (lower case). */
   countries?: string[];
+  /** A georeferenced layer served by its library's WMS (already placed on the earth by the library). */
+  wms?: { url: string; layer: string; bbox: [number, number, number, number] };
 }
 
 /** What the image server says about the scan itself (IIIF info.json). */
@@ -144,6 +149,48 @@ export async function searchAllmaps(bbox: [number, number, number, number], sign
         thumb: `${m.resource.id}/full/300,/0/default.jpg`, iiif: m.resource.id, manifest: manifest?.id, page: m.id.replace('annotations.allmaps.org/maps', 'viewer.allmaps.org/?url=https://annotations.allmaps.org/maps'),
         rights: m.resource.id.includes('davidrumsey') ? COLLECTION.rumsey.rights : COLLECTION.allmaps.rights,
         georef: { annotation: m.id, imageService: m.resource.id, width: m.resource.width, height: m.resource.height, gcps: m.gcps.map((g) => ({ px: g.resource, geo: g.geo })), mask: m.resourceMask, transformation: m.transformation?.type },
+      };
+    });
+}
+
+// ── University map libraries: public georeferenced layers (static index, WMS) ──
+
+type GisRow = [string, string, number, number, [number, number, number, number], string, string, string, string];
+let gisIndex: Promise<GisRow[]> | undefined;
+const loadGisIndex = () => (gisIndex ??= fetch(`${import.meta.env.BASE_URL}world/maps/georef-index.json`).then((r) => (r.ok ? r.json() : { maps: [] })).then((d: { maps: GisRow[] }) => d.maps).catch(() => { gisIndex = undefined; return []; }));
+
+const bboxKm = (b: [number, number, number, number]) => extentKm([[b[0], b[1]], [b[2], b[3]]]);
+/** WMS GetMap for a layer's whole extent, in Web Mercator so the image lines up with the map as a rectangle. */
+export function wmsImage(w: NonNullable<HistMap['wms']>, width = 1600, transparent = true): { url: string; coordinates: Overlay['coordinates'] } {
+  const [west, south, east, north] = w.bbox;
+  const [x0, y0] = merc([west, south]);
+  const [x1, y1] = merc([east, north]);
+  const height = Math.max(1, Math.min(2048, Math.round((width * (y1 - y0)) / Math.max(1e-9, x1 - x0))));
+  const p = new URLSearchParams({ service: 'WMS', version: '1.1.1', request: 'GetMap', layers: w.layer, styles: '', format: 'image/png', transparent: String(transparent), srs: 'EPSG:3857', bbox: [x0, y0, x1, y1].join(','), width: String(width), height: String(height) });
+  return { url: `${w.url}?${p}`, coordinates: [[west, north], [east, north], [east, south], [west, south]] };
+}
+export function wmsOverlay(m: HistMap): Overlay | undefined {
+  if (!m.wms) return undefined;
+  const { url, coordinates } = wmsImage(m.wms);
+  return { url, coordinates, errorKm: NaN, extentKm: bboxKm(m.wms.bbox), points: 0,
+    note: `Georeferenced by ${m.holder || 'the holding library'} and served as a map layer; drawn across the layer’s stated extent. The library does not publish its error, so check it against coastlines and rivers.` };
+}
+
+/** Public georeferenced layers covering an area (and, if given, made within the dates), most local first. */
+export async function searchGisIndex(bbox: [number, number, number, number], from?: number, to?: number): Promise<HistMap[]> {
+  const rows = await loadGisIndex();
+  const view = bboxKm(bbox);
+  return rows
+    .filter(([, , y0, y1, b]) => b[0] <= bbox[2] && b[2] >= bbox[0] && b[1] <= bbox[3] && b[3] >= bbox[1] && (from === undefined || (y1 >= from && y0 <= (to ?? Infinity))))
+    .map((r) => ({ r, km: bboxKm(r[4]) }))
+    .filter(({ km }) => km < Math.max(view * 40, 300))
+    .sort((a, b) => a.km - b.km)
+    .slice(0, 20)
+    .map(({ r: [id, title, y0, y1, b, url, layer, holder, page] }) => {
+      const wms = { url, layer, bbox: b };
+      return {
+        id: `gis:${id}`, title, date: yearFrom(y0 === y1 ? String(y0) : `${y0}–${y1}`), subjects: [], collection: 'gis' as const, holder: holder || COLLECTION.gis.name,
+        thumb: wmsImage(wms, 300, false).url, page, rights: COLLECTION.gis.rights, wms,
       };
     });
 }
@@ -309,6 +356,7 @@ export async function searchMaps(opts: { q?: string; bbox?: [number, number, num
     jobs.push(searchRumsey(q, opts.from, opts.to, opts.signal).catch(() => { errors.push('David Rumsey Map Collection couldn’t be reached.'); return []; }));
   }
   if (opts.bbox) jobs.push(searchAllmaps(opts.bbox, opts.signal).catch(() => { errors.push('Allmaps couldn’t be reached.'); return []; }));
+  if (opts.bbox) jobs.push(searchGisIndex(opts.bbox, opts.from, opts.to).catch(() => { errors.push('The georeferenced map index couldn’t be loaded.'); return []; }));
   const all = (await Promise.all(jobs)).flat();
   const inRange = (m: HistMap) => opts.from === undefined || m.date.precision === 'unknown' || ((m.date.latest ?? Infinity) >= opts.from && (m.date.earliest ?? -Infinity) <= (opts.to ?? Infinity));
   const seen = new Set<string>();

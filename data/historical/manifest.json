@@ -186,6 +186,18 @@
   "sha256": "8288991abf9a27aaaa795dbc103c653c044a174279c2732850fdfa300fb43124",
   "downloaded": "2026-10-01"
  },
+ "croatia-cultural-goods/original/data.json": {
+  "url": "https://data.gov.hr/ckan/dataset/c0410787-33b1-4299-b92c-9bbf38dd8bbf/resource/c9a9bce6-1b70-45ec-b2cf-d3f93bca7a02/download/data.json",
+  "bytes": 10227091,
+  "sha256": "044edd20bb9fc6861547ec4a76d8c13157237c2a0cc5ffb225fc1724dc3919b3",
+  "downloaded": "2026-10-01"
+ },
+ "croatia-cultural-goods/original/geonames-HR.zip": {
+  "url": "https://download.geonames.org/export/dump/HR.zip",
+  "bytes": 800166,
+  "sha256": "0280b84420ac2e352143e67bee231f5f701d22c6587521e52e77516a436e870a",
+  "downloaded": "2026-10-01"
+ },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
   "bytes": 44501172,
@@ -570,6 +582,18 @@
   "sha256": "e33f1823350650fb8369abb38ce46585ddc60b442daada0e7cd41e9465364dd4",
   "downloaded": "2026-09-30"
  },
+ "dissiloc-inquisition-places/original/README.md": {
+  "url": "https://zenodo.org/api/records/21031406/files/README.md/content",
+  "bytes": 12548,
+  "sha256": "8d423eb26cf0d72a8b38b5792a8107dbf9f57ec819a86ad8ea04a425bf578fbc",
+  "downloaded": "2026-10-01"
+ },
+ "dissiloc-inquisition-places/original/dissiloc.tsv": {
+  "url": "https://zenodo.org/api/records/21031406/files/dissiloc.tsv/content",
+  "bytes": 1197248,
+  "sha256": "1d0c4d95e32b13c446ba4ec41ae1fac51f91afd93afe421cd1071f9b8daf117b",
+  "downloaded": "2026-10-01"
+ },
  "dk-fund-og-fortidsminder/original/FF.zip": {
   "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
   "bytes": 109119092,
@@ -800,6 +824,12 @@
   "sha256": "4832d91c44b45871ff5fe09ae3a81b91eb0d17ed227d0037f6d6a12a68d4c4ac",
   "downloaded": "2026-10-01"
  },
+ "index-villaris-1680/original/geonames-GB.zip": {
+  "url": "https://download.geonames.org/export/dump/GB.zip",
+  "bytes": 3639093,
+  "sha256": "e31c630e66e18b72ce29401a2081c5f452e1f894ab1b890ae8eb871f453d0db1",
+  "downloaded": "2026-10-01"
+ },
  "inland-navigation/original/gis/direct_evidence.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
   "bytes": 1115556,
@@ -914,6 +944,18 @@
   "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
   "downloaded": "2026-09-29"
  },
+ "latvia-monuments/original/geonames-LV.zip": {
+  "url": "https://download.geonames.org/export/dump/LV.zip",
+  "bytes": 1068796,
+  "sha256": "e0cabc84f888d1fe2d6b37259150abc48723c808ce565647e5da18639017da22",
+  "downloaded": "2026-10-01"
+ },
+ "latvia-monuments/original/saraksts.csv": {
+  "url": "https://data.gov.lv/dati/dataset/79e7246f-57cc-41fc-9a10-96521422359c/resource/25583e4e-ca54-430e-b275-b38057a5ee70/download/saraksts.csv",
+  "bytes": 2012570,
+  "sha256": "ae9f294d5fe0baef76146a0e6d7c789e63f56714859b19940d4a3710d6d6d5d8",
+  "downloaded": "2026-10-01"
+ },
  "list-latin-inscriptions/original/LIST_v1-2.parquet": {
   "url": "https://zenodo.org/api/records/10473706/files/LIST_v1-2.parquet/content",
   "bytes": 109990225,
@@ -991,6 +1033,36 @@
   "bytes": 143,
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
   "downloaded": "2026-09-29"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.cpg": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208060?format=original",
+  "bytes": 5,
+  "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.dbf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208059?format=original",
+  "bytes": 4409,
+  "sha256": "430f3558a9b2c7feb5882cec1b266d8a0eaa84fc5c04ddd9ef38bd6f73cf6bea",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.prj": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208063?format=original",
+  "bytes": 419,
+  "sha256": "a1321e12a80058c45a08046b66c426d682a9f522c7a7f688591a6463028cf1cb",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.shp": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208062?format=original",
+  "bytes": 18592,
+  "sha256": "ab76e60af35bc3d4a9bb61d382a4a877df9ed9bf7bb090ec42a39a5d733f6d22",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.shx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208061?format=original",
+  "bytes": 444,
+  "sha256": "0959e184daee3cf160552bfef83a2d3a29a4792fc942996488c40b2be0a6f292",
+  "downloaded": "2026-10-01"
  },
  "lutsch-transylvania-1751/original/Appendix. Mountain and hill names in 1735 and 1751.doc": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/7226246?format=original",
@@ -1814,10 +1886,64 @@
   "sha256": "8480146fa43519579403a54f9d3fbedb2a8827d2a23ca9536c9d2c0107620c3a",
   "downloaded": "2026-09-30"
  },
+ "rohgis-settlements-1904-1913/original/rohgis_setro_0413.csv": {
+  "url": "https://zenodo.org/records/15613857/files/rohgis_setro_0413.csv?download=1",
+  "bytes": 445141,
+  "sha256": "04b20401c9f33f6ecfca3597fcefa325a94721f7bd30cd9cb4c705a1311a9311",
+  "downloaded": "2026-10-01"
+ },
+ "russian-3verst-gazetteer/original/Russian_3verst.csv": {
+  "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
+  "bytes": 506311,
+  "sha256": "fab7bd0f195f9fda8753c993d2460964eae515e65a2f2b89637a7a881180cdd7",
+  "downloaded": "2026-10-01"
+ },
  "slovenia-rkd-register/original/rnpd.csv": {
   "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
   "bytes": 24015168,
   "sha256": "b14c58cbc7de8b597294c4f0b3fd5aa00ecad52a88adef140d8e8f7e9395278e",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Basic_settlement_unit_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Basic_settlement_unit_v1.0.csv/content",
+  "bytes": 2893792,
+  "sha256": "8dc5393f7e4e3f36fb55b85d42a2daebae8a711689eee232a5d65b207b09d7f3",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-ancient_monument_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-ancient_monument_v1.0.csv/content",
+  "bytes": 6776,
+  "sha256": "6ca439ee17cef22a1ccb3d6fa07cf4229f245b05766d44c53c1974f9ee67d0cf",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-church_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-church_v1.0.csv/content",
+  "bytes": 96785,
+  "sha256": "7fefa57e617e6c67ea43aae285c4d497890055b381d6781ae2a53931f74fbdf4",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-industry_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-industry_v1.0.csv/content",
+  "bytes": 26822,
+  "sha256": "5e3b71794611624771c33da46e1077fcc70508ba8bcfd456c63b41c5d4788344",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-watermill_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-watermill_v1.0.csv/content",
+  "bytes": 271155,
+  "sha256": "f8330b02574d3f9c4dfa7c61e40306d78562961ae54bfccbb84aee488fb902c1",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-windmill_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-windmill_v1.0.csv/content",
+  "bytes": 48882,
+  "sha256": "d851aa5b19329a26e68491080a6b41ccf77c00a95e717cb3888f54f91da94633",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1680-1700/original/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip": {
+  "url": "https://zenodo.org/api/records/15118501/files/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip/content",
+  "bytes": 8500526,
+  "sha256": "3b9e8cbe02d56ee331328c5c7f72306ec54694a060b3d4230463c98d848e8191",
   "downloaded": "2026-10-01"
  },
  "sweden-lamningar/original/lamningar_sverige.gpkg": {
@@ -2162,6 +2288,12 @@
   "sha256": "ebd6ac3540b9c316928d522fcec78d3f70c156d9d9056d17269f469f754f3de0",
   "downloaded": "2026-09-30"
  },
+ "transice-iceland/original/TransIce_dataset_WP1.zip": {
+  "url": "https://zenodo.org/api/records/17537206/files/TransIce_dataset_WP1.zip/content",
+  "bytes": 544608,
+  "sha256": "8a785595a4a0746ce6a5793c70876c4c48254e2d5d63f9e851aacb725a78f471",
+  "downloaded": "2026-10-01"
+ },
  "tribal-hidage/original/Individuals_Data.csv": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
   "bytes": 534736,
@@ -2191,6 +2323,12 @@
   "bytes": 218696,
   "sha256": "c1be803803f71ae91acaf6a54e573ed8ab50625b78165a274d3cf2e8be46fd4b",
   "downloaded": "2026-09-29"
+ },
+ "tyrol-mining-gazetteer/original/historical_place_gazetteer_tyrol_links_202203.csv": {
+  "url": "https://zenodo.org/api/records/6368451/files/historical_place_gazetteer_tyrol_links_202203.csv/content",
+  "bytes": 102114,
+  "sha256": "d1193b6ea0be0e1754d0fbb8deee884a8bd80a3cd60b4f1b630a8f75bfea02cb",
+  "downloaded": "2026-10-01"
  },
  "viabundus/original/Viabundus-2-edges.geojson": {
   "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.geojson/content",

@@ -591,7 +591,7 @@ def build(rows_only=False):
         rfeats.append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
     stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
                                      'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
-                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0)')
+                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0)')
     from cassini_tiles import build_cassini_roads
     stats['cassiniRoads'] = build_cassini_roads(TILES)
     from cassini_tiles import build_inscriptions
@@ -843,7 +843,11 @@ def regional_layers(recs, rows, sites_out):
     reg_stats, reg_index = {}, Counter()
     loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
                ('ottomannfs', REG.ottoman_nfs), ('generalkarte', REG.generalkarte), ('cassini', REG.cassini_places), ('lutsch', REG.lutsch),
-               ('sirkd', REG.slovenia_rkd))
+               ('sirkd', REG.slovenia_rkd), ('lvmon', REG.latvia_monuments),
+               ('hrreg', REG.croatia_goods),
+               ('r3verst', REG.russian_3verst), ('rohgis', REG.rohgis_settlements),
+               ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
+               ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining))
     for name, fn in loaders:
         res = fn()
         recs, note = (res if isinstance(res, tuple) else (res, None))
