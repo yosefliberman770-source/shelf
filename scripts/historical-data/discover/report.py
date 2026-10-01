@@ -301,6 +301,8 @@ def main():
         ('Swedish geometrical maps', 'Envelope 1630–1655 (the maps it is drawn on)', "Each map's own year not in the dataset"),
         ('Tyrol mining documents', "Attested in the document's years", '226 places not localised by the source'),
         ('Lutsch roads', 'Snapshot 1751', '—'),
+        ('Arkas (Slovenia)', "Each site's own years (Leto_od–Leto_do)", 'Prehistoric-only sites left out'),
+        ('ARIADNE catalogue (private pack)', "Each provider period (PeriodO-linked from/until); separate periods stay separate phases", 'No join across gaps; records without a point placed at their municipality only when the name is unique'),
     ]))
     w('')
     w('Display rules added: a snapshot is drawn at full strength in its year and lighter within ±25 years (a display allowance, stated in the popup, not a claim); '
