@@ -3073,5 +3073,23 @@
   "bytes": 184889,
   "sha256": "5f98120d4372f947328213b1a164f03fb5e1f0525961570d5905d5169ac65e8d",
   "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/grobovi-graves.xlsx": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/grob/excel (the web app's own public export; response is base64 of the .xlsx, decoded)",
+  "bytes": 2448557,
+  "sha256": "6948abe5c1302707f3d7762e96e167a14c9469081821d42d6d01e6430f8de733",
+  "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/najdisca-koordinate.json": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/koordinate",
+  "bytes": 472018,
+  "sha256": "a7b27cd4f7551bfeffa6c093776eeda16abe58e5cea3f77af8a4d32de54495cc",
+  "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/najdisca-sites.xlsx": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/excel (the web app's own public export; response is base64 of the .xlsx, decoded)",
+  "bytes": 1041228,
+  "sha256": "7a9c415c7c6d6a00705ecbb0e31948e4578352f29194f5bc07eb942811cb8494",
+  "downloaded": "2026-10-01"
  }
 }

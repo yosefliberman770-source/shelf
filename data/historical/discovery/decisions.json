@@ -697,10 +697,10 @@
    "match": [
     "zbiva.zrc-sazu.si"
    ],
-   "status": "blocked",
-   "state": "blocked",
+   "status": "acquired",
+   "state": "acquired",
    "region": "Slovenia, Austria, Croatia, NE Italy",
-   "note": "Chain lead from the Zbiva subset (integrated). 2026-10-01: the host resets the TLS connection from this machine (curl error 35, http and https). Retry from another network or ask ZRC SAZU for an export; the published subset is in use meanwhile."
+   "note": "Old host zbiva.zrc-sazu.si resets connections, but the current app zbiva4.zrc-sazu.si serves its own public exports (no login): 3,915 sites (3,739 with coordinates; 3,019 with their own earliest/latest dating, 896 undated) and 12,048 graves, acquired 2026-10-01. The app states CC BY-NC-SA 3.0 → private pack. Integration queued for cycle 3, replacing the 1,104-site Zenodo subset."
   },
   {
    "title": "INHILLDAUGAR: annotated place-names along the Daugava (Latvia)",

@@ -1470,5 +1470,25 @@
     "path": "original/Railroads.zip"
    }
   ]
+ },
+ {
+  "id": "zbiva-full",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/excel",
+    "path": "original/najdisca-sites.xlsx",
+    "note": "public export of the Zbiva 4 web app; base64-decoded"
+   },
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/grob/excel",
+    "path": "original/grobovi-graves.xlsx",
+    "note": "public export; base64-decoded"
+   },
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/koordinate",
+    "path": "original/najdisca-koordinate.json"
+   }
+  ]
  }
 ]
