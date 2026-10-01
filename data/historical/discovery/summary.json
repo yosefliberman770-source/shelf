@@ -1,5 +1,5 @@
 {
- "candidates": 185636,
+ "candidates": 185648,
  "byChannel": {
   "datacite": 8657,
   "data.europa.eu": 12587,
@@ -10,26 +10,26 @@
   "zenodo": 4941,
   "shelf-audit": 153,
   "whg": 102,
-  "direct-search": 7,
+  "direct-search": 19,
   "wikidata-register": 3031,
   "figshare": 100
  },
  "byClass": {
-  "A": 49382,
-  "C": 1718,
+  "A": 49385,
+  "C": 1720,
   "E": 58629,
-  "G": 711,
+  "G": 715,
   "B": 84,
   "F": 8,
-  "I": 75104
+  "I": 75107
  },
- "relevant": 11977,
+ "relevant": 11980,
  "byStatus": {
-  "discovered": 185285,
-  "integrated": 64,
-  "evaluated": 93,
-  "acquired": 9,
-  "blocked": 185
+  "discovered": 185067,
+  "integrated": 74,
+  "blocked": 399,
+  "evaluated": 98,
+  "acquired": 10
  },
  "byRegion(relevance≥50)": {
   "England": 2305,
@@ -40,8 +40,8 @@
   "Italy": 680,
   "Low Countries": 670,
   "Balkans": 444,
-  "Anatolia & Caucasus": 790,
-  "Austria & Switzerland": 354,
+  "Anatolia & Caucasus": 791,
+  "Austria & Switzerland": 355,
   "Hungary": 179,
   "Germany": 1456,
   "Spain": 595,
@@ -49,7 +49,7 @@
   "Poland": 467,
   "Czechia & Slovakia": 307,
   "Romania & Moldova": 143,
-  "Baltic": 299,
+  "Baltic": 300,
   "East Slavic": 564,
   "Finland & Iceland": 286,
   "(bbox in Europe/Mediterranean)": 2043,
@@ -57,25 +57,25 @@
   "Ireland": 259
  },
  "byCategory(relevance≥50)": {
-  "Settlements": 5407,
+  "Settlements": 5408,
   "Political": 6385,
-  "Religious": 2793,
-  "Economic": 3191,
-  "Names": 436,
+  "Religious": 2794,
+  "Economic": 3192,
+  "Names": 438,
   "Military": 2576,
   "Maritime": 1030,
   "Physical": 6487,
-  "Archaeology": 2454,
-  "Transport": 4116,
+  "Archaeology": 2455,
+  "Transport": 4117,
   "Events": 1097,
   "Population": 2333
  },
  "byCentury(relevance≥50)": {
-  "1500": 1263,
-  "1600": 1026,
-  "1700": 1575,
-  "1800": 2360,
-  "1900": 1725,
+  "1500": 1265,
+  "1600": 1027,
+  "1700": 1576,
+  "1800": 2361,
+  "1900": 1726,
   "200": 1875,
   "300": 1362,
   "400": 1577,
@@ -87,8 +87,8 @@
   "1000": 870,
   "1100": 772,
   "1200": 811,
-  "1300": 1050,
-  "1400": 1050
+  "1300": 1051,
+  "1400": 1052
  },
  "queries": 2551
 }

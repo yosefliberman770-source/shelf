@@ -67,6 +67,9 @@ export interface GazetteerInfo {
   box: [number, number, number, number];
   describe: string;
   record: (id: number | string) => string;
+  /** Only attests places mentioned in its documents (a register's index of names): it corroborates and dates a
+   *  place, but is never the record shown for it, and its name forms never decide between places. */
+  attests?: true;
 }
 
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
@@ -106,9 +109,9 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'r3verst', name: 'Russian 3-verst map gazetteer (Balkans, 1877–1879)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.8411078', coverage: [1877, 1879], core: [1877, 1879], box: [21.5, 40.5, 29.5, 44.5], describe: 'Settlements, monasteries, khans and other places on the Russian military 3-verst map of the Balkans, surveyed during and after the 1877–78 war, with their modern names.', record: () => 'https://doi.org/10.5281/zenodo.8411078' },
   { id: 'rohgis', name: 'RoHGIS settlements of Romania (1904–1913)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.15613857', coverage: [1904, 1913], core: [1904, 1913], box: [22, 43.5, 30, 48.5], describe: 'Every settlement of the Kingdom of Romania existing between 1904 and 1913, with official name variants.', record: () => 'https://doi.org/10.5281/zenodo.15613857' },
   { id: 'transice', name: 'TransIce: Icelandic shielings and farms', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.17537206', coverage: [900, 1950], core: [1703, 1703], box: [-24.6, 63.2, -13.4, 66.6], describe: 'Farms listed in the Jarðabók of 1703 and shielings with their first mention and abandonment years, from the Institute of Archaeology, Iceland.', record: () => 'https://doi.org/10.5281/zenodo.17537206' },
-  { id: 'dissiloc', name: 'DISSILOC: places in medieval inquisition registers', license: 'CC BY-SA 4.0', url: 'https://doi.org/10.5281/zenodo.21031406', coverage: [1241, 1522], core: [1241, 1399], box: [-5, 40, 20, 56], describe: 'Settlements, churches, religious houses and castles named in inquisition registers of Languedoc, northern and central Italy, England and Bohemia, 1240s–1520s; each dated by its register.', record: () => 'https://doi.org/10.5281/zenodo.21031406' },
+  { id: 'dissiloc', name: 'DISSILOC: places in medieval inquisition registers', license: 'CC BY-SA 4.0', url: 'https://doi.org/10.5281/zenodo.21031406', coverage: [1241, 1522], core: [1241, 1399], box: [-5, 40, 20, 56], attests: true, describe: 'Settlements, churches, religious houses and castles named in inquisition registers of Languedoc, northern and central Italy, England and Bohemia, 1240s–1520s; each dated by its register.', record: () => 'https://doi.org/10.5281/zenodo.21031406' },
   { id: 'swegeo', name: 'Swedish geometrical maps (1630–1655)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.15121019', coverage: [1630, 1655], core: [1630, 1655], box: [10.5, 55, 24.5, 69], describe: 'Villages, churches, water- and windmills drawn on the large-scale Swedish land-survey maps of 1630–1655.', record: () => 'https://doi.org/10.5281/zenodo.15121019' },
-  { id: 'tyrolmine', name: 'Tyrolean mining documents (1460s–1510s)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.6368451', coverage: [1460, 1525], core: [1460, 1525], box: [10.5, 46.8, 12.6, 47.8], describe: 'Places around Schwaz and Kufstein named in the mining documents Hs. 37 (1460–1463) and Hs. 1587 (c. 1515), with their document forms.', record: () => 'https://doi.org/10.5281/zenodo.6368451' },
+  { id: 'tyrolmine', name: 'Tyrolean mining documents (1460s–1510s)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.6368451', coverage: [1460, 1525], core: [1460, 1525], box: [10.5, 46.8, 12.6, 47.8], attests: true, describe: 'Places around Schwaz and Kufstein named in the mining documents Hs. 37 (1460–1463) and Hs. 1587 (c. 1515), with their document forms.', record: () => 'https://doi.org/10.5281/zenodo.6368451' },
   { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
@@ -476,7 +479,9 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   const scope = (p: GazPlace) => (inDatasetScope(p) ? 0 : 1);
   // Wikidata aggregates: it corroborates a specialist record of the same place, never replaces it as the record shown.
   // Its dates still count — the place's temporal support is the best any of its records gives (see `dated` below).
-  const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' ? 1 : 0);
+  // Datasets that only attest places mentioned in their documents rank with it.
+  const attestsOnly = (p: GazPlace) => !!GAZETTEERS.find((x) => x.id === p.gazetteer)?.attests;
+  const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' || attestsOnly(p) ? 1 : 0);
   const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || aggregator(a.place) - aggregator(b.place) || fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
@@ -504,7 +509,7 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
     }
     if (!chosen) {
       // A single group where the name is the main title, against at most one other place listing it as an alternative.
-      const titled = groups.filter((gr) => gr.some((x) => x.isTitle));
+      const titled = groups.filter((gr) => gr.some((x) => x.isTitle && !attestsOnly(x.place)));
       if (titled.length === 1 && groups.length - 1 <= 1 && lead(titled[0]).place.precise) { chosen = titled[0]; basis = 'main-title'; why = `The only place in ${srcList(pool.map((h) => h.place.gazetteer))} whose main name is “${written}”.`; }
     }
   }

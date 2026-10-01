@@ -9,17 +9,25 @@
   "nid": 28219,
   "irlsmr": 365,
   "viabundus": 7488,
+  "hrreg": 2193,
+  "dissiloc": 2668,
   "nokm": 8941,
   "merimee": 9875,
   "cassini": 3334,
   "hre": 2390,
   "bridges1250": 258,
-  "ivillaris": 23095,
+  "ivillaris": 22838,
   "nsh": 764,
   "generalkarte": 21107,
+  "r3verst": 6290,
   "finreg": 1823,
+  "swegeo": 14165,
   "sirkd": 9360,
+  "tyrolmine": 232,
+  "rohgis": 10020,
   "ottomannfs": 16234,
+  "transice": 1476,
+  "lvmon": 1371,
   "wbohemia": 839,
   "lutsch": 271,
   "tib": 2802,
@@ -48,6 +56,14 @@
    "water-far": 627,
    "stacked": 881
   },
+  "hrreg": {
+   "water-near": 26,
+   "stacked": 216
+  },
+  "dissiloc": {
+   "outside-box": 16,
+   "stacked": 27
+  },
   "nokm": {
    "water-near": 256
   },
@@ -63,14 +79,16 @@
    "water-near": 17
   },
   "ivillaris": {
-   "water-near": 341,
-   "water-far": 267,
-   "outside-box": 7,
-   "stacked": 76
+   "water-near": 330,
+   "outside-box": 4,
+   "stacked": 75
   },
   "generalkarte": {
    "water-near": 81,
    "water-far": 1
+  },
+  "tyrolmine": {
+   "outside-box": 7
   },
   "viabundus": {
    "water-near": 17
@@ -94,8 +112,14 @@
    "water-near": 16,
    "outside-box": 1
   },
+  "transice": {
+   "water-near": 15
+  },
   "ottomannfs": {
    "water-near": 4
+  },
+  "swegeo": {
+   "water-near": 5
   },
   "bridges1250": {
    "water-near": 2
@@ -105,6 +129,9 @@
   },
   "sirkd": {
    "water-near": 9
+  },
+  "r3verst": {
+   "water-near": 1
   },
   "tib": {
    "water-near": 35,
@@ -140,6 +167,9 @@
   "nid": {
    "stacked": 8369
   },
+  "lvmon": {
+   "stacked": 75
+  },
   "ran": {
    "stacked": 43
   }
@@ -148,22 +178,28 @@
   "canmore": 0.0035,
   "wikidata": 0.0,
   "pleiades": 0.0438,
+  "hrreg": 0.0985,
+  "dissiloc": 0.0161,
   "nokm": 0.0,
   "buringh": 0.0027,
   "merimee": 0.0025,
   "cassini": 0.0,
-  "ivillaris": 0.0152,
+  "ivillaris": 0.0035,
   "generalkarte": 0.0,
+  "tyrolmine": 0.0302,
   "viabundus": 0.0,
   "finreg": 0.0,
   "althurayya": 0.0028,
   "germaniasacra": 0.0016,
   "irlsmr": 0.0,
   "nsh": 0.0013,
+  "transice": 0.0,
   "ottomannfs": 0.0,
+  "swegeo": 0.0,
   "bridges1250": 0.0,
   "hre": 0.0,
   "sirkd": 0.0,
+  "r3verst": 0.0,
   "tib": 0.0021,
   "darmc": 0.1305,
   "mfairs": 0.0,
@@ -173,6 +209,7 @@
   "afontium": 0.0,
   "dicotopo": 0.006,
   "nid": 0.2966,
+  "lvmon": 0.0547,
   "ran": 0.015
  },
  "examples": {
@@ -969,6 +1006,277 @@
     ]
    ]
   },
+  "hrreg": {
+   "water-near": [
+    [
+     "Z-5005",
+     "Crkva sv. Ciprijana na groblju",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-6510",
+     "Crkva Svih svetih",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-4779",
+     "Crkva sv. Jurja",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-4781",
+     "Crkva sv. Jeronima",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-4778",
+     "Crkva sv. Ante Opata",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-5296",
+     "Kaštel Cicarelli",
+     "castle",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-1869",
+     "Crkva Gospe od Batka",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-3825",
+     "Kula Akvila (Aquilla)",
+     "castle",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-3826",
+     "Crkva Blažene Gospe od Utjehe na groblju",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-4574",
+     "Crkva sv. Lucije",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-4681",
+     "Crkva sv. Jurja na Veloj Bračuti",
+     "church",
+     16.73389,
+     43.34778,
+     0.0
+    ],
+    [
+     "Z-5170",
+     "Crkva sv. Nikole",
+     "church",
+     17.01667,
+     42.97639,
+     0.1
+    ],
+    [
+     "Z-2903",
+     "Urbanistička cjelina naselja Kaštel Stari",
+     "castle",
+     16.35,
+     43.55,
+     0.1
+    ],
+    [
+     "Z-3251",
+     "Kaštel Ćipiko, Trg Brce",
+     "castle",
+     16.35,
+     43.55,
+     0.1
+    ],
+    [
+     "Z-3335",
+     "Crkva sv. Ivana Krstitelja",
+     "church",
+     16.35,
+     43.55,
+     0.1
+    ]
+   ],
+   "stacked": [
+    [
+     [
+      15.97798,
+      45.81444
+     ],
+     54
+    ],
+    [
+     [
+      16.43915,
+      43.50891
+     ],
+     39
+    ],
+    [
+     [
+      18.10909,
+      42.64125
+     ],
+     37
+    ],
+    [
+     [
+      16.25167,
+      43.5125
+     ],
+     32
+    ],
+    [
+     [
+      15.22514,
+      44.11578
+     ],
+     29
+    ],
+    [
+     [
+      16.44278,
+      43.1725
+     ],
+     25
+    ]
+   ]
+  },
+  "dissiloc": {
+   "outside-box": [
+    [
+     "2e023c91-d8d0-47a0-b4fc-541249a50113",
+     "Almaria",
+     -2.463,
+     36.841
+    ],
+    [
+     "c21c28b4-7794-4084-aae6-68f9d3f35038",
+     "Granada",
+     -3.6,
+     37.173
+    ],
+    [
+     "50516598-47a1-4353-8c20-4c859e32e7f0",
+     "Lugo",
+     -7.558,
+     43.009
+    ],
+    [
+     "44b29c71-9fa7-4d60-9b5b-5e263d902932",
+     "Padernum",
+     13.352,
+     38.111
+    ],
+    [
+     "46e76f10-6288-41f8-85b6-d0c102d9a7bc",
+     "Palermo",
+     13.364,
+     38.119
+    ],
+    [
+     "a6f2fe19-e104-480b-af82-a2e29600db19",
+     "Yherusalem",
+     35.234,
+     31.777
+    ],
+    [
+     "fe1f4a5b-de49-4d4b-a520-a3049acbd060",
+     "Jérusalem",
+     35.219,
+     31.773
+    ],
+    [
+     "0fdcd491-781f-4b58-b9ee-d6f1a47059fc",
+     "Lisbon",
+     -9.133,
+     38.71
+    ],
+    [
+     "85274cac-1351-40f8-9f18-0d6cd13bb6ef",
+     "Porto",
+     -8.615,
+     41.153
+    ],
+    [
+     "56da8cf9-f8e6-48c8-9b17-e36720817076",
+     "eccleisa Sancti Iacobi (Santiago de Compostela)",
+     -8.544,
+     42.88
+    ],
+    [
+     "4d2a84f3-ff78-4b94-b76c-2ecfc99d0f8d",
+     "Sanctus Iacobus",
+     -8.545,
+     42.88
+    ],
+    [
+     "fd55f0a5-62a5-4eef-9da2-275ad37fc3fc",
+     "Sanctus Iacobus de Compostella",
+     -8.545,
+     42.88
+    ],
+    [
+     "28a00546-ea33-484a-9254-c6e713b65793",
+     "Sanctus Jacobus",
+     -8.544,
+     42.878
+    ],
+    [
+     "b15e1fff-dc71-43f8-ad44-9209f984e2b3",
+     "Constantinopolis",
+     28.956,
+     41.014
+    ],
+    [
+     "8e5d1e75-e3b2-4934-a00c-0192e23f1055",
+     "Alexandria",
+     29.9,
+     31.199
+    ]
+   ],
+   "stacked": [
+    [
+     [
+      11.343,
+      44.496
+     ],
+     27
+    ]
+   ]
+  },
   "nokm": {
    "water-near": [
     [
@@ -1535,6 +1843,14 @@
      0.0
     ],
     [
+     "IV1680-061-53",
+     "Bulston",
+     "settlement",
+     -4.93767,
+     51.7677,
+     0.0
+    ],
+    [
      "IV1680-071-39",
      "S. Carew",
      "settlement",
@@ -1548,14 +1864,6 @@
      "settlement",
      -5.24998,
      51.8681,
-     0.1
-    ],
-    [
-     "IV1680-086-32",
-     "St. Clement",
-     "settlement",
-     -5.01554,
-     50.2401,
      0.1
     ],
     [
@@ -1607,152 +1915,12 @@
      0.8
     ]
    ],
-   "water-far": [
-    [
-     "IV1680-009-50",
-     "Anthony",
-     "settlement",
-     -4.91057,
-     50.1627,
-     2.5
-    ],
-    [
-     "IV1680-042-33",
-     "Bodregan",
-     "settlement",
-     -4.70216,
-     50.2595,
-     4.4
-    ],
-    [
-     "IV1680-053-11",
-     "St. Brides",
-     "settlement",
-     -5.16778,
-     51.3667,
-     19.1
-    ],
-    [
-     "IV1680-082-05",
-     "Chilch Great",
-     "settlement",
-     -5.11058,
-     50.8014,
-     18.4
-    ],
-    [
-     "IV1680-083-52",
-     "Chollacomb",
-     "settlement",
-     -5.93533,
-     50.9091,
-     55.1
-    ],
-    [
-     "IV1680-143-15",
-     "St. Goven",
-     "settlement",
-     -4.92522,
-     51.5632,
-     2.3
-    ],
-    [
-     "IV1680-156-47",
-     "Harlyne",
-     "settlement",
-     -5.07007,
-     50.6905,
-     10.2
-    ],
-    [
-     "IV1680-190-18",
-     "Kellah",
-     "settlement",
-     -4.50303,
-     50.2973,
-     2.4
-    ],
-    [
-     "IV1680-192-15",
-     "Kerick-Male",
-     "settlement",
-     -4.97773,
-     51.5729,
-     2.3
-    ],
-    [
-     "IV1680-210-20",
-     "Letkee Dineck",
-     "settlement",
-     -4.5953,
-     51.3906,
-     14.1
-    ],
-    [
-     "IV1680-220-19",
-     "Llanstephen",
-     "settlement",
-     -4.20552,
-     51.2459,
-     3.2
-    ],
-    [
-     "IV1680-236-21",
-     "St. Mawes Castle",
-     "settlement",
-     -5.38598,
-     51.1421,
-     40.2
-    ],
-    [
-     "IV1680-236-26",
-     "Mawnam",
-     "settlement",
-     -4.90755,
-     50.1568,
-     2.9
-    ],
-    [
-     "IV1680-247-43",
-     "St. Moscea",
-     "settlement",
-     -5.40138,
-     51.1024,
-     43.2
-    ],
-    [
-     "IV1680-249-02",
-     "St. Moze",
-     "settlement",
-     -4.9326,
-     50.1681,
-     2.1
-    ]
-   ],
    "outside-box": [
-    [
-     "IV1680-391-10",
-     "Wingfield",
-     -9.36377,
-     51.2243
-    ],
     [
      "IV1680-393-47",
      "Withcock",
      -9.76676,
      51.9662
-    ],
-    [
-     "IV1680-100-33",
-     "Croft",
-     0.70188,
-     57.9419
-    ],
-    [
-     "IV1680-148-26",
-     "Gwige",
-     3.98783,
-     53.1301
     ],
     [
      "IV1680-168-40",
@@ -1793,7 +1961,7 @@
       -0.13183,
       51.5087
      ],
-     21
+     20
     ]
    ]
   },
@@ -1928,6 +2096,52 @@
      24.60043,
      40.85312,
      2.1
+    ]
+   ]
+  },
+  "tyrolmine": {
+   "outside-box": [
+    [
+     "hs1587/pl38",
+     "Österreich",
+     14.49613,
+     47.52266
+    ],
+    [
+     "hs1587/pl6",
+     "Elsass",
+     7.79043,
+     48.81602
+    ],
+    [
+     "hs1587/pl5",
+     "Hagenau",
+     7.79043,
+     48.81602
+    ],
+    [
+     "hs37/et103_pl1",
+     "Püdensdorf",
+     12.69908,
+     49.21016
+    ],
+    [
+     "hs37/et8_pl14",
+     "Regensburg",
+     12.10021,
+     49.01781
+    ],
+    [
+     "hs1587/pl11",
+     "Bayern",
+     11.57899,
+     49.04077
+    ],
+    [
+     "hs37/et17_pl6",
+     "Bayern",
+     11.57899,
+     49.04077
     ]
    ]
   },
@@ -2587,6 +2801,130 @@
     ]
    ]
   },
+  "transice": {
+   "water-near": [
+    [
+     "ST-045:001",
+     "Ásmundarnes",
+     "settlement",
+     -21.4522,
+     65.77274,
+     0.0
+    ],
+    [
+     "BO-040:001",
+     "Höfði (Staðarhöfði)",
+     "settlement",
+     -21.98083,
+     64.30208,
+     0.0
+    ],
+    [
+     "GK-180:001",
+     "Lángeyri",
+     "settlement",
+     -21.97274,
+     64.07445,
+     0.0
+    ],
+    [
+     "GK-078:001",
+     "Lambastaðir",
+     "settlement",
+     -22.67808,
+     64.08077,
+     0.0
+    ],
+    [
+     "GK-081:001",
+     "Lónshús",
+     "settlement",
+     -22.67362,
+     64.08014,
+     0.0
+    ],
+    [
+     "GK-102:001",
+     "Hrúðurnes",
+     "settlement",
+     -22.59255,
+     64.04518,
+     0.0
+    ],
+    [
+     "GK-103:001",
+     "Stóri-Hólmur",
+     "settlement",
+     -22.59202,
+     64.04482,
+     0.0
+    ],
+    [
+     "GK-152:001",
+     "Naustakot",
+     "settlement",
+     -22.3007,
+     64.01694,
+     0.0
+    ],
+    [
+     "GK-165:001",
+     "Straumur",
+     "settlement",
+     -22.04727,
+     64.0414,
+     0.0
+    ],
+    [
+     "GK-167:001",
+     "Lambhagi",
+     "settlement",
+     -22.03884,
+     64.04338,
+     0.0
+    ],
+    [
+     "GK-193:001",
+     "Hlið",
+     "settlement",
+     -22.03973,
+     64.09591,
+     0.0
+    ],
+    [
+     "GK-225:001",
+     "Grótta",
+     "settlement",
+     -22.02141,
+     64.165,
+     0.2
+    ],
+    [
+     "GK-226:001",
+     "Bygggarður",
+     "settlement",
+     -22.00682,
+     64.1618,
+     0.0
+    ],
+    [
+     "ÍS-145:001",
+     "Stekkjanes",
+     "settlement",
+     -23.16713,
+     66.05959,
+     0.0
+    ],
+    [
+     "ST-020:001",
+     "Munaðarnes",
+     "settlement",
+     -21.61881,
+     66.07887,
+     0.0
+    ]
+   ]
+  },
   "ottomannfs": {
    "water-near": [
     [
@@ -2619,6 +2957,50 @@
      "settlement",
      28.82707,
      40.38519,
+     0.0
+    ]
+   ]
+  },
+  "swegeo": {
+   "water-near": [
+    [
+     "win22164",
+     "Windmill, Årsvik",
+     "mill",
+     16.40631,
+     56.36782,
+     0.0
+    ],
+    [
+     "ind21948",
+     "Industry, Tinntorp",
+     "mill",
+     16.64363,
+     57.76256,
+     0.1
+    ],
+    [
+     "s1020",
+     "Gärdsnäs",
+     "settlement",
+     18.7276,
+     59.6224,
+     0.0
+    ],
+    [
+     "s1052",
+     "Norrby Sjöängar",
+     "settlement",
+     18.7049,
+     59.6452,
+     0.0
+    ],
+    [
+     "wat36392",
+     "Mjölkvarn",
+     "mill",
+     18.69536,
+     59.63621,
      0.0
     ]
    ]
@@ -2728,6 +3110,18 @@
      13.58076,
      45.51502,
      0.0
+    ]
+   ]
+  },
+  "r3verst": {
+   "water-near": [
+    [
+     "Свети Николая:43.3614:28.4666",
+     "Свети Николая",
+     "church",
+     28.46656,
+     43.36145,
+     0.1
     ]
    ]
   },
@@ -3817,6 +4211,24 @@
       53.1235
      ],
      146
+    ]
+   ]
+  },
+  "lvmon": {
+   "stacked": [
+    [
+     [
+      24.10589,
+      56.946
+     ],
+     52
+    ],
+    [
+     [
+      23.77038,
+      56.968
+     ],
+     23
     ]
    ]
   },

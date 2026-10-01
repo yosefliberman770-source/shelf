@@ -944,21 +944,37 @@ DISSILOC_KIND = {'settlement': 'settlement', 'church': 'church', 'religious hous
 
 
 def dissiloc():
+    """One record per place (DISSILOC's 'preferred' row and its cross-register identifications), attested from its
+    earliest to its latest register: a place named in registers of 1246 and 1323 existed in between."""
+    rows = list(csv.DictReader(open(raw('dissiloc-inquisition-places', 'dissiloc.tsv'), encoding='utf-8'), delimiter='\t'))
+    group = defaultdict(list)
+    for r in rows:
+        group[r['canonical_id'] or r['id']].append(r)
     out, skipped = [], Counter()
-    for r in csv.DictReader(open(raw('dissiloc-inquisition-places', 'dissiloc.tsv'), encoding='utf-8'), delimiter='\t'):
-        kind = DISSILOC_KIND.get(r['location_type'])
+    for gid, rs in group.items():
+        head = next((r for r in rs if r['preferred'] == 'TRUE'), rs[0])
+        kind = DISSILOC_KIND.get(head['location_type'])
         if not kind:
             skipped['houses, rooms, streets, regions and other features not mapped as places'] += 1
             continue
-        if not r['latitude'] or r['coord_source_type'] not in ('original', 'nearby', 'superordinate (immediate)'):
+        if not head['latitude'] or head['coord_source_type'] not in ('original', 'nearby', 'superordinate (immediate)'):
             skipped['no coordinates of its own or of its immediate container'] += 1
             continue
-        yrs = DISSILOC_YEARS.get(r['case'])
-        x = {'src': 'dissiloc', 'id': r['id'], 'name': r['label'], 'kind': kind, 'lon': float(r['longitude']), 'lat': float(r['latitude']),
-             'precise': r['coord_source_type'] == 'original', 'ty': f"{r['location_type']} · named in the {r['case']} inquisition register", 'ctx': [],
-             'names': [(r['label'], yrs[0] if yrs else None, None, f"{r['label_language'] or 'form'} in register")]}
+        yrs = [DISSILOC_YEARS[r['case']] for r in rs if r['case'] in DISSILOC_YEARS]
+        cases = sorted({r['case'] for r in rs})
+        forms = []
+        for r in rs:
+            # A label may list several forms ('Roma; civitas Rome; de'): keep each real name once.
+            for form in (f.strip() for f in (r['label'] or '').split(';')):
+                if len(form) >= 3 and form[0].isupper() and form not in [f[0] for f in forms]:
+                    y = DISSILOC_YEARS.get(r['case'])
+                    forms.append((form, y[0] if y else None, None, f"{r['label_language'] or 'form'} in the {r['case']} register"))
+        x = {'src': 'dissiloc', 'id': gid, 'name': (head['label'] or '').split(';')[0].strip(), 'kind': kind, 'lon': float(head['longitude']), 'lat': float(head['latitude']),
+             'precise': head['coord_source_type'] == 'original', 'ty': f"{head['location_type']} · named in {', '.join(cases)} inquisition register{'s' if len(cases) > 1 else ''}",
+             'ctx': [], 'names': forms[:6]}
         if yrs:
-            x.update(env=yrs, per=f"named in an inquisition register of {yrs[0]}{'' if yrs[0] == yrs[1] else '–' + str(yrs[1])} ({r['case']}; DISSILOC)")
+            lo, hi = min(a for a, _ in yrs), max(b for _, b in yrs)
+            x.update(env=(lo, hi), per=f"named in inquisition registers of {lo}{'' if lo == hi else '–' + str(hi)} ({', '.join(cases)}; DISSILOC)")
         else:
             skipped['register undated in its edition title (kept undated)'] += 1
         out.append(x)
