@@ -4,10 +4,10 @@
  "public": true,
  "enabled": true,
  "geometry": "polygons",
- "title": "Counties, municipal boroughs, parliamentary constituencies and poor law unions of Wales on the first- and second-edition Ordnance Survey maps (Welsh historic boundaries, RCAHMW / ArcGIS)",
+ "title": "Counties, municipal boroughs and wards, parliamentary constituencies and poor law unions of Wales on the first- and second-edition Ordnance Survey maps (Welsh historic boundaries, RCAHMW / ArcGIS)",
  "licence": "Open Government Licence v3.0",
  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_1st_Edition/FeatureServer/0",
- "describe": "Welsh counties as drawn on the first-edition (surveyed 1860s–80s) and second-edition (1888–1913) OS County Series, municipal boroughs and parliamentary constituencies on the first edition, and poor law unions on the second; each unit is shown over the years its sheets were surveyed.",
+ "describe": "Welsh counties as drawn on the first-edition (surveyed 1860s–80s) and second-edition (1888–1913) OS County Series, municipal boroughs, their wards and parliamentary constituencies on the first edition, and poor law unions on the second; each unit is shown over the years its sheets were surveyed.",
  "layers": [
   "historical-units"
  ],
@@ -114,6 +114,34 @@
     "mode": "fields",
     "field": "SurveyDate",
     "label": "second-edition OS survey"
+   }
+  },
+  {
+   "read": {
+    "path": "wales-units/original/wards_os1.geojson"
+   },
+   "keep": {
+    "field": "MapSym",
+    "values": [
+     "Municipal Ward"
+    ]
+   },
+   "dissolve": [
+    {
+     "field": [
+      "County",
+      "StandName"
+     ],
+     "nameField": "StandName",
+     "level": "municipal ward",
+     "minzoom": 9,
+     "simplify": 0.0003
+    }
+   ],
+   "dating": {
+    "mode": "fields",
+    "field": "SurveyDate",
+    "label": "first-edition OS survey"
    }
   }
  ]

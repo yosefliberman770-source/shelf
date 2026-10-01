@@ -759,6 +759,14 @@
   "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
   "downloaded": "2026-09-30"
  },
+ "finland-lake-ore/original/PANGAEA.860941.tab": {
+  "url": "https://doi.pangaea.de/10.1594/PANGAEA.860941?format=textfile",
+  "bytes": 9938,
+  "sha256": "a21f3132ce78bfcf50dd71daee0e2b4e557798af31b6a3c78a3a43bb5397c6c4",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 3.0",
+  "note": "Solitander (1882), lake-ore workings of eastern Finland supplying ironworks, per-lake extraction years"
+ },
  "france-mining-cadastre/original/camino-titres.csv": {
   "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
   "bytes": 7275368,
@@ -788,6 +796,13 @@
   "bytes": 3625148,
   "sha256": "b7ddbd4697d094796faffada7cf437367d0038e9fc6006f65f052fa9b53102bd",
   "downloaded": "2026-09-30"
+ },
+ "gobolitide/original/Dataset-Gobolitide.csv": {
+  "url": "https://zenodo.org/api/records/5849856/files/Dataset-Gobolitide.csv/content",
+  "bytes": 112363,
+  "sha256": "3518cd424bcd3a39d70080251bac591879cc90f0609aa91e4fd75f1a34dde189",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
  },
  "gough-map/original/Gough_Map_website_intro.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
@@ -2636,6 +2651,12 @@
   "sha256": "5ffa58c4cb4c439dc50d5cbcec25d53bf85a1c075a7a473525fbf48a6c4e2437",
   "downloaded": "2026-10-01"
  },
+ "wales-units/original/hundreds_other.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Hundreds_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 75672421,
+  "sha256": "24db17e9fc56235056b1652b30448dc0690e0d939e31d52754dbfaa3dcde0878",
+  "downloaded": "2026-10-01"
+ },
  "wales-units/original/municipal.geojson": {
   "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Municipal_Boundaries_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 4300290,
@@ -2660,10 +2681,28 @@
   "sha256": "b3991081ba4e6188d88fb6b7032fb809bca00f85ee8ca073a428ed581dccaadb",
   "downloaded": "2026-10-01"
  },
+ "wales-units/original/townships_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 30316931,
+  "sha256": "6e85ba2cd2108c6428afeadd03884680c58b6efcf907b71dba82962a4b57573f",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/townships_other.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 28289006,
+  "sha256": "2222b7c14231a708ed37bf2b3abe5ef022ecee36d6058a54dabe4ef2fea1eca6",
+  "downloaded": "2026-10-01"
+ },
  "wales-units/original/townships_pre1840.geojson": {
   "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_pre_1840/FeatureServer/0/query (all features, outSR=4326)",
   "bytes": 86331494,
   "sha256": "806266f352e9704ccc8750d1f04694505bb2aaeb28f6658f649aa45a57ce61c3",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/wards_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Municipal_Wards_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4309451,
+  "sha256": "bfa067bc8108a65d4a88005351cd6720d4da75842fefee9f1955134071352a6d",
   "downloaded": "2026-10-01"
  },
  "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {

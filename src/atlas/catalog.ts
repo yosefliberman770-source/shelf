@@ -979,7 +979,7 @@ export const LAYERS: AtlasLayerDef[] = [
       // levels of the sources, from the largest unit down (each source names its own levels)
       const MAJOR = ['county / duchy / prince-bishopric', 'county', 'cantref'];
       const MINOR = ['district', 'commote', 'hundred', 'borough', 'parliamentary constituency', 'poor law union'];
-      const FINE = ['civil parish', 'township'];
+      const FINE = ['civil parish', 'township', 'municipal ward'];
       const lv = (vs: string[]) => ['all', when, ['in', ['get', 'lv'], ['literal', vs]]] as FilterSpecification;
       const fade = ['case', ['all', ['has', 'sn'], ['!=', ['get', 'ef'], y]], 0.55, 0.9] as ExpressionSpecification;
       return [

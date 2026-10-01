@@ -159,6 +159,8 @@ def _rows_table(b, name, read):
         return [dict(zip(cols, r)) for r in rr[1:]]
     t = b.decode(read.get('encoding', 'utf-8-sig'), 'replace')
     csv.field_size_limit(1 << 30)  # geometry columns (GeoJSON text) can be large
+    if read.get('headerAfter'):  # a metadata block before the table (PANGAEA "/* … */"): the table starts on the next line
+        t = t.split(read['headerAfter'], 1)[1].lstrip('\r\n')
     delim = read.get('delimiter') or csv.Sniffer().sniff(t[:20000], delimiters=',;\t|').delimiter
     return list(csv.DictReader(io.StringIO(t), delimiter=delim))
 
@@ -449,7 +451,8 @@ def records(spec):
             an = f['altNames']
             alts = re.split(an.get('sep', r'\|'), str(p.get(an['field']) or ''))
             rec['names'] = [(a, None, None, '') for a in sorted({a.strip() for a in alts if a.strip() and a.strip().lower() != name.lower()})[:12]]
-        if f.get('generic') or generic_name or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
+        # survey codes as names ("SGNAS SITE 018", genericPattern) and type-only names are drawn but not indexed as places
+        if f.get('generic') or generic_name or (f.get('genericPattern') and re.fullmatch(f['genericPattern'], name)) or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
             rec['generic'] = 1  # the name is only the monument type ("Rath"): drawn and searchable by type, not a place name
         ap = f.get('approx')
         rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')

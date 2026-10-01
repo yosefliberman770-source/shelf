@@ -1308,6 +1308,115 @@
    "region": "England",
    "note": "3,456 dated weather records (1500s–1700s; diaries of Josselin, Pepys, Evelyn, chronicles, agricultural records). No licence on the layer → private spec earlymodernweather, kind 'event', each record at its own start/end years; imprecise locations drawn as approximate; type-only names not indexed as places.",
    "dataset": "early-modern-weather"
+  },
+  {
+   "title": "Historic Municipal Wards of Wales (OS 1st edition, ArcGIS)",
+   "match": [
+    "Historic_Municipal_Wards_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "46 wards (OGL v3) → part of public spec wales-counties, level 'municipal ward', dated by each ward's own first-edition OS survey years."
+  },
+  {
+   "title": "Historic Townships of Wales (1st edition OS; and the unversioned layer)",
+   "match": [
+    "Historic_Townships_of_Wales/",
+    "Historic_Townships_of_Wales_1st_Edition"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Wales",
+   "note": "323 of 367 townships are already in the pre-1840 township compilation with identical survey dates; the rest are spelling variants of the same units. Not drawn twice."
+  },
+  {
+   "title": "Historic Hundreds of Wales (1st edition OS, ArcGIS)",
+   "match": [
+    "Historic_Hundreds_of_Wales"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Wales",
+   "note": "The same first-edition hundreds are already drawn as unions of their first-edition parishes (wales-parishes)."
+  },
+  {
+   "title": "Average chemical composition of lake ores of Finland and North-Eastern Russia extracted in the late nineteenth century (PANGAEA)",
+   "match": [
+    "10.1594/PANGAEA.860941"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Finland",
+   "dataset": "finland-lake-ore",
+   "note": "34 lake-ore workings (CC BY 3.0) → public spec finlandlakeore, kind mine; each over its own extraction years in the table (1871–1881, from Solitander 1882)."
+  },
+  {
+   "title": "Dataset for \"The Gobolitide (Al-Jibal) microregion: geography and settlement network evolution from Nabataean to Byzantine times\"",
+   "match": [
+    "zenodo.5849855",
+    "zenodo.5849856",
+    "zenodo.org/record/5849855"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "dataset": "gobolitide",
+   "note": "812 sites (CC BY 4.0) → public spec gobolitide; 861 dated phases from Nabataean/Roman/Byzantine period names via a stated MEGA-Jordan period table; Iron Age, Persian and bare 'Islamic' left out; 514 survey-code names not indexed as places."
+  },
+  {
+   "title": "Strucke C14 Sweden",
+   "match": [
+    "zenodo.10966331"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Radiocarbon dates (median calibrated years) of mostly prehistoric samples; not historical features — not integrated."
+  },
+  {
+   "title": "IE GSI MI GSRO Maritime Boundaries Irish Waters WGS84",
+   "match": [
+    "IE_GSI_MI_GSRO_Maritime_Boundaries"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Modern maritime boundaries; outside the atlas period."
+  },
+  {
+   "title": "ICEland-1: A geochronological database for reconstructing Late Quaternary glacier, relative sea level",
+   "match": [
+    "zenodo.org/records/20028895"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Quaternary geochronology; not historical."
+  },
+  {
+   "title": "Dataset: Human-vegetation dynamics in Holocene South-Eastern Norway based on radiocarbon-dated charcoal",
+   "match": [
+    "zenodo.org/record/6242974"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Radiocarbon-dated charcoal (environmental); not historical features."
+  },
+  {
+   "title": "Dive Lines - SeaRover layer",
+   "match": [
+    "Dive%20Lines%20-%20SeaRover"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Modern survey dive tracks."
+  },
+  {
+   "title": "The Dataset for the Fauna et Flora Fennica project - Historical sighting data",
+   "match": [
+    "zenodo.17192104"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Historical animal/plant sightings (environmental history), not a map category here; kept as a lead only."
   }
  ]
 }

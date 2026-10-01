@@ -1,14 +1,130 @@
 {
- "id": "gobolitide", "src": "gobolitide", "public": true, "enabled": true,
- "title": "Gobolitide (al-Jibāl, southern Jordan) settlement survey dataset, Nabataean to Byzantine (Kopij & Bała 2021)",
- "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.5849856",
- "describe": "Archaeological sites of the Gobolitide microregion in southern Jordan (surveys and the MEGA-Jordan register) with the periods recorded for each; years from the standard Jordanian period scheme.",
- "layers": ["medieval-archaeology"],
- "read": {"path": "gobolitide/original/Dataset-Gobolitide.csv", "delimiter": ";", "lon": "Longitude", "lat": "Latitude", "crs": "EPSG:4326"},
- "fields": {"id": "Identyfikator", "name": "Name", "context": ["District", "Province"], "type": ["Type"],
-            "kind": {"field": "Type", "map": {"settlement; sherd/flint surface scatter": "settlement", "settlement": "settlement", "tower": "castle", "fort": "castle", "fort?": "castle", "milestone": "road"}, "default": "site"}},
- "dating": {"mode": "periods", "field": "Chronology", "sep": ";", "label": "standard Jordanian period scheme (MEGA-Jordan)",
-            "table": {"nabatean": [-312, 106], "early roman": [-63, 135], "roman": [-63, 324], "late roman": [135, 324], "byzantine": [324, 636], "islamic": [636, 1918],
-                      "persian": [-539, -332], "iron age": [-1200, -539]}},
- "datingLabel": "periods recorded in the survey"
+ "id": "gobolitide",
+ "src": "gobol",
+ "public": true,
+ "enabled": true,
+ "title": "Sites of the Gobolitide (al-Jibal) microregion, southern Jordan, Nabataean to Byzantine times (Kopij & Bała 2021; Zenodo)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.5849856",
+ "describe": "Settlements, towers, forts, farms, water structures, roads, churches and surface scatters between Petra, Tafilah and the Dead Sea, compiled from regional surveys (SGNAS, MEGA-Jordan/JADIS), each shown over the period(s) the dataset assigns; the years are the conventional MEGA-Jordan period table stated in each label. Iron Age, Persian and undifferentiated 'Islamic' attributions are left out (outside the atlas range or too broad to date).",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "gobolitide/original/Dataset-Gobolitide.csv",
+  "delimiter": ";",
+  "pointFields": [
+   "Longitude",
+   "Latitude"
+  ]
+ },
+ "fields": {
+  "id": "Identyfikator",
+  "name": "Name",
+  "genericPattern": "(?:[A-Z]+ )?SITE \\d+[A-Z]?|[A-Z]+ ?\\d+",
+  "type": [
+   "Type"
+  ],
+  "context": [
+   "District",
+   "Province"
+  ],
+  "altNames": {
+   "field": "Name (alt)",
+   "sep": ";"
+  },
+  "kind": {
+   "field": "Type",
+   "firstToken": true,
+   "map": {
+    "settlement": "settlement",
+    "settlement?": "settlement",
+    "farm": "settlement",
+    "farm?": "settlement",
+    "village": "settlement",
+    "fort": "castle",
+    "fort?": "castle",
+    "tower": "castle",
+    "tower?": "castle",
+    "church": "church",
+    "monastery": "monastery",
+    "temple": "church",
+    "road": "road",
+    "milestone": "road",
+    "reservoir/cistern": "site",
+    "water structure": "site"
+   },
+   "default": "site"
+  }
+ },
+ "dating": {
+  "mode": "periods",
+  "field": "Chronology",
+  "sep": ";",
+  "label": "period in the dataset; years from the MEGA-Jordan period table",
+  "table": {
+   "nabatean": [
+    -312,
+    106
+   ],
+   "early roman": [
+    -63,
+    135
+   ],
+   "late roman": [
+    135,
+    324
+   ],
+   "roman": [
+    -63,
+    324
+   ],
+   "byzantine": [
+    324,
+    636
+   ],
+   "early byzantine": [
+    324,
+    491
+   ],
+   "late byzantine": [
+    491,
+    636
+   ],
+   "umayyad": [
+    661,
+    750
+   ],
+   "abbasid": [
+    750,
+    969
+   ],
+   "ayyubid": [
+    1174,
+    1263
+   ],
+   "mamluk": [
+    1250,
+    1516
+   ],
+   "ottoman": [
+    1516,
+    1918
+   ]
+  },
+  "ignore": [
+   "iron age",
+   "persian",
+   "islamic",
+   "hellenistic",
+   "bronze age",
+   "early bronze age",
+   "late bronze age",
+   "chalcolithic",
+   "neolithic",
+   "paleolithic",
+   "unknown",
+   ""
+  ]
+ }
 }

@@ -1532,6 +1532,22 @@
    {
     "path": "original/poorlaw_unions.geojson",
     "note": "snapshot of Historic_Poor_Law_Unions_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/townships_os1.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py — not used: 323 of 367 are in townships_pre1840 with identical dates"
+   },
+   {
+    "path": "original/townships_other.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales/FeatureServer/0 via fetch_arcgis.py — not used: earlier version of the first-edition townships"
+   },
+   {
+    "path": "original/wards_os1.geojson",
+    "note": "snapshot of Historic_Municipal_Wards_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/hundreds_other.geojson",
+    "note": "snapshot of Historic_Hundreds_of_Wales/FeatureServer/0 via fetch_arcgis.py — not used: the same first-edition hundreds are drawn as unions of their parishes"
    }
   ]
  },
@@ -1543,6 +1559,28 @@
    {
     "path": "original/events.geojson",
     "note": "snapshot of Early_Modern_Weather_Database_Updated/FeatureServer/0 via fetch_arcgis.py (3,456 records)"
+   }
+  ]
+ },
+ {
+  "id": "finland-lake-ore",
+  "url": "https://doi.org/10.1594/PANGAEA.860941",
+  "licence": "CC BY 3.0",
+  "files": [
+   {
+    "path": "original/PANGAEA.860941.tab",
+    "note": "PANGAEA text export (metadata block, then the tab-separated table)"
+   }
+  ]
+ },
+ {
+  "id": "gobolitide",
+  "url": "https://doi.org/10.5281/zenodo.5849856",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/Dataset-Gobolitide.csv",
+    "note": "Zenodo record 5849856 file"
    }
   ]
  }
