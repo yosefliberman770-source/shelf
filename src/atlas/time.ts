@@ -43,7 +43,7 @@ export const clampYear = (y: HistYear) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, 
 //   D. unknown            — no evidence at all. Not placed in dated views.
 
 /** Why a record without dates is still bounded in time. */
-export type EnvelopeBasis = 'related' | 'part-of' | 'source' | 'dataset' | 'names';
+export type EnvelopeBasis = 'related' | 'part-of' | 'source' | 'dataset' | 'names' | 'style';
 export interface Envelope { from?: HistYear; to?: HistYear; basis: EnvelopeBasis }
 export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
   related: 'dated records linked to it (sites at it, roads it lies on, connections)',
@@ -51,6 +51,7 @@ export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
   source: 'the period covered by the reference work it comes from',
   dataset: 'the period the whole dataset covers',
   names: 'the dates of its recorded names',
+  style: 'its architectural style, as dated in Wikidata (a style is a range of building dates, not this building’s date)',
 };
 
 /**

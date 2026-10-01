@@ -1,5 +1,5 @@
 {
- "version": "2026-09-30",
+ "version": "2026-10-01",
  "datasets": [
   {
    "id": "pleiades",
@@ -17,7 +17,7 @@
     "../world/tiles/pleiades.pmtiles"
    ],
    "notes": "Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.",
-   "retrieved": "2026-09-30",
+   "retrieved": "2026-10-01",
    "counts": {
     "places": 20340,
     "lines": 612,
@@ -41,7 +41,7 @@
     "awmc-snapshots.json"
    ],
    "notes": "Road and shoreline dates are Barrington periods. Inland water is modern-based (OSM). Dates for non-Roman snapshots are the conventional dates of the extents their titles name.",
-   "retrieved": "2026-09-30",
+   "retrieved": "2026-10-01",
    "counts": {
     "roads": 3165,
     "shoreline": 9901,
@@ -63,7 +63,7 @@
     "cliopatria/names.json"
    ],
    "notes": "One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.",
-   "retrieved": "2026-09-30",
+   "retrieved": "2026-10-01",
    "counts": {
     "polities": 43252,
     "classified": 12211,
@@ -86,7 +86,7 @@
     "wikidata-wars.json"
    ],
    "notes": "Battles, sieges and campaigns with a location and a date. Crowd-sourced; check important facts.",
-   "retrieved": "2026-09-30",
+   "retrieved": "2026-10-01",
    "counts": {
     "events": 11670,
     "wars": 888
@@ -106,7 +106,7 @@
     "ne-rivers.json"
    ],
    "notes": "Modern coastline and modern river courses. Rivers and coasts have moved since antiquity; ancient coastlines come from AWMC.",
-   "retrieved": "2026-09-30",
+   "retrieved": "2026-10-01",
    "counts": {
     "land": 1420,
     "rivers": 1201

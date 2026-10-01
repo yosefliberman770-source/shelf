@@ -2354,6 +2354,12 @@
   "sha256": "50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/temporal-evidence.json": {
+  "url": "https://query.wikidata.org/sparql (queries/temporal-evidence.rq)",
+  "bytes": 269967,
+  "sha256": "5691109c371a14f5e60d4852618e3d781421cad6ffded024eb90f1432c078f47",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/town.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/town.names.rq)",
   "bytes": 7625491,

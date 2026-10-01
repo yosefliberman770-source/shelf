@@ -327,8 +327,17 @@ function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, o
   // A record with only an end (a dissolution, a destruction) existed at some time before it, but nothing says
   // since when: before its end it is as unevidenced as an undated record.
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
-  const when: ExpressionSpecification = ['all', existedIn(y, { undated: ctx.showUndated ? 'show' : 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]];
-  const unevidenced: ExpressionSpecification = ['any', notYetRecorded, ['all', endOnly, ['boolean', y >= SITES[0]]]];
+  const when: ExpressionSpecification = ['all', existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]];
+  // A site with no evidence at the year (no dates at all, first recorded later, or only an end) is drawn only when the
+  // reader includes unevidenced records, and then only inside the period its dataset covers (w0–w1, written by the
+  // build from the dataset registry) — so a medieval church with no recorded date never sits on a map of 68 CE.
+  // Tiles built before the window existed fall back to this layer's own period.
+  const inWindow: ExpressionSpecification = ['all', ['<=', ['coalesce', ['get', 'w0'], SITES[0]], y], ['>=', ['coalesce', ['get', 'w1'], SITES[1]], y]];
+  const noEvidence: ExpressionSpecification = ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]];
+  // Before an evidence period begins (a register's period class, a building style) the site is not shown as absent
+  // either: like a place first recorded later, it may be older — hollow, inside the window, on request.
+  const beforeEvidence: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['has', 'ef'], ['>', ['get', 'ef'], y]];
+  const unevidenced: ExpressionSpecification = ['all', inWindow, ['any', noEvidence, notYetRecorded, endOnly, beforeEvidence]];
   const filter = ['all', ['in', ['get', 'k'], ['literal', kinds]], ctx.showUndated ? ['any', when, unevidenced] : when] as FilterSpecification;
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
   const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];

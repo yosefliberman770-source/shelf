@@ -149,5 +149,30 @@ class BuildRejectsBadRecords(unittest.TestCase):
                         self.assertTrue(shape(ft['geometry']).is_valid, f'invalid polygon in tile {z}/{x}/{y}')
 
 
+class UndatedEvidence(unittest.TestCase):
+    REG = quality.dataset_registry(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+    def test_display_window_is_the_datasets_documented_period_not_a_date(self):
+        self.assertEqual(quality.display_window({'i': 'Q42', 'k': 'castle'}, self.REG), tuple(self.REG['wikidata']['core']))
+        self.assertEqual(quality.display_window({'i': 'gs7', 'k': 'monastery'}, self.REG), tuple(self.REG['germaniasacra']['core']))
+        self.assertEqual(quality.display_window({'src': 'dicotopo'}, self.REG), tuple(self.REG['dicotopo']['core']))
+        # A market is not shown before its first recorded grant.
+        self.assertEqual(quality.display_window({'src': 'mfairs', 'm': 1227}, self.REG)[0], 1227)
+
+    def test_a_dated_statement_is_evidence_of_existence_never_a_founding(self):
+        ev = quality.wikidata_evidence([{'prop': 'event', 'v': 'Q385378', 'y': 1312}, {'prop': 'opening', 'v': None, 'y': 1290}], {})
+        self.assertEqual(ev[:2], ('attested', 1290))
+        self.assertNotIn('found', ev[2])
+
+    def test_a_style_or_period_gives_only_the_dates_wikidata_records_for_it(self):
+        self.assertEqual(quality.wikidata_evidence([{'prop': 'style', 'v': 'Q176483', 'y': None}], {'Q176483': [1140, 1520]}), ('period', 1140, 1520, 'style'))
+        # Romanesque and Gothic together: the union, labelled as style.
+        self.assertEqual(quality.wikidata_evidence([{'prop': 'style', 'v': 'A', 'y': None}, {'prop': 'style', 'v': 'B', 'y': None}], {'A': [1000, 1200], 'B': [1140, None]}),
+                         ('period', 1000, None, 'style'))
+        # A style Wikidata gives no dates for adds nothing: nothing is guessed.
+        self.assertIsNone(quality.wikidata_evidence([{'prop': 'style', 'v': 'C', 'y': None}], {'C': [None, None]}))
+        self.assertIsNone(quality.wikidata_evidence([{'prop': 'event', 'v': 'X', 'y': 0}], {}))  # year 0 = no date
+
+
 if __name__ == '__main__':
     unittest.main()

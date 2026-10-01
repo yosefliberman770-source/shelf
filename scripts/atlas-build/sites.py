@@ -34,6 +34,7 @@ import re
 import unicodedata
 from collections import Counter, defaultdict
 
+import quality
 import tiler
 import translit
 import regional
@@ -55,6 +56,18 @@ NAME_LANGS = 'mul de fr it es pt ca nl pl cs sk hu ro hr sl sv da nb fi is la lt
 # Labels in other scripts, kept as the place's own name when nothing else exists.
 OTHER_SCRIPT_LANGS = 'uk be bg sr mk ru el ka hy ar he'.split()
 LATEST = 1650  # later foundations are outside this layer's scope
+EVIDENCE = os.path.join(RAW, 'wikidata-medieval', 'original', 'temporal-evidence.json')  # wikidata_dates.py
+
+
+def load_evidence():
+    """Extra dated statements Wikidata holds for the snapshot's undated items (empty when not fetched)."""
+    if not os.path.exists(EVIDENCE):
+        return {}, {}
+    d = json.load(open(EVIDENCE, encoding='utf-8'))
+    by = defaultdict(list)
+    for x in d['statements']:
+        by[x['i']].append(x)
+    return by, d['periods']
 # More specific kinds, from Wikidata's own classes (English labels of P31).
 SUBTYPES = [
     ('abbey', 'abbey'), ('priory', 'priory'), ('friary', 'friary'), ('convent', 'convent'), ('nunnery', 'convent'),
@@ -410,6 +423,8 @@ def build(rows_only=False):
 
     rows, sites = [], []
     skipped = Counter()
+    ev_by, ev_periods = load_evidence()
+    evidence_used = Counter()
     for r in recs.values():
         if r['kind'] in ('city', 'town') or (r['kind'] == 'settlement' and r['q'] in town_q):
             continue
@@ -441,6 +456,17 @@ def build(rows_only=False):
             continue
         if end is not None and start is not None and end < start:
             end = None
+        # No date in the snapshot: the other dated statements Wikidata holds for the item (a dated event, an opening,
+        # a style or period with its own dates). A dated statement is evidence the place existed then, not a founding.
+        env = None
+        if start is None and end is None:
+            ev = quality.wikidata_evidence(ev_by.get(r['q'], []), ev_periods)
+            if ev and ev[0] == 'attested':
+                start, basis = ev[1], ev[2]
+                evidence_used['attested'] += 1
+            elif ev:
+                env = [ev[1], ev[2], ev[3]]
+                evidence_used['period'] += 1
         st = subtype(r)
         # Every label is kept (the name index finds a place by any of them); Latin-script ones first.
         labels = sorted(((k, v) for k, v in r['names'].items() if v != title), key=lambda kv: (not latin(kv[1]), kv[0]))
@@ -448,7 +474,7 @@ def build(rows_only=False):
         if r['en'] and r['en'] != title:
             names.insert(0, [r['en'], None, None, 'en'])
         related = [[r['dio'], 'in diocese', r['dioN'], 0]] if r['dio'] and r['dioN'] else []
-        extra = {'k': r['kind'], **({'st': st} if st else {}), **({'fb': basis} if basis else {}), **({'nl': lang, 'nb': name_basis} if lang != 'en' else {}),
+        extra = {'k': r['kind'], **({'st': st} if st else {}), **({'fb': basis} if basis else {}), **({'env': env} if env else {}), **({'nl': lang, 'nb': name_basis} if lang != 'en' else {}),
                  **({'o': r['orders'][:4]} if r['orders'] else {}), **({'gs': g['gsn'], 'go': g['orders'][:6]} if g else {})}
         rows.append(['wikidata', r['q'], title, r['lon'], r['lat'], 1, r['kind'] + (',' + st if st else ''), start, end, 0, names,
                      [r['dioN']] if r['dioN'] else [], related, extra])
@@ -461,6 +487,11 @@ def build(rows_only=False):
             props['t'] = end
         if basis:
             props['fb'] = basis
+        if env:
+            props['ef'] = env[0]
+            if env[1] is not None:
+                props['et'] = env[1]
+            props['per'] = 'period of its architectural style (Wikidata)' if env[2] == 'style' else 'its recorded period (Wikidata)'
         if r['orders']:
             props['o'] = ', '.join(r['orders'][:3])[:80]
         if r['dioN']:
@@ -518,7 +549,7 @@ def build(rows_only=False):
     hre_feats, private_feats, private_rows[:], reg_stats = regional_layers(recs, rows, sites)
     log('  regional', reg_stats)
 
-    log('  place-index rows', len(rows), Counter(r[0] for r in rows), ' skipped', dict(skipped))
+    log('  place-index rows', len(rows), Counter(r[0] for r in rows), ' skipped', dict(skipped), ' Wikidata evidence for undated items', dict(evidence_used))
     if rows_only:
         return rows, {}
 
@@ -527,8 +558,10 @@ def build(rows_only=False):
     zoom = {'cathedral': 5, 'university': 5, 'diocese': 6, 'monastery': 7, 'castle': 7, 'fortification': 8, 'bridge': 9, 'settlement': 9,
             'church': 9, 'market': 7, 'site': 9, 'hoard': 9, 'wreck': 9, 'road': 9}
     feats = []
+    registry = quality.dataset_registry(ROOT)
     for p in sites:
         ll = p.pop('_ll')
+        with_window(p, registry)
         mz = zoom[p['k']]
         if p.get('st') in ('abbey',):
             mz -= 1
@@ -536,6 +569,8 @@ def build(rows_only=False):
     stats['hre'] = tiler.build(os.path.join(TILES, 'hre-towns.pmtiles'), 'towns', hre_feats, 10, 'Towns of the Holy Roman Empire',
                                'Princes and Townspeople (Bogucka, Cantoni, Mohr, Weigand), CC0')
     # Private data pack only (never in git or the public site): see scripts/atlas-build/private_pack.py.
+    for _, p, _ in private_feats:
+        with_window(p, registry)
     os.makedirs(os.path.join(PRIVATE_BUILD, 'tiles'), exist_ok=True)
     stats['private'] = tiler.build(os.path.join(PRIVATE_BUILD, 'tiles', 'private-sites.pmtiles'), 'sites', private_feats, 11, 'Private sites',
                                    'Private data pack — used privately in Shelf, not republished')
@@ -628,6 +663,14 @@ if __name__ == '__main__':
 # ── Regional specialist datasets (second audit pass; see regional.py) ─────
 
 FIN_PERIODS = {'keskiaikainen': (1150, 1550), 'rautakautinen': (-500, 1150), 'historiallinen': (1150, 1900)}
+
+
+def with_window(p, registry):
+    """w0/w1: the period the feature's dataset covers. The map draws a site with no evidence at the chosen year (no dates,
+    or first recorded later) only inside it, and only when the reader includes unevidenced records (see catalog.ts)."""
+    w = quality.display_window(p, registry)
+    if w:
+        p['w0'], p['w1'] = w
 
 
 def _site_props(i, name, kind, lon, lat, **kw):

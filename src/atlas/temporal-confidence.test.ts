@@ -222,3 +222,43 @@ describe('sources: specialist, aggregator and incidental records of one place', 
     expect(m.temporal).toBe('attested'); // …but the place is recorded in 1150, by Wikidata's first mention
   });
 });
+
+describe('undated and not-yet-recorded sites on the map: kept, but only inside their dataset’s period', () => {
+  const drawn = (layer: string, props: Record<string, unknown>, year: number, showUndated: boolean) => {
+    const spec = LAYERS.find((l) => l.id === layer)!.specs({ year, base: '/atlas/', showUndated } as LayerCtx).find((s) => s.type === 'circle')! as { filter: unknown };
+    return featureFilter(spec.filter as never).filter({ zoom: 8 } as never, { type: 1, properties: props } as never);
+  };
+  const church = { k: 'monastery', w0: 500, w1: 1650 }; // a Wikidata religious house with no date at all
+  it('an undated church is never drawn at 68 CE, and stays available inside the period its dataset covers', () => {
+    expect(drawn('religious-houses', church, 68, true)).toBe(false);
+    expect(drawn('religious-houses', church, 1200, true)).toBe(true);
+    expect(drawn('religious-houses', church, 1200, false)).toBe(false); // undated records only when the reader asks
+  });
+  it('a church first recorded in 1200 is hollow before then only within its dataset’s period, solid from 1200', () => {
+    const later = { ...church, f: 1200, fb: 'first mention' };
+    expect(drawn('religious-houses', later, 68, true)).toBe(false);
+    expect(drawn('religious-houses', later, 900, true)).toBe(true);
+    expect(drawn('religious-houses', later, 900, false)).toBe(false);
+    expect(drawn('religious-houses', later, 1300, false)).toBe(true);
+  });
+  it('a period from its architectural style draws it within that period by default, and not at 68 CE', () => {
+    const gothic = { ...church, ef: 1140, per: 'period of its architectural style (Wikidata)' };
+    expect(drawn('religious-houses', gothic, 1300, false)).toBe(true);
+    expect(drawn('religious-houses', gothic, 68, true)).toBe(false);
+    // A style dates the building's form, not the place's beginning: a church rebuilt in the Baroque style (from 1600)
+    // is not shown as absent in 1300 — hollow, on request, inside its dataset's period.
+    const baroque = { ...church, ef: 1600 };
+    expect(drawn('religious-houses', baroque, 1300, false)).toBe(false);
+    expect(drawn('religious-houses', baroque, 1300, true)).toBe(true);
+    expect(drawn('religious-houses', baroque, 68, true)).toBe(false);
+  });
+  it('tiles built before the window existed keep medieval sites off ancient maps (the layer’s own period)', () => {
+    expect(drawn('castles', { k: 'castle' }, 68, true)).toBe(false);
+    expect(drawn('castles', { k: 'castle' }, 1200, true)).toBe(true);
+  });
+  it('a market is not drawn before its first recorded grant', () => {
+    const market = { k: 'market', src: 'mfairs', m: 1227, w0: 1227, w1: 1516 };
+    expect(drawn('medieval-markets', market, 1100, true)).toBe(false);
+    expect(drawn('medieval-markets', market, 1300, true)).toBe(true);
+  });
+});

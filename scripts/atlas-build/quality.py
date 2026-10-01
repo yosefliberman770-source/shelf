@@ -98,3 +98,59 @@ def clean_dates(props: dict, pairs=(('f', 't'), ('ef', 'et'))) -> str | None:
             props.pop(b, None)
             why = why or w
     return why
+
+
+def dataset_registry(root: str) -> dict:
+    """Each gazetteer's documented core period and region, read from the app's registry (src/atlas/gazetteer.ts)."""
+    import os
+    import re
+    src = open(os.path.join(root, 'src', 'atlas', 'gazetteer.ts'), encoding='utf-8').read()
+    return {m.group(1): {'core': [int(m.group(2)), int(m.group(3))], 'box': [float(x) for x in m.group(4).split(',')]}
+            for m in re.finditer(r"\{ id: '(\w+)'.*?core: \[(-?\d+), (-?\d+)\], box: \[([-\d., ]+)\]", src)}
+
+
+def site_dataset(props: dict) -> str:
+    """Which dataset a site feature comes from: its src, else its id (Q… Wikidata, gs… Germania Sacra)."""
+    if props.get('src'):
+        return props['src']
+    return 'germaniasacra' if str(props.get('i', '')).startswith('gs') else 'wikidata'
+
+
+def display_window(props: dict, registry: dict) -> tuple[int, int] | None:
+    """The period in which a site with no evidence at the year may still be drawn (hollow, only when the reader asks
+    for unevidenced records): the period its dataset documents itself as covering — not a date for the record. A market
+    record is not drawn before its first recorded grant."""
+    core = (registry.get(site_dataset(props)) or {}).get('core')
+    if not core:
+        return None
+    lo, hi = core
+    if isinstance(props.get('m'), (int, float)) and props['m']:
+        lo = max(lo, int(props['m']))
+    return lo, hi
+
+
+# What a dated Wikidata statement says about a place: evidence that it existed then, never a founding.
+EVIDENCE_BASIS = {'event': 'dated event recorded in Wikidata', 'opening': 'official opening recorded in Wikidata',
+                  'instance-start': 'start of its recorded use (Wikidata)'}
+
+
+def wikidata_evidence(statements: list[dict], periods: dict, latest: int = 2100):
+    """From one item's extra Wikidata statements: ('attested', year, basis) for its earliest dated statement, else
+    ('period', from, to, basis) from the dates Wikidata records for its time period, style or culture, else None."""
+    years = [(s['y'], s['prop']) for s in statements if s['prop'] in EVIDENCE_BASIS and isinstance(s.get('y'), int)
+             and date_problem(s['y'], None) is None and s['y'] <= latest]
+    if years:
+        y, prop = min(years)
+        return ('attested', y, EVIDENCE_BASIS[prop])
+    spans = []
+    for s in statements:
+        if s['prop'] in ('period', 'style', 'culture') and s.get('v') in periods:
+            a, b = periods[s['v']]
+            if a is not None and date_problem(a, b) is None:
+                spans.append((a, b, s['prop']))
+    if not spans:
+        return None
+    a = min(x[0] for x in spans)
+    b = None if any(x[1] is None for x in spans) else max(x[1] for x in spans)
+    kinds = sorted({x[2] for x in spans})
+    return ('period', a, b, 'style' if kinds == ['style'] else 'source')
