@@ -1,0 +1,35 @@
+{
+ "id": "russia-livestock-1864",
+ "src": "rulivestock",
+ "public": false,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Provinces of European Russia with their total livestock in the census of 1864 (Farmlands: Counting Sheep, K. O'Neill and O. Kiyan, Imperiia project; Harvard Dataverse)",
+ "licence": "CC BY-NC 4.0 — private pack",
+ "url": "https://doi.org/10.7910/DVN/OTTZQY",
+ "describe": "The 49 provinces of European Russia as delimited in the dataset, each with the total head of livestock (cattle, horses, sheep, goats, swine, reindeer, camels) of the 1864 census published in the Statistical Yearbook of the Russian Empire (1866), shown as a snapshot of 1864.",
+ "layers": [
+  "historical-units"
+ ],
+ "read": {
+  "path": "russia-livestock-1864/derived/provinces_livestock_1864.shp",
+  "derive": "scripts/historical-data/livestock_1864.py"
+ },
+ "dissolve": [
+  {
+   "field": "province",
+   "level": "guberniia (province)",
+   "minzoom": 3,
+   "simplify": 0.004,
+   "note": {
+    "field": "livestock",
+    "label": "head of livestock"
+   }
+  }
+ ],
+ "dating": {
+  "mode": "snapshot",
+  "year": 1864,
+  "label": "livestock census of 1864"
+ }
+}

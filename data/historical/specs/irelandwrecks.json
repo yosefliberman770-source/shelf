@@ -1,0 +1,12 @@
+{
+ "id": "irelandwrecks", "src": "iewrecks", "public": false, "enabled": true,
+ "title": "Wreck Inventory of Ireland Database: wrecks with known locations (National Monuments Service, ArcGIS layer)",
+ "licence": "none stated on the ArcGIS layer — private pack",
+ "url": "https://services3.arcgis.com/ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks/FeatureServer/3",
+ "describe": "Located shipwrecks around Ireland, each shown in the year it was lost (the date of loss in the inventory, from Lloyd's List, the Annual Register and other sources); wrecks with an unknown date of loss are left out.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "ireland-wrecks/original/wrecks.geojson"},
+ "fields": {"id": "Wreck_No", "name": "Wreck_Name", "type": ["Classification"], "context": ["Place_of_Loss"], "kind": "wreck"},
+ "dating": {"mode": "fields", "from": "Date_of_Loss_Year_Only"},
+ "datingLabel": "year of loss in the Wreck Inventory of Ireland"
+}

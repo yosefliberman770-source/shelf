@@ -1,0 +1,113 @@
+{
+ "id": "scoto-itineraries",
+ "src": "scoto",
+ "public": true,
+ "enabled": true,
+ "dedupe": true,
+ "title": "Francesco Scoto's Italian travel manuals 1650–1700: places on the routes (Early Modern Digital Itineraries)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.19909380",
+ "describe": "Cities, castles, villages and inns listed on the post routes of four editions of Scoto's travel manual (1650, 1675, 1675, 1700), each place shown as listed in that edition's year.",
+ "layers": [
+  "gazetteer-settlements",
+  "medieval-archaeology"
+ ],
+ "fields": {
+  "id": "Location_ID",
+  "name": "Location_extracted",
+  "type": [
+   "LocationType",
+   "RouteDescription"
+  ],
+  "context": [
+   "Location_current"
+  ],
+  "kind": {
+   "field": "LocationType",
+   "map": {
+    "città": "settlement",
+    "citta": "settlement",
+    "borgo": "settlement",
+    "terra": "settlement",
+    "villa": "settlement",
+    "castello": "castle",
+    "rocca": "castle",
+    "fortezza": "castle",
+    "hosteria": "station",
+    "osteria": "station",
+    "posta": "station",
+    "taverna": "station",
+    "porto": "harbour",
+    "ponte": "bridge"
+   },
+   "default": "settlement"
+  },
+  "approx": {
+   "field": "Location_certainty",
+   "values": [
+    "0"
+   ]
+  }
+ },
+ "keep": {
+  "field": "LineType",
+  "values": [
+   "location"
+  ]
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "scoto-itineraries/original/i_SF1650.csv",
+    "lon": "GEONAME_LON",
+    "lat": "GEONAME_LAT",
+    "crs": "EPSG:4326"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1650,
+    "label": "listed in Scoto's itinerary, edition of 1650"
+   }
+  },
+  {
+   "read": {
+    "path": "scoto-itineraries/original/i_SF1675_01.csv",
+    "lon": "GEONAME_LON",
+    "lat": "GEONAME_LAT",
+    "crs": "EPSG:4326"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1675,
+    "label": "listed in Scoto's itinerary, edition of 1675"
+   }
+  },
+  {
+   "read": {
+    "path": "scoto-itineraries/original/i_SF1675_02.csv",
+    "lon": "GEONAME_LON",
+    "lat": "GEONAME_LAT",
+    "crs": "EPSG:4326"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1675,
+    "label": "listed in Scoto's itinerary, edition of 1675"
+   }
+  },
+  {
+   "read": {
+    "path": "scoto-itineraries/original/i_SF1700.csv",
+    "lon": "GEONAME_LON",
+    "lat": "GEONAME_LAT",
+    "crs": "EPSG:4326"
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1700,
+    "label": "listed in Scoto's itinerary, edition of 1700"
+   }
+  }
+ ],
+ "datingLabel": "edition year"
+}

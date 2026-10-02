@@ -1,0 +1,13 @@
+{
+ "id": "agglomerations", "src": "arkeoagglo", "public": false, "enabled": true,
+ "title": "Agglomerations of the Roman world, 8th c. BCE – 15th c. CE (ArkeoGIS; Hanson 2016 cities, Jullien 2023–24), Nakala",
+ "licence": "CC BY-NC-SA 4.0 — private pack",
+ "url": "https://doi.org/10.34847/nkl.4678112k",
+ "describe": "Excavated towns of the Roman world (Hanson's urban sites and Jullien's urban geography), with the period in which each documented characteristic (settlement, public buildings, walls, water works…) starts and ends; an undetermined end is left open, never filled in.",
+ "layers": ["gazetteer-settlements", "medieval-archaeology"],
+ "read": {"path": "agglomerations-roman/original/agglomerations-EN.csv", "delimiter": ";", "lon": "LONGITUDE", "lat": "LATITUDE", "crs": "EPSG:4326"},
+ "fields": {"id": "SITE_SOURCE_ID", "name": "SITE_NAME", "nameSplit": ",", "context": ["LOCALISATION"], "type": ["CHARAC_LVL1", "CHARAC_LVL2"], "kind": "settlement"},
+ "groupBy": true, "groupNoun": "documented characteristic", "groupVerb": "with", "groupType": "Roman-world agglomeration",
+ "dating": {"mode": "fields", "from": "STARTING_PERIOD", "to": "ENDING_PERIOD", "signedYears": true, "openValues": ["undetermined"]},
+ "datingLabel": "start and end periods of the site's documented characteristics (ArkeoGIS)"
+}

@@ -1,0 +1,11 @@
+{
+ "id": "trajansgate", "src": "trajansgate", "public": true, "enabled": true,
+ "title": "Archaeological sites in the Trajan's Gate Pass, Bulgaria (Ottoman-period sources and archaeology)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.17579442",
+ "read": {"path": "trajans-gate/original/tgp.zip", "member": "tgp/tgp.gpkg", "layer": "tgp_sites"},
+ "fields": {"id": "fid", "name": "name", "nameFallback": "type",
+            "kind": {"field": "type", "map": {"village": "settlement", "inn": "building", "fortress": "castle", "fort": "castle", "town": "settlement"}, "default": "site"},
+            "type": ["type"], "context": ["source"], "approx": {"field": "geocoding_accuracy", "values": ["200-500 m", ">500 m", "500-1000 m"]}},
+ "dating": {"mode": "fields", "from": "start_date", "to": "end_date"},
+ "datingLabel": "dating in the dataset"
+}

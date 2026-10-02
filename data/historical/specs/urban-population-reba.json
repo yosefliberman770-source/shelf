@@ -1,0 +1,44 @@
+{
+ "id": "urban-population-reba",
+ "src": "hurbpop",
+ "public": true,
+ "enabled": true,
+ "title": "Historical Urban Population 3700 BC – AD 2000 (Reba, Reitsma & Seto; geocoded Chandler 1987 and Modelski 2003 estimates; SEDAC/Harvard Dataverse)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.7927/H4ZG6QBX",
+ "describe": "Cities of the world with the population estimates of Tertius Chandler's Four Thousand Years of Urban Growth (1987) and George Modelski's World Cities (2003), geocoded by Reba, Reitsma & Seto (2016). Each estimate is shown in its own year only; nothing is interpolated between estimates. Positions the authors rank least certain (rank 3) are marked approximate.",
+ "layers": [
+  "gazetteer-settlements"
+ ],
+ "placeIndex": false,
+ "read": {
+  "path": "historical-urban-population-reba/derived/population.csv",
+  "derive": "scripts/historical-data/reba_urban.py",
+  "lon": "Longitude",
+  "lat": "Latitude",
+  "crs": "EPSG:4326"
+ },
+ "fields": {
+  "id": "Record",
+  "name": "City",
+  "context": [
+   "Country"
+  ],
+  "type": [
+   "popl"
+  ],
+  "kind": "settlement",
+  "approx": {
+   "field": "Certainty",
+   "values": [
+    "3"
+   ]
+  }
+ },
+ "dating": {
+  "mode": "attestations",
+  "field": "year",
+  "yearRegex": "^(\\d{1,4})$",
+  "label": "population estimate for {year} (Chandler 1987 / Modelski 2003)"
+ }
+}

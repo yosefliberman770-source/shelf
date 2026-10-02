@@ -1,0 +1,76 @@
+{
+ "id": "irelandstations",
+ "src": "iestations",
+ "public": false,
+ "enabled": true,
+ "title": "Historical railway stations of Ireland (ATU Galway Heritage Research Group, 2023)",
+ "licence": "CC BY-NC-SA 4.0 — private pack",
+ "url": "https://www.arcgis.com/home/item.html?id=63612b1edcff44fdb4cf70146eaf6d65",
+ "describe": "Railway stations, halts and termini of Ireland: those taken from the Viceregal Commission on Irish Railways' 1906 map are shown at 1906; those with dates of their own in the project (mostly from the National Inventory of Architectural Heritage) are shown over those dates. Stations with neither are left out. The project's line dates mix company and line dates and are not used.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "fields": {
+  "id": "RegNo",
+  "name": "Townland",
+  "nameTitleCase": true,
+  "type": [
+   "OriginalTy",
+   "COMPOSITIO"
+  ],
+  "context": [
+   "County"
+  ],
+  "kind": "station"
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "ireland-rail/original/IrishRail_Lines.zip",
+    "member": "Stations.shp",
+    "lon": "LONGITUDE",
+    "lat": "LATITUDE"
+   },
+   "keep": [
+    {
+     "field": "Source",
+     "values": [
+      "Viceregal Commision on Irish Railways including Light Railways 1906 Map"
+     ]
+    },
+    {
+     "field": "DATEFROM",
+     "values": [
+      ""
+     ]
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1906,
+    "label": "on the Viceregal Commission on Irish Railways' 1906 map"
+   }
+  },
+  {
+   "read": {
+    "path": "ireland-rail/original/IrishRail_Lines.zip",
+    "member": "Stations.shp",
+    "lon": "LONGITUDE",
+    "lat": "LATITUDE"
+   },
+   "keep": {
+    "field": "DATEFROM",
+    "notValues": [
+     ""
+    ]
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "DATEFROM",
+    "to": "DATETO"
+   }
+  }
+ ],
+ "dropUndated": true,
+ "datingLabel": "dates the project gives for the station (survey building dates or service years)"
+}

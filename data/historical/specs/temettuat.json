@@ -1,0 +1,10 @@
+{
+ "id": "temettuat", "src": "tmt1840", "public": true, "enabled": true,
+ "title": "Villages in the Ottoman temettuat (income) registers of the 1840s, with their recorded land uses (UrbanOccupationsOETR, Koç University; Zenodo)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.13220585",
+ "describe": "A geographic sample of villages in six Ottoman regions (Ankara, Bursa, Edirne, Manisa, Plovdiv, Ruse) whose households' fields, vineyards and gardens were recorded in the temettuat income registers of the 1840s; the source dates the registers to the 1840s, so the villages are shown for that decade.",
+ "layers": ["gazetteer-settlements"],
+ "read": {"path": "oetr-temettuat/derived/villages.csv", "lon": "lon", "lat": "lat", "crs": "EPSG:4326", "delimiter": ",", "derive": "scripts/historical-data/temettuat_villages.py"},
+ "fields": {"id": "geocode", "name": "village", "context": ["subdistrict", "region"], "type": ["land_uses"], "kind": "settlement"},
+ "dating": {"mode": "envelope", "from": 1840, "to": 1849, "label": "village recorded in the temettuat registers of the 1840s"}
+}

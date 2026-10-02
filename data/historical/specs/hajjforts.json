@@ -1,0 +1,13 @@
+{
+ "id": "hajjforts", "src": "hajjforts", "public": false, "enabled": true,
+ "title": "Fortresses and stations on the Damascus–Medina pilgrimage road, as recorded in Arabic travel accounts 1861–1912 (coordinates after A. Petersen; ArcGIS)",
+ "licence": "none stated (ArcGIS Online layer) — private pack",
+ "url": "https://services1.arcgis.com/KUeKSLlMUcWvuPRM/arcgis/rest/services/Fortresses_between_Damascus_and_Medina_(coordinates_from_Andrew_Petersen)/FeatureServer/0",
+ "describe": "Hajj-road fortresses, wells and railway stations between Damascus and Medina, each shown in the year of the pilgrimage account that records it; fortresses without a dated account are left out.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "hajj-forts/original/forts.geojson"},
+ "fields": {"id": "ObjectId", "name": "Transliteration", "nameFallback": "Name", "context": ["Location", "Primary_Sources"], "type": ["Type"],
+            "kind": {"field": "Type", "map": {"fortress": "castle", "way station,fortress": "castle", "train station,fortress": "castle", "train station,well,fortress": "castle"}, "default": "castle"}},
+ "dating": {"mode": "attestations", "field": "Trip_date__from_Primary_Sources_", "label": "recorded in a pilgrimage account of the {year} journey"},
+ "datingLabel": "years of the travel accounts that record it (snapshots)"
+}

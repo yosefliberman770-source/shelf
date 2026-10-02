@@ -79,3 +79,38 @@ describe('overlaying an original map', () => {
     expect(overlayFor({ annotation: 'a', imageService: 'x', width: 1000, height: 800, gcps }).ok).toBe(true);
   });
 });
+
+describe('georeferenced layers from university map libraries (WMS)', () => {
+  it('asks for the layer’s own extent in Web Mercator and places the image on those corners', async () => {
+    const { wmsImage } = await import('./maps');
+    const r = wmsImage({ url: 'https://example.org/wms', layer: 'lib:MAP_1721', bbox: [-1.8, 45.96, -0.81, 46.47] }, 800);
+    const p = new URL(r.url).searchParams;
+    expect(p.get('srs')).toBe('EPSG:3857');
+    expect(p.get('layers')).toBe('lib:MAP_1721');
+    expect(Number(p.get('width'))).toBe(800);
+    expect(r.coordinates).toEqual([[-1.8, 46.47], [-0.81, 46.47], [-0.81, 45.96], [-1.8, 45.96]]);
+    const [x0, y0, x1, y1] = p.get('bbox')!.split(',').map(Number);
+    expect(x0).toBeLessThan(x1);
+    expect(y0).toBeLessThan(y1);
+    // Height follows the Mercator aspect ratio of the box.
+    expect(Number(p.get('height'))).toBe(Math.round((800 * (y1 - y0)) / (x1 - x0)));
+  });
+});
+
+describe('georeferenced scans served as map tiles by their publisher', () => {
+  it('previews the tile at the middle of the map and lays the tiles only within the map’s extent', async () => {
+    const { wmsOverlay, xyzTile } = await import('./maps');
+    // Llandegla tithe map (1847): the extent from the publisher's tile service
+    const xyz = { url: 'https://example.org/MapServer/tile/{z}/{y}/{x}', bbox: [-3.23336, 53.0217, -3.10992, 53.08693] as [number, number, number, number] };
+    expect(xyzTile(xyz)).toBe('https://example.org/MapServer/tile/11/666/1005');
+    expect(xyzTile(xyz, 2)).toBe('https://example.org/MapServer/tile/13/2666/4023');
+    const o = wmsOverlay({ id: 'gis:x', title: 'Llandegla Tithe Survey 1847', date: parseDate('1847')!, subjects: [], collection: 'gis', holder: 'National Library of Wales', page: '', rights: '', xyz })!;
+    expect(o.tiles).toBe(xyz.url);
+    // a WMS drawn only from zoom 12, served tile by tile: the preview asks for one 256 px tile's box at zoom 12
+    const wms = { url: 'https://example.org/wms?LAYERS=L&BBOX={bbox-epsg-3857}&WIDTH=256&HEIGHT=256', bbox: [2.5, 50.7, 5.9, 51.5] as [number, number, number, number], minzoom: 12 };
+    const [bx0, by0, bx1, by1] = new URL(xyzTile(wms)).searchParams.get('BBOX')!.split(',').map(Number);
+    expect(Math.round(bx1 - bx0)).toBe(Math.round((2 * Math.PI * 6378137) / 2 ** 12));
+    expect(Math.round(by1 - by0)).toBe(Math.round(bx1 - bx0));
+    expect(o.coordinates).toEqual([[-3.23336, 53.08693], [-3.10992, 53.08693], [-3.10992, 53.0217], [-3.23336, 53.0217]]);
+  });
+});

@@ -1,0 +1,5512 @@
+{
+"10.5281/zenodo.8409506": {
+"title": "Gazetteer_Generalkarte von Mitteleuropa",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.8409507"
+],
+[
+"creator",
+"Grigor Boykov",
+4
+]
+],
+"found": 5
+},
+"10.7910/dvn/28674": {
+"title": "The 18th century Cassini roads and cities dataset",
+"level": 0,
+"edges": [
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/ctcdqg"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/uljy6r"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/32ddla"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/xt8owm"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/w84pcd"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/e8m0ei"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/hqoihw"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/28674/g4e9tx"
+],
+[
+"creator",
+"Perret, Julien",
+100
+],
+[
+"creator",
+"Gribaudi, Maurizio",
+100
+],
+[
+"creator",
+"Barthelemy, Marc",
+63
+],
+[
+"creator",
+"Abadie, Nathalie",
+100
+]
+],
+"found": 371
+},
+"10.7910/dvn/etorpu": {
+"title": "Settlements … on the Lutsch map of Transylvania (1751)",
+"level": 0,
+"edges": [
+[
+"creator",
+"N., Andrei",
+9
+]
+],
+"found": 9
+},
+"10.7910/dvn/2hlxc3": {
+"title": "Main roads and mountain paths on the Lutsch map of Transylvania (1751)",
+"level": 0,
+"edges": [
+[
+"creator",
+"N., Andrei",
+9
+]
+],
+"found": 9
+},
+"10.5281/zenodo.8411078": {
+"title": "Gazetteer_Russian-3verst_map (Boykov) — Balkans",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.8411077"
+],
+[
+"creator",
+"Grigor Boykov",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.8411077": {
+"title": "Gazetteer_Russian-3verst_map (Boykov) — Balkans",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.8411078"
+],
+[
+"creator",
+"Grigor Boykov",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.15613857": {
+"title": "RoHGIS. Settlements in the Kingdom of Romania (1904-1913)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.15245067"
+],
+[
+"creator",
+"Buterez, Cezar",
+6
+],
+[
+"creator",
+"Apostol, Ionuț",
+4
+],
+[
+"creator",
+"Radu, Alessandra",
+4
+],
+[
+"creator",
+"Dumitru, Andreea",
+4
+]
+],
+"found": 19
+},
+"10.5281/zenodo.17537206": {
+"title": "Rise and fall of transhumance in Iceland: Shielings and related sites (TransIce)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17537205"
+],
+[
+"creator",
+"Helgason, Gylfi",
+2
+],
+[
+"creator",
+"Júlíusson, Árni Daníel",
+3
+]
+],
+"found": 6
+},
+"10.5281/zenodo.21031406": {
+"title": "DISSILOC: places in medieval inquisition registers",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.21031405"
+],
+[
+"creator",
+"Zbíral, David",
+43
+],
+[
+"creator",
+"Shaw, Robert L. J.",
+16
+],
+[
+"creator",
+"Riccardo, Katia",
+25
+],
+[
+"creator",
+"Wallnerová, Daniela",
+2
+]
+],
+"found": 87
+},
+"10.5281/zenodo.15121019": {
+"title": "Sweden: older geometrical maps 1630–1655",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.12187807"
+],
+[
+"creator",
+"Karsvall, Olof",
+10
+]
+],
+"found": 11
+},
+"10.5281/zenodo.15118501": {
+"title": "Sweden: younger geometrical maps 1680–1700",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.15118500"
+],
+[
+"creator",
+"Karsvall, Olof",
+10
+]
+],
+"found": 11
+},
+"10.5281/zenodo.6368451": {
+"title": "Historical Place Gazetteer and Mine Register, Tyrol 15th–16th c.",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.6275762"
+],
+[
+"creator",
+"Gruber-Tokić, Elisabeth",
+18
+],
+[
+"creator",
+"Hiebel, Gerald",
+32
+],
+[
+"creator",
+"Peralta Fridburg, Milena",
+3
+],
+[
+"creator",
+"Danthine, Brigit",
+19
+]
+],
+"found": 73
+},
+"10.5281/zenodo.7820725": {
+"title": "Arkas 2.0 — archaeological sites of Slovenia (ZRC SAZU)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.7820724"
+],
+[
+"creator",
+"Lozić, Edisa",
+11
+],
+[
+"creator",
+"Štular, Benjamin",
+9
+],
+[
+"creator",
+"Lavrenčič, Lucija",
+2
+]
+],
+"found": 23
+},
+"10.5281/zenodo.10912495": {
+"title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (IHGK Lublin)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.10912494"
+],
+[
+"creator",
+"Litak, Stanisław",
+2
+],
+[
+"creator",
+"Szady, Bogumił",
+10
+]
+],
+"found": 13
+},
+"10.17632/md8jp9ny9z": {
+"title": "Mid-19th-century building structures in Galicia and Austrian Silesia (Second Military Survey)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.17632/md8jp9ny9z.2"
+],
+[
+"related",
+"HasVersion",
+"10.17632/md8jp9ny9z.1"
+],
+[
+"creator",
+"Kaim, Dominik",
+81
+]
+],
+"found": 83
+},
+"10.5281/zenodo.19183844": {
+"title": "İslam Tarih Atlası / Atlas of Islamic History (v7.5.0.0)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.19183845"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.19312622"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"ÇETİNKAYA, ALİ",
+11
+]
+],
+"found": 18
+},
+"10.5281/zenodo.17579442": {
+"title": "Archaeological sites in the Trajan's Gate Pass, Bulgaria (according to data from the Ottoman period and modern archaeolo",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17579441"
+],
+[
+"creator",
+"Kirilov, Chavdar",
+4
+]
+],
+"found": 5
+},
+"10.6084/m9.figshare.29881058.v1": {
+"title": "Mapping smallpox cases and vaccination efforts in New South Wales, 1830 to 1834: Supporting material for the article, ‘S",
+"level": 0,
+"edges": [
+[
+"related",
+"IsPreviousVersionOf",
+"10.6084/m9.figshare.29881058"
+],
+[
+"creator",
+"Pitt, Nicholas",
+6
+]
+],
+"found": 7
+},
+"10.6084/m9.figshare.22752623": {
+"title": "HMAP Dataset 19: Estonian Fisheries: Pärnu City Customs Records",
+"level": 0,
+"edges": [
+[
+"creator",
+"Nicholls, John",
+100
+]
+],
+"found": 100
+},
+"10.5281/zenodo.2840332": {
+"title": "A database for Spondylus gaederopus during the Neolithic of Europe",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.2840333"
+],
+[
+"creator",
+"Windler, Arne",
+2
+]
+],
+"found": 3
+},
+"10.5281/zenodo.8409507": {
+"title": "Gazetteer_Generalkarte von Mitteleuropa",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.8409506"
+],
+[
+"creator",
+"Grigor Boykov",
+4
+]
+],
+"found": 5
+},
+"10.7910/dvn/28674/ctcdqg": {
+"title": "edge.csv",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/uljy6r": {
+"title": "edge.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/32ddla": {
+"title": "face.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/xt8owm": {
+"title": "france_cassini_cities.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/w84pcd": {
+"title": "france_cassini_roads.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/e8m0ei": {
+"title": "node.csv",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/hqoihw": {
+"title": "node.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.7910/dvn/28674/g4e9tx": {
+"title": "version.csv",
+"level": 1,
+"edges": [
+[
+"creator",
+"Perret, Julien (COGIT Lab, IGN); Gribaudi, Maurizio (LaDéHiS Lab, EHESS); Barthelemy, Marc (IPhT, CEA); Abadie, Nathalie (COGIT Lab, IGN); Baciocchi, Stéphane (LaDéHiS Lab, EHESS); Bertelli, Carlo (Charta SRL); Bonin, Olivier (LVMT, IFSTTAR); Bordin, Patricia (Geospective); Costes, Benoît (COGIT Lab, IGN); Cristofoli, Pascal (LaDéHiS Lab, EHESS); Dumenieu, Bertrand (COGIT Lab, IGN); Gravier, Julie (Géographie-Cités); Hubert, Jean-Paul (AME, DEST, IFSTTAR); Le Ny, Pierre-André (Le Ny Conseil); Mermet, Eric (LaDéHiS Lab, EHESS); Motte, Claude (LaDéHiS Lab, EHESS); Pardoen, Mylène (LaDéHiS Lab, EHESS); Raimond, Ana-Maria (COGIT Lab, IGN); Robert, Sandrine (LaDéHiS Lab, EHESS); Vouloir, Marie-Christine (LaDéHiS Lab, EHESS)",
+44
+]
+],
+"found": 44
+},
+"10.5281/zenodo.15245067": {
+"title": "RoHGIS. Settlements in the Kingdom of Romania (1904-1913)",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15245068"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15613857"
+],
+[
+"creator",
+"Buterez, Cezar",
+6
+],
+[
+"creator",
+"Apostol, Ionuț",
+4
+],
+[
+"creator",
+"Radu, Alessandra",
+4
+],
+[
+"creator",
+"Dumitru, Andreea",
+4
+]
+],
+"found": 20
+},
+"10.5281/zenodo.17537205": {
+"title": "Rise and fall of transhumance in Iceland: Shielings and related sites, 10th-20th century CE",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17537206"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17537206"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17537206"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.17537206"
+],
+[
+"creator",
+"Helgason, Gylfi",
+2
+],
+[
+"creator",
+"Júlíusson, Árni Daníel",
+3
+]
+],
+"found": 9
+},
+"10.5281/zenodo.21031405": {
+"title": "DISSILOC: A dataset of geocoded locations mentioned in medieval inquisition registers",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21031406"
+],
+[
+"creator",
+"Zbíral, David",
+43
+],
+[
+"creator",
+"Shaw, Robert L. J.",
+16
+],
+[
+"creator",
+"Riccardo, Katia",
+25
+],
+[
+"creator",
+"Wallnerová, Daniela",
+2
+]
+],
+"found": 87
+},
+"10.5281/zenodo.12187807": {
+"title": "Data from the project \"Nationalutgåva av de äldre geometriska kartorna\", 1630–1655",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.12187808"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15121019"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15120765"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.13305098"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15082828"
+],
+[
+"creator",
+"Karsvall, Olof",
+10
+]
+],
+"found": 15
+},
+"10.5281/zenodo.15118500": {
+"title": "Data from the project \"Projekt Yngre geometriska kartor\" 1680–1700",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15118501"
+],
+[
+"creator",
+"Karsvall, Olof",
+10
+]
+],
+"found": 11
+},
+"10.5281/zenodo.6275762": {
+"title": "Historical Place Gazetteer and Historical Mine Register, Tyrol 15th, 16th century",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.6275763"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.6368451"
+],
+[
+"creator",
+"Gruber-Tokić, Elisabeth",
+18
+],
+[
+"creator",
+"Hiebel, Gerald",
+32
+],
+[
+"creator",
+"Peralta Fridburg, Milena",
+3
+],
+[
+"creator",
+"Danthine, Brigit",
+19
+]
+],
+"found": 74
+},
+"10.5281/zenodo.7820724": {
+"title": "Arkas 2.0",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7820725"
+],
+[
+"creator",
+"Lozić, Edisa",
+11
+],
+[
+"creator",
+"Štular, Benjamin",
+9
+],
+[
+"creator",
+"Lavrenčič, Lucija",
+2
+]
+],
+"found": 23
+},
+"10.5281/zenodo.10912494": {
+"title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth in the Eighteenth Century",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.10912495"
+],
+[
+"creator",
+"Litak, Stanisław",
+2
+],
+[
+"creator",
+"Szady, Bogumił",
+10
+]
+],
+"found": 13
+},
+"10.17632/md8jp9ny9z.2": {
+"title": "Mid-19th-century building structure locations in Galicia and Austrian Silesia under the Habsburg Monarchy",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.17632/md8jp9ny9z"
+],
+[
+"creator",
+"Kaim, Dominik",
+81
+]
+],
+"found": 82
+},
+"10.17632/md8jp9ny9z.1": {
+"title": "Mid-19th-century building structure locations in Galicia and Austrian Silesia under the Habsburg Monarchy",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.17632/md8jp9ny9z"
+],
+[
+"creator",
+"Kaim, Dominik",
+81
+]
+],
+"found": 82
+},
+"10.5281/zenodo.19183845": {
+"title": "İslam Tarih Atlası / Atlas of Islamic History (v6.5.2)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.19183844"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"ÇETİNKAYA, ALİ",
+11
+]
+],
+"found": 17
+},
+"10.5281/zenodo.19312622": {
+"title": "İslam Tarih Atlası / Atlas of Islamic History (v7.5.0.0)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.19183844"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"ÇETİNKAYA, ALİ",
+11
+]
+],
+"found": 17
+},
+"10.5281/zenodo.17579441": {
+"title": "Archaeological sites in the Trajan's Gate Pass, Bulgaria (according to data from the Ottoman period and modern archaeolo",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17579442"
+],
+[
+"creator",
+"Kirilov, Chavdar",
+4
+]
+],
+"found": 5
+},
+"10.6084/m9.figshare.29881058": {
+"title": "Mapping smallpox cases and vaccination efforts in New South Wales, 1830 to 1834: Supporting material for the article, ‘S",
+"level": 1,
+"edges": [
+[
+"citedBy",
+"is-supplement-to",
+"10.6084/m9.figshare.29881058.v2"
+],
+[
+"creator",
+"Pitt, Nicholas",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.2840333": {
+"title": "A database for Spondylus gaederopus during the Neolithic of Europe",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.2840332"
+],
+[
+"creator",
+"Windler, Arne",
+2
+]
+],
+"found": 3
+},
+"10.60585/": {
+"title": "AMCR — Archaeological Map of the Czech Republic (Archeologický informační systém ČR)",
+"level": 0,
+"edges": [],
+"found": 0
+},
+"10.5281/zenodo.5761811": {
+"title": "Zbiva, Early Medieval Data Set for the Eastern Alps (subset)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5761810"
+],
+[
+"creator",
+"Štular, Benjamin",
+9
+],
+[
+"creator",
+"Pleterski, Andrej",
+3
+],
+[
+"creator",
+"Belak, Mateja",
+3
+]
+],
+"found": 16
+},
+"10.5281/zenodo.21981430": {
+"title": "VIA-TARIQ: Medieval road system in the Levant (roads and sites)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.21904950"
+],
+[
+"creator",
+"Pažout, Adam",
+15
+]
+],
+"found": 16
+},
+"10.5281/zenodo.7575860": {
+"title": "Mapping Jewish Communities of the Byzantine Empire",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.1009559"
+],
+[
+"creator",
+"Rees, Gethin",
+12
+],
+[
+"creator",
+"De Lange, Nicholas",
+2
+],
+[
+"creator",
+"Panayotov, Alexander",
+4
+],
+[
+"creator",
+"Palm, Fredrik",
+12
+]
+],
+"found": 31
+},
+"10.5281/zenodo.5849856": {
+"title": "Gobolitide (al-Jibal) microregion settlement dataset",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5849855"
+],
+[
+"creator",
+"Kopij, Kamil",
+8
+],
+[
+"creator",
+"Bała, Sebastian",
+2
+]
+],
+"found": 11
+},
+"10.5281/zenodo.21157502": {
+"title": "INHILLDAUGAR: annotated place-names along the Daugava (Latvia)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.21076364"
+],
+[
+"creator",
+"Kalniņš, Aigars",
+3
+],
+[
+"creator",
+"Sitchinava, Dmitry",
+3
+],
+[
+"creator",
+"Seržant, Ilja",
+33
+]
+],
+"found": 40
+},
+"10.5281/zenodo.19909380": {
+"title": "Francesco Scoto's Italian travel manuals 1650–1700 (EMDigIt)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.19909381"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.20924507"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.22939426"
+],
+[
+"creator",
+"Chodejovska, Eva",
+4
+],
+[
+"creator",
+"Münzberger, Josef",
+4
+]
+],
+"found": 11
+},
+"10.5281/zenodo.22939426": {
+"title": "Francesco Scoto's Italian travel manuals 1650–1700 (EMDigIt)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.19909380"
+],
+[
+"creator",
+"Chodejovska, Eva",
+4
+],
+[
+"creator",
+"Münzberger, Josef",
+4
+]
+],
+"found": 9
+},
+"10.5281/zenodo.17090406": {
+"title": "Woodlands of Antiquity: dendroarchaeological dataset",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18370269"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17090407"
+],
+[
+"creator",
+"Muigg, Bernhard",
+3
+],
+[
+"creator",
+"Haneca, Kristof",
+100
+],
+[
+"creator",
+"Tegel, Willy",
+17
+],
+[
+"creator",
+"Bernard, Vincent",
+8
+]
+],
+"found": 130
+},
+"10.5281/zenodo.18370269": {
+"title": "Woodlands of Antiquity: dendroarchaeological dataset",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17090406"
+],
+[
+"creator",
+"Muigg, Bernhard",
+3
+],
+[
+"creator",
+"Haneca, Kristof",
+100
+],
+[
+"creator",
+"Tegel, Willy",
+17
+],
+[
+"creator",
+"Bernard, Vincent",
+8
+]
+],
+"found": 129
+},
+"10.34894/btkfhv": {
+"title": "Historical Atlas of the Low Countries (1350–1800), DataverseNL",
+"level": 0,
+"edges": [
+[
+"creator",
+"Stapel, Rombert",
+58
+],
+[
+"publisher",
+"DataverseNL",
+200
+]
+],
+"found": 258
+},
+"10.5281/zenodo.5708032": {
+"title": "Archaeological Sites in Slovak Republic — Harmonized Dataset (CEANS 2021)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5708033"
+],
+[
+"creator",
+"Demján, Peter",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.5708033": {
+"title": "Archaeological Sites in Slovak Republic — Harmonized Dataset (CEANS 2021)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5708032"
+],
+[
+"creator",
+"Demján, Peter",
+6
+]
+],
+"found": 7
+},
+"10.11588/data/10063": {
+"title": "Georeferencing of the Lorscher Codex (UB Heidelberg)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsSupplementTo",
+"10.11588/diglit.19939"
+],
+[
+"related",
+"HasPart",
+"10.11588/data/10063/ehyv2s"
+],
+[
+"related",
+"HasPart",
+"10.11588/data/10063/wjyhan"
+],
+[
+"citedBy",
+"is-part-of",
+"10.11588/data/10063/luo4a8"
+],
+[
+"citedBy",
+"is-part-of",
+"10.11588/data/10063/hpfsrr"
+],
+[
+"citedBy",
+"is-part-of",
+"10.11588/data/10063/wjyhan"
+],
+[
+"citedBy",
+"is-part-of",
+"10.11588/data/10063/ehyv2s"
+],
+[
+"creator",
+"Antretter, Marlene",
+5
+],
+[
+"creator",
+"Eller, Dirk",
+5
+],
+[
+"creator",
+"Elstermann, Hannes",
+5
+],
+[
+"creator",
+"Geissler, Stefan",
+12
+],
+[
+"publisher",
+"heiDATA",
+167
+]
+],
+"found": 201
+},
+"10.34894/1nwhjb": {
+"title": "Mint Houses of the Low Countries (IISH)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Stapel, Rombert",
+58
+],
+[
+"publisher",
+"DataverseNL",
+200
+]
+],
+"found": 258
+},
+"10.34894/pb9at3": {
+"title": "Mint Authorities of the Low Countries (IISH)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Stapel, Rombert",
+58
+],
+[
+"publisher",
+"DataverseNL",
+200
+]
+],
+"found": 258
+},
+"10.7910/dvn/8s8l0v": {
+"title": "Fields on Fire",
+"level": 0,
+"edges": [
+[
+"creator",
+"O'Neill, Kelly",
+100
+],
+[
+"creator",
+"Gasparyan, Davit",
+2
+],
+[
+"creator",
+"Schaffner, Thomas",
+1
+],
+[
+"creator",
+"Vădan, Paul",
+1
+]
+],
+"found": 104
+},
+"10.7910/dvn/4an2fl": {
+"title": "Where Went UK Churches: A Dataset of over 30,000+ Converted UK Churches and Their Post-Conversion Classification.",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kelechi Okereke Collins",
+1
+]
+],
+"found": 1
+},
+"10.5281/zenodo.12601441": {
+"title": "MobileGIS in archaeological prospection in Tunisia",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.12601440"
+],
+[
+"creator",
+"Chyla, Julia M.",
+5
+],
+[
+"creator",
+"Makowski, Piotr",
+16
+],
+[
+"creator",
+"Antos, Magdalena",
+2
+],
+[
+"creator",
+"Kowalewski, Konstanty",
+2
+]
+],
+"found": 26
+},
+"10.5281/zenodo.18818238": {
+"title": "Islamic Civilization Atlas Dataset: Bosworth's Islamic Dynasties Database (632–1924 CE)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18818237"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"Çetinkaya, Ali",
+11
+]
+],
+"found": 17
+},
+"10.7910/dvn/z0ahal": {
+"title": "Spatiotemporal historical datasets on micro-level for geocoded individuals in five Swedish parishes, 1813-1914",
+"level": 0,
+"edges": [
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/wapvq2"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/4vxgty"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/bi5yk0"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/ivssss"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/bled9i"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/krywot"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/lh9ssl"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/ztf4gw"
+],
+[
+"related",
+"HasPart",
+"10.7910/dvn/z0ahal/o1dqzv"
+],
+[
+"creator",
+"Hedefalk, Finn",
+29
+],
+[
+"creator",
+"Svensson, Patrick",
+5
+],
+[
+"creator",
+"Harrie, Lars",
+28
+]
+],
+"found": 71
+},
+"10.5281/zenodo.7351936": {
+"title": "Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.7351935"
+],
+[
+"creator",
+"Kabadayi, M. Erdem",
+17
+],
+[
+"creator",
+"Boykov, Grigor",
+8
+],
+[
+"creator",
+"Sefer, Akın",
+4
+],
+[
+"creator",
+"Gerrits, Piet",
+10
+]
+],
+"found": 40
+},
+"10.5281/zenodo.18818237": {
+"title": "Islamic Civilization Atlas Dataset: Bosworth's Islamic Dynasties Database (632–1924 CE) — v2.0",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18818238"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18824469"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"Çetinkaya, Ali",
+11
+]
+],
+"found": 18
+},
+"10.5281/zenodo.20050035": {
+"title": "Thailand Canonical Administrative-Names Reference",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.20049930"
+],
+[
+"creator",
+"Reynolds, William J.",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.2233046": {
+"title": "Data package for modeling the journey of Colonel William Leake in the southern Mani Peninsula, Greece, using least-cost ",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.2233047"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.2233935"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.2234016"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.2564907"
+],
+[
+"creator",
+"Seifried, Rebecca M.",
+14
+],
+[
+"creator",
+"Gardner, Chelsea A.M.",
+7
+]
+],
+"found": 25
+},
+"10.5281/zenodo.6917159": {
+"title": "N Italy Zooarchaeological Dataset",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.6917158"
+],
+[
+"creator",
+"Angela Trentacoste",
+2
+],
+[
+"creator",
+"Ariadna Nieto-Espinet",
+2
+],
+[
+"creator",
+"Silvia Guimarães Chiarelli",
+2
+],
+[
+"creator",
+"Silvia Valenzuela-Lamas",
+2
+]
+],
+"found": 9
+},
+"10.5281/zenodo.15111789": {
+"title": "UnitoAssyrianGovernance/villages-to-empire-dataset: Paper submission version",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.15111732"
+],
+[
+"creator",
+"Andrea Titolo",
+1
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+]
+],
+"found": 43
+},
+"10.5281/zenodo.5638600": {
+"title": "Lublin 1944 aerial images with spatial overlay index",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5638599"
+],
+[
+"creator",
+"Kuna, Jakub",
+2
+]
+],
+"found": 3
+},
+"10.5281/zenodo.18852123": {
+"title": "Toponymy in Nineteenth-Century Trento: A FAIR Dataset of Historical Evolution of Urban Toponyms in the Piazza del Duomo ",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18852124"
+],
+[
+"creator",
+"Maragno, Anna",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.7567790": {
+"title": "LOCATION DOMESTIC ARCHITECTURE AUGUSTA EMERITA (MERIDA, SPAIN)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.7567789"
+],
+[
+"creator",
+"Corrales Álvarez, Álvaro",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.18150826": {
+"title": "An integrated relational geodatabase for spatial analysis and diachronic reconstruction of ancient landscapes: a case-st",
+"level": 0,
+"edges": [
+[
+"related",
+"Cites",
+"10.5281/zenodo.17597517"
+],
+[
+"related",
+"Cites",
+"10.5281/zenodo.17537451"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.19471519"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18150827"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150827"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150827"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.19471519"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.19471519"
+],
+[
+"creator",
+"DE STEFANO, FRANCESCO",
+3
+]
+],
+"found": 11
+},
+"10.5281/zenodo.14503864": {
+"title": "22 Tragedies",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.14503863"
+],
+[
+"creator",
+"Craig, Hugh",
+37
+]
+],
+"found": 38
+},
+"10.5281/zenodo.7418864": {
+"title": "Historical GIS and Guidebooks: Czechoslovak Tourist Attractions",
+"level": 0,
+"edges": [
+[
+"related",
+"IsCompiledBy",
+"10.5281/zenodo.7447896"
+],
+[
+"related",
+"IsCitedBy",
+"10.5281/zenodo.10498921"
+],
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.7418863"
+],
+[
+"creator",
+"Bechmann Pedersen, Sune",
+2
+],
+[
+"creator",
+"Johansson, Mathias",
+14
+]
+],
+"found": 19
+},
+"10.5281/zenodo.18710760": {
+"title": "Historical Evolution of Trento: Graphic Reconstructions of the City's Development Through the Centuries",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18710761"
+],
+[
+"creator",
+"Maragno, Anna",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.18231455": {
+"title": "Dataset - Hus och gård i det förurbana samhället",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18231456"
+],
+[
+"creator",
+"Kyhlberg, Ola",
+2
+],
+[
+"creator",
+"Göthberg, Hans",
+2
+],
+[
+"creator",
+"Vinberg, Ann",
+2
+],
+[
+"publisher",
+"Riksantikvarieämbetet",
+2
+]
+],
+"found": 9
+},
+"10.5281/zenodo.17976540": {
+"title": "ARBOREA: archaeobotanical records of Olea and Vitis from published sources",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17976541"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17976541"
+],
+[
+"creator",
+"Moricca, Claudia",
+9
+],
+[
+"creator",
+"Di Fonso, Erasmo",
+2
+],
+[
+"creator",
+"Nicolini, Rachele",
+4
+]
+],
+"found": 17
+},
+"10.5281/zenodo.18301550": {
+"title": "Dataset for Context-Based Modeling and Prediction of Energy Consumption in Sofia City",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18301549"
+],
+[
+"creator",
+"Hristov, Emil",
+6
+],
+[
+"creator",
+"Terzieva, Elena",
+2
+],
+[
+"creator",
+"Aghazadeh Ardebili, Ali",
+2
+],
+[
+"creator",
+"Shirinyan, Evgeny",
+4
+]
+],
+"found": 15
+},
+"10.5281/zenodo.18648098": {
+"title": "Spatial dataset supporting the article: Archaeological Landscapes as Lenses for Long-Term Regional Transformation (1951–",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18648097"
+],
+[
+"creator",
+"Tuna, Aysun",
+2
+]
+],
+"found": 3
+},
+"10.5281/zenodo.5156103": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5846699"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17794371"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.6427045"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.6323305"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5156104"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5846835"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17794379"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17794371"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17794379"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Shennan, Stephen",
+33
+]
+],
+"found": 138
+},
+"10.5281/zenodo.14555923": {
+"title": "Full historical database on fire occurrences in the natural core of Falz-Fein Biosphere Reserve \"Askania Nova\", Ukraine ",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14555924"
+],
+[
+"creator",
+"Kazantsev, Taras",
+2
+],
+[
+"creator",
+"Shapoval, Viktor",
+19
+]
+],
+"found": 22
+},
+"10.5281/zenodo.17277119": {
+"title": "Georeferenced toponyms relating to the Consegne dei Boschi (1822)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17277118"
+],
+[
+"creator",
+"Colaprice, Vincenzo",
+27
+]
+],
+"found": 28
+},
+"10.5281/zenodo.14267604": {
+"title": "Destruction of the Cultural-Archaeological Landscape in the Gaza Strip",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.14267603"
+],
+[
+"creator",
+"EAMENA database",
+39
+]
+],
+"found": 40
+},
+"10.34847/nkl.aecdrl48": {
+"title": "Hillforts in Latvia along Daugava from Bronze Age to Modern Period",
+"level": 0,
+"edges": [
+[
+"related",
+"HasPart",
+"10.34847/nkl.da8e3x30"
+],
+[
+"citedBy",
+"is-part-of",
+"10.34847/nkl.da8e3x30"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 226
+},
+"10.1594/pangaea.860941": {
+"title": "Average chemical composition of lake ores of Finland and North-Eastern Russia extracted in the late nineteen century",
+"level": 0,
+"edges": [
+[
+"related",
+"IsDerivedFrom",
+"10.7289/v52z13ft"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.7289/v53x84kn"
+],
+[
+"creator",
+"Solitander, C P",
+1
+]
+],
+"found": 3
+},
+"10.5281/zenodo.21932353": {
+"title": "Strucke C14 Sweden",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.10966331"
+],
+[
+"creator",
+"Strucke, Ulf",
+3
+],
+[
+"publisher",
+"Uppsala University",
+200
+]
+],
+"found": 204
+},
+"10.5281/zenodo.17550847": {
+"title": "From the Earliest Settlements to the Historical Periods: Archaeological sites in the Eastern Anatolian Highlands (Türkiy",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17550848"
+],
+[
+"creator",
+"Aslan, Alper",
+4
+]
+],
+"found": 5
+},
+"10.6084/m9.figshare.29180390": {
+"title": "HMAP Data File Russian Herring - In Process",
+"level": 0,
+"edges": [
+[
+"creator",
+"Nicholls, John",
+100
+]
+],
+"found": 100
+},
+"10.34847/nkl.81ae8759": {
+"title": "Hillforts of Britain and Ireland (extract)",
+"level": 0,
+"edges": [
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 224
+},
+"10.34847/nkl.7decwa99": {
+"title": "Hillforts of Britain and Ireland (only total enclosed area sup 14,7 ha )",
+"level": 0,
+"edges": [
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 224
+},
+"10.1594/pangaea.928980": {
+"title": "Monthly-resolved swordfish bycatch data from Milazzo tuna trap, 1896-1901",
+"level": 0,
+"edges": [
+[
+"related",
+"References",
+"10.1594/pangaea.928996"
+],
+[
+"related",
+"References",
+"10.1594/pangaea.928981"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928981"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928996"
+],
+[
+"creator",
+"MacKenzie, Brian R",
+41
+],
+[
+"creator",
+"Romeo, Teresa",
+8
+],
+[
+"creator",
+"Addis, Piero",
+13
+],
+[
+"creator",
+"Battaglia, Pietro",
+7
+]
+],
+"found": 73
+},
+"10.34847/nkl.db53j42l": {
+"title": "Sites archéologiques de la Lorraine médiévale",
+"level": 0,
+"edges": [
+[
+"creator",
+"MOREL, Charlène",
+10
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 210
+},
+"10.17632/268xx6ddf4.1": {
+"title": "Georeferenced database of Medieval military and religious sites in Northern Italy - ver 1.0",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.17632/268xx6ddf4"
+],
+[
+"creator",
+"Casazza, Marco",
+100
+],
+[
+"creator",
+"Barone, Fabrizio",
+6
+]
+],
+"found": 107
+},
+"10.34847/nkl.ac829at9": {
+"title": "Rurland – The rural lands of north-eastern gaul, from the late LaTène period to the late antiquity",
+"level": 0,
+"edges": [
+[
+"creator",
+"Reddé, Michel",
+100
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 300
+},
+"10.34847/nkl.8abbmf9q": {
+"title": "Rurland, Nuss, z1, xyab, 5e s. ap JC",
+"level": 0,
+"edges": [
+[
+"creator",
+"Reddé, Michel",
+100
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 300
+},
+"10.34847/nkl.5402590d": {
+"title": "Sondages archéologiques pour datations OSL-PD (South-Hams, Devon)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsSupplementedBy",
+"10.34847/nkl.dfffz1tg"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.34847/nkl.dfffz1tg"
+],
+[
+"creator",
+"Domingo-Ribas, Guillem",
+1
+],
+[
+"creator",
+"Turner, Sam",
+9
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 212
+},
+"10.1594/pangaea.928996": {
+"title": "Swordfish bycatch data from tuna traps located at four sites in Italy, 1896-2010",
+"level": 0,
+"edges": [
+[
+"related",
+"References",
+"10.1594/pangaea.928980"
+],
+[
+"related",
+"References",
+"10.1594/pangaea.928981"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928981"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928980"
+],
+[
+"creator",
+"MacKenzie, Brian R",
+41
+],
+[
+"creator",
+"Romeo, Teresa",
+8
+],
+[
+"creator",
+"Addis, Piero",
+13
+],
+[
+"creator",
+"Battaglia, Pietro",
+7
+]
+],
+"found": 73
+},
+"10.34847/nkl.ad0au38a": {
+"title": "Projet Atelier Time Machine - Plan Verniquet (1785-1791) TA",
+"level": 0,
+"edges": [
+[
+"creator",
+"Costa, Laurent",
+47
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 247
+},
+"10.1594/pangaea.819142": {
+"title": "Strontium isotope ratios of plant and soil samples from France",
+"level": 0,
+"edges": [
+[
+"creator",
+"Willmes, Malte",
+12
+],
+[
+"creator",
+"Grün, Rainer",
+8
+],
+[
+"creator",
+"McMorrow, Linda",
+1
+]
+],
+"found": 21
+},
+"10.5281/zenodo.21033971": {
+"title": "Remote Sensing Data Udhruh Roman fortress, Jordan",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.21033970"
+],
+[
+"creator",
+"van der Kraan, Gunnar",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.14292453": {
+"title": "Location and information files",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.14251195"
+],
+[
+"creator",
+"Chmielowski, Riia",
+7
+]
+],
+"found": 8
+},
+"10.5281/zenodo.14503863": {
+"title": "22 Tragedies",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14503864"
+],
+[
+"creator",
+"Craig, Hugh",
+37
+]
+],
+"found": 38
+},
+"10.5281/zenodo.12570129": {
+"title": "Appendix: Mycenaean roads in the Peloponnese, Greece: least-cost path modelling using R and Movecost",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.12570128"
+],
+[
+"creator",
+"Kovačević, Jovan",
+4
+],
+[
+"creator",
+"Nuttall, Christopher",
+9
+]
+],
+"found": 14
+},
+"10.34894/2zj3rf": {
+"title": "Curaçao Historical Administrative Areas (1792-1954)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Stapel, Rombert",
+58
+],
+[
+"publisher",
+"DataverseNL",
+200
+]
+],
+"found": 258
+},
+"10.34847/nkl.4678112k": {
+"title": "Agglomérations, vestiges du VIIIe s AEC au XVe s EC dans le monde romain",
+"level": 0,
+"edges": [
+[
+"related",
+"Requires",
+"10.34847/nkl.3c69bmtb"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.ec11io3s"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.d14c40y4"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.9fc201h1"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.ad1bwler"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.cdca743t"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.f2fd40ij"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.7ce2t604"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.34847/nkl.df00wjm9"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 233
+},
+"10.1594/pangaea.936074": {
+"title": "Mapping the global distribution of the freshwater hydrozoan Craspedacusta sowerbii",
+"level": 0,
+"edges": [
+[
+"creator",
+"Marchessaux, Guillaume",
+10
+],
+[
+"creator",
+"Lüskow, Florian",
+32
+],
+[
+"creator",
+"Sarà, Gianluca",
+16
+],
+[
+"creator",
+"Pakhomov, Evgeny A",
+50
+]
+],
+"found": 108
+},
+"https://doi.org/10.1594/pangaea.957252": {
+"title": "Radiocarbon dates from North Cantal Peatlands (France)",
+"level": 0,
+"edges": [],
+"found": 0
+},
+"10.1594/pangaea.984513": {
+"title": "Water chemistry of Lagrangian samplings of Inland Elbe 2024 (MOSES Hydrological Extremes)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kamjunke, Norbert",
+20
+],
+[
+"creator",
+"von Tümpling, Wolf",
+7
+],
+[
+"creator",
+"Hoff, Andrea",
+5
+],
+[
+"creator",
+"Koschorreck, Matthias",
+37
+]
+],
+"found": 69
+},
+"10.1594/pangaea.935962": {
+"title": "Stable isotopes (δ15N and δ13C) from the baleen of North Atlantic minke whales (Balaenoptera acutorostrata)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Eerkes-Medrano, Dafne",
+1
+],
+[
+"creator",
+"Aldridge, David C",
+44
+],
+[
+"creator",
+"Blix, Arnoldus Schytte",
+3
+]
+],
+"found": 48
+},
+"10.34847/nkl.dba1su38": {
+"title": "Projet Alpage - Espaces de pouvoir - Censives au XVIIIe siècle délimitées par les îlots Vasserot",
+"level": 0,
+"edges": [
+[
+"creator",
+"Bove, Boris",
+9
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 209
+},
+"10.34847/nkl.abbflg45": {
+"title": "Projet Alpage - Espaces de pouvoir - Censives au XVIIIe siècle d’après les plans-terriers",
+"level": 0,
+"edges": [
+[
+"creator",
+"Bove, Boris",
+9
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 209
+},
+"10.5281/zenodo.17571650": {
+"title": "Isotopic Dataset to: Depaermentier, MLC, Kempf, M, Motuzaitė Matuzevičiūtė, G. \"Environmentally adjusted δ13C thresholds",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17571649"
+],
+[
+"creator",
+"Depaermentier, Margaux L. C.",
+11
+]
+],
+"found": 12
+},
+"10.5281/zenodo.16536448": {
+"title": "HiRoN-PL: High-Speed Road Network Vector Data with Construction Year Attribution for Poland (1936-2023)",
+"level": 0,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.19570041"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.16536449"
+],
+[
+"creator",
+"Śleszyński, Przemysław",
+12
+],
+[
+"creator",
+"Krasnodębska, Katarzyna",
+4
+]
+],
+"found": 18
+},
+"10.5281/zenodo.16536449": {
+"title": "HiRoN-PL: Network of motorways and expressways in Poland attributed with the date of commissioning (1936-2023)",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.16536448"
+],
+[
+"creator",
+"Śleszyński, Przemysław",
+12
+],
+[
+"creator",
+"Krasnodębska, Katarzyna",
+4
+]
+],
+"found": 17
+},
+"10.5281/zenodo.18999959": {
+"title": "Fifteen thousand years of bioarchaeological data reveal life history trade-offs among Europe's first farmers – Supplemen",
+"level": 0,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18999958"
+],
+[
+"creator",
+"Parkinson, Eóin",
+3
+]
+],
+"found": 4
+},
+"10.5281/zenodo.5761810": {
+"title": "Zbiva, Early Medieval Data Set for the Eastern Alps. Data sub-set",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.10008341"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5761811"
+],
+[
+"creator",
+"Štular, Benjamin",
+9
+],
+[
+"creator",
+"Pleterski, Andrej",
+3
+],
+[
+"creator",
+"Belak, Mateja",
+3
+]
+],
+"found": 17
+},
+"10.5281/zenodo.21904950": {
+"title": "Geospatial data for the Medieval road system in the Levant (Bilād al-Šām)",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21981430"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21904951"
+],
+[
+"creator",
+"Pažout, Adam",
+15
+]
+],
+"found": 17
+},
+"10.5281/zenodo.1009559": {
+"title": "Mapping Jewish Communities of the Byzantine Empire",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.1009560"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.1116960"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7575860"
+],
+[
+"creator",
+"Rees, Gethin",
+12
+],
+[
+"creator",
+"De Lange, Nicholas",
+2
+],
+[
+"creator",
+"Panayotov, Alexander",
+4
+],
+[
+"creator",
+"Palm, Fredrik",
+12
+]
+],
+"found": 33
+},
+"10.5281/zenodo.5849855": {
+"title": "Dataset for \"The Gobolitide (Al-Jibal) microregion: geography and settlement network evolution from Nabataean to Byzanti",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5849856"
+],
+[
+"creator",
+"Kopij, Kamil",
+8
+],
+[
+"creator",
+"Bała, Sebastian",
+2
+]
+],
+"found": 11
+},
+"10.5281/zenodo.21076364": {
+"title": "INHILLDAUGAR database. A linguistically, historically and partially archeologically annotated database of place names al",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21157502"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21076365"
+],
+[
+"creator",
+"Kalniņš, Aigars",
+3
+],
+[
+"creator",
+"Sitchinava, Dmitry",
+3
+],
+[
+"creator",
+"Seržant, Ilja",
+33
+]
+],
+"found": 41
+},
+"10.5281/zenodo.19909381": {
+"title": "Early Modern Italian Travel Manuals Geodataset (Francesco Scoto, 1650–1700)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.19909380"
+],
+[
+"creator",
+"Chodejovska, Eva",
+4
+],
+[
+"creator",
+"Münzberger, Josef",
+4
+]
+],
+"found": 9
+},
+"10.5281/zenodo.20924507": {
+"title": "Early Modern Italian Travel Manuals Geodataset (Francesco Scoto, 1650–1700)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.19909380"
+],
+[
+"creator",
+"Chodejovska, Eva",
+4
+],
+[
+"creator",
+"Münzberger, Josef",
+4
+]
+],
+"found": 9
+},
+"10.5281/zenodo.17090407": {
+"title": "Woodlands of Antiquity - dendroarchaeological dataset",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17090406"
+],
+[
+"creator",
+"Muigg, Bernhard",
+3
+],
+[
+"creator",
+"Haneca, Kristof",
+100
+],
+[
+"creator",
+"Tegel, Willy",
+17
+],
+[
+"creator",
+"Bernard, Vincent",
+8
+]
+],
+"found": 129
+},
+"10.11588/diglit.19939": {
+"title": "\"Codex Laureshamensis\"",
+"level": 1,
+"edges": [
+[
+"citedBy",
+"is-supplement-to",
+"10.11588/data/10063"
+],
+[
+"publisher",
+"Lorsch: NN",
+0
+]
+],
+"found": 1
+},
+"10.11588/data/10063/ehyv2s": {
+"title": "LorscherCodexBesitz.kml",
+"level": 1,
+"edges": [
+[
+"related",
+"IsPartOf",
+"10.11588/data/10063"
+],
+[
+"creator",
+"Antretter, Marlene",
+5
+],
+[
+"creator",
+"Eller, Dirk",
+5
+],
+[
+"creator",
+"Elstermann, Hannes",
+5
+],
+[
+"creator",
+"Geissler, Stefan",
+12
+],
+[
+"publisher",
+"heiDATA",
+167
+]
+],
+"found": 195
+},
+"10.11588/data/10063/wjyhan": {
+"title": "LorscherCodex.kml",
+"level": 1,
+"edges": [
+[
+"related",
+"IsPartOf",
+"10.11588/data/10063"
+],
+[
+"creator",
+"Antretter, Marlene",
+5
+],
+[
+"creator",
+"Eller, Dirk",
+5
+],
+[
+"creator",
+"Elstermann, Hannes",
+5
+],
+[
+"creator",
+"Geissler, Stefan",
+12
+],
+[
+"publisher",
+"heiDATA",
+167
+]
+],
+"found": 195
+},
+"10.11588/data/10063/luo4a8": {
+"title": "LorscherCodexBesitz.kml",
+"level": 1,
+"edges": [
+[
+"related",
+"IsPartOf",
+"10.11588/data/10063"
+],
+[
+"creator",
+"Antretter, Marlene",
+5
+],
+[
+"creator",
+"Eller, Dirk",
+5
+],
+[
+"creator",
+"Elstermann, Hannes",
+5
+],
+[
+"creator",
+"Geissler, Stefan",
+12
+],
+[
+"publisher",
+"heiDATA",
+167
+]
+],
+"found": 195
+},
+"10.11588/data/10063/hpfsrr": {
+"title": "LorscherCodex.kml",
+"level": 1,
+"edges": [
+[
+"related",
+"IsPartOf",
+"10.11588/data/10063"
+],
+[
+"creator",
+"Antretter, Marlene",
+5
+],
+[
+"creator",
+"Eller, Dirk",
+5
+],
+[
+"creator",
+"Elstermann, Hannes",
+5
+],
+[
+"creator",
+"Geissler, Stefan",
+12
+],
+[
+"publisher",
+"heiDATA",
+167
+]
+],
+"found": 195
+},
+"10.5281/zenodo.12601440": {
+"title": "MobileGIS in archaeological prospection in Tunisia",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.12601441"
+],
+[
+"creator",
+"Chyla, Julia M.",
+5
+],
+[
+"creator",
+"Makowski, Piotr",
+16
+],
+[
+"creator",
+"Antos, Magdalena",
+2
+],
+[
+"creator",
+"Kowalewski, Konstanty",
+2
+]
+],
+"found": 26
+},
+"10.7910/dvn/z0ahal/wapvq2": {
+"title": "Buildings_points.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/4vxgty": {
+"title": "Buildings_polygons.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/bi5yk0": {
+"title": "Codelist_SEDDGeo.pdf",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/ivssss": {
+"title": "Lakes.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/bled9i": {
+"title": "property_units_SEDD.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/krywot": {
+"title": "Railroads.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/lh9ssl": {
+"title": "Roads.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/ztf4gw": {
+"title": "Streams.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.7910/dvn/z0ahal/o1dqzv": {
+"title": "Wetlands.zip",
+"level": 1,
+"edges": [
+[
+"creator",
+"Hedefalk, Finn (Lund University); Patrick Svensson (Lund University); Lars Harrie (Lund University)",
+25
+]
+],
+"found": 25
+},
+"10.5281/zenodo.7351935": {
+"title": "Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7351936"
+],
+[
+"creator",
+"Kabadayi, M. Erdem",
+17
+],
+[
+"creator",
+"Boykov, Grigor",
+8
+],
+[
+"creator",
+"Sefer, Akın",
+4
+],
+[
+"creator",
+"Gerrits, Piet",
+10
+]
+],
+"found": 40
+},
+"10.5281/zenodo.18824469": {
+"title": "Islamic Civilization Atlas Dataset: Bosworth's Islamic Dynasties Database (632–1924 CE) — v2.0",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18818237"
+],
+[
+"creator",
+"GOKALP, HUSEYIN",
+5
+],
+[
+"creator",
+"Çetinkaya, Ali",
+11
+]
+],
+"found": 17
+},
+"10.5281/zenodo.20049930": {
+"title": "Thailand Canonical Administrative-Names Reference",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.20054021"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.20049931"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20049931"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20050035"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.5281/zenodo.20054021"
+],
+[
+"creator",
+"Reynolds, William J.",
+4
+]
+],
+"found": 28
+},
+"10.5281/zenodo.2233047": {
+"title": "Data package for modeling the journey of Colonel William Leake in the southern Mani Peninsula, Greece, using least-cost ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.2233046"
+],
+[
+"creator",
+"Seifried, Rebecca M.",
+14
+],
+[
+"creator",
+"Gardner, Chelsea A.M.",
+7
+]
+],
+"found": 22
+},
+"10.5281/zenodo.2233935": {
+"title": "Data package for modeling the journey of Colonel William Leake in the southern Mani Peninsula, Greece, using least-cost ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.2233046"
+],
+[
+"creator",
+"Seifried, Rebecca M.",
+14
+],
+[
+"creator",
+"Gardner, Chelsea A.M.",
+7
+]
+],
+"found": 22
+},
+"10.5281/zenodo.2234016": {
+"title": "Data package for modeling the journey of Colonel William Leake in the southern Mani Peninsula, Greece, using least-cost ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.2233046"
+],
+[
+"creator",
+"Seifried, Rebecca M.",
+14
+],
+[
+"creator",
+"Gardner, Chelsea A.M.",
+7
+]
+],
+"found": 22
+},
+"10.5281/zenodo.2564907": {
+"title": "Data package for modeling the journey of Colonel William Leake in the southern Mani Peninsula, Greece, using least-cost ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.2233046"
+],
+[
+"creator",
+"Seifried, Rebecca M.",
+14
+],
+[
+"creator",
+"Gardner, Chelsea A.M.",
+7
+]
+],
+"found": 22
+},
+"10.5281/zenodo.6917158": {
+"title": "N Italy Zooarchaeological Dataset",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.6917159"
+],
+[
+"creator",
+"Angela Trentacoste",
+2
+],
+[
+"creator",
+"Ariadna Nieto-Espinet",
+2
+],
+[
+"creator",
+"Silvia Guimarães Chiarelli",
+2
+],
+[
+"creator",
+"Silvia Valenzuela-Lamas",
+2
+]
+],
+"found": 9
+},
+"10.5281/zenodo.15111732": {
+"title": "UnitoAssyrianGovernance/villages-to-empire-dataset: Version 1.2",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15111733"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.15111789"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17178312"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17285091"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17178312"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17285091"
+],
+[
+"creator",
+"Titolo, Andrea",
+6
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+]
+],
+"found": 53
+},
+"10.5281/zenodo.5638599": {
+"title": "Lublin 1944 aerial images with spatial overlay index",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.5638600"
+],
+[
+"creator",
+"Kuna, Jakub",
+2
+]
+],
+"found": 3
+},
+"10.5281/zenodo.18852124": {
+"title": "Toponymy in Nineteenth-Century Trento: A FAIR Dataset of Historical Evolution of Urban Toponyms in the Piazza del Duomo ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18852123"
+],
+[
+"creator",
+"Maragno, Anna",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.7567789": {
+"title": "LOCATION DOMESTIC ARCHITECTURE AUGUSTA EMERITA (MERIDA, SPAIN)",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7567790"
+],
+[
+"creator",
+"Corrales Álvarez, Álvaro",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.17597517": {
+"title": "Arborea-s-home/Lucus_Feroniae_archaeobotanical: v1.0.0 – Prima versione pubblica",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17597518"
+],
+[
+"citedBy",
+"is-supplement-to",
+"10.5281/zenodo.17597518"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150827"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.19471519"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150826"
+],
+[
+"creator",
+"erasmdif",
+0
+],
+[
+"creator",
+"claudiamoricca",
+0
+]
+],
+"found": 5
+},
+"10.5281/zenodo.17537451": {
+"title": "IULIA: a georeferenced anthropological dataset from Ancient Latium",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18986288"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17537452"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17640644"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150827"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.19471519"
+],
+[
+"citedBy",
+"cites",
+"10.5281/zenodo.18150826"
+],
+[
+"creator",
+"Formichella, Giulia",
+8
+],
+[
+"creator",
+"Cecconi, Niccolò",
+8
+],
+[
+"creator",
+"Farese, Martina",
+9
+],
+[
+"creator",
+"Rossi, Paola Francesca",
+6
+]
+],
+"found": 37
+},
+"10.5281/zenodo.19471519": {
+"title": "An integrated relational geodatabase for spatial analysis and diachronic reconstruction of ancient landscapes: a case-st",
+"level": 1,
+"edges": [
+[
+"related",
+"Cites",
+"10.5281/zenodo.17597517"
+],
+[
+"related",
+"Cites",
+"10.5281/zenodo.17537451"
+],
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18150826"
+],
+[
+"creator",
+"DE STEFANO, FRANCESCO",
+3
+]
+],
+"found": 6
+},
+"10.5281/zenodo.18150827": {
+"title": "An integrated relational geodatabase for spatial analysis and diachronic reconstruction of ancient landscapes: a case-st",
+"level": 1,
+"edges": [
+[
+"related",
+"Cites",
+"10.5281/zenodo.17597517"
+],
+[
+"related",
+"Cites",
+"10.5281/zenodo.17537451"
+],
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18150826"
+],
+[
+"creator",
+"DE STEFANO, FRANCESCO",
+3
+]
+],
+"found": 6
+},
+"10.5281/zenodo.7447896": {
+"title": "MatJohaDH/citadel: v1.0.0",
+"level": 1,
+"edges": [
+[
+"related",
+"Compiles",
+"10.5281/zenodo.7418864"
+],
+[
+"related",
+"IsCitedBy",
+"10.5281/zenodo.10498921"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7447897"
+],
+[
+"creator",
+"Mathias Johansson",
+0
+],
+[
+"creator",
+"Bechmann Pedersen, Sune",
+2
+]
+],
+"found": 5
+},
+"10.5281/zenodo.10498921": {
+"title": "Historical GIS and Guidebooks: A Scalable Reading of Czechoslovak Tourist Attractions",
+"level": 1,
+"edges": [
+[
+"related",
+"IsSupplementedBy",
+"10.5281/ZENODO.7418864"
+],
+[
+"related",
+"IsDocumentedBy",
+"10.5281/zenodo.7447896"
+],
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.10498920"
+],
+[
+"creator",
+"Bechmann Pedersen, Sune",
+2
+],
+[
+"creator",
+"Johansson, Mathias",
+14
+]
+],
+"found": 19
+},
+"10.5281/zenodo.7418863": {
+"title": "Historical GIS and Guidebooks: Czechoslovak Tourist Attractions",
+"level": 1,
+"edges": [
+[
+"related",
+"IsCompiledBy",
+"10.5281/zenodo.7447896"
+],
+[
+"related",
+"IsCitedBy",
+"10.5281/zenodo.10498921"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.7418864"
+],
+[
+"creator",
+"Bechmann Pedersen, Sune",
+2
+],
+[
+"creator",
+"Johansson, Mathias",
+14
+]
+],
+"found": 19
+},
+"10.5281/zenodo.18710761": {
+"title": "Historical Evolution of Trento: Graphic Reconstructions of the City's Development Through the Centuries",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18710760"
+],
+[
+"creator",
+"Maragno, Anna",
+6
+]
+],
+"found": 7
+},
+"10.5281/zenodo.18231456": {
+"title": "Dataset - Hus och gård i det förurbana samhället",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.18231455"
+],
+[
+"creator",
+"Kyhlberg, Ola",
+2
+],
+[
+"creator",
+"Göthberg, Hans",
+2
+],
+[
+"creator",
+"Vinberg, Ann",
+2
+],
+[
+"publisher",
+"Riksantikvarieämbetet",
+2
+]
+],
+"found": 9
+},
+"10.5281/zenodo.17976541": {
+"title": "ARBOREA: archaeobotanical records of Olea and Vitis from published sources",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17976540"
+],
+[
+"creator",
+"Moricca, Claudia",
+9
+],
+[
+"creator",
+"Di Fonso, Erasmo",
+2
+],
+[
+"creator",
+"Nicolini, Rachele",
+4
+]
+],
+"found": 16
+},
+"10.5281/zenodo.18301549": {
+"title": "Dataset for Context-Based Modeling and Prediction of Energy Consumption in Sofia City",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18301550"
+],
+[
+"creator",
+"Hristov, Emil",
+6
+],
+[
+"creator",
+"Terzieva, Elena",
+2
+],
+[
+"creator",
+"Aghazadeh Ardebili, Ali",
+2
+],
+[
+"creator",
+"Shirinyan, Evgeny",
+4
+]
+],
+"found": 15
+},
+"10.5281/zenodo.18648097": {
+"title": "Spatial dataset supporting the article: Archaeological Landscapes as Lenses for Long-Term Regional Transformation (1951–",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18648098"
+],
+[
+"creator",
+"Tuna, Aysun",
+2
+]
+],
+"found": 3
+},
+"10.5281/zenodo.5846699": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Roberts, Neil",
+50
+]
+],
+"found": 147
+},
+"10.5281/zenodo.17794371": {
+"title": "apalmisano82/AIDA: v6.0 AIDA",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Alessio Palmisano",
+0
+]
+],
+"found": 1
+},
+"10.5281/zenodo.6427045": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Roberts, Neil",
+50
+]
+],
+"found": 147
+},
+"10.5281/zenodo.6323305": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Roberts, Neil",
+50
+]
+],
+"found": 147
+},
+"10.5281/zenodo.5156104": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Roberts, Neil",
+50
+]
+],
+"found": 147
+},
+"10.5281/zenodo.5846835": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Roberts, Neil",
+50
+]
+],
+"found": 147
+},
+"10.5281/zenodo.17794379": {
+"title": "AIDA (Archive of Italian radiocarbon DAtes)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.5156103"
+],
+[
+"creator",
+"Palmisano, Alessio",
+41
+],
+[
+"creator",
+"Bevan, Andrew",
+47
+],
+[
+"creator",
+"Kabelindde, Alexander",
+8
+],
+[
+"creator",
+"Shennan, Stephen",
+33
+]
+],
+"found": 130
+},
+"10.5281/zenodo.14555924": {
+"title": "Full historical database on fire occurrences in the natural core of Falz-Fein Biosphere Reserve \"Askania Nova\", Ukraine ",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.14555923"
+],
+[
+"creator",
+"Kazantsev, Taras",
+2
+],
+[
+"creator",
+"Shapoval, Viktor",
+19
+]
+],
+"found": 22
+},
+"10.5281/zenodo.17277118": {
+"title": "Georeferenced toponyms relating to the Consegne dei Boschi (1822)",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17277119"
+],
+[
+"creator",
+"Colaprice, Vincenzo",
+27
+]
+],
+"found": 28
+},
+"10.5281/zenodo.14267603": {
+"title": "Destruction of the Cultural-Archaeological Landscape in the Gaza Strip",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14267604"
+],
+[
+"creator",
+"EAMENA database",
+39
+]
+],
+"found": 40
+},
+"10.34847/nkl.da8e3x30": {
+"title": "Chronologie : Lettonie de l'Âge du Bronze à l'Époque moderne",
+"level": 1,
+"edges": [
+[
+"related",
+"IsPartOf",
+"10.34847/nkl.aecdrl48"
+],
+[
+"creator",
+"Čakare, Agnese",
+1
+],
+[
+"creator",
+"Haferberga, Vanda",
+3
+],
+[
+"creator",
+"Ibsen, Timo",
+3
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 232
+},
+"10.7289/v52z13ft": {
+"title": "NOAA and MMS Marine Minerals Geochemical Database",
+"level": 1,
+"edges": [
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.848973"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.853911"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.855399"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858518"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864497"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864729"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864726"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864670"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864911"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864922"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.865239"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.862535"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.868681"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.861235"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864668"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864804"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864723"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864802"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.873161"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.882385"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.877305"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.848967"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.859446"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.874787"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.874789"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.874791"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.881118"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.883822"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.877913"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.871598"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879765"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879544"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.880486"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.876627"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.877348"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.876540"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.875092"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.871493"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.870953"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.872131"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879656"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.880309"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879287"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879534"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879759"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.874800"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.881434"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867452"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.862568"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.871636"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.879864"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.880253"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.881163"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.868634"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.888108"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.874277"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.869807"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.861920"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.865317"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867155"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867109"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867177"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.865196"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867123"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867180"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.867261"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.866946"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858474"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.861332"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.866364"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.865194"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.868091"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.875110"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.862079"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.862026"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.849004"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.864599"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858037"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858513"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.861927"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858779"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858194"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.856995"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.857109"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.856994"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.855460"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.871829"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.881562"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.872188"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.858007"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.857955"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.857960"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.875106"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.882201"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.873684"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.871048"
+],
+[
+"citedBy",
+"is-derived-from",
+"10.1594/pangaea.857913"
+],
+[
+"creator",
+"Grant, J. Bruce",
+1
+],
+[
+"creator",
+"Moore, Carla J.",
+2
+],
+[
+"creator",
+"Alameddin, George",
+1
+],
+[
+"creator",
+"Chen, Kuiying",
+1
+],
+[
+"publisher",
+"NOAA National Centers for Environmental Information",
+200
+]
+],
+"found": 302
+},
+"10.7289/v53x84kn": {
+"title": "The NOAA and MMS Marine Minerals Bibliography",
+"level": 1,
+"edges": [
+[
+"citedBy",
+"references",
+"10.1594/pangaea.859446"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.857955"
+],
+[
+"creator",
+"Warnken, Robin R.",
+1
+],
+[
+"creator",
+"Virden, William T.",
+1
+],
+[
+"creator",
+"Moore, Carla J.",
+2
+],
+[
+"publisher",
+"NOAA National Centers for Environmental Information",
+200
+]
+],
+"found": 206
+},
+"10.5281/zenodo.10966331": {
+"title": "Strucke C14 Sweden",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.10966332"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21932353"
+],
+[
+"creator",
+"Strucke, Ulf",
+3
+],
+[
+"publisher",
+"Uppsala University",
+200
+]
+],
+"found": 205
+},
+"10.5281/zenodo.17550848": {
+"title": "From the Earliest Settlements to the Historical Periods: Archaeological sites in the Eastern Anatolian Highlands (Türkiy",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.17550847"
+],
+[
+"creator",
+"Aslan, Alper",
+4
+]
+],
+"found": 5
+},
+"10.1594/pangaea.928981": {
+"title": "Timing and duration of fishing seasons for artisanal bluefin tuna traps at four sites in Italy, 1896-2010",
+"level": 1,
+"edges": [
+[
+"related",
+"References",
+"10.1594/pangaea.928980"
+],
+[
+"related",
+"References",
+"10.1594/pangaea.928996"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928980"
+],
+[
+"citedBy",
+"references",
+"10.1594/pangaea.928996"
+],
+[
+"creator",
+"MacKenzie, Brian R",
+41
+],
+[
+"creator",
+"Romeo, Teresa",
+8
+],
+[
+"creator",
+"Addis, Piero",
+13
+],
+[
+"creator",
+"Battaglia, Pietro",
+7
+]
+],
+"found": 73
+},
+"10.17632/268xx6ddf4": {
+"title": "Georeferenced database of Medieval military and religious sites in Northern Italy - ver 1.0",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.17632/268xx6ddf4.1"
+],
+[
+"creator",
+"Casazza, Marco",
+100
+],
+[
+"creator",
+"Barone, Fabrizio",
+6
+]
+],
+"found": 107
+},
+"10.34847/nkl.dfffz1tg": {
+"title": "Sondages et datations OSL-PD en South-Hams (Devon)_Rapport",
+"level": 1,
+"edges": [
+[
+"related",
+"IsSupplementTo",
+"10.34847/nkl.5402590d"
+],
+[
+"creator",
+"Kinnaird, Tim",
+4
+],
+[
+"creator",
+"Turner, Sam",
+9
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 214
+},
+"10.5281/zenodo.21033970": {
+"title": "Remote Sensing Data Udhruh Roman fortress, Jordan",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.21033971"
+],
+[
+"creator",
+"van der Kraan, Gunnar",
+4
+]
+],
+"found": 5
+},
+"10.5281/zenodo.14251195": {
+"title": "Location and information files",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14251196"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14292453"
+],
+[
+"creator",
+"Chmielowski, Riia",
+7
+]
+],
+"found": 9
+},
+"10.5281/zenodo.12570128": {
+"title": "Compendium of R code and data for Mycenaean roads in the Peloponnese, Greece: least-cost path modelling using R and Move",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.12570129"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14312232"
+],
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.14743792"
+],
+[
+"creator",
+"Nuttall, Christopher",
+9
+],
+[
+"creator",
+"Kovačević, Jovan",
+4
+]
+],
+"found": 16
+},
+"10.34847/nkl.3c69bmtb": {
+"title": "Chronologie : Monde romain-byzantin de la fondation de Rome à la chute de Constantinople",
+"level": 1,
+"edges": [
+[
+"related",
+"IsRequiredBy",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"creator",
+"Scholtus, Lizzie",
+28
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 253
+},
+"10.34847/nkl.ec11io3s": {
+"title": "Alésia_t___ELT_1",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"Letellier-Taillefer, Eloïse",
+0
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 201
+},
+"10.34847/nkl.d14c40y4": {
+"title": "B@sic_3_39_2. Le camp de Carnuntum",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"Gugl, Christian",
+1
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 202
+},
+"10.34847/nkl.9fc201h1": {
+"title": "Latrines romaines de Xanten",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 201
+},
+"10.34847/nkl.ad1bwler": {
+"title": "Alba Helviorum maquette du forum",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 225
+},
+"10.34847/nkl.cdca743t": {
+"title": "Alba Helviorum Cardo maximus base des pilastres",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 225
+},
+"10.34847/nkl.f2fd40ij": {
+"title": "Alba Helviorum vue aérienne",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 225
+},
+"10.34847/nkl.7ce2t604": {
+"title": "Alba Helviorum - Cardo maximus",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 225
+},
+"10.34847/nkl.df00wjm9": {
+"title": "Lugdunum-Convenarum vue aérienne",
+"level": 1,
+"edges": [
+[
+"related",
+"Documents",
+"10.34847/nkl.4678112k"
+],
+[
+"creator",
+"JULLIEN, Philippe",
+24
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 225
+},
+"10.5281/zenodo.17571649": {
+"title": "Isotopic Dataset to: Depaermentier, MLC, Kempf, M, Motuzaitė Matuzevičiūtė, G. \"Environmentally adjusted δ13C thresholds",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.17571650"
+],
+[
+"creator",
+"Depaermentier, Margaux L. C.",
+11
+]
+],
+"found": 12
+},
+"10.5281/zenodo.19570041": {
+"title": "HiRoN-PL: High-Speed Road Network Vector Data with Construction Year Attribution for Poland (1936-2023)",
+"level": 1,
+"edges": [
+[
+"related",
+"IsVersionOf",
+"10.5281/zenodo.16536448"
+],
+[
+"creator",
+"Śleszyński, Przemysław",
+12
+],
+[
+"creator",
+"Krasnodębska, Katarzyna",
+4
+]
+],
+"found": 17
+},
+"10.5281/zenodo.18999958": {
+"title": "Fifteen thousand years of bioarchaeological data reveal life history trade-offs among Europe's first farmers – Supplemen",
+"level": 1,
+"edges": [
+[
+"related",
+"HasVersion",
+"10.5281/zenodo.18999959"
+],
+[
+"creator",
+"Parkinson, Eóin",
+3
+]
+],
+"found": 4
+},
+"10.1594/pangaea.963359": {
+"title": "Water chemistry of Lagrangian samplings of Inland Elbe 2023 (MOSES Hydrological Extremes)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kamjunke, Norbert",
+20
+],
+[
+"creator",
+"von Tümpling, Wolf",
+7
+],
+[
+"creator",
+"Hoff, Andrea",
+5
+],
+[
+"creator",
+"Koschorreck, Matthias",
+37
+]
+],
+"found": 69
+},
+"10.1594/pangaea.963358": {
+"title": "Water chemistry of Lagrangian samplings of Inland Elbe 2022 (MOSES Hydrological Extremes)",
+"level": 0,
+"edges": [
+[
+"creator",
+"Kamjunke, Norbert",
+20
+],
+[
+"creator",
+"von Tümpling, Wolf",
+7
+],
+[
+"creator",
+"Hoff, Andrea",
+5
+],
+[
+"creator",
+"Koschorreck, Matthias",
+37
+]
+],
+"found": 69
+},
+"10.34847/nkl.ec493t3m": {
+"title": "Projet Rurland, Bassée, Sites archéologiques",
+"level": 0,
+"edges": [
+[
+"creator",
+"Reddé, Michel",
+100
+],
+[
+"publisher",
+"NAKALA - https://nakala.fr (Huma-Num - CNRS)",
+200
+]
+],
+"found": 300
+}
+}

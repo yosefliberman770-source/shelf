@@ -1,0 +1,45 @@
+{
+ "id": "francemines",
+ "src": "frmines",
+ "public": true,
+ "enabled": true,
+ "title": "French mining concessions since 1810 (Camino mining cadastre, Ministère de la Transition écologique)",
+ "licence": "Licence Ouverte / Etalab Open Licence 2.0",
+ "url": "https://data.europa.eu/data/datasets/5dceb39c634f416d5593c858",
+ "describe": "Mining concessions (iron, coal, lignite, lead, copper, salt, bitumen…) from the national mining cadastre, each placed at its concession area and shown from its grant to its end date. Concessions whose recorded start is 21 April 1810 — the date of the Mining Law under which older concessions were re-registered — have no grant date of their own and are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "france-mining-cadastre/original/camino-titres.csv",
+  "delimiter": ",",
+  "geojsonCol": "geojson"
+ },
+ "keep": {
+  "field": "type",
+  "values": [
+   "concession"
+  ]
+ },
+ "fields": {
+  "id": "id",
+  "name": "nom",
+  "type": [
+   "substances"
+  ],
+  "context": [
+   "departements"
+  ],
+  "kind": "mine"
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "date_debut",
+  "to": "date_fin",
+  "openValues": [
+   "21-04-1810"
+  ]
+ },
+ "datingLabel": "grant and end dates of the concession in the mining cadastre",
+ "dropUndated": true
+}

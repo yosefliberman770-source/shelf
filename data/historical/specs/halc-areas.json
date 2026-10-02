@@ -1,0 +1,117 @@
+{
+ "id": "halc-areas",
+ "src": "halcareas",
+ "public": true,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Historical Atlas of the Low Countries (HALC): counties, duchies and districts c. 1500 (Stapel, DataverseNL)",
+ "licence": "CC BY-SA 4.0",
+ "url": "https://doi.org/10.34894/BTKFHV",
+ "describe": "Territorial units of the Low Countries as reconstructed for c. 1500, merged from HALC's locality polygons: counties, duchies and prince-bishoprics, and their districts. Where rule over a locality was divided or contested, the source lists several holders; it is drawn with the first.",
+ "layers": [
+  "historical-units"
+ ],
+ "read": {
+  "path": "halc-low-countries/original/HALC 1500.gpkg",
+  "layer": "HALC 1500"
+ },
+ "keep": {
+  "field": "TYPE",
+  "values": [
+   "0",
+   "1",
+   "2"
+  ]
+ },
+ "names": {
+  "ADM1": {
+   "AM": "Amiens",
+   "AR": "Artois",
+   "AU": "Auxerre",
+   "BA": "Bar",
+   "BE": "Bentheim",
+   "BX": "Berg",
+   "BL": "Bouillon",
+   "BG": "Boulogne",
+   "BR": "Brabant",
+   "BU": "Buren",
+   "BD": "Burgundy",
+   "CA": "Cambrai",
+   "CH": "Charolais",
+   "CC": "Château-Chinon",
+   "CL": "Cleves",
+   "KO": "Cologne",
+   "CU": "Culemborg",
+   "DA": "Dalhem",
+   "DR": "Drenthe",
+   "EF": "East Frisia",
+   "EU": "Eu",
+   "FL": "Flanders",
+   "FC": "Franche-Comté",
+   "FS": "Frisia",
+   "GR": "Groningen",
+   "GE": "Guelders",
+   "HA": "Hainaut",
+   "HT": "Hertogenrade",
+   "HO": "Holland",
+   "HR": "Horn",
+   "JU": "Jülich",
+   "LG": "Liège",
+   "LM": "Limburg",
+   "LI": "Lingen",
+   "LO": "Lorraine",
+   "LU": "Luxembourg",
+   "LL": "Luxeuil",
+   "MC": "Mâcon",
+   "MA": "Mark",
+   "ME": "Mechelen",
+   "MZ": "Metz",
+   "MO": "Moers",
+   "MB": "Montbéliard",
+   "MU": "Münster",
+   "NA": "Namur",
+   "NE": "Nevers",
+   "OL": "Oldenburg",
+   "OS": "Osnabrück",
+   "OV": "Overijssel",
+   "PO": "Ponthieu",
+   "PR": "Prüm",
+   "RE": "Rethel",
+   "ST": "Stavelot-Malmédy",
+   "TB": "Tecklenburg",
+   "TR": "Thérouanne",
+   "TH": "Thorn",
+   "TL": "Toul",
+   "TO": "Tournai",
+   "TE": "Trier",
+   "UT": "Utrecht",
+   "VA": "Valkenburg",
+   "VD": "Verdun",
+   "VE": "Vermandois",
+   "VI": "Vianen",
+   "ZE": "Zeeland",
+   "XX": "Small souvereign regions",
+   "EN": "England",
+   "FR": "France"
+  }
+ },
+ "dissolve": [
+  {
+   "field": "ADM1",
+   "level": "county / duchy / prince-bishopric",
+   "minzoom": 3,
+   "simplify": 0.002
+  },
+  {
+   "field": "ADM2",
+   "level": "district",
+   "minzoom": 6,
+   "simplify": 0.0008
+  }
+ ],
+ "dating": {
+  "mode": "snapshot",
+  "year": 1500,
+  "label": "territorial units as reconstructed for c. 1500 (HALC)"
+ }
+}

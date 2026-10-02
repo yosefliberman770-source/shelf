@@ -1,5 +1,5 @@
 {
- "version": "2026-10-01",
+ "version": "2026-10-02",
  "datasets": [
   {
    "id": "pleiades",
@@ -17,7 +17,7 @@
     "../world/tiles/pleiades.pmtiles"
    ],
    "notes": "Dates are broad archaeological periods (e.g. Roman = 30 BCE–300 CE), not founding dates. Pleiades does not record settlement size.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "places": 20340,
     "lines": 612,
@@ -41,7 +41,7 @@
     "awmc-snapshots.json"
    ],
    "notes": "Road and shoreline dates are Barrington periods. Inland water is modern-based (OSM). Dates for non-Roman snapshots are the conventional dates of the extents their titles name.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "roads": 3165,
     "shoreline": 9901,
@@ -63,7 +63,7 @@
     "cliopatria/names.json"
    ],
    "notes": "One scholarly version of each polity’s territory; borders were rarely this sharp. Kingdom/empire/republic types come from Wikidata where available.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "polities": 43252,
     "classified": 12211,
@@ -86,7 +86,7 @@
     "wikidata-wars.json"
    ],
    "notes": "Battles, sieges and campaigns with a location and a date. Crowd-sourced; check important facts.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "events": 11670,
     "wars": 888
@@ -106,7 +106,7 @@
     "ne-rivers.json"
    ],
    "notes": "Modern coastline and modern river courses. Rivers and coasts have moved since antiquity; ancient coastlines come from AWMC.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "land": 1420,
     "rivers": 1201
@@ -125,7 +125,7 @@
     "../world/tiles/hydrorivers.pmtiles"
    ],
    "notes": "Modern river network of Europe with upstream area and discharge, used for the zoomed-out base map (to zoom 8). Lines are derived from a 500 m elevation model; rivers have moved since antiquity.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "segments": 136290,
     "tiles": 1827,
@@ -145,7 +145,7 @@
     "physical-change.json"
    ],
    "notes": "Outlines of Dutch polders (or the municipalities that are the polder), fetched via Nominatim. The dates of draining and of the lakes’ extent are Shelf’s, from standard histories, and are approximate.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "features": 11
    }
@@ -164,25 +164,70 @@
     "../world/tiles/osm-water.pmtiles"
    ],
    "notes": "Today’s land and sea of Europe, simplified, to zoom 8. Drawn only when the detailed OpenFreeMap tiles cannot load.",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "land": {
      "land": {
-      "polygons": 16006,
-      "tiles": 3775,
-      "rejected": []
+      "land": {
+       "land": {
+        "land": {
+         "land": {
+          "land": {
+           "land": {
+            "land": {
+             "land": {
+              "land": {
+               "land": {
+                "land": {
+                 "land": {
+                  "land": {
+                   "land": {
+                    "land": {
+                     "polygons": 16006,
+                     "tiles": 3775,
+                     "rejected": []
+                    },
+                    "sea": {
+                     "polygons": 1313,
+                     "tiles": 3896,
+                     "rejected": []
+                    }
+                   },
+                   "sea": {
+                    "polygons": 1313,
+                    "tiles": 3896,
+                    "rejected": []
+                   }
+                  },
+                  "sea": null
+                 },
+                 "sea": null
+                },
+                "sea": null
+               },
+               "sea": null
+              },
+              "sea": null
+             },
+             "sea": null
+            },
+            "sea": null
+           },
+           "sea": null
+          },
+          "sea": null
+         },
+         "sea": null
+        },
+        "sea": null
+       },
+       "sea": null
+      },
+      "sea": null
      },
-     "sea": {
-      "polygons": 1313,
-      "tiles": 3896,
-      "rejected": []
-     }
+     "sea": null
     },
-    "sea": {
-     "polygons": 1313,
-     "tiles": 3896,
-     "rejected": []
-    }
+    "sea": null
    }
   },
   {
@@ -198,7 +243,7 @@
     "../world/tiles/reservoirs.pmtiles"
    ],
    "notes": "Reservoirs of Europe, drawn as land before their dam. The year is the earliest inception/opening date of a Wikidata dam or reservoir within 3 km of the outlet; reservoirs with none are drawn as land before 1800 (assumed).",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "reservoirs": 1411,
     "dated": 276,
@@ -219,7 +264,7 @@
     "physical-labels.json"
    ],
    "notes": "Today’s names of mountain ranges, plateaus, plains and deltas, and of peaks with a recorded prominence of at least 300 m (named from zoom 7 for 2,000 m to zoom 10 for 300 m).",
-   "retrieved": "2026-10-01",
+   "retrieved": "2026-10-02",
    "counts": {
     "regions": 92,
     "peaks": 2941

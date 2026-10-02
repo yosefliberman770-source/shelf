@@ -1,0 +1,37 @@
+{
+ "id": "lorsch-codex",
+ "src": "lorsch",
+ "public": true,
+ "enabled": true,
+ "groupBy": "place",
+ "groupFirstAttested": true,
+ "title": "Places in the Lorsch Codex (Codex Laureshamensis), georeferenced (UB Heidelberg)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.11588/DATA/10063",
+ "describe": "Villages and towns named in the charters copied into the Lorsch Codex (8th–12th c.), each shown from the year of its earliest charter — a first attestation, not a founding.",
+ "layers": [
+  "gazetteer-settlements"
+ ],
+ "read": {
+  "path": "lorsch-codex/original/LorscherCodex.kml"
+ },
+ "fields": {
+  "id": "Urkundennummer",
+  "name": "Ortsname",
+  "kind": "settlement",
+  "type": [
+   "Quellennamen"
+  ],
+  "context": [
+   "Quellennamen"
+  ]
+ },
+ "groupType": "place named in a Lorsch charter",
+ "groupNoun": "Lorsch Codex charter",
+ "dating": {
+  "mode": "fields",
+  "from": "Jahreszahl",
+  "to": "Jahreszahl"
+ },
+ "datingLabel": "charter year"
+}

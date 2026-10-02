@@ -1,0 +1,14 @@
+SELECT ?i ?prop ?v ?y WHERE { VALUES ?i { wd:Q… }
+  { ?i wdt:P2348 ?v . BIND("period" AS ?prop) }
+  UNION { ?i wdt:P149 ?v . BIND("style" AS ?prop) }
+  UNION { ?i wdt:P2596 ?v . BIND("culture" AS ?prop) }
+  UNION { ?i p:P793 ?s . ?s ps:P793 ?v . { ?s pq:P585 ?d } UNION { ?s pq:P580 ?d } BIND(YEAR(?d) AS ?y) BIND("event" AS ?prop) }
+  UNION { ?i wdt:P1619 ?d . BIND(YEAR(?d) AS ?y) BIND("opening" AS ?prop) }
+  UNION { ?i p:P31 ?s . ?s ps:P31 ?v . ?s pq:P580 ?d . BIND(YEAR(?d) AS ?y) BIND("instance-start" AS ?prop) }
+}
+
+SELECT ?v ?a ?b WHERE { VALUES ?v { wd:Q… }
+  OPTIONAL { ?v wdt:P580 ?s1 } OPTIONAL { ?v wdt:P582 ?e1 } OPTIONAL { ?v wdt:P571 ?s2 } OPTIONAL { ?v wdt:P576 ?e2 }
+  OPTIONAL { ?v wdt:P2348 ?p . OPTIONAL { ?p wdt:P580 ?s3 } OPTIONAL { ?p wdt:P582 ?e3 } }
+  BIND(YEAR(COALESCE(?s1, ?s2, ?s3)) AS ?a) BIND(YEAR(COALESCE(?e1, ?e2, ?e3)) AS ?b)
+}

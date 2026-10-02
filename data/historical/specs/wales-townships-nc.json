@@ -1,0 +1,44 @@
+{
+ "id": "wales-townships-nc",
+ "src": "walestwpnc",
+ "public": false,
+ "enabled": true,
+ "title": "Townships of Wales before c. 1840 — records the dataset marks Non-Commercial Government Licence or leaves without a licence (Welsh historic boundaries, RCAHMW / ArcGIS 2025)",
+ "licence": "Non-Commercial Government Licence v2.0 or none stated (per record) — private pack",
+ "describe": "The remaining township records of the same dataset, shown the same way (each over the year(s) of its own source), kept in the private pack because their own licence field is non-commercial or empty.",
+ "keep": [
+  {
+   "field": "Copyright",
+   "notValues": [
+    "Open Government Licence v.3.0",
+    "Open Government License v.3.0"
+   ]
+  }
+ ],
+ "geometry": "polygons",
+ "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_pre_1840/FeatureServer/0",
+ "layers": [
+  "historical-units"
+ ],
+ "read": {
+  "path": "wales-units/original/townships_pre1840.geojson"
+ },
+ "dissolve": [
+  {
+   "field": [
+    "County",
+    "Parish",
+    "Township"
+   ],
+   "nameField": "Township",
+   "level": "township",
+   "minzoom": 9,
+   "simplify": 0.0003
+  }
+ ],
+ "dating": {
+  "mode": "fields",
+  "field": "SurveyDate",
+  "label": "township boundary as recorded in its source"
+ }
+}

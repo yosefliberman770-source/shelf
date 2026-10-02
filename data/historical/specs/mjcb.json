@@ -1,0 +1,42 @@
+{
+ "id": "mjcb",
+ "src": "mjcb",
+ "public": true,
+ "enabled": true,
+ "groupBy": "place",
+ "title": "Mapping Jewish Communities of the Byzantine Empire (MJCB; Holo, de Lange et al.)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.7575860",
+ "describe": "Places where Jewish communities in the Byzantine Empire are attested, with the dated evidence (inscriptions, texts, documents) for each.",
+ "layers": [
+  "religious-houses"
+ ],
+ "read": {
+  "path": "mjcb-byzantine-jewry/original/mjcb_attribute.csv",
+  "encoding": "utf-16",
+  "delimiter": "\t",
+  "lon": "X",
+  "lat": "Y",
+  "join": {
+   "path": "mjcb-byzantine-jewry/original/mjcb_gazetteer.csv",
+   "key": "id",
+   "on": "Gazetteer_ID",
+   "delimiter": ","
+  },
+  "wkbHex": "postgis"
+ },
+ "fields": {
+  "id": "Gazetteer_ID",
+  "name": "primary_toponym",
+  "kind": "church",
+  "type": [
+   "Type of evidence"
+  ]
+ },
+ "groupType": "Jewish community (attested)",
+ "dating": {
+  "mode": "text",
+  "field": "Years"
+ },
+ "datingLabel": "years of the evidence"
+}

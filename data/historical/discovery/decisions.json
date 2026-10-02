@@ -1,0 +1,1715 @@
+{
+ "_comment": "Outcome of the 2026-10 discovery pass for inspected candidates. 'match' lists exact lower-case fragments of a candidate's DOI or URL (never a bare word of a title). A decision no harvested candidate matches is added to the inventory as a 'direct-search' candidate. inventory.py applies these as the candidate's status.",
+ "decisions": [
+  {
+   "title": "Canmore — National Record of the Historic Environment (points)",
+   "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+   "match": [
+    "canmore_points.zip",
+    "property:p718"
+   ],
+   "status": "integrated",
+   "dataset": "canmore-scotland",
+   "region": "Scotland",
+   "note": "174,054 records dated from ScAPA periods, centuries or years; undated generic records stay out of the index.",
+   "state": "integrated"
+  },
+  {
+   "title": "Archaeological Survey of Ireland — Sites and Monuments Record",
+   "url": "https://www.archaeology.ie/",
+   "match": [
+    "archaeology.ie"
+   ],
+   "status": "integrated",
+   "dataset": "ireland-smr",
+   "region": "Ireland",
+   "note": "56,074 records; dated only where the monument class itself names a period (3,575).",
+   "state": "integrated"
+  },
+  {
+   "title": "Rejestr zabytków nieruchomych (NID, dane.gov.pl)",
+   "url": "https://dane.gov.pl/",
+   "match": [
+    "dane.gov.pl/pl/dataset/1130"
+   ],
+   "status": "integrated",
+   "dataset": "poland-nid-register",
+   "region": "Poland",
+   "note": "Construction windows parsed from 'chronologia'; placed at locality level (the register has no coordinates).",
+   "state": "integrated"
+  },
+  {
+   "title": "Index Villaris 1680 (John Adams), digital edition",
+   "match": [
+    "indexvillaris"
+   ],
+   "status": "integrated",
+   "dataset": "index-villaris-1680",
+   "region": "England",
+   "note": "Snapshot 1680 — listed in that year; beginning and end unknown.",
+   "state": "integrated"
+  },
+  {
+   "title": "Ottoman natural features and settlements gazetteer (NFS)",
+   "match": [],
+   "status": "integrated",
+   "dataset": "ottoman-nfs-gazetteer",
+   "region": "Balkans, Anatolia",
+   "note": "Snapshot per tax register (hijri → CE).",
+   "state": "integrated"
+  },
+  {
+   "title": "Gazetteer_Generalkarte von Mitteleuropa",
+   "match": [
+    "10.5281/zenodo.8409506"
+   ],
+   "status": "integrated",
+   "dataset": "generalkarte-gazetteer",
+   "region": "Central & SE Europe",
+   "note": "Envelope 1880–1918; lat/lon columns swapped in the source, corrected.",
+   "state": "integrated"
+  },
+  {
+   "title": "The 18th century Cassini roads and cities dataset",
+   "match": [
+    "10.7910/dvn/28674"
+   ],
+   "status": "integrated",
+   "dataset": "cassini-roads-cities",
+   "region": "France",
+   "note": "Places and roads, envelope 1756–1815.",
+   "state": "integrated"
+  },
+  {
+   "title": "Settlements … on the Lutsch map of Transylvania (1751)",
+   "match": [
+    "10.7910/dvn/etorpu"
+   ],
+   "status": "integrated",
+   "dataset": "lutsch-transylvania-1751",
+   "region": "Romania",
+   "note": "Snapshot 1751.",
+   "state": "integrated"
+  },
+  {
+   "title": "LIST — Latin Inscriptions in Space and Time v1.2",
+   "match": [
+    "latin inscriptions in space"
+   ],
+   "status": "integrated",
+   "dataset": "list-latin-inscriptions",
+   "region": "Roman Empire",
+   "note": "Per find-spot and century, only inscriptions dated to ≤150 years.",
+   "state": "integrated"
+  },
+  {
+   "title": "Register nepremične kulturne dediščine (RKD), Slovenia",
+   "url": "https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine",
+   "match": [
+    "6b5bf6d9-d3bd-4231-95ac-3863b6d70c56",
+    "register-nepremicne-kulturne-dediscine"
+   ],
+   "status": "integrated",
+   "dataset": "slovenia-rkd-register",
+   "region": "Slovenia",
+   "note": "Register dating per record: construction period for buildings, period of use for sites.",
+   "state": "integrated"
+  },
+  {
+   "title": "Engel Pál, Magyarország a középkor végén (2020)",
+   "match": [],
+   "status": "blocked",
+   "dataset": "engel-hungary",
+   "region": "Hungary",
+   "note": "Database encrypted inside a Windows GIS program; needs the institute's cooperation. Cycle 4: the user's upload is the same Engel2020.zip already in the vault (same checksum).",
+   "state": "blocked"
+  },
+  {
+   "title": "Euratlas Periodical Historical Atlas (Harvard Geospatial Library copy)",
+   "match": [
+    "harvard-euratlas",
+    "euratlas"
+   ],
+   "status": "blocked",
+   "region": "Europe",
+   "note": "Harvard copy is Restricted; a commercial licence exists — not bought without the user.",
+   "state": "blocked"
+  },
+  {
+   "title": "Epigraphic Database Heidelberg (site)",
+   "url": "https://edh.ub.uni-heidelberg.de/",
+   "match": [
+    "edh.ub.uni-heidelberg.de"
+   ],
+   "status": "evaluated",
+   "region": "Roman Empire",
+   "note": "Site behind a bot wall; its content reached through LIST (EDH + EDCS).",
+   "state": "duplicate"
+  },
+  {
+   "title": "Main roads and mountain paths on the Lutsch map of Transylvania (1751)",
+   "match": [
+    "10.7910/dvn/2hlxc3"
+   ],
+   "status": "integrated",
+   "dataset": "lutsch-roads-1751",
+   "region": "Romania",
+   "note": "43 roads/paths, snapshot 1751, in the dated-map roads layer.",
+   "state": "integrated"
+  },
+  {
+   "title": "Latvia: list of state-protected immovable monuments",
+   "url": "https://data.gov.lv/dati/dataset/valsts-aizsargajamo-nekustamo-piemineklu-saraksts",
+   "match": [
+    "valsts-aizsargajamo-nekustamo-piemineklu-saraksts"
+   ],
+   "status": "integrated",
+   "dataset": "latvia-monuments",
+   "region": "Latvia",
+   "note": "List dating per record (centuries, years, archaeological periods); placed at town/village/parish via GeoNames (no coordinates in the list). CC0.",
+   "state": "integrated"
+  },
+  {
+   "title": "Croatia: Register of cultural goods",
+   "url": "https://data.gov.hr/ckan/dataset/registar-kulturnih-dobara",
+   "match": [
+    "c0410787-33b1-4299-b92c-9bbf38dd8bbf",
+    "registar-kulturnih-dobara"
+   ],
+   "status": "integrated",
+   "dataset": "croatia-cultural-goods",
+   "region": "Croatia",
+   "note": "Register dating per record ('A do B'); placed at the named settlement via GeoNames. Open Licence (HR).",
+   "state": "integrated"
+  },
+  {
+   "title": "Czechia: Památkový katalog open data (KP / NKP lists)",
+   "url": "https://www.pamatkovykatalog.cz/opendata/npu_opendata_KP.csv",
+   "match": [
+    "pamatkovykatalog.cz/opendata"
+   ],
+   "status": "evaluated",
+   "region": "Czechia",
+   "note": "No dating field and no coordinates; dates appear only in free-text annotations — not used, to avoid inventing dates.",
+   "state": "insufficient-temporal"
+  },
+  {
+   "title": "Portugal: SRUP Imóveis Classificados (DGT WFS)",
+   "url": "https://dados.gov.pt/pt/datasets/srup-imoveis-classificados/",
+   "match": [
+    "srup-imoveis-classificados"
+   ],
+   "status": "evaluated",
+   "region": "Portugal",
+   "note": "Coordinates but only the date of the protection decree, not of the building — no usable historical dating.",
+   "state": "insufficient-temporal"
+  },
+  {
+   "title": "Estonia (register.muinas.ee) and Lithuania (kvr.kpd.lt) heritage registers",
+   "match": [
+    "register.muinas.ee",
+    "kvr.kpd.lt"
+   ],
+   "status": "blocked",
+   "region": "Estonia, Lithuania",
+   "note": "Bot wall (403) from this machine; no bulk dataset found on andmed.eesti.ee or data.gov.lt. Cycle 2 retry (2026-10-01): Estonia reached through the Land Board WFS (gsavalik.envir.ee muinsuskaitse:kpo_malestised_241, 12,494 monuments with positions) — but the service carries no dating; dates exist only on the bot-walled register pages. Lithuania: geoportal.lt CSW 404, data.gov.lt API and get.data.gov.lt behind the same block page. Both stay blocked for dates; queued for a Wikidata cross-link (Estonian monument ID P2948 / Lithuanian KVR ID) as an alternative route. Cycle 3 retry: register.muinas.ee and kvr.kpd.lt both behind a Cloudflare challenge (403) on every path — a deliberate block, left to a browser check by the user (task 9).",
+   "state": "blocked"
+  },
+  {
+   "title": "German Historical GIS (HGIS Germany) boundaries 1820–1914 (Harvard Geospatial Library)",
+   "match": [
+    "harvard-ghgis"
+   ],
+   "status": "integrated",
+   "region": "Germany",
+   "note": "1820 states (41) and Prussian provinces (10) with inhabitants, downloaded by the user (2026-10-01); non-commercial academic → private pack. Other HGIS Germany years (1830–1914) still to fetch.",
+   "state": "integrated",
+   "dataset": "germany-1820-ghgis"
+  },
+  {
+   "title": "Gazetteer_Russian-3verst_map (Boykov) — Balkans",
+   "match": [
+    "10.5281/zenodo.8411078",
+    "10.5281/zenodo.8411077"
+   ],
+   "status": "integrated",
+   "dataset": "russian-3verst-gazetteer",
+   "region": "Bulgaria",
+   "note": "Envelope 1877–1879 (survey); lat/lon columns exchanged in the source, corrected.",
+   "state": "integrated"
+  },
+  {
+   "title": "RoHGIS. Settlements in the Kingdom of Romania (1904-1913)",
+   "match": [
+    "10.5281/zenodo.15613857"
+   ],
+   "status": "integrated",
+   "dataset": "rohgis-settlements-1904-1913",
+   "region": "Romania",
+   "note": "Every settlement existing 1904–1913.",
+   "state": "integrated"
+  },
+  {
+   "title": "Rise and fall of transhumance in Iceland: Shielings and related sites (TransIce)",
+   "match": [
+    "10.5281/zenodo.17537206"
+   ],
+   "status": "integrated",
+   "dataset": "transice-iceland",
+   "region": "Iceland",
+   "note": "Farms: 1703 snapshot (Jarðabók); shielings: first mention / abandonment years.",
+   "state": "integrated"
+  },
+  {
+   "title": "DISSILOC: places in medieval inquisition registers",
+   "match": [
+    "10.5281/zenodo.21031406"
+   ],
+   "status": "integrated",
+   "dataset": "dissiloc-inquisition-places",
+   "region": "France, Italy, England, Bohemia",
+   "note": "Attested in register years taken from each edition title; Stettin register undated.",
+   "state": "integrated"
+  },
+  {
+   "title": "Sweden: older geometrical maps 1630–1655",
+   "match": [
+    "10.5281/zenodo.15121019"
+   ],
+   "status": "integrated",
+   "dataset": "sweden-geometric-maps-1630-1655",
+   "region": "Sweden",
+   "note": "Settlement units, churches, mills drawn on the 1630–1655 maps; shown for that survey window.",
+   "state": "integrated"
+  },
+  {
+   "title": "Sweden: younger geometrical maps 1680–1700",
+   "match": [
+    "10.5281/zenodo.15118501"
+   ],
+   "status": "acquired",
+   "dataset": "sweden-geometric-maps-1680-1700",
+   "region": "Sweden",
+   "note": "HTML transcriptions without coordinates — would need linking to places first.",
+   "state": "acquired"
+  },
+  {
+   "title": "Historical Place Gazetteer and Mine Register, Tyrol 15th–16th c.",
+   "match": [
+    "10.5281/zenodo.6368451"
+   ],
+   "status": "integrated",
+   "dataset": "tyrol-mining-gazetteer",
+   "region": "Austria",
+   "note": "Attested in document years (Hs. 37 1460–1463; Hs. 1587 c. 1515).",
+   "state": "integrated"
+  },
+  {
+   "title": "Ottoman Gazetteer (Hanley), incl. 1530 place names",
+   "match": [
+    "10.5281/zenodo.4660216"
+   ],
+   "status": "evaluated",
+   "region": "Ottoman Empire",
+   "note": "1530 register names without coordinates; CC BY-NC. Geocoding Ottoman names to modern places would be guesswork.",
+   "state": "insufficient-spatial"
+  },
+  {
+   "title": "World Historical Gazetteer contributed datasets (e.g. List of Russian towns late 14c, Benjamin of Tudela, Heritage Gazetteer of Libya)",
+   "match": [
+    "whgazetteer.org/datasets"
+   ],
+   "status": "blocked",
+   "region": "various",
+   "note": "WHG now answers 'Bot access denied'; no WHG token in this environment. Cycle 3 retry: the public API lists 102 datasets but still answers \"Bot access denied\" to automated clients (it only answers requests that claim to be a browser). Not circumvented: the legitimate route is a WHG API token (user task 3, env WHG_API_TOKEN).",
+   "state": "blocked"
+  },
+  {
+   "title": "Syria town database (2004 census)",
+   "match": [
+    "10.7910/dvn/yqq07l"
+   ],
+   "status": "evaluated",
+   "region": "Levant",
+   "note": "Modern census — not historical.",
+   "state": "irrelevant"
+  },
+  {
+   "title": "Replication Data for: Warfare and Welfare in Colonial Algeria",
+   "match": [
+    "10.7910/dvn/na5vf4"
+   ],
+   "status": "evaluated",
+   "region": "Maghreb",
+   "note": "Aggregate tables, no places.",
+   "state": "insufficient-spatial"
+  },
+  {
+   "title": "Portugal population 1527–1864 (Palma, Reis, Zhang)",
+   "match": [
+    "10.5281/zenodo.8010054"
+   ],
+   "status": "evaluated",
+   "region": "Portugal",
+   "note": "Regional population tables; would need historical region polygons.",
+   "state": "insufficient-spatial"
+  },
+  {
+   "title": "Public georeferenced historical maps (Harvard Geospatial Library and other OpenGeoMetadata catalogues)",
+   "match": [],
+   "status": "integrated",
+   "dataset": "public/world/maps/georef-index.json",
+   "region": "Europe",
+   "note": "1,052 public georeferenced scans indexed (year, extent, WMS) and offered as overlays in the map archive.",
+   "state": "integrated"
+  },
+  {
+   "title": "Arkas 2.0 — archaeological sites of Slovenia (ZRC SAZU)",
+   "match": [
+    "10.5281/zenodo.7820725"
+   ],
+   "status": "integrated",
+   "dataset": "arkas-slovenia",
+   "region": "Slovenia",
+   "note": "Each site's own dating in years (Leto_od/Leto_do); 3,684 sites in 1–1914.",
+   "state": "integrated"
+  },
+  {
+   "title": "Database of northeastern African archaeological and heritage sites (Marmarica)",
+   "match": [
+    "10.5281/zenodo.7678852"
+   ],
+   "status": "evaluated",
+   "region": "Egypt, Libya",
+   "note": "3,355 sites but 3,214 'Undetermined'; the ~190 dated ones carry only named periods without years.",
+   "state": "insufficient-temporal"
+  },
+  {
+   "title": "Slovakia: Atlas of the Landscape monuments layers (SAŽP WFS)",
+   "match": [
+    "geos.sazp.sk"
+   ],
+   "status": "evaluated",
+   "region": "Slovakia",
+   "note": "Points with category only — no names, no dates.",
+   "state": "insufficient-temporal"
+  },
+  {
+   "title": "ARIADNE portal — European archaeology catalogue (records with PeriodO-linked periods)",
+   "url": "https://portal.ariadne-infrastructure.eu/",
+   "match": [
+    "portal.ariadne-infrastructure.eu"
+   ],
+   "status": "integrated",
+   "dataset": "ariadne",
+   "region": "Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others",
+   "note": "Harvested per country (API: 50/page, 10,000/query). Hungary, above the window, harvested by one text query per GeoNames municipality/town name (8,855 names in 3 resumable slices; completed 2026-10-01). Each phase keeps its own period; records without a point placed at their municipality only when the name is unique (2,638 left out). 63,354 dated records in the pack. Provider licences vary (e.g. Ísleif CC BY-NC-ND) → private pack.",
+   "state": "integrated"
+  },
+  {
+   "title": "Atlas of the Latin Church in the Polish-Lithuanian Commonwealth c. 1772 (IHGK Lublin)",
+   "match": [
+    "10.5281/zenodo.10912495"
+   ],
+   "status": "integrated",
+   "dataset": "latin-church-1772",
+   "region": "Poland, Lithuania, Belarus, Ukraine, Latvia",
+   "note": "7,715 churches and 1,327 religious houses as a 1772 snapshot; EPSG:3857 coordinates converted; CC BY-NC → private pack.",
+   "state": "integrated"
+  },
+  {
+   "title": "Archaeological sites of wine and olive oil production in Hispania (CSUC Dataverse)",
+   "match": [
+    "10.34810/data2461"
+   ],
+   "status": "acquired",
+   "region": "Spain, Portugal",
+   "note": "Downloaded by the user (2026-10-01), CC BY 4.0, now in the vault. 551 Roman wine/oil production sites of Hispania, but no coordinates (municipality only) and 373 with 'Indeterminada' chronology: not drawn yet; candidate for municipality-level placement, marked approximate.",
+   "state": "acquired"
+  },
+  {
+   "title": "Historical Urban Population 3700 BC – AD 2000 (Reba, Reitsma & Seto; Harvard Dataverse copy)",
+   "match": [
+    "10.7910/dvn/lmcqgx"
+   ],
+   "status": "integrated",
+   "region": "Global (incl. Egypt, Maghreb, Levant)",
+   "note": "Downloaded by the user through the guestbook (2026-10-01). CC BY 4.0. 8,377 population estimates for AD 1–1914 shown, each at its own year only (1,975 BC or post-1914 rows not drawn); geocoding rank 3 marked approximate; alternate-name column not used as names (it also holds US state names).",
+   "state": "integrated",
+   "dataset": "urban-population-reba"
+  },
+  {
+   "title": "Stadestér 1.0 — global database of 41,000+ cities",
+   "match": [
+    "10.5281/zenodo.17180328"
+   ],
+   "status": "evaluated",
+   "region": "Global",
+   "note": "Rejected: populations cubic-spline interpolated to annual values — manufactured precision, not source estimates.",
+   "state": "rejected"
+  },
+  {
+   "title": "Mid-19th-century building structures in Galicia and Austrian Silesia (Second Military Survey)",
+   "match": [
+    "10.17632/md8jp9ny9z"
+   ],
+   "status": "integrated",
+   "region": "Poland, Ukraine, Czechia",
+   "note": "1,327,466 buildings (CC BY 4.0) → public building-density layer: counted per 0.01° cell and per survey-sheet years (1837–1841 Austrian Silesia, 1861–1864 Galicia), 52,264 cells, each shown only over its sheet's survey years; 9,192 buildings on undated sheets left out. The 99 districts → public area spec galicia-districts, each a snapshot at its census year (1857/1869) with the census population in its label.",
+   "state": "integrated",
+   "dataset": "galicia-buildings"
+  },
+  {
+   "title": "Archaeological sites in the Trajan's Gate Pass, Bulgaria",
+   "match": [
+    "10.5281/zenodo.17579442"
+   ],
+   "status": "integrated",
+   "region": "Bulgaria",
+   "note": "Inspected 2026-10-01 (tgp.zip, CC BY 4.0, kept in the raw vault): 15 sites (inns, villages, a fortress) dated by century, several marked uncertain (?), plus an undated Ottoman road trace Ihtiman–Plovdiv. Too small to change any coverage cell; not integrated for now.",
+   "state": "integrated"
+  },
+  {
+   "title": "AMCR — Archaeological Map of the Czech Republic (Archeologický informační systém ČR)",
+   "url": "https://api.aiscr.cz/2.0/oai",
+   "match": [
+    "aiscr.cz",
+    "10.60585/"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Czechia",
+   "dataset": "amcr-czechia",
+   "note": "Found by the automated investigation (92 of its document records surfaced as candidates). Open OAI-PMH API, CC BY-NC 4.0 → private pack. 11,042 sites and 236,259 fieldwork events, each split into components with an AMCR period whose years come from its PeriodO-linked vocabulary (e.g. Early Middle Hillfort Period 801–850); 268,599 spatial units (PIAN) with geometry; 18,376 individual finds. Harvest started 2026-10-01 (fetch_oai.py, resumable). Harvest completed 2026-10-01: 69,860 dated phases (private pack); 34,305 restricted records and 184,788 negative units left out."
+  },
+  {
+   "title": "A database for Spondylus gaederopus during the Neolithic of Europe",
+   "match": [
+    "10.5281/zenodo.2840332",
+    "10.5281/zenodo.2840333"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Europe-wide",
+   "note": "Automated investigation 2026-10-01, reviewed: Neolithic artefact finds only — outside 1–1914."
+  },
+  {
+   "title": "Mapping smallpox cases and vaccination efforts in New South Wales",
+   "match": [
+    "10.6084/m9.figshare.29881058"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Australia",
+   "note": "Automated investigation 2026-10-01, reviewed: New South Wales, Australia (matched \"Wales\" in metadata)."
+  },
+  {
+   "title": "Thailand Canonical Administrative-Names Reference",
+   "match": [
+    "10.5281/zenodo.20050035"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Thailand",
+   "note": "Automated investigation 2026-10-01, reviewed: Outside the atlas area."
+  },
+  {
+   "title": "Villages to empire (Assyrian governance)",
+   "match": [
+    "10.5281/zenodo.15111789"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Mesopotamia",
+   "note": "Automated investigation 2026-10-01, reviewed: Northern Mesopotamia, Iron Age — outside the atlas area."
+  },
+  {
+   "title": "Where Went UK Churches: converted churches",
+   "match": [
+    "10.7910/dvn/4an2fl"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "England",
+   "note": "Automated investigation 2026-10-01, reviewed: Dates are modern conversion years, not the churches' history."
+  },
+  {
+   "title": "N Italy Zooarchaeological Dataset",
+   "match": [
+    "10.5281/zenodo.6917159"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Italy",
+   "note": "Automated investigation 2026-10-01, reviewed: Bronze Age faunal assemblages — outside 1–1914."
+  },
+  {
+   "title": "Historical Place Gazetteer and Historical Mine Register, Tyrol (duplicate of integrated)",
+   "match": [
+    "10.5281/zenodo.6275762"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Austria",
+   "note": "Automated investigation 2026-10-01, reviewed: Already integrated (tyrolmine)."
+  },
+  {
+   "title": "Ottoman NFS gazetteer population file (duplicate of integrated)",
+   "match": [
+    "10.5281/zenodo.7351936"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Balkans/Anatolia",
+   "note": "Automated investigation 2026-10-01, reviewed: Already integrated (ottomannfs)."
+  },
+  {
+   "title": "Bosworth Islamic Dynasties (Islamic Civilization Atlas Dataset) — same data as the Islamic History Atlas v7.5",
+   "match": [
+    "10.5281/zenodo.18818238",
+    "10.5281/zenodo.18818237"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Levant/Maghreb/Anatolia",
+   "note": "Automated investigation 2026-10-01, reviewed: Same table as Atlas of Islamic History v7.5.0.0 (zenodo.19183844)."
+  },
+  {
+   "title": "İslam Tarih Atlası / Atlas of Islamic History (v7.x)",
+   "match": [
+    "10.5281/zenodo.19183844",
+    "10.5281/zenodo.19312622"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Levant, Egypt & Maghreb; Anatolia",
+   "note": "Data inspected 2026-10-01: a derived web-app compilation. Its Yāqūt layer is geocoded by an AI model (\"enriched via Claude API\"), narratives are AI-completed, and its mint list mixes ancient and modern mints (e.g. Greek Haluntium, modern A Coruña) under \"Islamic mints\". Not used as a source; its underlying sources are followed instead (Bosworth, Nomisma, Hamburg Islamic Coin Corpus, al-Thurayyā — the last already integrated)."
+  },
+  {
+   "title": "Hamburg Islamic Coin Corpus (HICC) — dated emissions per mint",
+   "url": "https://www.aai.uni-hamburg.de/voror/forschung/numismatik.html",
+   "match": [
+    "www.aai.uni-hamburg.de"
+   ],
+   "status": "discovered",
+   "state": "catalogue-only",
+   "region": "Mediterranean",
+   "note": "Lead from the discovery chain of the Islamic History Atlas: coins with mint and year would date each mint's activity from emissions. Not yet inspected."
+  },
+  {
+   "title": "Nomisma.org mints (linked open data, CC BY)",
+   "url": "https://nomisma.org/",
+   "match": [
+    "nomisma.org"
+   ],
+   "status": "discovered",
+   "state": "catalogue-only",
+   "region": "Mediterranean",
+   "note": "Lead from the same chain: mint places with coordinates and identifiers; dating would come from coin corpora (OCRE, CRRO, HICC). Not yet inspected."
+  },
+  {
+   "title": "Zbiva, Early Medieval Data Set for the Eastern Alps (subset)",
+   "match": [
+    "10.5281/zenodo.5761811"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Slovenia, Austria, Croatia, NE Italy",
+   "note": "1,104 sites via spec (generic loader): own earliest–latest dates, dating method and confidence kept; names as published (Š/Č/Ž lost in the source files, not restored by guess). Chain lead: the full online Zbiva database (zbiva.zrc-sazu.si).",
+   "dataset": "zbiva"
+  },
+  {
+   "title": "VIA-TARIQ: Medieval road system in the Levant (roads and sites)",
+   "match": [
+    "10.5281/zenodo.21981430"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "note": "2,372 road segments drawn per period (650–950, 950–1250, 1250–1350, 1350–1517) with certainty; 1,065 sites with own dates (9999 = unknown/continuing kept open), else the period of the map they are in.",
+   "dataset": "viatariq"
+  },
+  {
+   "title": "Egypt Exploration Society Delta Survey sites",
+   "match": [
+    "EES_Delta_Survey",
+    "Egypt_Exploration_Society_Delta_Survey"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Egypt",
+   "note": "782 sites (current ArcGIS layer snapshot); periods → years by standard Egyptian chronology stated in each label; private pack (reuse needs EES permission).",
+   "dataset": "eesdelta"
+  },
+  {
+   "title": "Mapping Jewish Communities of the Byzantine Empire",
+   "match": [
+    "10.5281/zenodo.7575860"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Greece, Anatolia, S Italy, Balkans",
+   "note": "176 attested phases from dated evidence joined to the gazetteer; island-level evidence placed at the island (approximate); 33 evidence rows the source could not locate left out.",
+   "dataset": "mjcb"
+  },
+  {
+   "title": "Gobolitide (al-Jibal) microregion settlement dataset",
+   "match": [
+    "10.5281/zenodo.5849856",
+    "zenodo.5849855",
+    "zenodo.org/record/5849855"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "note": "900 dated site phases; periods → years by the standard Jordanian (MEGA-Jordan) scheme, stated in labels. Revised in cycle 3: bare 'Islamic' (636–1918) and Iron Age/Persian attributions no longer drawn (too broad / outside the atlas range); 514 survey-code names ('SGNAS SITE 018') drawn but not indexed as places; alternative names kept.",
+   "dataset": "gobolitide"
+  },
+  {
+   "title": "Place-names in the Saga of the Earls of Orkney (Nottingham, 2025)",
+   "match": [
+    "Place_Names_in_the_Saga_of_the_Earls_of_Orkney"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Scotland",
+   "note": "92 names shown from their earliest saga-manuscript attestation (first attestation ≠ founding); no licence stated → private pack.",
+   "dataset": "orkneysaga"
+  },
+  {
+   "title": "MobileGIS in archaeological prospection in Tunisia (MR3)",
+   "match": [
+    "10.5281/zenodo.12601441"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Maghreb",
+   "note": "Survey of finds inside one rural site — not atlas-scale."
+  },
+  {
+   "title": "HMAP Dataset 19: Pärnu City Customs Records",
+   "match": [
+    "10.6084/m9.figshare.22752623"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-spatial",
+   "region": "Estonia",
+   "note": "Customs time series for one port (Pärnu); no further places."
+  },
+  {
+   "title": "Zbiva full database (zbiva.zrc-sazu.si) — sites, graves, artefacts",
+   "url": "https://zbiva.zrc-sazu.si/",
+   "match": [
+    "zbiva.zrc-sazu.si"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Slovenia, Austria, Croatia, NE Italy",
+   "note": "Old host zbiva.zrc-sazu.si resets connections, but the current app zbiva4.zrc-sazu.si serves its own public exports (no login): 3,915 sites (3,739 with coordinates; 3,019 with their own earliest/latest dating, 896 undated) and 12,048 graves, acquired 2026-10-01. The app states CC BY-NC-SA 3.0 → private pack. Cycle 3: private spec zbivafull — 1,799 dated sites not already in the public subset (1,100 skipped as already shown; 838 undated and 176 unpositioned left out)."
+  },
+  {
+   "title": "INHILLDAUGAR: annotated place-names along the Daugava (Latvia)",
+   "match": [
+    "10.5281/zenodo.21157502"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Latvia",
+   "note": "516 of 10,098 names carry a documented attestation century (13th–19th c.; sources such as the 1557 register, Mellin 1798) and are shown from it as first attestations; the rest (linguistic \"early/late\" only, or unclear) stay undated.",
+   "dataset": "inhilldaugar"
+  },
+  {
+   "title": "Francesco Scoto's Italian travel manuals 1650–1700 (EMDigIt)",
+   "match": [
+    "10.5281/zenodo.19909380",
+    "10.5281/zenodo.22939426"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Italy",
+   "note": "972 place listings as snapshots of the 1650, 1675 (two editions) and 1700 editions; uncertain identifications marked approximate.",
+   "dataset": "scoto"
+  },
+  {
+   "title": "Woodlands of Antiquity: dendroarchaeological dataset",
+   "match": [
+    "10.5281/zenodo.17090406",
+    "10.5281/zenodo.18370269"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Germany, France, Switzerland, Low Countries",
+   "note": "592 site phases from 3,392 exact felling dates; 13,058 post-quem and 3,947 interval dates not used (no construction year).",
+   "dataset": "woodlands"
+  },
+  {
+   "title": "Historical GIS and Guidebooks: Czechoslovak Tourist Attractions",
+   "match": [
+    "10.5281/zenodo.7418864"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Czechia",
+   "note": "A 1928 guidebook — after the atlas period (≤1914)."
+  },
+  {
+   "title": "AIDA Archive of Italian radiocarbon dates",
+   "match": [
+    "10.5281/zenodo.5156103"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Italy",
+   "note": "Overwhelmingly prehistoric radiocarbon samples."
+  },
+  {
+   "title": "Energy consumption dataset (year built)",
+   "match": [
+    "10.5281/zenodo.18301550"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "—",
+   "note": "Modern buildings energy certificates."
+  },
+  {
+   "title": "Historic Cantrefs and Commotes of Wales c. 1543 (ArcGIS)",
+   "match": [
+    "Historic_Cantrefs_of_Wales",
+    "Historic_Commotes_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "46 cantrefs + 142 commotes (OGL v3) → public area spec wales-cantrefs, snapshot c. 1570 (Peniarth MS 147, the list the boundaries follow)."
+  },
+  {
+   "title": "Historical Atlas of the Low Countries (1350–1800), DataverseNL",
+   "match": [
+    "10.34894/btkfhv"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "Already integrated in cycle 1 (specs halc and halc-areas); decision updated."
+  },
+  {
+   "title": "Arab conquest of the Maghreb (ArcGIS events)",
+   "match": [
+    "ArabConquestOfMaghreb"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "Maghreb",
+   "note": "95 points digitised from one atlas map (Mu'nis 1987, map 66) of the first conquest phase; no per-place dates. Giving every place the map's period would turn a source-wide range into feature dates. Snapshot deleted."
+  },
+  {
+   "title": "Early Medieval Belfast (ArcGIS)",
+   "match": [
+    "Early_Medieval_Belfast"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Ireland",
+   "note": "A 205-site subset of the Northern Ireland SMR, which is now integrated in full (nismr)."
+  },
+  {
+   "title": "Archaeological Sites in Slovak Republic — Harmonized Dataset (CEANS 2021)",
+   "match": [
+    "10.5281/zenodo.5708032",
+    "10.5281/zenodo.5708033"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Slovakia",
+   "dataset": "ceans",
+   "note": "Found by investigation batch 2. 16,586 dated records: 6,742 with their own century/year, the rest by Slovak period code with conventional years stated in each label; prehistoric-only, negative and undatable records left out; cadastre-centre positions marked approximate."
+  },
+  {
+   "title": "Strucke C14 Sweden",
+   "match": [
+    "10.5281/zenodo.21932353"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Sweden",
+   "note": "Investigation batch 2, reviewed: Radiocarbon dates, overwhelmingly prehistoric."
+  },
+  {
+   "title": "Greek migration / diaspora maps (ArcGIS)",
+   "match": [
+    "GreekMigration_Embarkation",
+    "Composite_Migration_Map_of_the_Greek_Diaspora"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Greece",
+   "note": "Investigation batch 2, reviewed: 20th-century emigration records."
+  },
+  {
+   "title": "John Pendlebury's trips in Crete (ArcGIS)",
+   "match": [
+    "Pendlebury"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Greece",
+   "note": "Investigation batch 2, reviewed: 1930s travel itinerary."
+  },
+  {
+   "title": "HMAP Russian herring",
+   "match": [
+    "10.6084/m9.figshare.29180390"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-spatial",
+   "region": "East Slavic",
+   "note": "Investigation batch 2, reviewed: Catch/trade series without place geometry."
+  },
+  {
+   "title": "National Monuments Record of Wales (RCAHMW, NMRW)",
+   "match": [
+    "NMRW/FeatureServer",
+    "coflein.gov.uk"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "Found by investigation batch 2. 121,770 records snapshot (OGL v3.0); 107,389 dated phases via the FISH period thesaurus (years stated in labels); unknown/general/prehistoric-only left out.",
+   "dataset": "nmrw"
+  },
+  {
+   "title": "Georeferencing of the Lorscher Codex (UB Heidelberg)",
+   "match": [
+    "10.11588/data/10063"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Germany",
+   "note": "1,145 places shown from their earliest Lorsch charter (first attestation, not founding); 169 placemarks without a year left out.",
+   "dataset": "lorsch"
+  },
+  {
+   "title": "Mint Houses of the Low Countries (IISH)",
+   "match": [
+    "10.34894/1nwhjb"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "365 production phases from active years; CC BY-NC-SA → private pack.",
+   "dataset": "lcmints"
+  },
+  {
+   "title": "Mint Authorities of the Low Countries (IISH)",
+   "match": [
+    "10.34894/pb9at3"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "121 dated territories (CC BY-NC-SA) → private area spec lc-mint-authorities, drawn from the private pack (new private-units.pmtiles) in the territorial-units layer, each for its own from/to dates."
+  },
+  {
+   "title": "Hierokles places (ArcGIS) — Synekdemos (c. 527)",
+   "match": [
+    "hierokles_places"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Greece, Anatolia, Balkans, Levant",
+   "note": "Snapshot 918 places; private spec hierokles (no licence on the layer); shown only at c. 527 (date of the Synekdemos)."
+  },
+  {
+   "title": "EMDigIt Core Italian Itinerary Waypoints (ArcGIS)",
+   "match": [
+    "Early_Modern_Digital_Itineraries_(EMDigIt)"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Italy",
+   "note": "Snapshot 3,782 waypoints; private spec emdigit; one snapshot per itinerary year (1562–1720) that lists the place; 9,423 records."
+  },
+  {
+   "title": "Fortresses between Damascus and Medina (Hajj route; after Petersen)",
+   "match": [
+    "Fortresses_between_Damascus_and_Medina"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Levant",
+   "note": "Snapshot 27 forts; private spec hajjforts; 21 shown at the year of the pilgrimage account recording them (1861–1912); 8 without a dated account left out."
+  },
+  {
+   "title": "Georeferenced database of Medieval military and religious sites in Northern Italy",
+   "match": [
+    "10.17632/268xx6ddf4"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Italy",
+   "note": "84 structures with own year/century; CC BY 4.0 → public spec piemonte."
+  },
+  {
+   "title": "Historic Civil Parishes of Wales (OS 1st/2nd edition, ArcGIS)",
+   "match": [
+    "Historic_Civil_Parishes_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "1,174 first-edition parishes and 1,320 second-edition parishes (OGL v3) → public area spec wales-parishes; each parish and hundred dated by its own OS survey years (first edition 1860s–1880s, second edition 1888–1913)."
+  },
+  {
+   "title": "Agglomérations, vestiges du VIIIe s AEC au XVe s EC dans le monde romain (Nakala)",
+   "match": [
+    "10.34847/nkl.4678112k"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Europe-wide",
+   "note": "2,977 characteristic rows → 1,483 grouped town phases with signed-year start/end periods (1,122 with undetermined end left open); CC BY-NC-SA → private spec agglomerations."
+  },
+  {
+   "title": "Hillforts in Latvia along Daugava (Nakala)",
+   "match": [
+    "10.34847/nkl.aecdrl48"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Latvia",
+   "note": "8 hillforts, 21 dated phase records (OSL/radiocarbon/settlement); Etalab 2.0 → public spec daugavahillforts."
+  },
+  {
+   "title": "Fund og Fortidsminder record pages (kulturarv.dk) — entries of the Danish heritage register",
+   "match": [
+    "kulturarv.dk"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Denmark",
+   "note": "Individual register entries harvested as catalogue records; the register itself (Fund og Fortidsminder) is already integrated (private pack, dkff)."
+  },
+  {
+   "title": "Cart_Lir_Reino_Castilla (ArcGIS): kingdom extents illustrating Galician-Portuguese lyric poems",
+   "match": [
+    "Cart_Lir_Reino_Castilla"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Iberia",
+   "note": "11 kingdom-of-Castile polygons (c. 1230/1252) attached to individual cantigas; illustrative extents, no features; covered better by existing political layers."
+  },
+  {
+   "title": "Northern Ireland Sites and Monuments Record (OpenDataNI)",
+   "match": [
+    "northern-ireland-sites-and-monuments-record"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Ireland",
+   "note": "18,509 records (OGL v3); 7,623 with a period in 400–1914 → public spec nismr (NI period table stated in the spec). The automated pass had marked it insufficient-temporal from catalogue metadata; the data itself carries a period per record."
+  },
+  {
+   "title": "Wreck Inventory of Ireland (ArcGIS, located wrecks)",
+   "match": [
+    "ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Ireland",
+   "note": "3,564 located wrecks, 1,950 with a year of loss (527 up to 1914) → private spec irelandwrecks (no licence on the layer)."
+  },
+  {
+   "title": "Mining cadastre / Camino (France)",
+   "match": [
+    "5dceb39c634f416d5593c858"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "France",
+   "note": "2,980 concessions; 801 whose start is the 1810 Mining Law date are left out (no grant date of their own); 2,164 kept, 1,742 granted by 1914 → public spec francemines (Licence Ouverte)."
+  },
+  {
+   "title": "CastlesMedieval (ArcGIS)",
+   "match": [
+    "TQSFiGYN0xveoERF/arcgis/rest/services/CastlesMedieval"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Europe-wide",
+   "note": "30 well-known castles with years rounded to the century (1000, 1100) — a teaching compilation; the castles are in the registers already."
+  },
+  {
+   "title": "Treasure Map (ArcGIS): documented treasure hunts in Spain",
+   "match": [
+    "Ue34o2qxc9h430hV/arcgis/rest/services/Treasure_Map"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Iberia",
+   "note": "34 archival cases 1600–1684 with document dates; tiny events layer — kept in the queue, low priority."
+  },
+  {
+   "title": "Archaeological sites in the Eastern Anatolian Highlands (Chalcolithic–Iron Age)",
+   "match": [
+    "10.5281/zenodo.17550847",
+    "10.5281/zenodo.17550848"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Anatolia",
+   "note": "796 sites ending c. 200 BCE — before the atlas range."
+  },
+  {
+   "title": "Northern Ireland Wrecks database (MEDIN / ADS)",
+   "match": [
+    "northern-ireland-wrecks-database"
+   ],
+   "status": "evaluated",
+   "state": "blocked",
+   "region": "Ireland",
+   "note": "Distribution is an ADS landing page without a file (unpathd.ads.ac.uk resource); the Irish WIID covers Irish waters; retry ADS next cycle."
+  },
+  {
+   "title": "Historical Rail Lines and Stations of Ireland (ATU Galway Heritage Research Group)",
+   "match": [
+    "63612b1edcff44fdb4cf70146eaf6d65"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Ireland",
+   "note": "CC BY-NC-SA → private spec irelandstations: 502 stations from the Viceregal Commission 1906 map (snapshot 1906) + 287 with dates of their own. Lines NOT used: StartDate/FinishDate mix company dates (1844 GSWR founding, 1924 amalgamation) with line opening/closure."
+  },
+  {
+   "title": "Fields on Fire (Russian Empire fires 1860–1864, Harvard Dataverse)",
+   "match": [
+    "10.7910/dvn/8s8l0v"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "East Slavic",
+   "note": "CC BY-NC-SA → private spec fieldsonfire: 478 towns of 49 western provinces, dated by the years with recorded fires (1860–1864); positions from the dataset's GeoNames lat/long (its projected .prj does not round-trip)."
+  },
+  {
+   "title": "Spatiotemporal datasets for five Swedish parishes 1813–1914 (SEDD geography)",
+   "match": [
+    "10.7910/dvn/z0ahal"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Sweden",
+   "note": "CC0 → public line spec sedd-roads: 3,331 road segments (1812–20 reconnaissance map, 1860/1865 topographic maps, 1910 economic map) + 150 railway segments (1910), each at its own map date. Buildings (4,854 unnamed residential points) not used."
+  },
+  {
+   "title": "PORTIC / Navigocorpus ports and ship calls (18th c.)",
+   "match": [
+    "data.portic.fr",
+    "navigocorpus"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Europe-wide",
+   "note": "1,700 ports; 1,396 named in dated ship calls (1748–1799) → private spec porticports, one snapshot per year a dated call names the port (derived by scripts/historical-data/portic_years.py). Found by targeted maritime search (cycle 2), following the Navigocorpus DataCite records."
+  },
+  {
+   "title": "NorFish historical fisheries datasets 1368–1899 (25 datasets, figshare, CC BY 4.0)",
+   "match": [
+    "norfish",
+    "10.6084/m9.figshare.14258318"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-spatial",
+   "region": "Nordic",
+   "note": "Inspected (Iceland cod 1520–1871): one national catch series per year placed at a single sea-region centroid (coordinate uncertainty ~530 km), some years extrapolated — statistics, not located features. Followed from the Sound Toll search; the series could feed an Economic indicator later, not map points."
+  },
+  {
+   "title": "STRO Monetary Conversion Tables (Sound Toll Registers Online)",
+   "match": [
+    "10.5281/zenodo.21490656",
+    "10.5281/zenodo.22144958"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Nordic",
+   "note": "Currency conversion tables, no places. The STRO place list itself has no bulk download found (soundtoll.nl reachable; no data export) — queued as a chain lead."
+  },
+  {
+   "title": "Ottoman Plovdiv geodataset (Boykov, Zenodo)",
+   "match": [
+    "10.5281/zenodo.10046836"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Bulgaria",
+   "note": "CC BY 4.0 → public spec plovdiv: 274 quarter-by-register snapshots (46 mahalles, tax registers 1472–1614, households + author's estimate) counted as Population, and 85 buildings dated by century. RAR/FileGDB read via plovdiv_extract.py (libarchive-c, pyogrio). Found by targeted Bosnia/Ottoman defter search."
+  },
+  {
+   "title": "UrbanOccupationsOETR 1532 Ottoman campaign / 1840s settlements (Zenodo)",
+   "match": [
+    "10.5281/zenodo.7079747"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Bulgaria",
+   "note": "CC BY 4.0 → public spec campaign1532: 36 army stops of the 1532 campaign (snapshot 1532, counted as Events). Its Settlements_1840 layer (935) duplicates the Ottoman NFS gazetteer already integrated; its modelled least-cost routes are models, not sources — not used."
+  },
+  {
+   "title": "UrbanOccupationsOETR temettuat geosamples (Bursa district; 6 regions)",
+   "match": [
+    "10.5281/zenodo.12610779",
+    "10.5281/zenodo.13220585",
+    "10.5281/zenodo.13220611"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Anatolia",
+   "note": "6-region sample (CC BY): 39,002 holdings → 270 villages with coordinates (Ankara, Bursa, Edirne, Manisa, Plovdiv, Ruse) → public spec temettuat; dated 1840–1849 because the source dates the registers only to \"the 1840s\"; counted as Settlements and Economic. The Bursa-only geosample (12610779) is a subset and not used separately."
+  },
+  {
+   "title": "MobileGIS in archaeological prospection in Tunisia (Mustis region survey)",
+   "match": [
+    "10.5281/zenodo.12601440",
+    "10.5281/zenodo.12601441"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "Maghreb",
+   "note": "643 individual finds (sherds, bricks) from one survey area with chronology labels; a local artefact scatter, low value at map scale — kept in the queue, low priority."
+  },
+  {
+   "title": "Historic England Aerial Investigation Mapping (AIM)",
+   "match": [
+    "HE_AIM_data"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "England",
+   "note": "498k mapped features with PERIOD; England already scores high — deferred until weak regions are exhausted."
+  },
+  {
+   "title": "Tees Valley Archaeology mapped / council HER open-data layers",
+   "match": [
+    "Tees_Valley_Archaeology_mapped",
+    "open_data_historic_environment_records_sites"
+   ],
+   "status": "evaluated",
+   "state": "promising",
+   "region": "England",
+   "note": "Local HER extracts (2.5k–5.7k, period per record); England strong, low priority."
+  },
+  {
+   "title": "Nordic Spatial Humanities (Zenodo 14871254)",
+   "match": [
+    "10.5281/zenodo.14871254"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Nordic",
+   "note": "Already integrated in an earlier pass (source nordic-spatial-humanities)."
+  },
+  {
+   "title": "Pleiades Ancient Cyprus Sites (ArcGIS)",
+   "match": [
+    "PleiadesAncientCyprusSites"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Cyprus",
+   "note": "A Pleiades extract; Pleiades is integrated in full."
+  },
+  {
+   "title": "Archaeological / Prehistoric Sites in the Greater Belfast Area (ArcGIS)",
+   "match": [
+    "Archaeological_Sites_in_the_Greater_Belfast",
+    "Prehistoric_Sites_in_the_Greater_Belfast"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Ireland",
+   "note": "Subsets of the NI Sites and Monuments Record, integrated in full (nismr)."
+  },
+  {
+   "title": "Personal names / Place names in the Saga of the Earls of Orkney (ArcGIS)",
+   "match": [
+    "Personal_names_in_Saga",
+    "Place_Names_in_The_Sag_of_theEarls"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Scotland",
+   "note": "Same project as the Orkney saga place-names already integrated (orkneysaga)."
+  },
+  {
+   "title": "Fishery / water-chemistry / isotope series (PANGAEA: tuna traps 1896–, Elbe MOSES, herring, whales)",
+   "match": [
+    "pangaea.928980",
+    "pangaea.928996",
+    "pangaea.928981",
+    "pangaea.963359",
+    "pangaea.963358",
+    "pangaea.984513",
+    "pangaea.954518"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "—",
+   "note": "Environmental measurement series at sampling stations, not historical places; the automated pass scored them promising because they have positions and dates."
+  },
+  {
+   "title": "Municipal Finance and Water Supply in Cities of the Russian Empire 1894–1910 (Zenodo)",
+   "match": [
+    "10.5281/zenodo.20932484",
+    "10.5281/zenodo.20005303",
+    "10.5281/zenodo.20005304",
+    "10.5281/zenodo.20961856",
+    "10.5281/zenodo.20961857"
+   ],
+   "status": "blocked",
+   "state": "blocked",
+   "region": "East Slavic",
+   "note": "950 towns with 1897 census population and 1904/1910 estimates (CC BY) — but every version lists no files (restricted or metadata-only on 2026-10-01); no coordinates either (would need linking by name to the Russian 3-verst gazetteer). Retry next cycle. Cycle 4: the user's copy (20932484.json) is the record metadata only — files still restricted."
+  },
+  {
+   "title": "Welsh historic boundaries: counties (OS 1st/2nd ed.), municipal boroughs, parliamentary constituencies, civil parishes (2nd ed.) — RCAHMW ArcGIS",
+   "match": [
+    "Historic_Counties_of_Wales",
+    "Historic_Municipal_Boundaries_of_Wales",
+    "Historic_Parliamentary_Boundaries_of_Wales",
+    "Historic_Civil_Parishes_of_Wales_2nd_Edition"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "Found by the cycle-3 weak-region investigation (same publisher as the integrated parishes and cantrefs). OGL v3 → public area spec wales-counties (counties 1st and 2nd edition, 47 boroughs, 74 constituency parts), each unit dated by its own survey years (1867–1913). Also found: tiled 1835–1857 coastal charts (MapServer tiles only) — queued for a tile-overlay feature."
+  },
+  {
+   "title": "Historic Townships of Wales pre-1840 (ArcGIS)",
+   "match": [
+    "Historic_Townships_of_Wales_pre_1840"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "1,063 township polygons, each with its own source and date (tithe maps, 1841/1851 censuses, estate maps, first-edition OS; 1806–1888, one 1939). Licence is per record: 698 units marked OGL v3 → public spec wales-townships; 332 marked Non-Commercial Government Licence or blank → private spec wales-townships-nc. 'c.1800' and '-' dates are not drawn."
+  },
+  {
+   "title": "Historic Poor Law Unions of Wales (OS 2nd edition, ArcGIS)",
+   "match": [
+    "Historic_Poor_Law_Unions_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "64 unions (OGL v3) → part of public spec wales-counties, level 'poor law union', dated by the source's own second-edition OS survey window 1888–1913 (not by the 1834 Act)."
+  },
+  {
+   "title": "Early Modern Weather Database (ArcGIS)",
+   "match": [
+    "Early_Modern_Weather_Database"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "England",
+   "note": "3,456 dated weather records (1500s–1700s; diaries of Josselin, Pepys, Evelyn, chronicles, agricultural records). No licence on the layer → private spec earlymodernweather, kind 'event', each record at its own start/end years; imprecise locations drawn as approximate; type-only names not indexed as places.",
+   "dataset": "early-modern-weather"
+  },
+  {
+   "title": "Historic Municipal Wards of Wales (OS 1st edition, ArcGIS)",
+   "match": [
+    "Historic_Municipal_Wards_of_Wales"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "46 wards (OGL v3) → part of public spec wales-counties, level 'municipal ward', dated by each ward's own first-edition OS survey years."
+  },
+  {
+   "title": "Historic Townships of Wales (1st edition OS; and the unversioned layer)",
+   "match": [
+    "Historic_Townships_of_Wales/",
+    "Historic_Townships_of_Wales_1st_Edition"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Wales",
+   "note": "323 of 367 townships are already in the pre-1840 township compilation with identical survey dates; the rest are spelling variants of the same units. Not drawn twice."
+  },
+  {
+   "title": "Historic Hundreds of Wales (1st edition OS, ArcGIS)",
+   "match": [
+    "Historic_Hundreds_of_Wales"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Wales",
+   "note": "The same first-edition hundreds are already drawn as unions of their first-edition parishes (wales-parishes)."
+  },
+  {
+   "title": "Average chemical composition of lake ores of Finland and North-Eastern Russia extracted in the late nineteenth century (PANGAEA)",
+   "match": [
+    "10.1594/PANGAEA.860941"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Finland",
+   "dataset": "finland-lake-ore",
+   "note": "34 lake-ore workings (CC BY 3.0) → public spec finlandlakeore, kind mine; each over its own extraction years in the table (1871–1881, from Solitander 1882)."
+  },
+  {
+   "title": "Strucke C14 Sweden",
+   "match": [
+    "zenodo.10966331"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Radiocarbon dates (median calibrated years) of mostly prehistoric samples; not historical features — not integrated."
+  },
+  {
+   "title": "IE GSI MI GSRO Maritime Boundaries Irish Waters WGS84",
+   "match": [
+    "IE_GSI_MI_GSRO_Maritime_Boundaries"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Modern maritime boundaries; outside the atlas period."
+  },
+  {
+   "title": "ICEland-1: A geochronological database for reconstructing Late Quaternary glacier, relative sea level",
+   "match": [
+    "zenodo.org/records/20028895"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Quaternary geochronology; not historical."
+  },
+  {
+   "title": "Dataset: Human-vegetation dynamics in Holocene South-Eastern Norway based on radiocarbon-dated charcoal",
+   "match": [
+    "zenodo.org/record/6242974"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Radiocarbon-dated charcoal (environmental); not historical features."
+  },
+  {
+   "title": "Dive Lines - SeaRover layer",
+   "match": [
+    "Dive%20Lines%20-%20SeaRover"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Modern survey dive tracks."
+  },
+  {
+   "title": "The Dataset for the Fauna et Flora Fennica project - Historical sighting data",
+   "match": [
+    "zenodo.17192104"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "note": "Historical animal/plant sightings (environmental history), not a map category here; kept as a lead only."
+  },
+  {
+   "title": "Welsh georeferenced historical map scans (tiled MapServers: estate maps, tithe and enclosure surveys, charts, 1600s–1890)",
+   "match": [
+    "tiles.arcgis.com/tiles/YFaBqL5jL3y8fq7s"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Wales",
+   "note": "100 tiled services from the same publisher as the Welsh boundary layers; 94 whose own name gives the year the map was made are in the original-maps index (public/world/maps/georef-index.json) and can be laid over the atlas, streamed from the publisher's tile server and credited to the holder in each service's copyright line (National Library of Wales, North East Wales Archives, Bangor University, Grosvenor Estate). 6 without a year in the name (incl. the Barmouth–South Stack coastal chart) are left out rather than dated by guess."
+  },
+  {
+   "title": "Digital Atlas of Dioceses and Ecclesiastical Provinces in Late Medieval Europe 1200 to 1500",
+   "match": [
+    "Digital_Atlas_of_Dioceses",
+    "rh195hm5975"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Europe",
+   "dataset": "dioceses-dorin",
+   "note": "R. Dorin (gen. ed.), CC BY 3.0. The atlas' own time slices (c. 1250, 1350, 1450; 665–705 dioceses and 77–84 provinces each) → public spec dioceses-dorin, layer medieval-dioceses, each a snapshot of its year. The 'max' layers' StartDate/EndDate use 999/1501 as markers for 'before/after the atlas period', so they are kept in the vault but not used for dating."
+  },
+  {
+   "title": "Orthodox monasteries (Harvard CGA ArcGIS)",
+   "match": [
+    "Orthodox_monasteries"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Russia, Ukraine, Belarus",
+   "dataset": "orthodox-monasteries",
+   "note": "512 monasteries and hermitages; no licence on the item → private spec orthodox-monasteries. 440 shown from their founding year to their closing year (open end when none); 56 founding years that are century midpoints (1350, 1450…) shown as the whole century; 46 without a founding year and 26 without coordinates left out."
+  },
+  {
+   "title": "Surveys of mills from 1794 to 1809 (Enquêtes sur les moulins de 1794 à 1809)",
+   "match": [
+    "62b6885593d5659857a1f84c",
+    "enquetes-sur-les-moulins"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "France",
+   "dataset": "france-mills-1794-1809",
+   "note": "20,313 records (Licence Ouverte) → public spec france-mills: 19,614 mill records as snapshots of their survey (an II → 1794, an X → 1801, 1809, as the dataset dates them), at commune centroids (approximate); 699 without coordinates left out; mill names not indexed as places."
+  },
+  {
+   "title": "İslam Tarih Atlası / Atlas of Islamic History (v6.5.2)",
+   "match": [
+    "zenodo.19183845",
+    "10.5281/zenodo.19183845"
+   ],
+   "status": "evaluated",
+   "state": "rejected",
+   "region": "Middle East",
+   "note": "CC BY 4.0 web-app bundle (dynasties after Bosworth, al-Aʿlām scholars, Yāqūt's Muʿjam al-Buldān places). Not integrated: no per-record sources, narrative text and round population 'estimates' (Baghdad 800 = 1,000,000), coordinates rounded or automatically geocoded with self-assigned confidence — not verifiable to the temporal and spatial standard; al-Thurayya already covers the early Islamic places from a sourced gazetteer. Archive kept in the vault."
+  },
+  {
+   "title": "Sites archéologiques de la Lorraine médiévale (Nakala, ArkeoGIS export)",
+   "match": [
+    "nkl.db53j42l"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "France",
+   "note": "6 records, CC BY-NC-ND; too small. Other ArkeoGIS exports on Nakala found are prehistoric (Bronze Age swords, Iron Age burials)."
+  },
+  {
+   "title": "Historic Coastal Towns (Ireland, NMPF heritage assets)",
+   "match": [
+    "d92327c5-6687-43c2-abff-45b95e902d31",
+    "NMPF_7_3_Heritage_Assets"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "Ireland",
+   "note": "28 towns dated only by an origin class ('12-15th century Anglo-Norman'); no start or end years; towns already shown from other sources."
+  },
+  {
+   "title": "Rurland – The rural lands of north-eastern Gaul, from the late La Tène period to late antiquity (Nakala series)",
+   "match": [
+    "Rurland",
+    "nkl.ac829at9",
+    "nkl.8abbmf9q"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "France",
+   "dataset": "rurland",
+   "note": "Etalab 2.0. Nüsslein's per-century occupation files (2nd–5th c., zones 1–2; 152 sites, each with one occupation span) and the Moselle-valley site list (dated by century text) → public spec rurland, 202 records. Soil, geology and hydrography layers of the same series are environmental and not used; 1st-c. and High Empire files are before the atlas range or duplicate the century files."
+  },
+  {
+   "title": "Historical Oyster Habitat and Fisheries in English Coastal Waters (EA)",
+   "match": [
+    "HistoricalOysterHabitatAndFisheries"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "England",
+   "dataset": "oyster-fisheries",
+   "note": "227 oyster beds/fisheries (OGL) → public spec oyster-fisheries, kind fishery (Maritime), each in the year(s) of the historical account that mentions it (1154–1920s; mostly 1850s–1890s), with the reference; low-confidence locations marked uncertain."
+  },
+  {
+   "title": "NorfolkSuffolkChurches (ArcGIS)",
+   "match": [
+    "NorfolkSuffolkChurches"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "England",
+   "note": "1,479 churches with 'Founded: Medieval' only; no years. Churches already shown from Historic England / Wikidata."
+  },
+  {
+   "title": "Digitisation of historical land use and land use changes in Flanders (1778-2022)",
+   "match": [
+    "d81789eb-f1ee-421d-ba60-92bc6247c016",
+    "0de23940-8af2-4014-aa9a-6a3d207d7038",
+    "HistLandgebruik"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Low Countries",
+   "note": "Free-reuse licence (Modellicentie gratis hergebruik). The 1778 (Ferraris) and 1873 land-use layers added to the original-maps index as tiled WMS overlays (the INBO WMS draws only from about zoom 14); the vector data (WFS/OGC API) is not downloaded this cycle — a land-cover polygon layer is a candidate for later."
+  },
+  {
+   "title": "Dataset - Hus och gård i det förurbana samhället",
+   "match": [
+    "zenodo.18231455",
+    "zenodo.18231456"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Sweden",
+   "dataset": "hus-och-gard",
+   "note": "531 excavated houses (CC BY 4.0) → public spec hus-och-gard: 342 dated phases from the project's period flags (Roman Iron Age → Middle Ages) via the stated Swedish period scheme; 58 houses with unfixed location marked approximate; Stone/Bronze Age-only houses left out."
+  },
+  {
+   "title": "Toponymy in Nineteenth-Century Trento",
+   "match": [
+    "zenodo.18852123",
+    "zenodo.18852124"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Italy",
+   "note": "A few dozen street names of one square in Trento (5 KB); too local for the atlas."
+  },
+  {
+   "title": "Georeferenced toponyms relating to the Consegne dei Boschi (1822)",
+   "match": [
+    "zenodo.17277119"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Italy",
+   "note": "37 micro-toponyms of one Ligurian forest; too local."
+  },
+  {
+   "title": "Early-Medieval British Isles (ArcGIS)",
+   "match": [
+    "ROSiDsWkQXhsUAs0/arcgis/rest/services/B8WMi"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Britain and Ireland",
+   "note": "14 hand-entered annal events (a course project); not a dataset to integrate."
+  },
+  {
+   "title": "Denkmalschutz und Kultur - Landkreis Cham (castles, monasteries, churches, monuments)",
+   "match": [
+    "b1414d3ddeb04c9c95054489d8c27d51",
+    "opendata_denkmalschutz_kultur"
+   ],
+   "status": "evaluated",
+   "state": "irrelevant",
+   "region": "Bavaria",
+   "note": "CC BY 4.0 but one district: 16 castles (with built/destroyed dates), 8 monasteries; too small to add as a dataset this cycle; candidate if Bavarian district open-data layers are gathered together."
+  },
+  {
+   "title": "Sites outside the Delta Survey area (EES ArcGIS)",
+   "match": [
+    "Sites_outside_the_Delta_Survey_area"
+   ],
+   "status": "evaluated",
+   "state": "duplicate",
+   "region": "Egypt",
+   "note": "4 sites (Pelusium, Alexandria, Plinthine…), already in Pleiades and outside the EES Delta Survey that is integrated (eesdelta)."
+  },
+  {
+   "title": "Imperiia project layers (K. O'Neill, Harvard; Russian Empire 1547–1900) on ArcGIS (WorldMap migration)",
+   "match": [
+    "koneill_worldmap",
+    "easteurotopo_worldmap",
+    "services7.arcgis.com/iEMmryaM5E3wkdnU"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Western Russia, Ukraine, Belarus, Baltics, Caucasus",
+   "dataset": "imperiia",
+   "note": "Found by the cycle-4 targeted ArcGIS search. 56 layers snapshotted; no licence on the items → private specs imperiia-units (749 units: state extent at 14 dates as snapshots; Piadyshev-atlas provinces and uezdy over 1820–1827, the atlas's own years; provinces 1856; Pale of Settlement 1791 and 1825–1887; Cossack Hetmanate 1649–1657; Don Cossacks) and imperiia-sites (10,527: Piadyshev towns, villages, post stations, military and economic sites, monasteries; towns of 1727; town populations 1719, c. 1743, 1766, 1781 where a figure is given; unrest counts per 20-year period). Not used yet: partition and Jewish-restriction border lines, troop movements (lines), post roads (lines), small Crimean layers."
+  },
+  {
+   "title": "Register of Immovable Cultural Heritage of Lithuania (KVR) — Lithuanian statistics portal ArcGIS",
+   "match": [
+    "kvr_taskai_enriched",
+    "kvr_poligonai_enriched",
+    "kvr.kpd.lt"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Lithuania",
+   "dataset": "lithuania-kvr",
+   "note": "Found by the cycle-4 targeted ArcGIS search (kvr.kpd.lt itself blocks automated access). CC BY 4.0 → public spec lithuania-kvr: 15,800 objects dated by the register's own age text, translated from Lithuanian conventions (century parts, millennia, decades; tested); 5,433 without an age left out; type-only names not indexed as places."
+  },
+  {
+   "title": "Latvia: state-protected cultural monuments (NKMP list, Dec 2024) — ArcGIS geometry copy",
+   "match": [
+    "kulturas_pieminekli_NKMP_12_2024",
+    "79e7246f-57cc-41fc-9a10-96521422359c"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Latvia",
+   "dataset": "latvia-monuments",
+   "note": "8,082 monuments dated from the list's own dating, translated from Latvian conventions (centuries with parts and quarters; archaeological periods by the stated Latvian scheme; Bronze/Stone Age left undated; tested). The CC0 list on data.gov.lv has no coordinates; the geometry comes from an ArcGIS copy without a licence → private spec latvia-monuments."
+  },
+  {
+   "title": "Estonia: Kultuurimälestis ArcGIS copies (municipal / project)",
+   "match": [
+    "Kultuurimälestis_150925",
+    "SiiriKobras"
+   ],
+   "status": "evaluated",
+   "state": "insufficient-temporal",
+   "region": "Estonia",
+   "note": "Partial copies (48 objects) of the Estonian register with no dating fields; the full register (register.muinas.ee) still blocks automated access."
+  },
+  {
+   "title": "Finland ancient monuments register (Museovirasto WFS, muinaisjaannos_piste)",
+   "match": [
+    "rajapinta_suojellut",
+    "muinaisjaannos_piste"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Finland",
+   "dataset": "finland-relics",
+   "note": "41,723 points (CC BY 4.0). Medieval-classed sites were already integrated (finreg). Added: 2,983 Iron Age-classed sites (500 BC–1150). Not added: 18,325 'historiallinen' sites — the class spans 1150–1900 and would show e.g. 19th-century tar pits from the 12th century; candidates if a finer dating (alatyyppi, kyppi.fi records) can be obtained."
+  },
+  {
+   "title": "Farmlands: Counting Sheep — livestock census of European Russia 1864 (Harvard Dataverse)",
+   "match": [
+    "OTTZQY"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "W Russia",
+   "dataset": "russia-livestock-1864",
+   "note": "49 province polygons with the total head of livestock from the totals table (CC BY-NC 4.0, private pack), snapshot 1864 as the source's census year. Per-animal counts kept in the vault, not shown."
+  },
+  {
+   "title": "EAMENA Bani Walid (Libya) heritage places",
+   "match": [
+    "eamena-baniwalid",
+    "mlacd_baniwalid"
+   ],
+   "status": "insufficient-temporal",
+   "state": "insufficient-temporal",
+   "region": "Maghreb",
+   "note": "224 records, CC BY 4.0. Every explicit date field is empty; the only dating is EAMENA cultural period names (e.g. 'Roman Imperial (North Africa)', 'Byzantine (Maghreb)'). EAMENA's own date ranges for these periods are not in the download, and 121 records are Unknown/blank, so not integrated rather than assigning invented ranges. Candidate if EAMENA's period chronology table is obtained."
+  },
+  {
+   "title": "Evliya Çelebi's Istanbul (ArcGIS layers)",
+   "match": [
+    "Evliya"
+   ],
+   "status": "candidate",
+   "state": "promising",
+   "region": "Turkey",
+   "note": "218 building entries for Istanbul from the 17th-century travel account; no licence stated on the items. Small and Istanbul-only: left as a candidate for the private pack."
+  },
+  {
+   "title": "A lost campaign (Zenodo 10.5281/zenodo.11067209)",
+   "match": [
+    "11067209",
+    "11067210"
+   ],
+   "status": "deferred",
+   "state": "metadata-inspected",
+   "note": "CC BY 4.0, EAMENA-format export; too few records to change any cell. Not integrated this round."
+  },
+  {
+   "title": "Norway cultural heritage register, dated sites (Riksantikvaren OGC API, lokaliteter)",
+   "match": [
+    "api.ra.no/kulturminner"
+   ],
+   "status": "integrated",
+   "state": "integrated",
+   "region": "Norway",
+   "dataset": "norway-kulturminner",
+   "note": "196,743 dated sites harvested (NLOD 1.0); 59,456 drawn. Exact datings used only when a plain year or range; free text like 'før 1350' or '1800-tallet' falls back to the register class, whose years come from the official KulturminneDatering code list. Not drawn: Migration Period–Middle Ages classes (already shown via nokm), classes over 700 years (Bronze–Iron Age, Iron Age–Middle Ages, Viking Age–Middle Ages: 53,833), pre/post-Reformation (30,930), 'older than 100 years' (6,874), Svalbard before/after 1945, Sámi classes."
+  }
+ ]
+}

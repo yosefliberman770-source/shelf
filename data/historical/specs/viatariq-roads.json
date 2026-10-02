@@ -1,0 +1,14 @@
+{
+ "id": "viatariq-roads", "src": "viatariqroads", "public": true, "enabled": true, "geometry": "lines",
+ "title": "VIA-TARIQ: medieval road network of the Levant (Bilād al-Šām), by period (Pažout, UAB)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.21981430",
+ "describe": "Main and secondary roads of the medieval Levant reconstructed from itineraries, geographers and archaeology, for four periods (650–950, 950–1250, 1250–1350, 1350–1517); each segment's certainty is kept.",
+ "layers": ["roads-cassini"],
+ "fields": {"id": "Id", "name": "name", "type": "type", "uncertain": {"field": "segmentCer", "values": ["Conjectured", "Hypothetical"]}, "keep": ["roadCer", "itinerary", "source"]},
+ "parts": [
+  {"read": {"path": "viatariq-levant/original/early_islamic_roads.geojson"}, "dating": {"mode": "envelope", "from": 650, "to": 950, "label": "Early Islamic road network (650–950)"}},
+  {"read": {"path": "viatariq-levant/original/middle_islamic_roads.geojson"}, "dating": {"mode": "envelope", "from": 950, "to": 1250, "label": "Middle Islamic road network (950–1250)"}},
+  {"read": {"path": "viatariq-levant/original/early_mamluk_roads.geojson"}, "dating": {"mode": "envelope", "from": 1250, "to": 1350, "label": "Early Mamluk road network (1250–1350)"}},
+  {"read": {"path": "viatariq-levant/original/late_mamluk_roads.geojson"}, "dating": {"mode": "envelope", "from": 1350, "to": 1517, "label": "Late Mamluk road network (1350–1517)"}}
+ ]
+}

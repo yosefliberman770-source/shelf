@@ -1,0 +1,471 @@
+#!/usr/bin/env python3
+"""Write docs/HISTORICAL_SOURCES_SEARCH.md — deliverables A–S of the 2026-10 discovery pass — from the generated files:
+
+  data/historical/discovery/inventory.jsonl.gz, summary.json, harvard.json, decisions.json
+  data/historical/coverage-centuries.json (now) and coverage-centuries-before.json (before this pass)
+  data/historical/audit/spatial-qa.json, entities.json
+
+  python3 scripts/historical-data/discover/report.py
+
+Every number in the document comes from those files; the prose sections (rules, recommendations, plans) are written here.
+"""
+import gzip
+import json
+import os
+import re
+import sys
+from collections import Counter, defaultdict
+
+ROOT = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+H = os.path.join(ROOT, 'data', 'historical')
+sys.path.insert(0, os.path.dirname(__file__))
+import queries  # noqa: E402
+import universe_queries  # noqa: E402
+
+# Coverage regions (present-day units) → the coarser regions the inventory's text matching uses.
+INV_REGION = {'England': 'England', 'Wales': 'England', 'Scotland': 'England', 'Ireland': 'Ireland', 'France': 'France', 'Low Countries': 'Low Countries',
+              'Germany': 'Germany', 'Austria': 'Austria & Switzerland', 'Switzerland': 'Austria & Switzerland', 'Italy': 'Italy', 'Spain': 'Spain',
+              'Portugal': 'Portugal', 'Denmark': 'Scandinavia', 'Sweden': 'Scandinavia', 'Norway': 'Scandinavia', 'Finland': 'Finland & Iceland',
+              'Iceland': 'Finland & Iceland', 'Poland': 'Poland', 'Czechia': 'Czechia & Slovakia', 'Slovakia': 'Czechia & Slovakia', 'Hungary': 'Hungary',
+              'Romania & Moldova': 'Romania & Moldova', 'Bulgaria': 'Balkans', 'Serbia, Kosovo & Montenegro': 'Balkans', 'Croatia': 'Balkans',
+              'Slovenia': 'Balkans', 'Bosnia & Herzegovina': 'Balkans', 'North Macedonia & Albania': 'Balkans', 'Greece': 'Greece & Cyprus',
+              'Cyprus': 'Greece & Cyprus', 'Estonia': 'Baltic', 'Latvia': 'Baltic', 'Lithuania': 'Baltic', 'Belarus': 'East Slavic', 'Ukraine': 'East Slavic',
+              'Western Russia': 'East Slavic', 'Turkey': 'Anatolia & Caucasus', 'Caucasus': 'Anatolia & Caucasus', 'Levant': 'Levant, Egypt & Maghreb',
+              'Egypt': 'Levant, Egypt & Maghreb', 'Maghreb': 'Levant, Egypt & Maghreb'}
+CLASS_TEXT = {'A': 'A — structured data, downloadable', 'B': 'B — identifiers / authority file (record-level links)', 'C': 'C — service only (WMS/WFS/API)',
+              'D': 'D — needs extraction from tables/text', 'E': 'E — scanned or georeferenced map image (raster)', 'F': 'F — register property without a resolvable formatter',
+              'G': 'G — metadata only, access unclear', 'H': 'H — restricted / paid', 'I': 'I — not relevant on inspection (relevance < 25)'}
+
+
+def load(p, default=None):
+    p = os.path.join(H, p)
+    return json.load(open(p, encoding='utf-8')) if os.path.exists(p) else default
+
+
+def inventory():
+    with gzip.open(os.path.join(H, 'discovery', 'inventory.jsonl.gz'), 'rt', encoding='utf-8') as fh:
+        for line in fh:
+            yield json.loads(line)
+
+
+def table(head, rows):
+    out = ['| ' + ' | '.join(head) + ' |', '| ' + ' | '.join('---' for _ in head) + ' |']
+    for r in rows:
+        out.append('| ' + ' | '.join(str(x).replace('|', '/').replace('\n', ' ') for x in r) + ' |')
+    return '\n'.join(out)
+
+
+def link(c):
+    d = str(c.get('doi') or '')
+    u = (f'https://hdl.handle.net/{d[4:]}' if d.startswith('hdl:') else f'https://doi.org/{d}') if d and not d.startswith('http') else (c.get('url') or d)
+    t = c['title'][:90].replace('[', '(').replace(']', ')')
+    return f'[{t}]({u})' if u else t
+
+
+def cand_row(c):
+    per = c.get('periods') or []
+    per = f"{min(per)}–{max(per) + 99}" if per else '—'
+    return [link(c), c['channel'], c['accessClass'], ', '.join(c['regions'][:2]) or '—', per, c['status']]
+
+
+def main():
+    summ = load('discovery/summary.json')
+    harv = load('discovery/harvard.json')
+    dec = load('discovery/decisions.json')['decisions']
+    now = load('coverage-centuries.json')
+    before = load('coverage-centuries-before.json')
+    qa = load('audit/spatial-qa.json', {})
+    ent = load('audit/entities.json', {})
+    cands = [c for c in inventory()]
+    rel = [c for c in cands if c['relevance'] >= 50]
+    cats = now['categories']
+    years = now['checkpoints']
+    cell = {(x['region'], x['year'], x['category']): x for x in now['cells']}
+    cell0 = {(x['region'], x['year'], x['category']): x for x in before['cells']}
+    regions = list(dict.fromkeys(x['region'] for x in now['cells']))
+    weak = [x for x in now['cells'] if x['score'] is not None and x['score'] < 70]
+    weak0 = [x for x in before['cells'] if x['score'] is not None and x['score'] < 70]
+    scored = [x for x in now['cells'] if x['score'] is not None]
+    L = []
+    w = L.append
+
+    w('# Historical-geography source search: deliverables A–S')
+    w('')
+    w(f"Generated by `scripts/historical-data/discover/report.py` from the files listed at the end. Scope: the map only. "
+      f"Built {now['built']}.")
+    w('')
+    st = summ.get('byState', {})
+    investigated = sum(v for k, v in st.items() if k not in ('catalogue-only', 'irrelevant', 'discovered'))
+    w('**What this cycle did, in short.** Search enormous, filter rigorously, integrate selectively, validate obsessively, then search again: '
+      f"{summ.get('rawRecords', summ['candidates']):,} catalogue records were harvested from {len(summ.get('rawByChannel', summ['byChannel']))} channels "
+      f"(DataCite, OpenAIRE, data.europa.eu, Zenodo, ArcGIS Hub, PANGAEA, Europeana, David Rumsey, 84 Dataverse installations, re3data, OpenGeoMetadata university "
+      f"catalogues, ARIADNE collections, discovery chains) with {len(universe_queries.universe_queries()):,} systematic multilingual queries; duplicates merged to "
+      f"**{summ['candidates']:,} unique candidates**; every candidate carries an investigation state; **{investigated:,}** went beyond the catalogue record "
+      f"(repository file lists, data samples, or a reviewed decision); the strongest were acquired and integrated through a reusable spec-driven loader; coverage "
+      f"was re-measured. Cells below 70 went from **{len(weak0):,}** to **{len(weak):,}** of {len(scored):,}. The discovery inventory and the integrated data are "
+      'separate deliverables (T below, and the map).')
+    w('')
+    w('**Rules followed throughout.** A record is dated only by what its own source says about it: a construction window, a period its record names, the year '
+      'a register or map lists it (a *snapshot* — evidence it existed then, nothing about before or after), or a first attestation (never treated as a founding). '
+      "A dataset's overall period is never copied onto its records. Conflicting dates are kept side by side. Undated records stay undated (drawn only when the reader "
+      'asks for undated records, never counted in coverage).')
+    w('')
+
+    # ── A ──
+    w('## A. Source inventory')
+    w('')
+    w(f"`data/historical/discovery/inventory.jsonl.gz` — one JSON object per candidate (title, identifiers, institution, licence, formats, bbox, regions, categories, "
+      f"periods named, access class, relevance 0–100, status, the queries that found it). {summ['queries']:,} catalogue queries were run "
+      f"({len(queries.all_queries()):,} distinct query strings: {len(queries.TOPICS)} topics in English, {sum(len(v) for v in queries.LOCAL.values())} local-language terms "
+      f"in {len(queries.LOCAL)} languages, and region × category combinations).")
+    w('')
+    w(table(['Channel', 'Candidates'], sorted(summ['byChannel'].items(), key=lambda x: -x[1])))
+    w('')
+    w(table(['Access class', 'Candidates'], [(CLASS_TEXT.get(k, k), v) for k, v in sorted(summ['byClass'].items())]))
+    w('')
+    w(table(['Investigation state', 'Candidates'], sorted(summ.get('byState', summ['byStatus']).items(), key=lambda x: -x[1])))
+    w('')
+    w(f"**{summ['relevant']:,} candidates have relevance ≥ 50** (historical + geographic + European/Mediterranean + a map category). By region and category:")
+    w('')
+    w(table(['Region (relevance ≥ 50)', 'Candidates'], sorted(summ['byRegion(relevance≥50)'].items(), key=lambda x: -x[1])))
+    w('')
+    w(table(['Category (relevance ≥ 50)', 'Candidates'], sorted(summ['byCategory(relevance≥50)'].items(), key=lambda x: -x[1])))
+    w('')
+    w('Decisions taken on inspected candidates (`data/historical/discovery/decisions.json`):')
+    w('')
+    w(table(['Source', 'State', 'Region', 'Note'], [(d['title'], d.get('state', d['status']), d.get('region', ''), d['note']) for d in dec]))
+    w('')
+
+    # ── T: the discovery universe and this cycle's funnel ──
+    w('## T. Discovery universe — cycle report')
+    w('')
+    w('The candidate universe is a deliverable of its own: `data/historical/discovery/universe-index.jsonl.gz` lists every unique candidate (id, channel, title, '
+      'link, relevance, state, regions, categories); `inventory.jsonl.gz` holds the full records of every candidate not ruled irrelevant; '
+      '`investigations.jsonl.gz` the evidence of each automated investigation (file lists, sampled columns, date samples); `queue.jsonl.gz` the not-yet-investigated '
+      'queue by priority; `region-questions.json` the per-region question sheet; `chains.json` the discovery graph.')
+    w('')
+    w(table(['Channel', 'Raw records harvested'], sorted(summ.get('rawByChannel', {}).items(), key=lambda x: -x[1])))
+    w('')
+    funnel = [('Raw catalogue records harvested', summ.get('rawRecords')), ('Duplicates merged (same DOI/URL, versions)', summ.get('duplicateRecordsMerged')),
+              ('Unique candidates (the universe)', summ['candidates']), ('Ruled irrelevant from metadata (off-topic or outside the area)', st.get('irrelevant', 0)),
+              ('Relevant, awaiting investigation (catalogue-only)', st.get('catalogue-only', 0)),
+              ('Metadata inspected (repository file list / service read)', st.get('metadata-inspected', 0)), ('Data inspected (sample read and profiled)', st.get('data-inspected', 0)),
+              ('Insufficient temporal information (positions, no dates)', st.get('insufficient-temporal', 0)),
+              ('Insufficient spatial information (dates, no positions)', st.get('insufficient-spatial', 0)),
+              ('Promising (positions and own dates)', st.get('promising', 0)), ('High priority (promising and targets weak cells)', st.get('high-priority', 0)),
+              ('Acquisition attempted / acquired', f"{st.get('acquisition-attempted', 0):,} / {st.get('acquired', 0):,}"),
+              ('Integrated', st.get('integrated', 0)), ('Rejected after inspection', st.get('rejected', 0)), ('Blocked (access refused)', st.get('blocked', 0)),
+              ('Duplicate of an integrated source', st.get('duplicate', 0))]
+    w(table(['Stage', 'Count'], [(k, f'{v:,}' if isinstance(v, int) else v) for k, v in funnel]))
+    w('')
+    w('Counts of *integrated*, *blocked* and *acquisition attempted* include every catalogue record of a collection handled as one source (e.g. all layers of a '
+      'blocked atlas, all document records of the Czech AMCR).')
+    w('')
+    cyc = load('discovery/cycles.json', [])
+    if cyc:
+        w('**Research cycles** (`cycles.json`, one row per completed cycle; each cycle rebuilds coverage, finds weak cells, searches, investigates, integrates):')
+        w('')
+        w(table(['Cycle', 'Date', 'Universe (unique)', 'Investigated (cum.)', 'Integrated sources (cum.)', 'New this cycle', 'Rejected / blocked (this cycle)',
+                 'Awaiting', 'Cells < 70', 'Main additions'],
+                [(c['cycle'], c['date'], f"{c['universe']:,}", f"{c['investigated']:,}", c['integratedSources'], c['newSources'], f"{c['rejected']} / {c['blocked']}",
+                  f"{c['awaiting']:,}", f"{c['weakBefore']:,} → {c['weakAfter']:,}", c['notes']) for c in cyc]))
+        w('')
+    rq = load('discovery/region-questions.json', {})
+    if rq:
+        qs = list(next(iter(rq.values())).keys())
+        w('**Region question sheet** (`region-questions.json`): for every region and question, candidates found / investigated / promising / integrated. '
+          'No region is treated as solved because one good dataset was found — each line is a set of open leads.')
+        w('')
+        rows = []
+        for r, qd in rq.items():
+            rows.append([r] + [f"{qd[q]['candidates']}/{qd[q]['investigated']}/{qd[q]['promising']}/{qd[q]['integrated']}" for q in qs])
+        w(table(['Region'] + qs, rows))
+        w('')
+    ch = load('discovery/chains.json', {})
+    if ch:
+        w(f"**Discovery chains** (`chains.json`): {len(ch)} strong datasets followed through related identifiers, citing records, creators, institutions and "
+          f"Zenodo communities; {sum(v.get('found', 0) for v in ch.values()):,} connected records added to the universe as channel *discovery-chain*.")
+        w('')
+    w('')
+
+    # ── B ──
+    w('## B. Coverage matrix (region × checkpoint × category)')
+    w('')
+    w('Full matrix with every cell: `docs/COVERAGE_CENTURIES.md` and `data/historical/coverage-centuries.json` (score, counts, dating mix, sources per cell). '
+      f"{len(regions)} regions × {len(years)} checkpoints ({years[0]}–{years[-1]}) × {len(cats)} categories. "
+      'Mean score per region and checkpoint after this pass, with the change from before it:')
+    w('')
+    rows = []
+    for r in regions:
+        row = [r]
+        for y in years:
+            a = [cell[(r, y, k)]['score'] for k in cats if cell.get((r, y, k)) and cell[(r, y, k)]['score'] is not None]
+            b = [cell0[(r, y, k)]['score'] for k in cats if cell0.get((r, y, k)) and cell0[(r, y, k)]['score'] is not None]
+            m, m0 = round(sum(a) / len(a)), round(sum(b) / len(b))
+            row.append(f"{'**' if m >= 70 else ''}{m}{'**' if m >= 70 else ''}{f' (+{m - m0})' if m > m0 else ''}")
+        rows.append(row)
+    w(table(['Region'] + [str(y) for y in years], rows))
+    w('')
+
+    # ── C ──
+    w('## C. Cells below 70')
+    w('')
+    w(f"`data/historical/weak-cells.csv` lists every one. **{len(weak):,} of {len(scored):,}** cells are below 70 (before this pass: {len(weak0):,}). "
+      'Cells that rose to 70 or more in this pass:')
+    w('')
+    lifted = sorted([(k, cell0[k]['score'], x['score']) for k, x in cell.items() if x['score'] is not None and k in cell0 and cell0[k]['score'] is not None
+                     and cell0[k]['score'] < 70 <= x['score']], key=lambda t: t[1] - t[2])
+    w(table(['Region', 'Year', 'Category', 'Before', 'After', 'Main sources now'],
+            [(k[0], k[1], k[2], b, a, ', '.join(list(cell[k]['sources'])[:3])) for k, b, a in lifted[:60]]))
+    if len(lifted) > 60:
+        w(f'\n…and {len(lifted) - 60} more.')
+    w('')
+    w(table(['Category', 'Cells < 70 now', 'before'], [(k, sum(1 for x in weak if x['category'] == k), sum(1 for x in weak0 if x['category'] == k)) for k in cats]))
+    w('')
+    w(table(['Region', 'Cells < 70 now', 'before'], sorted([(r, sum(1 for x in weak if x['region'] == r), sum(1 for x in weak0 if x['region'] == r)) for r in regions],
+                                                          key=lambda t: -t[1])))
+    w('')
+
+    # ── D ──
+    w('## D. Source targets for the weakest cells')
+    w('')
+    w('For each region × category, the mean score over the checkpoints, and the best not-yet-used inventory candidates for it (relevance ≥ 50, class A–C, '
+      'region and category matched automatically from their own metadata, datasets naming centuries first). These are leads to inspect, not conclusions: text matching is '
+      'noisy (a dataset that mentions a region is not always about it), and many will turn out to be undated or to cover only part of the region. Where no good '
+      'lead appears, the region needs a targeted search in its own language and national portal — that is how the Slovenian, Polish, Irish and Scottish registers were found.')
+    w('')
+    by_rc = defaultdict(list)
+    for x in scored:
+        by_rc[(x['region'], x['category'])].append(x['score'])
+    worst = sorted(((sum(v) / len(v), r, k) for (r, k), v in by_rc.items()), key=lambda t: t[0])
+    pool = defaultdict(list)
+    for c in rel:
+        # Datasets only: map scans are listed in G; a catalogue entry for a whole collection is not a dataset.
+        if (c['accessClass'] in ('A', 'B', 'C') and c['status'] == 'discovered' and c['channel'] not in ('ogm', 'harvard-geodata', 'loc-maps')
+                and not re.search(r'\bcollection\b', c['title'].lower())):
+            for r in c['regions']:
+                for k in c['categories']:
+                    pool[(r, k)].append(c)
+    rows = []
+    for m, r, k in worst[:70]:
+        hits = sorted(pool.get((INV_REGION.get(r, r), k), []), key=lambda c: (not c.get('periods'), -c['relevance'], c['title']))[:3]
+        rows.append([r, k, round(m), '<br>'.join(link(c) for c in hits) or 'no candidate yet — needs a targeted search'])
+    w(table(['Region', 'Category', 'Mean score', 'Best leads'], rows))
+    w('')
+
+    # ── E ──
+    hg, hd = harv['harvardGeospatialLibrary'], harv['harvardDataverse']
+    w('## E. Harvard deep search')
+    w('')
+    w(f"**Harvard Geospatial Library** (OpenGeoMetadata, `edu.harvard` Aardvark records): {hg['records']:,} records; {hg['inEuropeMediterranean']:,} in Europe/the "
+      f"Mediterranean; {hg['historicalMaps(year<=1950)']:,} historical (map year ≤ 1950); {hg['georeferencedRasters']:,} georeferenced rasters "
+      f"({hg['publicGeoreferencedRasters']:,} public); {hg['vectorLayersInEurope']:,} European vector layers ({hg['publicVectorLayersInEurope']:,} public).")
+    w('')
+    w(table(['Map year (century)', 'Records'], [(k, v) for k, v in hg['mapYearByCentury'].items()]))
+    w('')
+    w(table(['Publisher', 'Records'], hg['publishers'][:15]))
+    w('')
+    w('What it means for Shelf: the 1,100-odd public georeferenced map scans (mostly 1600–1900) are the largest ready-made source of historical-map overlays found anywhere '
+      'in this pass — each has a map year (a snapshot) and a bounding box. The Euratlas century layers (borders, cities, rivers, years 1–2000) are Restricted; HGIS Germany '
+      '(boundaries 1820–1914) is Public. See G and Q.')
+    w('')
+    w(f"**Harvard Dataverse** (search API, all dataverses incl. heiDATA, DataverseNL mirrors): {hd['candidates']:,} candidates, {hd['relevance>=50']} with relevance ≥ 50. Top:")
+    w('')
+    w(table(['Title', 'Dataverse', 'Relevance', 'Regions'], [(f"[{t['title'][:90]}](https://doi.org/{t['doi'].replace('hdl:', '')})" if not t['doi'].startswith('hdl') else t['title'][:90],
+                                                            t.get('dataverse', ''), t['relevance'], ', '.join(t.get('regions', [])[:3])) for t in hd['top'][:25]]))
+    w('')
+
+    # ── F ──
+    w('## F. Regional reports')
+    w('')
+    integ = Counter()
+    for x in now['cells']:
+        for s in x['sources']:
+            integ[(x['region'], s)] += x['sources'][s]
+    for r in regions:
+        rs = [x for x in scored if x['region'] == r]
+        m = round(sum(x['score'] for x in rs) / len(rs))
+        rs0 = [x for x in before['cells'] if x['region'] == r and x['score'] is not None]
+        m0 = round(sum(x['score'] for x in rs0) / len(rs0))
+        catm = sorted(((round(sum(x['score'] for x in rs if x['category'] == k) / max(1, sum(1 for x in rs if x['category'] == k))), k) for k in cats
+                       if any(x['category'] == k for x in rs)))
+        srcs = sorted(((v, s) for (rr, s), v in integ.items() if rr == r), reverse=True)[:6]
+        leads = sum(1 for c in rel if INV_REGION.get(r) in c['regions'])
+        w(f"**{r}** — mean {m} (before {m0}); {sum(1 for x in rs if x['score'] < 70)} of {len(rs)} cells below 70. "
+          f"Weakest: {', '.join(f'{k} {s}' for s, k in catm[:3])}. Strongest: {', '.join(f'{k} {s}' for s, k in catm[-2:])}. "
+          f"Main sources: {', '.join(s for _, s in srcs)}. Inventory leads (relevance ≥ 50, region '{INV_REGION.get(r)}'): {leads:,}.")
+        w('')
+
+    # ── G–L ──
+    def inv_section(letter, title, test, note):
+        sel = [c for c in rel if test(c)]
+        w(f'## {letter}. {title}')
+        w('')
+        w(note)
+        w('')
+        w(f"{len(sel):,} candidates (relevance ≥ 50). By access class: " + ', '.join(f'{k} {v:,}' for k, v in sorted(Counter(c['accessClass'] for c in sel).items())) +
+          '. By region: ' + ', '.join(f'{k} {v:,}' for k, v in Counter(r for c in sel for r in c['regions']).most_common(12)) + '.')
+        w('')
+        top = sorted(sel, key=lambda c: (c['status'] == 'discovered', -c['relevance'], -len(c.get('periods') or []), c['title']))[:30]
+        w(table(['Candidate', 'Channel', 'Class', 'Regions', 'Periods named', 'Status'], [cand_row(c) for c in top]))
+        w('')
+
+    txt = lambda c: (c['title'] + ' ' + ' '.join(map(str, c.get('keywords') or [])) + ' ' + (c.get('type') or '')).lower()  # noqa: E731
+    inv_section('G', 'Historical map inventory', lambda c: c['accessClass'] == 'E' or re.search(r'\b(map|carte|karte|mapa|térkép|kaart|carta)\b', txt(c)) is not None,
+                'Scanned and georeferenced historical maps. A map is a snapshot of its own year; it can be overlaid, not turned into dated features without digitising.')
+    inv_section('H', 'Archaeological inventory', lambda c: 'Archaeology' in c['categories'],
+                'Site and monument registers, excavation databases, find-spot corpora. Register datings are kept per record; period classes become approximate year ranges.')
+    inv_section('I', 'Gazetteer inventory', lambda c: re.search(r'gazetteer|place.?name|toponym|ortsnam|nomi di luogo|helynév|topony|dictionnaire topographique|ortsverzeichnis|names', txt(c)) is not None,
+                'Gazetteers and place-name collections: the main source of names-in-time and of attestation years.')
+    inv_section('J', 'Administrative & ecclesiastical inventory', lambda c: ('Political' in c['categories'] or 'Religious' in c['categories'])
+                and re.search(r'boundar|border|grenz|diocese|bistum|parish|pfarr|paroiss|county|district|province|administrative|kreis|comitat|deanery', txt(c)) is not None,
+                'Boundaries, dioceses, parishes, counties. Boundary data is the hardest to date honestly: a layer for one year is a snapshot, not a period.')
+    inv_section('K', 'Transport inventory', lambda c: 'Transport' in c['categories'], 'Roads, routes, itineraries, waterways, canals, railways, bridges, ports.')
+    inv_section('L', 'Population & economic inventory', lambda c: 'Population' in c['categories'] or 'Economic' in c['categories'],
+                'Censuses, tax registers, urban populations, markets, mills, mines, trade.')
+
+    # ── M ──
+    w('## M. Temporal-quality report')
+    w('')
+    mix, mix0 = Counter(), Counter()
+    for x in now['cells']:
+        mix.update(x['dating'])
+    for x in before['cells']:
+        mix0.update(x['dating'])
+    w('Record-checkpoint counts by dating type (a record counts once per checkpoint it overlaps), now and before this pass. The score weights them '
+      + ', '.join(f'{k} {v}' for k, v in now['datingWeights'].items()) + '; undated records are not counted.')
+    w('')
+    w(table(['Dating type', 'Now', 'Before', 'Share now'], [(k, f'{mix[k]:,}', f'{mix0[k]:,}', f"{100 * mix[k] / max(1, sum(mix.values())):.1f}%")
+                                                            for k in ('exact', 'attested', 'period-narrow', 'period-broad', 'dataset')]))
+    w('')
+    w('How each dataset added in this pass is dated (from the loaders in `scripts/atlas-build/registers.py`):')
+    w('')
+    w(table(['Dataset', 'Dating used', 'Not done'], [
+        ('Canmore (Scotland)', "Canmore's own period terms (ScAPA thesaurus → approximate years), named centuries and parts, years", 'Undated generic records (135,063) not indexed; nothing outside 0–1914'),
+        ('Ireland SMR', 'Only where the monument class names a period', 'Most records (52k) stay undated'),
+        ('Poland NID', "Construction window from 'chronologia' (open end: the building exists from then)", 'No end date invented; locality-level position only'),
+        ('Index Villaris', 'Snapshot 1680', 'No founding or end'),
+        ('Ottoman NFS', 'Snapshot per register (hijri → CE)', 'No founding or end'),
+        ('Generalkarte gazetteer', 'Envelope 1880–1918 (map sheets)', 'Not projected before or after'),
+        ('Cassini places and roads', 'Envelope 1756–1815', 'Not projected before or after'),
+        ('Lutsch map 1751', 'Snapshot 1751', '—'),
+        ('LIST inscriptions', 'Per find-spot per century, only inscriptions dated within ≤150 years', 'Broadly dated inscriptions (40,641) excluded'),
+        ('Slovenia RKD', 'Register dating: construction period for buildings (open end), union of named periods for sites', 'Prehistoric-only and post-1914 records left out'),
+        ('Latvia monuments list', 'List dating (centuries and parts, years, Latvian archaeological periods)', 'No coordinates in the list: placed at town/village/parish, marked approximate'),
+        ('Croatia register', "Register dating 'A do B' (centuries, years, BCE)", "Ambiguous 'NN. god.' not used; placed at the named settlement"),
+        ('Russian 3-verst map (Balkans)', 'Envelope 1877–1879 (survey)', 'Not projected before or after; swapped columns corrected'),
+        ('RoHGIS Romania', 'Envelope 1904–1913 (existing between two laws)', '—'),
+        ('TransIce Iceland', 'Farms: 1703 snapshot (Jarðabók); shielings: first mention → abandonment', 'Farms without a 1703 entry undated'),
+        ('DISSILOC', "Attested in the register's years (from the edition title)", 'Stettin register (no date in its title) undated'),
+        ('Swedish geometrical maps', 'Envelope 1630–1655 (the maps it is drawn on)', "Each map's own year not in the dataset"),
+        ('Tyrol mining documents', "Attested in the document's years", '226 places not localised by the source'),
+        ('Lutsch roads', 'Snapshot 1751', '—'),
+        ('Arkas (Slovenia)', "Each site's own years (Leto_od–Leto_do)", 'Prehistoric-only sites left out'),
+        ('Latin Church c. 1772 (private pack)', 'Snapshot 1772 (the atlas reconstruction year)', 'No founding or end'),
+        ('Wikidata: churches, mosques, synagogues, manors, caravanserais, hillforts, mills, mines, ports, lighthouses, canals, bridges 1600–1914, railway stations; settlements first recorded 1600–1914', "Earliest inception (P571) or first written mention (P1249) at Wikidata's recorded precision: a century- or decade-precision date is a window (marked), never a single year; first mention labelled as such", 'Millennium-precision dates not used; administrative units (e.g. the 1863 Swedish/Finnish rural municipalities, cadastral areas) excluded from settlements; items already in the medieval snapshot left to it'),
+        ('ARIADNE catalogue (private pack)', "Each provider period (PeriodO-linked from/until); separate periods stay separate phases", 'No join across gaps; records without a point placed at their municipality only when the name is unique'),
+    ]))
+    w('')
+    w('Display rules added: a snapshot is drawn at full strength in its year and lighter within ±25 years (a display allowance, stated in the popup, not a claim); '
+      'a construction window is drawn from its start; a period is drawn over the period. Popups say which of these applies.')
+    w('')
+
+    # ── N ──
+    w('## N. Spatial-quality report')
+    w('')
+    if qa:
+        w('`scripts/historical-data/spatial_qa.py` → `data/historical/audit/spatial-qa.json`. Nothing is changed or deleted: each suspicious record is classified with the reason.')
+        w('')
+        w(qa.get('method', '').split('\n\n')[0].replace('\n', ' '))
+        w('')
+        kinds = ['water-far', 'water-near', 'wreck-on-land', 'outside-box', 'swapped', 'stacked']
+        rows = []
+        for ds, n in sorted(qa['checked'].items(), key=lambda t: -t[1]):
+            f = qa['flags'].get(ds, {})
+            if f:
+                rows.append([ds, f'{n:,}'] + [f.get(k, '') for k in kinds] + [f"{100 * qa['shareFlagged'].get(ds, 0):.1f}%"])
+        w(table(['Dataset', 'Checked'] + kinds + ['Flagged (excl. water-near)'], rows))
+        w('')
+        w('Reading it: *water-near* is mostly coordinate precision or a shoreline that moved (expected for harbours, polders, lagoon islands); *water-far* in a '
+          'non-maritime dataset is a real error or a sunk/lost place and is reviewed per record; *stacked* marks placeholder positions (records placed at a parish '
+          'or county centre) — they are kept and should be drawn as approximate; *swapped* is a lat/lon exchange (fixed in the loader when a whole dataset has it, '
+          'as with the Generalkarte gazetteer).')
+    else:
+        w('Not yet run.')
+    w('')
+
+    # ── O ──
+    w('## O. Entity-resolution report')
+    w('')
+    if ent:
+        w(f"`scripts/historical-data/entity_report.py` → `data/historical/audit/entities.json`. {ent['records']:,} index records → {ent['entities']:,} entities; "
+          f"{ent['multiSourceEntities']:,} entities are described by more than one dataset ({ent['recordsInMultiSourceEntities']:,} records); the largest joins {ent['largestEntity']} records.")
+        w('')
+        w(ent.get('method', '').split('\n\n', 1)[-1].replace('\n', ' '))
+        w('')
+        w(table(['Dataset pair', 'Shared entities'], ent['sourcePairs'][:25]))
+        w('')
+        w('Examples (first groups found):')
+        w('')
+        for k, groups in ent['examples'].items():
+            if groups:
+                w(f"- **{k}**: " + ' · '.join('{' + ', '.join(g) + '}' for g in groups))
+        w('')
+        w('**Recommended generic mechanism.** Keep three levels: *source record* (as published, never edited), *entity* (a place through time, '
+          'with an id of its own) and *map representation* (what is drawn for a given year). Records join an entity by evidence, in order: a shared external '
+          'identifier (Wikidata, Pleiades, GeoNames, national register ids); a shared name form (any recorded name, normalised) within a distance that depends '
+          'on the kind of place; a link stated by a source (e.g. a gazetteer that cites another). A join is a stored claim with its evidence, reversible, and '
+          'never merges two records of the same dataset. Names stay attached to their records with their own dates, so the label for a year is chosen from '
+          'the entity\'s name forms valid then — no rule like "Istanbul = Constantinople" is hard-coded; it falls out of the dated name forms.')
+    else:
+        w('Not yet run.')
+    w('')
+
+    # ── P ──
+    w('## P. Base-map recommendations')
+    w('')
+    w('- Keep the present base (coast, sea depth, relief, rivers, lakes and reservoirs dated by completion year, modern reference layers off by default) — see `docs/BASE_MAP.md`.')
+    w('- Shorelines that moved (Low Countries polders, the Po delta, Venice lagoon, the Wash, Ravenna, Ephesus) are the main reason for *water-near* flags; '
+      'the dated polder layer already handles the Netherlands. Next: digitised historical coastlines for the Po delta and Ravenna (from georeferenced maps in G).')
+    w('- Rivers at zoom 9–11 still need either a Copernicus account (EU-Hydro, free but needs a login — the user\'s decision) or a 30 GB OSM extract (too large for this machine).')
+    w('- Historical map overlays: the 1,107 public georeferenced Harvard scans and the LoC maps are the best candidates for a "historical map underneath" option, '
+      'each shown only around its own map year.')
+    w('')
+
+    # ── Q/R/S ──
+    w('## Q. Immediate acquisition plan (next pass, days)')
+    w('')
+    w('1. HGIS Germany boundaries 1820–1914 (Harvard, catalogue says Public; non-commercial academic licence → private pack). Harvard returned 429 to this machine all night; download it from the phone/laptop or retry from another network.')
+    w('2. Estonia and Lithuania heritage registers: their sites block automated access — export them by hand in a browser (both offer CSV/Excel views) and drop the files into the raw vault.')
+    w('3. World Historical Gazetteer datasets for weak regions (List of Russian towns, late 14th c.; Benjamin of Tudela; Heritage Gazetteer of Libya; Usaybia places): WHG now refuses bots; a free WHG account token would let the build read them.')
+    w('4. The highest-ranked class-A leads in D for Egypt, the Maghreb, the Levant and Cyprus after 1000 — still the weakest areas.')
+    w('5. Further dated Wikidata classes for the thinnest categories (Maritime, Economic, Transport, Events): done for churches, mosques, synagogues, manors, mills, mines, ports, lighthouses, canals, bridges and railway stations (read at their recorded date precision). Next candidates: dated shipyards, salt works, toll houses, post stations, and treaties/uprisings as dated events — each only with its own date statement.')
+    w('6. Re-run `coverage_centuries.py` and this report after each integration.')
+    w('')
+    w('## R. Medium-term plan (weeks)')
+    w('')
+    w('1. Historical map overlays: done for 1,052 public georeferenced Harvard/NYU layers (map archive → overlay). Next: check each holder’s server allows browser loading (CORS) from the phone; add LoC and Rumsey georeferences via Allmaps as they appear.')
+    w('2. Entity layer as in O: store joins as claims; use them to pick the label for a year from dated name forms.')
+    w('3. Link the Swedish younger geometrical maps (1680–1700) transcriptions to places (they have map ids, no coordinates).')
+    w('4. Ottoman tax registers beyond the NFS gazetteer (e.g. Hanley\'s 1530 names) — only with a reliable identification method, never by guessing a modern namesake.')
+    w('')
+    w('## S. Long-term plan')
+    w('')
+    w('1. Engel (Hungary c. 1500) — needs the institute\'s export; contact them.')
+    w('2. Euratlas century layers — a paid licence exists; only with the user\'s explicit decision (no money spent automatically).')
+    w('3. Copernicus EU-Hydro for detailed rivers — needs the user\'s free account.')
+    w('4. Systematic attestation dating (first mentions per place) from national place-name dictionaries — the largest remaining gain for the Names category.')
+    w('')
+    w('---')
+    w('')
+    w('Generated files: `data/historical/discovery/{inventory.jsonl.gz, summary.json, harvard.json, decisions.json, inspected.jsonl}`, '
+      '`data/historical/coverage-centuries.json`, `data/historical/coverage-centuries-before.json`, `data/historical/weak-cells.csv`, '
+      '`data/historical/audit/{spatial-qa.json, entities.json}`. Scripts: `scripts/historical-data/discover/*.py`, `scripts/historical-data/coverage_centuries.py`, '
+      '`scripts/historical-data/spatial_qa.py`, `scripts/historical-data/entity_report.py`, `scripts/atlas-build/registers.py`.')
+    out = os.path.join(ROOT, 'docs', 'HISTORICAL_SOURCES_SEARCH.md')
+    open(out, 'w', encoding='utf-8').write('\n'.join(L) + '\n')
+    print(out, len(L), 'lines')
+
+
+if __name__ == '__main__':
+    main()

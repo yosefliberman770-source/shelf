@@ -1,0 +1,78 @@
+{
+ "id": "hus-och-gard",
+ "src": "husgard",
+ "public": true,
+ "enabled": true,
+ "title": "Excavated houses and farms of pre-urban Sweden (Hus och gård i det förurbana samhället, Riksantikvarieämbetet 1995; Zenodo 2026)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.18231456",
+ "describe": "Houses (long-houses, pit-houses, stone-footed houses…) excavated by Swedish contract archaeology up to the early 1990s, each shown in the periods the project assigns it; years from the conventional Swedish period scheme stated in each label (Roman Iron Age 1–400, Migration Period 400–550, Vendel 550–800, Viking Age 800–1050, Middle Ages 1050–1520). Houses whose location the dataset could not fix are marked approximate; Stone and Bronze Age houses are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "fields": {
+  "id": "id",
+  "name": "id_PLATS",
+  "type": [
+   "hus_HUSTYP"
+  ],
+  "context": [
+   "id_SOCKEN",
+   "id_LANDSKAP"
+  ],
+  "kind": "building"
+ },
+ "dating": {
+  "mode": "flags",
+  "flags": {
+   "per_FÖRROM": "pre-roman iron age",
+   "per_ROM": "roman iron age",
+   "per_FOLKV": "migration period",
+   "per_VENDEL": "vendel period",
+   "per_VIK": "viking age",
+   "per_MEDEL": "middle ages"
+  },
+  "table": {
+   "pre-roman iron age": [
+    -500,
+    0
+   ],
+   "roman iron age": [
+    1,
+    400
+   ],
+   "migration period": [
+    400,
+    550
+   ],
+   "vendel period": [
+    550,
+    800
+   ],
+   "viking age": [
+    800,
+    1050
+   ],
+   "middle ages": [
+    1050,
+    1520
+   ]
+  },
+  "label": "period in the project; years from the Swedish period scheme"
+ },
+ "parts": [
+  {
+   "read": {
+    "path": "hus-och-gard/original/Hus och gård punkter sweref_fixed_location.gpkg",
+    "layer": "Hus och gård punkter sweref_fixed_location"
+   }
+  },
+  {
+   "read": {
+    "path": "hus-och-gard/original/Hus och gård punkter sweref_not_fixed_location.gpkg",
+    "layer": "Hus och gård punkter sweref_not_fixed_location",
+    "approx": true
+   }
+  }
+ ]
+}

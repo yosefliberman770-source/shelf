@@ -1,0 +1,74 @@
+{
+ "id": "france-mills",
+ "src": "frmills",
+ "public": true,
+ "enabled": true,
+ "title": "Flour mills in the French national surveys of 1794, 1801 and 1809 (Archives nationales F/20; data.gouv.fr)",
+ "licence": "Licence Ouverte / Open Licence (Etalab)",
+ "url": "https://www.data.gouv.fr/fr/datasets/enquetes-sur-les-moulins-de-1794-a-1809/",
+ "describe": "Water mills, windmills and boat mills recorded commune by commune in the State's mill surveys of year II (1794, 72 départements), year X (1801, the départements supplying Paris) and 1809 (national, including annexed parts of Belgium, Germany and Italy); each record is shown as a snapshot of its survey, placed at its commune (approximate).",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "france-mills-1794-1809/original/moulins.csv",
+  "delimiter": ";",
+  "latLonField": "Géolocalisation",
+  "approx": true
+ },
+ "fields": {
+  "name": "Nom du moulin",
+  "nameFallback": "Type de moulin",
+  "type": [
+   "Type de moulin",
+   "Nombre de moulins"
+  ],
+  "context": [
+   "Commune ancienne",
+   "Département ancien"
+  ],
+  "kind": "mill",
+  "generic": true
+ },
+ "parts": [
+  {
+   "keep": {
+    "field": "Date de l'enquête",
+    "values": [
+     "an II"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1794,
+    "label": "national mill survey of year II (1794)"
+   }
+  },
+  {
+   "keep": {
+    "field": "Date de l'enquête",
+    "values": [
+     "an X"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1801,
+    "label": "survey of year X (1801) of the départements supplying Paris"
+   }
+  },
+  {
+   "keep": {
+    "field": "Date de l'enquête",
+    "values": [
+     "1809"
+    ]
+   },
+   "dating": {
+    "mode": "snapshot",
+    "year": 1809,
+    "label": "national mill survey of 1809"
+   }
+  }
+ ]
+}

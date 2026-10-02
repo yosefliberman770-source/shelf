@@ -1,0 +1,145 @@
+{
+ "id": "eesdelta",
+ "src": "eesdelta",
+ "public": false,
+ "enabled": true,
+ "title": "EES Delta Survey: archaeological sites of the Nile Delta (Egypt Exploration Society, after Spencer 2024)",
+ "licence": "Free to view; reuse needs the EES's permission (private use only)",
+ "url": "https://www.ees.ac.uk/our-cause/research/delta-survey.html",
+ "describe": "Archaeological sites of the Nile Delta with the periods the gazetteer records for each; years from standard Egyptian chronology.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "ees-delta-survey/original/ees_delta_survey.geojson"
+ },
+ "fields": {
+  "id": "OBJECTID",
+  "name": "Name",
+  "kind": "site",
+  "type": [
+   "Governorate"
+  ],
+  "context": [
+   "Other_Name",
+   "Governorate"
+  ]
+ },
+ "dating": {
+  "mode": "periods",
+  "field": "Periods",
+  "sep": "[;,:]",
+  "label": "standard Egyptian chronology",
+  "table": {
+   "roman": [
+    -30,
+    395
+   ],
+   "roman period": [
+    -30,
+    395
+   ],
+   "early roman": [
+    -30,
+    284
+   ],
+   "late roman": [
+    284,
+    641
+   ],
+   "late roman period": [
+    284,
+    641
+   ],
+   "byzantine": [
+    395,
+    641
+   ],
+   "coptic": [
+    284,
+    641
+   ],
+   "islamic": [
+    641,
+    1914
+   ],
+   "islamic period": [
+    641,
+    1914
+   ],
+   "medieval": [
+    641,
+    1517
+   ],
+   "ottoman": [
+    1517,
+    1914
+   ],
+   "ottoman period": [
+    1517,
+    1914
+   ],
+   "modern": [
+    1805,
+    1914
+   ],
+   "ptolemaic period": [
+    -332,
+    -30
+   ],
+   "ptolemaic": [
+    -332,
+    -30
+   ],
+   "late period": [
+    -664,
+    -332
+   ],
+   "third intermediate period": [
+    -1069,
+    -664
+   ],
+   "third intermediat period": [
+    -1069,
+    -664
+   ],
+   "new kingdom": [
+    -1550,
+    -1069
+   ],
+   "second intermediate period": [
+    -1650,
+    -1550
+   ],
+   "middle kingdom": [
+    -2055,
+    -1650
+   ],
+   "first intermediate period": [
+    -2160,
+    -2055
+   ],
+   "old kingdom": [
+    -2686,
+    -2160
+   ],
+   "early dynastic": [
+    -3100,
+    -2686
+   ],
+   "predynastic": [
+    -5300,
+    -3100
+   ],
+   "neolithic": [
+    -6000,
+    -4000
+   ]
+  },
+  "ignore": [
+   "unknown",
+   ""
+  ]
+ },
+ "datingLabel": "periods recorded by the EES gazetteer"
+}

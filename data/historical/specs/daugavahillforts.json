@@ -1,0 +1,12 @@
+{
+ "id": "daugavahillforts", "src": "daugavahf", "public": true, "enabled": true,
+ "title": "Hillforts in Latvia along the Daugava, Bronze Age to modern period (INHILLDAUGAR, ArkeoGIS, Nakala 2026)",
+ "licence": "Etalab Open Licence 2.0", "url": "https://doi.org/10.34847/nkl.aecdrl48",
+ "describe": "Hillforts on the Daugava with the start and end of each documented phase (settlement, ramparts, radiocarbon-dated layers); phases separated by gaps stay separate.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "daugava-hillforts/original/hillforts-EN.csv", "delimiter": ";", "lon": "LONGITUDE", "lat": "LATITUDE", "crs": "EPSG:4326"},
+ "fields": {"id": "SITE_SOURCE_ID", "name": "SITE_NAME", "nameTitleCase": true, "type": ["CHARAC_LVL1", "CHARAC_LVL2"], "kind": "castle"},
+ "groupBy": true, "groupNoun": "dated phase record", "groupVerb": "with", "groupType": "hillfort",
+ "dating": {"mode": "fields", "from": "STARTING_PERIOD", "to": "ENDING_PERIOD", "signedYears": true, "openValues": ["undetermined"]},
+ "datingLabel": "the hillfort's own dated phases (ArkeoGIS)"
+}

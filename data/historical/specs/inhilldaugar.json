@@ -1,0 +1,12 @@
+{
+ "id": "inhilldaugar", "src": "inhilldaugar", "public": true, "enabled": true,
+ "title": "INHILLDAUGAR: annotated place-names along the Daugava, Latvia (Potsdam/Polish-German project, 2025)",
+ "licence": "CC BY 4.0", "url": "https://doi.org/10.5281/zenodo.21157502",
+ "describe": "Place-names along the Daugava in Latvia with etymology and the century of their earliest documentary attestation where known (e.g. 13th-century chronicles, the 1557 register, Mellin 1798); names without a documented attestation are not dated.",
+ "layers": ["gazetteer-settlements"],
+ "read": {"path": "inhilldaugar/original/Inhilldaugar - database.csv", "lon": "_longitude", "lat": "_latitude", "crs": "EPSG:4326"},
+ "fields": {"id": "_obj ID", "name": "_toponym", "type": ["_obj type", "_meaning"], "context": ["source text for antequem"],
+            "kind": {"field": "_obj type", "map": {"farmstead": "settlement", "village": "settlement", "estate": "building", "neighbourhood": "settlement", "castle": "castle", "hillfort": "castle", "church": "church", "manor": "building", "town": "settlement", "mill": "mill"}, "default": "site"}},
+ "dating": {"mode": "firstAttested", "field": "_ante_quem", "sep": ";"},
+ "datingLabel": "century of the earliest documentary attestation"
+}

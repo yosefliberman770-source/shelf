@@ -1,0 +1,198 @@
+{
+ "id": "lithuania-kvr",
+ "src": "ltkvr",
+ "public": true,
+ "enabled": true,
+ "title": "Register of Immovable Cultural Heritage of Lithuania (KVR, Kultūros paveldo departamentas; Lithuanian official statistics portal ArcGIS)",
+ "licence": "CC BY 4.0",
+ "url": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD/kvr_taskai_enriched/FeatureServer",
+ "describe": "Hillforts, burial grounds, old settlements, churches, manors, mills and other registered monuments of Lithuania, each over the age the register gives it ('XIX a. pab.' = late 19th century, 'I t-metis' = 1st millennium AD; translated with the parts kept as stated); objects without an age are left out. Territories are placed at their centre.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "dedupe": false,
+ "parts": [
+  {
+   "read": {
+    "path": "lithuania-kvr/original/points.geojson",
+    "translateDating": {
+     "field": "amzius",
+     "lang": "lt"
+    }
+   },
+   "fields": {
+    "id": "unikalus_kodas",
+    "name": "pavadinimas",
+    "type": [
+     "klasifikatorius",
+     "reiksmingumas"
+    ],
+    "context": [
+     "adresas"
+    ],
+    "kind": {
+     "field": "klasifikatorius",
+     "map": {
+      "piliakalnis": "castle",
+      "piliakalnis su gyvenviete": "castle",
+      "pilis": "castle",
+      "pilies liekanos": "castle",
+      "pilies vieta": "castle",
+      "įtvirtinimai": "castle",
+      "bažnyčia": "church",
+      "koplyčia": "church",
+      "varpinė": "church",
+      "koplytėlė": "church",
+      "koplytstulpis": "church",
+      "cerkvė": "church",
+      "sinagoga": "church",
+      "vienuolynas": "monastery",
+      "vienuolyno ansamblis": "monastery",
+      "gyvenvietė": "settlement",
+      "senovės gyvenvietė": "settlement",
+      "kaimas": "settlement",
+      "miestelis": "settlement",
+      "dvaro sodyba": "building",
+      "dvaro sodybos fragmentai": "building",
+      "rūmai": "building",
+      "namas": "building",
+      "pastatas": "building",
+      "malūnas": "mill",
+      "vandens malūnas": "mill",
+      "vėjo malūnas": "mill",
+      "tiltas": "bridge",
+      "kautynių ir žūties vieta": "battle"
+     },
+     "default": "site"
+    },
+    "genericIfEquals": "klasifikatorius"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "__dating",
+    "dropUndated": true
+   }
+  },
+  {
+   "read": {
+    "path": "lithuania-kvr/original/polygons.geojson",
+    "translateDating": {
+     "field": "amzius",
+     "lang": "lt"
+    }
+   },
+   "fields": {
+    "id": "unikalus_kodas",
+    "name": "pavadinimas",
+    "type": [
+     "klasifikatorius",
+     "reiksmingumas"
+    ],
+    "context": [
+     "adresas"
+    ],
+    "kind": {
+     "field": "klasifikatorius",
+     "map": {
+      "piliakalnis": "castle",
+      "piliakalnis su gyvenviete": "castle",
+      "pilis": "castle",
+      "pilies liekanos": "castle",
+      "pilies vieta": "castle",
+      "įtvirtinimai": "castle",
+      "bažnyčia": "church",
+      "koplyčia": "church",
+      "varpinė": "church",
+      "koplytėlė": "church",
+      "koplytstulpis": "church",
+      "cerkvė": "church",
+      "sinagoga": "church",
+      "vienuolynas": "monastery",
+      "vienuolyno ansamblis": "monastery",
+      "gyvenvietė": "settlement",
+      "senovės gyvenvietė": "settlement",
+      "kaimas": "settlement",
+      "miestelis": "settlement",
+      "dvaro sodyba": "building",
+      "dvaro sodybos fragmentai": "building",
+      "rūmai": "building",
+      "namas": "building",
+      "pastatas": "building",
+      "malūnas": "mill",
+      "vandens malūnas": "mill",
+      "vėjo malūnas": "mill",
+      "tiltas": "bridge",
+      "kautynių ir žūties vieta": "battle"
+     },
+     "default": "site"
+    },
+    "genericIfEquals": "klasifikatorius"
+   },
+   "dating": {
+    "mode": "fields",
+    "from": "__dating",
+    "dropUndated": true
+   },
+   "excludeIdsFrom": {
+    "read": {
+     "path": "lithuania-kvr/original/points.geojson"
+    },
+    "field": "unikalus_kodas",
+    "label": "the point layer of the same register"
+   }
+  }
+ ],
+ "datingLabel": "age in the register",
+ "fields": {
+  "id": "unikalus_kodas",
+  "name": "pavadinimas",
+  "type": [
+   "klasifikatorius",
+   "reiksmingumas"
+  ],
+  "context": [
+   "adresas"
+  ],
+  "kind": {
+   "field": "klasifikatorius",
+   "map": {
+    "piliakalnis": "castle",
+    "piliakalnis su gyvenviete": "castle",
+    "pilis": "castle",
+    "pilies liekanos": "castle",
+    "pilies vieta": "castle",
+    "įtvirtinimai": "castle",
+    "bažnyčia": "church",
+    "koplyčia": "church",
+    "varpinė": "church",
+    "koplytėlė": "church",
+    "koplytstulpis": "church",
+    "cerkvė": "church",
+    "sinagoga": "church",
+    "vienuolynas": "monastery",
+    "vienuolyno ansamblis": "monastery",
+    "gyvenvietė": "settlement",
+    "senovės gyvenvietė": "settlement",
+    "kaimas": "settlement",
+    "miestelis": "settlement",
+    "dvaro sodyba": "building",
+    "dvaro sodybos fragmentai": "building",
+    "rūmai": "building",
+    "namas": "building",
+    "pastatas": "building",
+    "malūnas": "mill",
+    "vandens malūnas": "mill",
+    "vėjo malūnas": "mill",
+    "tiltas": "bridge",
+    "kautynių ir žūties vieta": "battle"
+   },
+   "default": "site"
+  },
+  "genericIfEquals": "klasifikatorius"
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "__dating",
+  "dropUndated": true
+ }
+}

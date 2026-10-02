@@ -758,7 +758,13 @@
  },
  {
   "id": "norway-kulturminner",
-  "files": [],
+  "files": [
+   {
+    "url": "https://api.ra.no/kulturminner/collections/kulturminner/items?f=json&limit=1000&filter=datering<>'Uviss tid' AND minnetype<>'ENK'",
+    "path": "original/kulturminner_dated.geojson",
+    "note": "paged OGC API harvest (offset 0–201,000, 1,000 per page), centre points and 14 fields kept, de-duplicated by lokalitetid"
+   }
+  ],
   "note": "Geonorge download order (whole country, GML, EPSG:4258) of dataset c72906a0-2bc2-41d7-bea2-c92d368e3c49; code lists from register.geonorge.no"
  },
  {
@@ -767,6 +773,1281 @@
    {
     "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
     "path": "original/source-data.zip"
+   }
+  ]
+ },
+ {
+  "id": "canmore-scotland",
+  "files": [
+   {
+    "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+    "path": "original/Canmore_Points.zip"
+   }
+  ]
+ },
+ {
+  "id": "ireland-smr",
+  "files": [
+   {
+    "url": "https://heritagedata.maps.arcgis.com/sharing/rest/content/items/63841b2807504a24942e44955119c339/data",
+    "path": "original/SMROpenData.csv"
+   }
+  ]
+ },
+ {
+  "id": "poland-nid-register",
+  "files": [
+   {
+    "url": "https://api.dane.gov.pl/media/resources/20260603/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv",
+    "path": "original/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/PL.zip",
+    "path": "original/geonames-PL.zip"
+   }
+  ]
+ },
+ {
+  "id": "index-villaris-1680",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
+    "path": "original/IndexVillaris1680-v2.0.4.zip"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/GB.zip",
+    "path": "original/geonames-GB.zip"
+   }
+  ]
+ },
+ {
+  "id": "ottoman-nfs-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",
+    "path": "original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "generalkarte-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
+    "path": "original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv"
+   }
+  ]
+ },
+ {
+  "id": "cassini-roads-cities",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685925?format=original",
+    "path": "original/edge.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685920?format=original",
+    "path": "original/france_cassini_cities.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685921?format=original",
+    "path": "original/france_cassini_roads.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685924?format=original",
+    "path": "original/node.csv"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/2685923?format=original",
+    "path": "original/version.csv"
+   }
+  ]
+ },
+ {
+  "id": "lutsch-transylvania-1751",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226246?format=original",
+    "path": "original/Appendix. Mountain and hill names in 1735 and 1751.doc"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226247?format=original",
+    "path": "original/POINTS LUTSCH.cpg"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226249?format=original",
+    "path": "original/POINTS LUTSCH.dbf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226251?format=original",
+    "path": "original/POINTS LUTSCH.prj"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226250?format=original",
+    "path": "original/POINTS LUTSCH.shp"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7226248?format=original",
+    "path": "original/POINTS LUTSCH.shx"
+   }
+  ]
+ },
+ {
+  "id": "list-latin-inscriptions",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10473706/files/LIST_v1-2.parquet/content",
+    "path": "original/LIST_v1-2.parquet"
+   },
+   {
+    "url": "https://zenodo.org/api/records/10473706/files/LI_metadata.csv/content",
+    "path": "original/LI_metadata.csv"
+   }
+  ]
+ },
+ {
+  "id": "slovenia-rkd-register",
+  "files": [
+   {
+    "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
+    "path": "original/rnpd.csv"
+   }
+  ]
+ },
+ {
+  "id": "lutsch-roads-1751",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208060?format=original",
+    "path": "original/ROADS LUTSCH.cpg"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208059?format=original",
+    "path": "original/ROADS LUTSCH.dbf"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208063?format=original",
+    "path": "original/ROADS LUTSCH.prj"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208062?format=original",
+    "path": "original/ROADS LUTSCH.shp"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/7208061?format=original",
+    "path": "original/ROADS LUTSCH.shx"
+   }
+  ]
+ },
+ {
+  "id": "latvia-monuments",
+  "files": [
+   {
+    "url": "https://data.gov.lv/dati/dataset/79e7246f-57cc-41fc-9a10-96521422359c/resource/25583e4e-ca54-430e-b275-b38057a5ee70/download/saraksts.csv",
+    "path": "original/saraksts.csv"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/LV.zip",
+    "path": "original/geonames-LV.zip"
+   }
+  ]
+ },
+ {
+  "id": "croatia-cultural-goods",
+  "files": [
+   {
+    "url": "https://data.gov.hr/ckan/dataset/c0410787-33b1-4299-b92c-9bbf38dd8bbf/resource/c9a9bce6-1b70-45ec-b2cf-d3f93bca7a02/download/data.json",
+    "path": "original/data.json"
+   },
+   {
+    "url": "https://download.geonames.org/export/dump/HR.zip",
+    "path": "original/geonames-HR.zip"
+   }
+  ]
+ },
+ {
+  "id": "russian-3verst-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
+    "path": "original/Russian_3verst.csv"
+   }
+  ]
+ },
+ {
+  "id": "rohgis-settlements-1904-1913",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/15613857/files/rohgis_setro_0413.csv?download=1",
+    "path": "original/rohgis_setro_0413.csv"
+   }
+  ]
+ },
+ {
+  "id": "transice-iceland",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/17537206/files/TransIce_dataset_WP1.zip/content",
+    "path": "original/TransIce_dataset_WP1.zip"
+   }
+  ]
+ },
+ {
+  "id": "dissiloc-inquisition-places",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21031406/files/dissiloc.tsv/content",
+    "path": "original/dissiloc.tsv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21031406/files/README.md/content",
+    "path": "original/README.md"
+   }
+  ]
+ },
+ {
+  "id": "sweden-geometric-maps-1630-1655",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Basic_settlement_unit_v1.0.csv/content",
+    "path": "original/Basic_settlement_unit_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-church_v1.0.csv/content",
+    "path": "original/Map_object-church_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-watermill_v1.0.csv/content",
+    "path": "original/Map_object-watermill_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-windmill_v1.0.csv/content",
+    "path": "original/Map_object-windmill_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-industry_v1.0.csv/content",
+    "path": "original/Map_object-industry_v1.0.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/15121019/files/Map_object-ancient_monument_v1.0.csv/content",
+    "path": "original/Map_object-ancient_monument_v1.0.csv"
+   }
+  ]
+ },
+ {
+  "id": "sweden-geometric-maps-1680-1700",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/15118501/files/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip/content",
+    "path": "original/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip"
+   }
+  ]
+ },
+ {
+  "id": "tyrol-mining-gazetteer",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/6368451/files/historical_place_gazetteer_tyrol_links_202203.csv/content",
+    "path": "original/historical_place_gazetteer_tyrol_links_202203.csv"
+   }
+  ]
+ },
+ {
+  "id": "arkas-slovenia",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7820725/files/1_Najdisca_2023-Apr-12_0708.csv/content",
+    "path": "original/1_Najdisca_2023-Apr-12_0708.csv"
+   }
+  ]
+ },
+ {
+  "id": "latin-church-1772",
+  "files": [
+   {
+    "url": "https://zenodo.org/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip?download=1",
+    "path": "original/latin_church_1772-v1.zip"
+   }
+  ]
+ },
+ {
+  "id": "historical-urban-population-reba",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/11815396?format=original",
+    "path": "original/urbanspatial-hist-urban-pop-3700bc-ad2000-xlsx.xlsx",
+    "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+   }
+  ],
+  "licence": "CC BY 4.0",
+  "doi": "10.7927/H4ZG6QBX"
+ },
+ {
+  "id": "trajans-gate",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/17579442/files/tgp.zip/content",
+    "path": "original/tgp.zip"
+   }
+  ]
+ },
+ {
+  "id": "zbiva",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_data.xlsx/content",
+    "path": "original/20211206_Zbiva_v4_selection_data.xlsx"
+   },
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_data.csv/content",
+    "path": "original/20211206_Zbiva_v4_selection_data.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/5761811/files/20211206_Zbiva_v4_selection_metadata.docx/content",
+    "path": "original/20211206_Zbiva_v4_selection_metadata.docx"
+   }
+  ]
+ },
+ {
+  "id": "viatariq-levant",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/readme.md/content",
+    "path": "original/readme.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/bibliography.md/content",
+    "path": "original/bibliography.md"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_roads.geojson/content",
+    "path": "original/early_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_islamic_sites.geojson/content",
+    "path": "original/early_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_roads.geojson/content",
+    "path": "original/middle_islamic_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/middle_islamic_sites.geojson/content",
+    "path": "original/middle_islamic_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_roads.geojson/content",
+    "path": "original/early_mamluk_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/early_mamluk_sites.geojson/content",
+    "path": "original/early_mamluk_sites.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_roads.geojson/content",
+    "path": "original/late_mamluk_roads.geojson"
+   },
+   {
+    "url": "https://zenodo.org/api/records/21981430/files/late_mamluk_sites.geojson/content",
+    "path": "original/late_mamluk_sites.geojson"
+   }
+  ]
+ },
+ {
+  "id": "ees-delta-survey",
+  "local_only": true,
+  "note": "Snapshot of the EES ArcGIS layer by scripts/historical-data/fetch_arcgis.py; reuse needs the EES's permission → private pack.",
+  "files": []
+ },
+ {
+  "id": "amcr-czechia",
+  "local_only": true,
+  "note": "OAI-PMH harvest by scripts/historical-data/fetch_oai.py (api.aiscr.cz, CC BY-NC 4.0) → private pack.",
+  "files": []
+ },
+ {
+  "id": "gobolitide",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5849856/files/Dataset-Gobolitide.csv/content",
+    "path": "original/Dataset-Gobolitide.csv"
+   }
+  ]
+ },
+ {
+  "id": "mjcb-byzantine-jewry",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_attribute.csv/content",
+    "path": "original/mjcb_attribute.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_gazetteer.csv/content",
+    "path": "original/mjcb_gazetteer.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/7575860/files/mjcb_bibliography.txt/content",
+    "path": "original/mjcb_bibliography.txt"
+   }
+  ]
+ },
+ {
+  "id": "inhilldaugar",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/21157502/files/Inhilldaugar%20-%20database.csv/content",
+    "path": "original/Inhilldaugar - database.csv"
+   }
+  ]
+ },
+ {
+  "id": "scoto-itineraries",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1650.csv/content",
+    "path": "original/i_SF1650.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1675_01.csv/content",
+    "path": "original/i_SF1675_01.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1675_02.csv/content",
+    "path": "original/i_SF1675_02.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/i_SF1700.csv/content",
+    "path": "original/i_SF1700.csv"
+   },
+   {
+    "url": "https://zenodo.org/api/records/22939426/files/README_v1.2.txt/content",
+    "path": "original/README_v1.2.txt"
+   }
+  ]
+ },
+ {
+  "id": "woodlands-antiquity",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/18370269/files/dataset_Woodlands_of_Antiquity_v2.xlsx/content",
+    "path": "original/dataset_Woodlands_of_Antiquity_v2.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "orkney-saga-names",
+  "local_only": true,
+  "note": "ArcGIS snapshot by fetch_arcgis.py; no licence stated → private pack.",
+  "files": []
+ },
+ {
+  "id": "ceans-slovakia",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/5708033/files/CEANS_2021_harmonized.zip/content",
+    "path": "original/CEANS_2021_harmonized.zip"
+   }
+  ]
+ },
+ {
+  "id": "nmrw-wales",
+  "note": "ArcGIS snapshot by fetch_arcgis.py (RCAHMW, OGL v3.0).",
+  "files": []
+ },
+ {
+  "id": "lc-mints",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.nl/api/access/datafile/572795",
+    "path": "original/Mint houses.csv"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/572800",
+    "path": "original/Mint authorities.geojson"
+   }
+  ]
+ },
+ {
+  "id": "lorsch-codex",
+  "files": [
+   {
+    "url": "https://heidata.uni-heidelberg.de/api/access/datafile/552",
+    "path": "original/LorscherCodex.kml"
+   }
+  ]
+ },
+ {
+  "id": "halc-low-countries",
+  "files": [
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639017",
+    "path": "original/HALC Localities.gpkg"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639014",
+    "path": "original/HALC 1500.gpkg"
+   },
+   {
+    "url": "https://dataverse.nl/api/access/datafile/639016",
+    "path": "original/HALC Codebook.xlsx"
+   }
+  ]
+ },
+ {
+  "id": "hierokles-synekdemos",
+  "local_only": true,
+  "arcgis": "https://services.arcgis.com/ycIuRaoIC4UuCDAS/arcgis/rest/services/hierokles_places/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/places.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "hajj-forts",
+  "local_only": true,
+  "arcgis": "https://services1.arcgis.com/KUeKSLlMUcWvuPRM/arcgis/rest/services/Fortresses_between_Damascus_and_Medina_(coordinates_from_Andrew_Petersen)/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/forts.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "emdigit-waypoints",
+  "local_only": true,
+  "arcgis": "https://services2.arcgis.com/V2PQwgZMTFfgM0Xu/arcgis/rest/services/Early_Modern_Digital_Itineraries_(EMDigIt)__Core_Italian_Itinerary_Waypoints/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/waypoints.geojson",
+    "note": "snapshot via scripts/historical-data/fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "piemonte-medieval",
+  "files": [
+   {
+    "url": "https://data.mendeley.com/public-files/datasets/268xx6ddf4/files/c889aac1-215c-4502-8ee4-b19966f95e0a/file_downloaded",
+    "path": "original/fortifications_and_religious_sites_Piemonte_ver1-0.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "agglomerations-roman",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://api.nakala.fr/data/10.34847/nkl.4678112k/349c80412051f3b0353d4a2277d6cedc797fd0b7",
+    "path": "original/agglomerations-EN.csv"
+   }
+  ]
+ },
+ {
+  "id": "daugava-hillforts",
+  "files": [
+   {
+    "url": "https://api.nakala.fr/data/10.34847/nkl.aecdrl48/11369fae61785da8e4fab893f14220dd17d2e6b8",
+    "path": "original/hillforts-EN.csv"
+   }
+  ]
+ },
+ {
+  "id": "ni-smr",
+  "files": [
+   {
+    "url": "https://admin.opendatani.gov.uk/dataset/46240fa5-db15-469e-b1c8-0460504b951c/resource/a2af36e6-d3f0-4abc-9314-b1b72d5a9e06/download/nismr_10092026.geojson",
+    "path": "original/nismr_10092026.geojson"
+   }
+  ]
+ },
+ {
+  "id": "wales-cantrefs",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/",
+  "files": [
+   {
+    "path": "original/cantrefs.geojson",
+    "note": "snapshot of Historic_Cantrefs_of_Wales_1543_Various_Sources/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/commotes.geojson",
+    "note": "snapshot of Historic_Commotes_of_Wales_1543_Various_Sources/FeatureServer/0 via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "wales-civil-parishes",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales/FeatureServer/0",
+  "files": [
+   {
+    "path": "original/parishes_os1.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "france-mining-cadastre",
+  "files": [
+   {
+    "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
+    "path": "original/camino-titres.csv",
+    "note": "data.gouv.fr resource df16a407-5292-4f03-b8b7-f028b66b5150 redirects here"
+   }
+  ]
+ },
+ {
+  "id": "ireland-wrecks",
+  "local_only": true,
+  "arcgis": "https://services3.arcgis.com/ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks/FeatureServer/3",
+  "files": [
+   {
+    "path": "original/wrecks.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "ireland-rail",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://www.arcgis.com/sharing/rest/content/items/63612b1edcff44fdb4cf70146eaf6d65/data",
+    "path": "original/IrishRail_Lines.zip"
+   }
+  ]
+ },
+ {
+  "id": "fields-on-fire",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8939572",
+    "path": "original/burned-households_town.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8939571?format=original",
+    "path": "original/burned-households_town.tab"
+   }
+  ]
+ },
+ {
+  "id": "portic-ports",
+  "local_only": true,
+  "files": [
+   {
+    "url": "http://data.portic.fr/api/ports/?srid=4326",
+    "path": "original/ports.json"
+   },
+   {
+    "url": "http://data.portic.fr/api/pointcalls/?params=pointcall_uhgs_id,pointcall_out_date,pointcall_in_date,source_suite&shortenfields=false",
+    "path": "original/pointcalls.json"
+   }
+  ],
+  "derived": "scripts/historical-data/portic_years.py → derived/ports-attested.csv"
+ },
+ {
+  "id": "ottoman-plovdiv",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/10046836/files/Ottoman_Plovdiv_geodata.rar/content",
+    "path": "original/Ottoman_Plovdiv_geodata.rar"
+   }
+  ],
+  "derived": "scripts/historical-data/plovdiv_extract.py → derived/quarters.geojson, derived/buildings.geojson"
+ },
+ {
+  "id": "oetr-1532-campaign",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/7079747/files/UrbanOccupationsOETR_1532_Ottoman_campaign_1840s_settlements_dataset.gpkg/content",
+    "path": "original/settlements.gpkg"
+   }
+  ]
+ },
+ {
+  "id": "sedd-scania",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3003533",
+    "path": "original/Roads.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3003532",
+    "path": "original/Railroads.zip"
+   }
+  ]
+ },
+ {
+  "id": "zbiva-full",
+  "local_only": true,
+  "files": [
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/excel",
+    "path": "original/najdisca-sites.xlsx",
+    "note": "public export of the Zbiva 4 web app; base64-decoded"
+   },
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/grob/excel",
+    "path": "original/grobovi-graves.xlsx",
+    "note": "public export; base64-decoded"
+   },
+   {
+    "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/koordinate",
+    "path": "original/najdisca-koordinate.json"
+   }
+  ]
+ },
+ {
+  "id": "oetr-temettuat",
+  "files": [
+   {
+    "url": "https://zenodo.org/api/records/13220585/files/UrbanOccupationsOETR_temettuat_cultivation_CLC_6_region_rural_geosample.xlsx/content",
+    "path": "original/temettuat_cultivation_6_region_rural_geosample.xlsx"
+   }
+  ],
+  "derived": "scripts/historical-data/temettuat_villages.py → derived/villages.csv"
+ },
+ {
+  "id": "wales-units",
+  "arcgis": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services",
+  "files": [
+   {
+    "path": "original/counties_os1.geojson",
+    "note": "snapshot of Historic_Counties_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/counties_os2.geojson",
+    "note": "snapshot of Historic_Counties_of_Wales_2nd_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/municipal.geojson",
+    "note": "snapshot of Historic_Municipal_Boundaries_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/parliamentary_os1.geojson",
+    "note": "snapshot of Historic_Parliamentary_Boundaries_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/parishes_os2.geojson",
+    "note": "snapshot of Historic_Civil_Parishes_of_Wales_2nd_Edition/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/townships_pre1840.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales_pre_1840/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/poorlaw_unions.geojson",
+    "note": "snapshot of Historic_Poor_Law_Unions_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/townships_os1.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales_1st_Edition/FeatureServer/0 via fetch_arcgis.py — not used: 323 of 367 are in townships_pre1840 with identical dates"
+   },
+   {
+    "path": "original/townships_other.geojson",
+    "note": "snapshot of Historic_Townships_of_Wales/FeatureServer/0 via fetch_arcgis.py — not used: earlier version of the first-edition townships"
+   },
+   {
+    "path": "original/wards_os1.geojson",
+    "note": "snapshot of Historic_Municipal_Wards_of_Wales/FeatureServer/0 via fetch_arcgis.py"
+   },
+   {
+    "path": "original/hundreds_other.geojson",
+    "note": "snapshot of Historic_Hundreds_of_Wales/FeatureServer/0 via fetch_arcgis.py — not used: the same first-edition hundreds are drawn as unions of their parishes"
+   }
+  ]
+ },
+ {
+  "id": "early-modern-weather",
+  "arcgis": "https://services.arcgis.com/rGKxabTU9mcXMw7k/arcgis/rest/services/Early_Modern_Weather_Database_Updated/FeatureServer/0",
+  "licence": "none stated on the layer (empty copyrightText) — private pack",
+  "files": [
+   {
+    "path": "original/events.geojson",
+    "note": "snapshot of Early_Modern_Weather_Database_Updated/FeatureServer/0 via fetch_arcgis.py (3,456 records)"
+   }
+  ]
+ },
+ {
+  "id": "finland-lake-ore",
+  "url": "https://doi.org/10.1594/PANGAEA.860941",
+  "licence": "CC BY 3.0",
+  "files": [
+   {
+    "path": "original/PANGAEA.860941.tab",
+    "note": "PANGAEA text export (metadata block, then the tab-separated table)"
+   }
+  ]
+ },
+ {
+  "id": "galicia-buildings",
+  "url": "https://doi.org/10.17632/md8jp9ny9z.2",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/Galicia_and_Austrian_Silesia_Buildings_v1.7z",
+    "note": "1,327,466 building points (type 1 residential / 2 outbuilding; Year1–Year2 = survey years of the map sheet)"
+   },
+   {
+    "path": "original/uncertainty_metadata.7z",
+    "note": "99 district polygons with census population (1857/1869) and map dates"
+   }
+  ]
+ },
+ {
+  "id": "dioceses-dorin",
+  "arcgis": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer",
+  "url": "https://doi.org/10.25740/rh195hm5975",
+  "licence": "CC BY 3.0",
+  "files": [
+   {
+    "path": "original/diocese1250.geojson",
+    "note": "snapshot of layer 0 (diocese1250) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocese1350.geojson",
+    "note": "snapshot of layer 1 (diocese1350) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocese1450.geojson",
+    "note": "snapshot of layer 2 (diocese1450) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/diocesemax.geojson",
+    "note": "snapshot of layer 3 (diocesemax) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1250.geojson",
+    "note": "snapshot of layer 4 (province1250) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1350.geojson",
+    "note": "snapshot of layer 5 (province1350) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/province1450.geojson",
+    "note": "snapshot of layer 6 (province1450) via fetch_arcgis.py"
+   },
+   {
+    "path": "original/provincemax.geojson",
+    "note": "snapshot of layer 7 (provincemax) via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "orthodox-monasteries",
+  "arcgis": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Orthodox_monasteries/FeatureServer/0",
+  "licence": "none stated (ArcGIS item has no licence text) — private pack",
+  "files": [
+   {
+    "path": "original/monasteries.geojson",
+    "note": "snapshot via fetch_arcgis.py (512 records)"
+   }
+  ]
+ },
+ {
+  "id": "france-mills-1794-1809",
+  "url": "https://www.data.gouv.fr/fr/datasets/enquetes-sur-les-moulins-de-1794-a-1809/",
+  "licence": "Licence Ouverte / Open Licence (Etalab)",
+  "files": [
+   {
+    "path": "original/moulins.csv",
+    "note": "data.gouv.fr resource 912c2c2f-9a5f-4316-8671-c2d995f55ca5 (20,313 records; GeoJSON resource failed to download, CSV used)"
+   }
+  ]
+ },
+ {
+  "id": "rurland",
+  "url": "https://nakala.fr/10.34847/nkl.ac829at9",
+  "licence": "Etalab Open Licence 2.0",
+  "files": [
+   {
+    "path": "original/rurland-nuss-z1-xyab-2e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.ebfd81l4"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-2e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.9f4e7s84"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-3e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.042c52n7"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-3e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.8e09hs7r"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-4e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.113fgof6"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-4e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.21c56055"
+   },
+   {
+    "path": "original/rurland-nuss-z1-xyab-5e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.8abbmf9q"
+   },
+   {
+    "path": "original/rurland-nuss-z2-xysn-5e-s-ap-jc_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.a81fb7id"
+   },
+   {
+    "path": "original/rurlandprogramme-vm-sites-archeologiques_EPSG4326.gpkg",
+    "note": "Nakala 10.34847/nkl.b7406gy1"
+   }
+  ]
+ },
+ {
+  "id": "oyster-fisheries",
+  "arcgis": "https://environment.data.gov.uk/arcgis/rest/services/EA/HistoricalOysterHabitatAndFisheries/FeatureServer/0",
+  "licence": "Open Government Licence v3.0 (© Environment Agency 2022)",
+  "files": [
+   {
+    "path": "original/oysters.geojson",
+    "note": "snapshot via fetch_arcgis.py (227 records)"
+   }
+  ]
+ },
+ {
+  "id": "hus-och-gard",
+  "url": "https://doi.org/10.5281/zenodo.18231456",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/Hus och gård punkter sweref_fixed_location.gpkg",
+    "note": "473 houses, fixed location"
+   },
+   {
+    "path": "original/Hus och gård punkter sweref_not_fixed_location.gpkg",
+    "note": "58 houses, location not fixed (approximate)"
+   }
+  ]
+ },
+ {
+  "id": "imperiia",
+  "arcgis": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services",
+  "licence": "none stated on the ArcGIS items (Harvard WorldMap migration, owners koneill_worldmap / easteurotopo_worldmap) — private pack",
+  "files": [
+   {
+    "path": "original/Boundaries_in_1547.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1584.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1613.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1645.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1689.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1725.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1740.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1762.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1796.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1801.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1825.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1855.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1881.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Boundaries_in_1894.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Cossack_Hetmanate_1649_1657.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Cossack_villages.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Don_Cossack_Territory.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Economic_sites_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Fortifications_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Fortresses.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Guberniia_in_1727_with_labels_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Guberniia_provinces_1820s.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Gubernskie_goroda_provincial_towns_1827.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Households_in_1719.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Households_per_uezd_in_1816.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Military_sites_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Monasteries.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Mosques_1886.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Orthodox_Churches_1727.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Pale_of_Settlement_1825_1887.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Pale_of_Settlement_in_1791.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_1719_revision_by_guberniia.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_3rd_revision_1781.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_c_1743_2nd_revision_by_town.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_figures_1766.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Population_in_1719_1st_revision_by_town.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Post_roads.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Post_stations.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Provincial_boundaries_1856.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Region_of_Jewish_restriction_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Regions_in_1781.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Second_partition_1793.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Third_partition_1795.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Tsarist_troop_deployments_1773.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Tsarist_troop_deployments_1774.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezd_boundaries_1792.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezd_towns_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uezdy_Voevodstva.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1800_to_1820.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1821_to_1840.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1841_to_1860.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1861_to_1880.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Unrest_1881_to_1900.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Uvarov_s_Expedition_Itinerary_1847_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Villages_1820s_.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   },
+   {
+    "path": "original/Wooden_Churches.geojson",
+    "note": "snapshot via fetch_arcgis.py"
+   }
+  ]
+ },
+ {
+  "id": "lithuania-kvr",
+  "arcgis": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "path": "original/points.geojson",
+    "note": "kvr_taskai_enriched/FeatureServer/0 via fetch_arcgis.py (8,856)"
+   },
+   {
+    "path": "original/polygons.geojson",
+    "note": "kvr_poligonai_enriched/FeatureServer/0 via fetch_arcgis.py (12,378)"
+   }
+  ]
+ },
+ {
+  "id": "latvia-monuments",
+  "arcgis": "https://services9.arcgis.com/AW5pFI46lnz0wQIw/arcgis/rest/services/kulturas_pieminekli_NKMP_12_2024/FeatureServer/0",
+  "licence": "attributes = the CC0 state list (data.gov.lv dataset 79e7246f…); this ArcGIS geometry copy states no licence — private pack",
+  "files": [
+   {
+    "path": "original/monuments.geojson",
+    "note": "snapshot via fetch_arcgis.py (8,370)"
+   }
+  ]
+ },
+ {
+  "id": "finland-relics",
+  "url": "https://geoserver.museovirasto.fi/geoserver/rajapinta_suojellut/wfs",
+  "licence": "CC BY 4.0 (Museovirasto)",
+  "files": [
+   {
+    "path": "original/muinaisjaannos_piste.geojson",
+    "note": "WFS muinaisjaannos_piste, 41,723 points, paged"
+   }
+  ]
+ },
+ {
+  "id": "russia-livestock-1864",
+  "doi": "10.7910/DVN/OTTZQY",
+  "licence": "CC BY-NC 4.0 — private pack",
+  "files": [
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8545227?format=original",
+    "path": "original/farmlands_provinces.zip"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544831?format=original",
+    "path": "original/livestock_european-russia_1864_codebook.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544829?format=original",
+    "path": "original/livestock_european-russia_1864_main.tab"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8545226?format=original",
+    "path": "original/livestock_european-russia_1864_readme.txt"
+   },
+   {
+    "url": "https://dataverse.harvard.edu/api/access/datafile/8544830?format=original",
+    "path": "original/livestock_european-russia_1864_totals.tab"
+   }
+  ]
+ },
+ {
+  "id": "harvard-ghgis",
+  "licence": "non-commercial academic use only (G-HGIS end-user terms) — private pack",
+  "files": [
+   {
+    "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820CORE)",
+    "path": "original/GHGIS1820CORE.zip",
+    "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+   },
+   {
+    "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820PROVINCES)",
+    "path": "original/GHGIS1820PROVINCES.zip",
+    "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+   }
+  ]
+ },
+ {
+  "id": "cora-torcularia",
+  "doi": "10.34810/data2461",
+  "licence": "CC BY 4.0",
+  "files": [
+   {
+    "url": "https://doi.org/10.34810/data2461",
+    "path": "original/doi-10.34810-data2461.zip",
+    "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
    }
   ]
  }

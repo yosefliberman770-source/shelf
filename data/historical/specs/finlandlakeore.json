@@ -1,0 +1,45 @@
+{
+ "id": "finlandlakeore",
+ "src": "fiore",
+ "public": true,
+ "enabled": true,
+ "title": "Lake-ore workings of Finland supplying the ironworks, 1870s–1880s (Solitander 1882; PANGAEA, NOAA-MMS Marine Minerals Geochemical Database)",
+ "licence": "CC BY 3.0",
+ "url": "https://doi.org/10.1594/PANGAEA.860941",
+ "describe": "Lakes from which bog/lake iron ore was dredged for the Putiloff, Värtsilä, Karttula and Porsaskoski ironworks, as reported by C. P. Solitander (1882), each over the years of extraction the source gives for it (1871–1881), with tonnage and ore composition.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "finland-lake-ore/original/PANGAEA.860941.tab",
+  "delimiter": "\t",
+  "headerAfter": "*/",
+  "pointFields": [
+   "Longitude",
+   "Latitude"
+  ]
+ },
+ "fields": {
+  "id": "Event",
+  "name": "Event",
+  "nameSplit": "_",
+  "nameSplitIndex": 0,
+  "type": [
+   "Name"
+  ],
+  "typeMap": {
+   "Name": {
+    "Putiloff": "lake ore for Putiloff's ironworks (Haapakoski, Huutokoski, Oravi)",
+    "Värtsilä": "lake ore for the Värtsilä ironworks",
+    "Karttula": "lake ore for the Karttula ironworks",
+    "Porsaskoski": "lake ore for the Porsaskoski ironworks"
+   }
+  },
+  "kind": "mine"
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "Coverage"
+ },
+ "datingLabel": "years of ore extraction reported by Solitander (1882)"
+}

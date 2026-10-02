@@ -1,0 +1,43 @@
+{
+ "id": "porticports",
+ "src": "portic",
+ "public": false,
+ "enabled": true,
+ "title": "Ports named in 18th-century shipping registers (PORTIC / Navigocorpus: admiralty congés, Marseille health office, 1748–1799)",
+ "licence": "no licence found on the API or project pages — private pack",
+ "url": "http://data.portic.fr/api/ports/",
+ "describe": "Ports of the Atlantic, Mediterranean, North Sea and Baltic named in dated ship calls of the PORTIC corpus (French admiralty congés, the Marseille health office's patent registers, petit cabotage registers); each port is shown in every year a dated call names it, nothing in between.",
+ "layers": [
+  "medieval-archaeology",
+  "gazetteer-settlements"
+ ],
+ "read": {
+  "path": "portic-ports/derived/ports-attested.csv",
+  "lon": "lon",
+  "lat": "lat",
+  "crs": "EPSG:4326",
+  "delimiter": ",",
+  "derive": "scripts/historical-data/portic_years.py"
+ },
+ "fields": {
+  "id": "uhgs_id",
+  "name": "name",
+  "type": [
+   "sources"
+  ],
+  "context": [
+   "state_1789"
+  ],
+  "kind": "harbour",
+  "altNames": {
+   "field": "toponym",
+   "sep": ";"
+  }
+ },
+ "dating": {
+  "mode": "attestations",
+  "field": "years",
+  "label": "named in a dated ship call of {year} (PORTIC registers)"
+ },
+ "datingLabel": "years of dated ship calls naming the port"
+}

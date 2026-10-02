@@ -8,6 +8,7 @@
 // index. Names are linked to a place only when its dataset records that name
 // for it; places from different datasets are treated as the same place only
 // when they carry the name *and* lie within a few kilometres of each other.
+import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { getJSON, km, type Pos } from './data';
 import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
@@ -16,9 +17,9 @@ import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LAB
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
 export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250'
-  | 'nsh' | 'nokm'
+  | 'nsh' | 'nokm' | 'canmore' | 'irlsmr' | 'nid' | 'ivillaris' | 'ottomannfs' | 'generalkarte' | 'cassini' | 'lutsch' | 'sirkd' | 'lvmon' | 'hrreg' | 'r3verst' | 'rohgis' | 'transice' | 'dissiloc' | 'swegeo' | 'tyrolmine' | 'arkas' | 'wdextra'
   // From the owner's private data pack only (see privateData.ts):
-  | 'tib' | 'mfairs' | 'afontium' | 'ran' | 'dicotopo' | 'raa' | 'ebidat' | 'darmc' | 'dkff';
+  | 'tib' | 'mfairs' | 'afontium' | 'ran' | 'dicotopo' | 'raa' | 'ebidat' | 'darmc' | 'dkff' | 'ariadne' | 'latin1772' | 'amcr' | SpecDatasetId;
 export interface Relation { title: string; key?: string; type: string; reverse?: boolean }
 export interface GazPlace {
   /** "<gazetteer>:<id>", e.g. "pleiades:423025" */
@@ -67,6 +68,9 @@ export interface GazetteerInfo {
   box: [number, number, number, number];
   describe: string;
   record: (id: number | string) => string;
+  /** Only attests places mentioned in its documents (a register's index of names): it corroborates and dates a
+   *  place, but is never the record shown for it, and its name forms never decide between places. */
+  attests?: true;
 }
 
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
@@ -92,7 +96,34 @@ export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'ebidat', name: 'EBIDAT castle database (private data)', license: 'not stated (private use)', url: 'https://www.ebidat.de/', coverage: [700, 1800], core: [900, 1600], box: [3, 45.5, 31, 63], describe: 'Castles of Germany and central Europe dated by the European Castle Institute (begin and end of use).', record: (id) => `https://www.ebidat.de/cgi-bin/ebidat.pl?id=${id}` },
   { id: 'darmc', name: 'DARMC scholarly datasets (private data)', license: 'not stated (private use)', url: 'https://darmc.harvard.edu/', coverage: [1, 1500], core: [400, 1500], box: [-12, 12, 45, 65], describe: 'Dated shipwrecks, Carolingian coin hoards and rural Anglo-Saxon settlements.', record: () => 'https://darmc.harvard.edu/' },
   { id: 'dkff', name: 'Danish register of ancient monuments (private data)', license: 'not verified (private use)', url: 'https://www.kulturarv.dk/fundogfortidsminder/', coverage: [400, 1600], core: [800, 1536], box: [8, 54.5, 15.5, 58], describe: 'Danish monuments the register dates to the Viking Age or Middle Ages.', record: () => 'https://www.kulturarv.dk/fundogfortidsminder/' },
+  { id: 'ariadne', name: 'ARIADNE archaeology catalogue (private data)', license: 'varies by provider (private use)', url: 'https://portal.ariadne-infrastructure.eu/', coverage: [1, 1914], core: [400, 1800], box: [-25, 34, 45, 67], describe: 'Archaeological sites and fieldwork records from national providers (Iceland, Hungary, Finland, Austria, Germany, Bulgaria, Portugal and others), each phase dated by the periods its provider gives.', record: () => 'https://portal.ariadne-infrastructure.eu/' },
+  { id: 'amcr', name: 'AMCR — Archaeological Map of the Czech Republic (private data)', license: 'CC BY-NC 4.0 (private use)', url: 'https://digiarchiv.aiscr.cz/', coverage: [-800, 2000], core: [500, 1800], box: [12.0, 48.5, 18.9, 51.1], describe: 'Archaeological sites and fieldwork in Czechia, each with the AMCR periods (years from its PeriodO-linked vocabulary) of what was found.', record: (id) => `https://digiarchiv.aiscr.cz/id/${String(id).split(':')[0]}` },
+  { id: 'latin1772', name: 'Atlas of the Latin Church in Poland-Lithuania c. 1772 (private data)', license: 'CC BY-NC 4.0 (private use)', url: 'https://doi.org/10.5281/zenodo.10912495', coverage: [1772, 1772], core: [1772, 1772], box: [14, 46.5, 34, 58], describe: 'Parish and auxiliary churches and religious houses of the Latin Church across the Polish-Lithuanian Commonwealth around 1772.', record: () => 'https://doi.org/10.5281/zenodo.10912495' },
+  { id: 'canmore', name: 'Canmore — National Record of the Historic Environment (Scotland)', license: 'OGL v3', url: 'https://www.trove.scot/', coverage: [79, 1914], core: [400, 1900], box: [-9, 54.5, -0.5, 61], describe: 'Scottish monuments, buildings and sites, each dated by the period its record names (Canmore period terms; broad periods converted with the ScAPA thesaurus years).', record: (id) => `https://www.trove.scot/place/${id}` },
+  { id: 'irlsmr', name: 'Archaeological Survey of Ireland (Sites and Monuments Record)', license: 'CC BY 4.0', url: 'https://www.archaeology.ie/', coverage: [400, 1900], core: [400, 1700], box: [-11, 51.3, -5.3, 55.5], describe: 'Irish monuments; dated only where the monument class names a date (e.g. “House - 17th century”), otherwise undated.', record: () => 'https://maps.archaeology.ie/historicenvironment' },
+  { id: 'nid', name: 'Polish register of immovable monuments (NID)', license: 'CC BY 4.0', url: 'https://dane.gov.pl/pl/dataset/1130', coverage: [1000, 1950], core: [1200, 1900], box: [14, 49, 24.2, 55], describe: 'Protected monuments of Poland, from the construction date or century the register records; placed at their village or town.', record: () => 'https://zabytek.pl/' },
+  { id: 'ivillaris', name: 'Index Villaris, 1680', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.10660024', coverage: [1680, 1680], core: [1680, 1680], box: [-6, 49.8, 2, 56], describe: 'All 24,000 cities, market towns, parishes, villages and seats of England and Wales listed by John Adams in 1680.', record: () => 'https://docuracy.github.io/IndexVillaris1680/' },
+  { id: 'ottomannfs', name: 'Ottoman NFS population-register gazetteer (1830–1849)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.7351936', coverage: [1830, 1849], core: [1830, 1849], box: [19, 35, 45, 46], describe: 'Populated places listed in 764 Ottoman population registers of 1830–1849, each in its register’s year.', record: () => 'https://doi.org/10.5281/zenodo.7351936' },
+  { id: 'generalkarte', name: 'Generalkarte von Mitteleuropa gazetteer (Balkans)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.8409506', coverage: [1880, 1918], core: [1880, 1918], box: [19, 39, 30, 46], describe: 'Settlements, monasteries, inns, forts, mines and other named features on the Austro-Hungarian 1:200,000 maps of the Balkans (sheet editions c. 1880–1918).', record: () => 'https://doi.org/10.5281/zenodo.8409506' },
+  { id: 'cassini', name: 'Cassini map — towns and villages (France, c. 1756–1815)', license: 'CC0', url: 'https://doi.org/10.7910/DVN/28674', coverage: [1756, 1815], core: [1756, 1815], box: [-5, 42, 8.5, 51.2], describe: 'Cities, towns and estates on the Cassini map of France (sheets surveyed 1756–1789).', record: () => 'https://doi.org/10.7910/DVN/28674' },
+  { id: 'lutsch', name: 'Lutsch map of Transylvania (1751)', license: 'CC BY-NC-SA 4.0', url: 'https://doi.org/10.7910/DVN/ETORPU', coverage: [1751, 1751], core: [1751, 1751], box: [22.5, 45, 27, 47.5], describe: 'Settlements, mountains, rivers, post stations, mines, monasteries and fortifications on the 1751 Lutsch map (Saxon seats and Kronstadt district).', record: () => 'https://doi.org/10.7910/DVN/ETORPU' },
+  { id: 'sirkd', name: 'Slovenian heritage register (RKD)', license: 'CC BY 4.0', url: 'https://podatki.gov.si/dataset/register-nepremicne-kulturne-dediscine', coverage: [-15, 1914], core: [1500, 1914], box: [13.3, 45.4, 16.7, 46.9], describe: 'Listed buildings, churches, castles, settlement cores and archaeological sites in Slovenia, each dated by the register itself (construction period for buildings, period of use for sites).', record: (id) => `https://eid.gov.si/S/${id}` },
+  { id: 'lvmon', name: 'Latvian protected monuments list', license: 'CC0 1.0', url: 'https://data.gov.lv/dati/dataset/valsts-aizsargajamo-nekustamo-piemineklu-saraksts', coverage: [1, 1914], core: [1200, 1914], box: [20.8, 55.6, 28.3, 58.1], describe: 'State-protected buildings, churches, manors, hillforts and archaeological sites in Latvia, dated by the list itself; placed at their town, village or parish (the list has no coordinates).', record: () => 'https://data.gov.lv/dati/dataset/valsts-aizsargajamo-nekustamo-piemineklu-saraksts' },
+  { id: 'hrreg', name: 'Croatian register of cultural goods', license: 'Open Licence (HR)', url: 'https://data.gov.hr/ckan/dataset/registar-kulturnih-dobara', coverage: [1, 1914], core: [1200, 1914], box: [13.4, 42.3, 19.5, 46.6], describe: 'Protected churches, monasteries, castles, town cores, buildings and archaeological sites in Croatia, dated by the register itself; placed at their settlement (the register has no coordinates).', record: () => 'https://registar.kulturnadobra.hr/' },
+  { id: 'r3verst', name: 'Russian 3-verst map gazetteer (Balkans, 1877–1879)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.8411078', coverage: [1877, 1879], core: [1877, 1879], box: [21.5, 40.5, 29.5, 44.5], describe: 'Settlements, monasteries, khans and other places on the Russian military 3-verst map of the Balkans, surveyed during and after the 1877–78 war, with their modern names.', record: () => 'https://doi.org/10.5281/zenodo.8411078' },
+  { id: 'rohgis', name: 'RoHGIS settlements of Romania (1904–1913)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.15613857', coverage: [1904, 1913], core: [1904, 1913], box: [22, 43.5, 30, 48.5], describe: 'Every settlement of the Kingdom of Romania existing between 1904 and 1913, with official name variants.', record: () => 'https://doi.org/10.5281/zenodo.15613857' },
+  { id: 'transice', name: 'TransIce: Icelandic shielings and farms', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.17537206', coverage: [900, 1950], core: [1703, 1703], box: [-24.6, 63.2, -13.4, 66.6], describe: 'Farms listed in the Jarðabók of 1703 and shielings with their first mention and abandonment years, from the Institute of Archaeology, Iceland.', record: () => 'https://doi.org/10.5281/zenodo.17537206' },
+  { id: 'dissiloc', name: 'DISSILOC: places in medieval inquisition registers', license: 'CC BY-SA 4.0', url: 'https://doi.org/10.5281/zenodo.21031406', coverage: [1241, 1522], core: [1241, 1399], box: [-5, 40, 20, 56], attests: true, describe: 'Settlements, churches, religious houses and castles named in inquisition registers of Languedoc, northern and central Italy, England and Bohemia, 1240s–1520s; each dated by its register.', record: () => 'https://doi.org/10.5281/zenodo.21031406' },
+  { id: 'swegeo', name: 'Swedish geometrical maps (1630–1655)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.15121019', coverage: [1630, 1655], core: [1630, 1655], box: [10.5, 55, 24.5, 69], describe: 'Villages, churches, water- and windmills drawn on the large-scale Swedish land-survey maps of 1630–1655.', record: () => 'https://doi.org/10.5281/zenodo.15121019' },
+  { id: 'tyrolmine', name: 'Tyrolean mining documents (1460s–1510s)', license: 'CC BY 4.0', url: 'https://doi.org/10.5281/zenodo.6368451', coverage: [1460, 1525], core: [1460, 1525], box: [10.5, 46.8, 12.6, 47.8], attests: true, describe: 'Places around Schwaz and Kufstein named in the mining documents Hs. 37 (1460–1463) and Hs. 1587 (c. 1515), with their document forms.', record: () => 'https://doi.org/10.5281/zenodo.6368451' },
+  { id: 'wdextra', name: 'Wikidata (dated churches, manors, later settlements)', license: 'CC0', url: 'https://www.wikidata.org/', coverage: [-400, 1914], core: [1600, 1914], box: [-32, 24, 62, 72], describe: 'Churches, mosques, synagogues, manor houses and caravanserais with a founding date or first written mention in Wikidata, and settlements first recorded 1600–1914; dates at the precision Wikidata records them.', record: (id) => `https://www.wikidata.org/wiki/${id}` },
+  { id: 'arkas', name: 'Arkas 2.0 (Slovenian archaeological sites)', license: 'CC BY-SA 4.0', url: 'https://doi.org/10.5281/zenodo.7820725', coverage: [-800, 1914], core: [1, 1000], box: [13.3, 45.4, 16.7, 46.9], describe: 'Archaeological sites of Slovenia with their own dating in years (Roman, late antique and medieval).', record: () => 'https://iza2.zrc-sazu.si/en/zbirka/arkas' },
   { id: 'buringh', name: 'Buringh (European urban population)', license: 'CC0', url: 'https://doi.org/10.17026/dans-xzy-u62q', coverage: [700, 2000], core: [700, 1850], box: [-25, 27, 60, 71], describe: 'About 2,200 European towns with estimated population per century, 700–2000.', record: () => 'https://doi.org/10.17026/dans-xzy-u62q' },
+  // Datasets read through spec files (data/historical/specs; generated registry).
+  ...(Object.entries(SPEC_DATASETS) as [SpecDatasetId, (typeof SPEC_DATASETS)[SpecDatasetId]][]).map(([id, d]): GazetteerInfo => ({
+    id, name: d.public ? d.name : `${d.name} (private data)`, license: d.license, url: d.url, coverage: [...d.coverage], core: [...d.core], box: [...d.box],
+    describe: d.describe, record: () => d.url,
+  })),
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
 /** Gazetteers whose period covers the year (all of them when the year is unknown). */
@@ -459,7 +490,9 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   const scope = (p: GazPlace) => (inDatasetScope(p) ? 0 : 1);
   // Wikidata aggregates: it corroborates a specialist record of the same place, never replaces it as the record shown.
   // Its dates still count — the place's temporal support is the best any of its records gives (see `dated` below).
-  const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' ? 1 : 0);
+  // Datasets that only attest places mentioned in their documents rank with it.
+  const attestsOnly = (p: GazPlace) => !!GAZETTEERS.find((x) => x.id === p.gazetteer)?.attests;
+  const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' || attestsOnly(p) ? 1 : 0);
   const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || aggregator(a.place) - aggregator(b.place) || fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
@@ -487,7 +520,7 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
     }
     if (!chosen) {
       // A single group where the name is the main title, against at most one other place listing it as an alternative.
-      const titled = groups.filter((gr) => gr.some((x) => x.isTitle));
+      const titled = groups.filter((gr) => gr.some((x) => x.isTitle && !attestsOnly(x.place)));
       if (titled.length === 1 && groups.length - 1 <= 1 && lead(titled[0]).place.precise) { chosen = titled[0]; basis = 'main-title'; why = `The only place in ${srcList(pool.map((h) => h.place.gazetteer))} whose main name is “${written}”.`; }
     }
   }

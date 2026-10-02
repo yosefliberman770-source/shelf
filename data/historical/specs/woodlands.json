@@ -1,0 +1,59 @@
+{
+ "id": "woodlands-antiquity",
+ "src": "woodlands",
+ "public": true,
+ "enabled": true,
+ "groupBy": "place",
+ "title": "Woodlands of Antiquity: dendro-dated timbers from Roman-period sites (Muigg, Haneca, Tegel et al.)",
+ "licence": "CC BY 4.0",
+ "url": "https://doi.org/10.5281/zenodo.17090406",
+ "describe": "Roman-period sites in Germany, France, Switzerland, the Low Countries and Austria with timbers whose exact felling year is known from tree rings (wells, buildings, roads and bridges, mills, harbours, forts, shrines). Only exact felling dates are used; 'felled after' and interval dates are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "woodlands-antiquity/original/dataset_Woodlands_of_Antiquity_v2.xlsx",
+  "lon": "longitude",
+  "lat": "latitude",
+  "crs": "EPSG:4326"
+ },
+ "keep": {
+  "field": "felling_date_type",
+  "values": [
+   "exact felling date"
+  ]
+ },
+ "fields": {
+  "id": "series",
+  "name": "location",
+  "type": [
+   "object_type_10"
+  ],
+  "context": [
+   "administrative_unit",
+   "roman_province"
+  ],
+  "kind": {
+   "field": "object_type_10",
+   "map": {
+    "dwelling/settlement": "settlement",
+    "transport infrastructure": "road",
+    "watermill": "mill",
+    "military infrastructure": "castle",
+    "religious structure": "church",
+    "waterfront/water structure": "harbour",
+    "watercraft (ship/log boat)": "wreck"
+   },
+   "default": "site"
+  }
+ },
+ "groupType": "dendro-dated timbers (exact felling years)",
+ "dating": {
+  "mode": "fields",
+  "from": "end_date",
+  "to": "end_date"
+ },
+ "datingLabel": "exact felling year of the timber",
+ "groupVerb": "dated by",
+ "groupNoun": "timber"
+}

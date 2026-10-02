@@ -48,6 +48,7 @@ ATLAS = os.path.join(ROOT, 'public', 'atlas')
 # Private data pack build output (git-ignored): tiles and place index for datasets that must not be republished.
 PRIVATE_BUILD = os.path.join(ROOT, 'data', 'private-pack', 'build')
 private_rows = []  # filled by build(); world.py writes them as the private place index
+register_feats = []  # national registers and historical gazetteers (registers.py) → registers.pmtiles
 
 # An item in several classes is filed under the first that applies.
 KINDS = ['cathedral', 'monastery', 'university', 'castle', 'fortification', 'bridge', 'diocese', 'settlement']
@@ -581,6 +582,29 @@ def build(rows_only=False):
         os.remove(stale)
     stats['sites'] = tiler.build(os.path.join(TILES, 'medieval-sites.pmtiles'), 'sites', feats, 11, 'Medieval sites of Europe',
                                  'Wikidata (CC0); Germania Sacra (CC BY-SA 3.0)')
+    reg_zoom = {'cathedral': 6, 'monastery': 7, 'castle': 8, 'fortification': 9, 'settlement': 9, 'church': 9, 'market': 8, 'bridge': 10,
+                'harbour': 9, 'wreck': 10, 'mill': 10, 'mine': 10, 'road': 10, 'site': 11, 'building': 11}
+    rfeats, sfeats = [], []
+    import generic as GEN2
+    spec_srcs = {sp['src'] for sp in GEN2.specs(public=True)}
+    for p in register_feats:
+        ll = p.pop('_ll')
+        with_window(p, registry)
+        # Spec-driven datasets go to their own tile set (keeps each file well under hosting limits).
+        (sfeats if p.get('src') in spec_srcs else rfeats).append(({'type': 'Point', 'coordinates': list(ll)}, p, reg_zoom.get(p['k'], 10)))
+    stats['specSites'] = tiler.build(os.path.join(TILES, 'spec-sites.pmtiles'), 'sites', sfeats, 11, 'Datasets read through spec files',
+                                     '; '.join(f"{sp['title']} ({sp['licence']})" for sp in GEN2.specs(public=True)))
+    stats['registers'] = tiler.build(os.path.join(TILES, 'registers.pmtiles'), 'sites', rfeats, 11, 'National registers and historical gazetteers',
+                                     'Canmore (HES, OGL); Archaeological Survey of Ireland (CC BY 4.0); NID register (CC BY 4.0); Index Villaris 1680 (CC BY 4.0); '
+                                     'Ottoman NFS gazetteer (CC BY 4.0); Generalkarte gazetteer (CC BY 4.0); Cassini (CC0); Lutsch 1751 (CC BY-NC-SA 4.0); Slovenian RKD register (CC BY 4.0); Latvian monuments list (CC0); Croatian register of cultural goods (Open Licence); Russian 3-verst map gazetteer (Boykov, CC BY 4.0); RoHGIS settlements 1904–1913 (CC BY 4.0); TransIce Iceland (CC BY 4.0); DISSILOC (CC BY-SA 4.0); Swedish geometrical maps 1630–1655 (CC BY 4.0); Tyrolean mining documents gazetteer (CC BY 4.0); Arkas 2.0 Slovenia (CC BY-SA 4.0)')
+    from cassini_tiles import build_cassini_roads
+    stats['cassiniRoads'] = build_cassini_roads(TILES)
+    from cassini_tiles import build_spec_areas
+    stats['specAreas'] = build_spec_areas(TILES, os.path.join(PRIVATE_BUILD, 'tiles'))
+    from cassini_tiles import build_building_density
+    stats['buildingDensity'] = build_building_density(TILES)
+    from cassini_tiles import build_inscriptions
+    stats['inscriptions'] = build_inscriptions(TILES)
     stats['towns'] = tiler.build(os.path.join(TILES, 'towns.pmtiles'), 'towns', town_feats, 10, 'European towns 700–2000',
                                  'Buringh, European urban population 700–2000 (DANS, CC0)')
     d = json.load(open(os.path.join(RAW, 'germania-sacra', 'original', 'diocese-borders.geojson'), encoding='utf-8'))
@@ -818,6 +842,68 @@ def regional_layers(recs, rows, sites_out):
         sites_out.append(_site_props('no' + x['id'], title, x['kind'], x['lon'], x['lat'], ef=lo, et=hi, st=x['art'], per=f'{label} (register dating)', src='nokm'))
     stats['nordic'] = {'nsh': sum(1 for r in rows if r[0] == 'nsh'), 'norway': len(no)}
 
+    # National registers and historical gazetteers (2026-10 discovery pass; see registers.py and
+    # docs/HISTORICAL_SOURCES_SEARCH.md). Every record keeps only the dating its own source gives: a construction window,
+    # a period the record names, or the single year in which a gazetteer or register lists it ('sn': a snapshot). Dated
+    # records go into the place index; undated ones only into the tiles (drawn when the reader includes undated records).
+    import registers as REG
+    COMMON_WORDS = {w.strip().lower() for w in open(os.path.join(ROOT, 'public', 'atlas', 'common-words.txt'), encoding='utf-8') if w.strip()}
+    register_feats[:] = []
+
+    def common(name):
+        # The name index drops a leading English article, so "The Mill" is the word "mill" there too.
+        n = name.strip().lower()
+        return n in COMMON_WORDS or (n.startswith('the ') and n[4:].strip() in COMMON_WORDS)
+
+    reg_stats, reg_index = {}, Counter()
+    loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
+               ('ottomannfs', REG.ottoman_nfs), ('generalkarte', REG.generalkarte), ('cassini', REG.cassini_places), ('lutsch', REG.lutsch),
+               ('sirkd', REG.slovenia_rkd), ('lvmon', REG.latvia_monuments),
+               ('hrreg', REG.croatia_goods),
+               ('r3verst', REG.russian_3verst), ('rohgis', REG.rohgis_settlements),
+               ('transice', REG.iceland_transice), ('dissiloc', REG.dissiloc),
+               ('swegeo', REG.sweden_geometric), ('tyrolmine', REG.tyrol_mining),
+               ('arkas', REG.arkas), ('wdextra', REG.wikidata_extra))
+    # Spec-driven datasets (data/historical/specs/*.json, read by generic.py): public ones join the registers here.
+    import generic as GEN
+    spec_loaded = {}
+
+    def spec_loader(sp):
+        def fn():
+            recs, skipped = GEN.records(sp)
+            spec_loaded[sp['src']] = recs
+            return recs, skipped
+        return fn
+    loaders += tuple((sp['src'], spec_loader(sp)) for sp in GEN.specs(public=True))
+    # Specs that only add evidence about places the gazetteers already hold (e.g. population estimates) are drawn but
+    # kept out of the place-name index, so they never compete with the gazetteers when a name is resolved.
+    no_index = {sp['src'] for sp in GEN.specs(public=None) if sp.get('placeIndex') is False}
+    for name, fn in loaders:
+        res = fn()
+        recs, note = (res if isinstance(res, tuple) else (res, None))
+        reg_stats[name] = {'records': len(recs), **({'notes': note} if note else {})}
+        for x in recs:
+            lon, lat = x['lon'], x['lat']
+            if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+                continue
+            pr = {'src': x['src'], 'st': x['ty'][:80], 'per': x.get('per'), 'u': None if x['precise'] else 1}
+            env = None
+            if x.get('snap'):
+                env = [x['snap'], x['snap'], 'source']
+                pr.update(ef=x['snap'], et=x['snap'], sn=1)
+            elif x.get('env'):
+                env = [x['env'][0], x['env'][1], 'source']
+                pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
+            register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
+            # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
+            if env and x['kind'] not in ('site', 'building') and not common(x['name']) and not x.get('generic') and x['src'] not in no_index:
+                extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
+                         **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
+                rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
+                             [list(n) for n in x['names'] if n[0] and not common(n[0])][:6], x['ctx'][:2], [], extra])
+                reg_index[x['src']] += 1
+    stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'tileFeatures': len(register_feats)}
+
     # Private data pack (never published): datasets with no licence to republish, or terms that forbid it.
     private, prows = [], []
 
@@ -863,6 +949,27 @@ def regional_layers(recs, rows, sites_out):
         add('ebidat', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 7, f=x['from'], fb='founded' if x['from'] is not None else None,
             env=None if x['from'] is not None else (x['envFrom'], x['envTo']) if x.get('envFrom') is not None else None,
             ty=x['type'], dt=x['dating'], t=x['to'])
+    # ARIADNE catalogue records (archaeology, Europe-wide): each phase of a record with its own period; provider licences vary.
+    import registers as REG2
+    ari, ari_skip = REG2.ariadne()
+    for x in ari:
+        add('ariadne', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
+    stats['ariadneSkipped'] = ari_skip
+    amcr_recs, amcr_skip = REG2.amcr() if os.path.exists(os.path.join(RAW, 'amcr-czechia', 'original', 'pian.xml.gz')) else ([], {})
+    for x in amcr_recs:
+        add('amcr', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=x['env'], per=x['per'], ty=x['ty'], precise=x['precise'])
+    stats['amcrSkipped'] = amcr_skip
+    for sp in GEN.specs(public=False):
+        recs, skipped = GEN.records(sp)
+        spec_loaded[sp['src']] = recs
+        for x in recs:
+            env = x.get('env') or ((x['snap'], x['snap']) if x.get('snap') else None)
+            add(sp['src'], x['id'], x['name'], x['kind'], x['lon'], x['lat'], 9, env=env, per=x.get('per'), ty=x['ty'], precise=x['precise'],
+                **({'sn': 1} if x.get('snap') else {}))
+        stats.setdefault('privateSpecs', {})[sp['src']] = {'records': len(recs), 'skipped': skipped}
+    GEN.write_app_module(spec_loaded)
+    for x in REG2.latin_church_1772():
+        add('latin1772', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(1772, 1772), per=x['per'], ty=x['ty'], sn=1)
     for x in regional.sweden():
         add('raa', x['id'], x['name'], x['kind'], x['lon'], x['lat'], 8, env=(x['from'], x['to']), per=f"{x['period']} (register dating)", ty=x['type'])
     stats['private'] = dict(Counter(r[0] for r in prows))

@@ -1,0 +1,11 @@
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+SELECT ?i (GROUP_CONCAT(DISTINCT CONCAT(LANG(?alt), ":", STR(?alt)); separator="|") AS ?names) WHERE {
+  { SELECT DISTINCT ?i ?c WHERE { VALUES ?cls { wd:Q486972 } ?i wdt:P31/wdt:P279* ?cls . ?i wdt:P625 ?c .
+    BIND(geof:longitude(?c) AS ?lon) BIND(geof:latitude(?c) AS ?lat)
+    FILTER(?lon > -32 && ?lon < 62 && ?lat > 24 && ?lat < 72) ?i wdt:P1082 ?pp . FILTER(?pp >= 5000) } }
+  ?i rdfs:label ?alt . FILTER(LANG(?alt) IN ("de","fr","it","es","pt","ca","nl","pl","cs","sk","hu","ro","hr","sl","sv","da","nb","fi","is","la","lt","lv","et","ga","cy","eu","gl","mul","sq","tr","sr-el","sh","lb","rm","fy","se","hsb","ru","uk","be","bg","sr","mk","el","ka","hy","ar","he"))
+} GROUP BY ?i

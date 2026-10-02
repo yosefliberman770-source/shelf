@@ -1,0 +1,11 @@
+{
+ "id": "orkneysaga", "src": "orkneysaga", "public": false, "enabled": true,
+ "title": "Place-names in the Saga of the Earls of Orkney (Rayner, University of Nottingham, 2025)",
+ "licence": "No licence stated (private use only)", "url": "https://www.arcgis.com/home/item.html?id=Place_Names_in_the_Saga_of_the_Earls_of_Orkney_2025",
+ "describe": "Place-names of the Northern Isles, Caithness and Sutherland in Orkneyinga saga, each with its forms in the saga manuscripts and their dates; shown from the earliest manuscript attestation.",
+ "layers": ["gazetteer-settlements"],
+ "read": {"path": "orkney-saga-names/original/saga_place_names_2025.geojson"},
+ "fields": {"id": "OBJECTID", "name": "Place_name", "kind": "settlement", "type": ["Old_Norse_Name"], "context": ["Parish", "Island"]},
+ "dating": {"mode": "firstAttested", "field": "Forms__sources__dates", "sep": "\n"},
+ "datingLabel": "earliest saga manuscript attesting the name"
+}

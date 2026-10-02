@@ -1,0 +1,15 @@
+{
+ "id": "zbiva-full", "src": "zbivafull", "public": false, "enabled": true,
+ "title": "Zbiva, Early Medieval Data Set for the Eastern Alps (ZRC SAZU) — full site list from the Zbiva 4 web application",
+ "licence": "CC BY-NC-SA 3.0 (as stated by the Zbiva web application) — private pack",
+ "url": "https://zbiva4.zrc-sazu.si/en",
+ "describe": "Early medieval cemeteries, settlements, churches and cult places, forts and towers and hoards of Slovenia, Austria, NW Croatia, NE Italy and neighbouring areas, each with its own earliest and latest date; sites already shown from the public Zenodo subset are left out here, and sites without a date of their own are not drawn.",
+ "layers": ["medieval-archaeology"],
+ "read": {"path": "zbiva-full/original/najdisca-sites.xlsx", "lon": "koordinate_x", "lat": "koordinate_y", "crs": "EPSG:4326"},
+ "excludeIdsFrom": {"read": {"path": "zbiva/original/20211206_Zbiva_v4_selection_data.xlsx"}, "field": "ID", "label": "the public Zbiva subset"},
+ "fields": {"id": "id", "name": "ime", "nameFallback": "naselje", "context": ["naselje", "drzava"], "type": ["primarna_kategorija", "vir_datacije"],
+            "kind": {"field": "primarna_kategorija", "map": {"grobišče": "site", "naselbina": "settlement", "kultni prostor": "church", "utrdba/stolp": "castle", "zaklad": "hoard", "posegi brez komunikacij": "site", "druga vrsta najdišča": "site"}, "default": "site"}},
+ "dropUndated": true,
+ "dating": {"mode": "fields", "from": "najprej", "to": "najkasneje"},
+ "datingLabel": "the site's own earliest and latest date in Zbiva"
+}

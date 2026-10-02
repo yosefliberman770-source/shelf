@@ -137,7 +137,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
   layersRequest?: { layers: string[]; n: number };
   onLayersChange?: (layers: string[]) => void;
   /** Original historical maps laid over the reconstruction (image placed by its four corners). */
-  mapOverlays?: { id: string; url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number }[];
+  mapOverlays?: { id: string; url: string; tiles?: string; minzoom?: number; coordinates: [[number, number], [number, number], [number, number], [number, number]]; opacity: number }[];
   /** Shown over the map (e.g. the "What am I looking at?" chip). */
   children?: React.ReactNode;
 }) {
@@ -375,7 +375,11 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     }
     for (const o of want.values()) {
       if (!map.getSource(`ov-${o.id}`)) {
-        map.addSource(`ov-${o.id}`, { type: 'image', url: o.url, coordinates: o.coordinates });
+        if (o.tiles) {
+          // a tiled scan: streamed from its publisher, only within its extent
+          const [[w, n], , [e, s]] = o.coordinates;
+          map.addSource(`ov-${o.id}`, { type: 'raster', tiles: [o.tiles], tileSize: 256, bounds: [w, s, e, n], minzoom: o.minzoom ?? 0, maxzoom: 19 });
+        } else map.addSource(`ov-${o.id}`, { type: 'image', url: o.url, coordinates: o.coordinates });
         map.addLayer({ id: `ov-${o.id}`, type: 'raster', source: `ov-${o.id}`, paint: { 'raster-opacity': o.opacity, 'raster-fade-duration': 0 } }, TOP);
         shownOverlays.current.add(o.id);
       } else map.setPaintProperty(`ov-${o.id}`, 'raster-opacity', o.opacity);
@@ -640,6 +644,45 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return {
         title: str('n') ?? 'Place', lines: [roles.join(', '), `Recorded: ${range(num('f'), num('t'))}`, ...(num('tf') !== undefined ? [`Town from ${yearLabel(num('tf')!)}`] : [])],
         pick: pickOf('viabundus'), source: credit('viabundus'), caution: 'Each role (town, toll, fair…) has its own dates in Viabundus — open the place history for them.',
+      };
+    }
+    case 'inscriptions': {
+      const cent = Math.floor(Math.max(100, Math.min(799, year)) / 100) * 100;
+      const here = num(`c${cent}`) ?? 0;
+      const byCent = [100, 200, 300, 400, 500, 600, 700].filter((c) => num(`c${c}`)).map((c) => `${c}s: ${num(`c${c}`)}`).join(' · ');
+      return {
+        title: str('n') ?? 'Find-spot',
+        lines: [`${here} Latin inscription${here === 1 ? '' : 's'} found here dated to the ${cent}s CE`, `All dated inscriptions here, by century: ${byCent}`,
+          ...(str('ty') ? [`Mostly: ${str('ty')}`] : []), ...(str('m') ? [`Modern place: ${str('m')}`] : []), ...(str('pv') ? [`Province: ${str('pv')}`] : [])],
+        link: str('pl') ? { href: `https://pleiades.stoa.org/places/${str('pl')}`, label: 'Pleiades ↗' } : { href: DATASET_CREDIT.lirelist.url, label: 'Dataset ↗' },
+        source: credit('lirelist'),
+        caution: 'Inscriptions show that people set up texts here then; the find-spot is where the stone was found, which may not be where it first stood.',
+      };
+    }
+    case 'spec-sites':
+    case 'register-sites': {
+      // National registers and historical gazetteers: each record says what its date is.
+      const src = str('src') as DatasetId | undefined;
+      const per = str('per');
+      const snap = num('sn') !== undefined;
+      const ef = num('ef');
+      const et = num('et');
+      const lines = [(str('st') ?? str('k') ?? 'site').replace(/^./, (x) => x.toUpperCase())];
+      lines.push(snap && ef !== undefined ? `${per ?? 'Listed'} — evidence that it existed in ${yearLabel(ef)}; nothing here says when it began or ended`
+        : ef !== undefined || et !== undefined ? `${per ?? 'Period named by the record'}: ${range(ef, et)}${num('cw') ? ' (from the start of the recorded construction window)' : ''}`
+        : 'No date recorded in the source');
+      if (src === 'nid') lines.push('Placed at its village or town (the register gives no coordinates)');
+      if (src === 'hrreg') lines.push('Placed at its settlement (the register names the place, not coordinates)');
+      if (src === 'lvmon') lines.push('Placed at its town, village or parish (the list gives an address, not coordinates)');
+      return {
+        title: str('n') ?? 'Site', lines,
+        pick: pt && src ? { key: `${src}:${(str('i') ?? '').split(':').slice(1).join(':')}`, name: str('n') ?? 'Site', lon: pt[0], lat: pt[1] } : undefined,
+        link: src === 'sirkd' ? { href: `https://eid.gov.si/S/${(str('i') ?? '').split(':')[1]}`, label: 'Register record ↗' } : src === 'wdextra' ? { href: `https://www.wikidata.org/wiki/${(str('i') ?? '').split(':')[1]}`, label: 'Wikidata ↗' }
+          : src ? { href: DATASET_CREDIT[src].url, label: 'Dataset ↗' } : undefined,
+        source: src ? credit(src) : '',
+        caution: snap ? `A source that lists a place in one year is shown (lighter) within 25 years of it — a display allowance, not a claim about those years.`
+          : num('u') ? 'The position is approximate in the source.'
+          : ef === undefined && et === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.' : undefined,
       };
     }
     case 'medieval-sites': {

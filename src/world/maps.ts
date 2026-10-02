@@ -5,6 +5,8 @@
 //   Library of Congress  loc.gov JSON search, IIIF images
 //   David Rumsey         LUNA search JSON, IIIF manifests
 //   Allmaps              georeferences (control points) for IIIF maps, searchable by area
+//   University GIS       public georeferenced map layers (Harvard Geospatial Library and others), served
+//                        as WMS — a static index built from their OpenGeoMetadata catalogues
 //
 // An original map shows what its maker knew, believed and chose to show, in
 // the conventions of its time. The app always labels it that way.
@@ -12,11 +14,12 @@ import { yearLabel } from '../atlas/time';
 import { type HistDate, parseDate, UNKNOWN_DATE } from './histdate';
 import { cachedJSON } from './live';
 
-export type MapCollection = 'loc' | 'rumsey' | 'allmaps';
+export type MapCollection = 'loc' | 'rumsey' | 'allmaps' | 'gis';
 export const COLLECTION: Record<MapCollection, { name: string; rights: string; url: string }> = {
   loc: { name: 'Library of Congress, Geography and Map Division', rights: 'See the item record (many maps have no known restrictions)', url: 'https://www.loc.gov/maps/' },
   rumsey: { name: 'David Rumsey Map Collection, Stanford Libraries', rights: 'CC BY-NC-SA 3.0 (David Rumsey Map Collection terms)', url: 'https://www.davidrumsey.com/' },
   allmaps: { name: 'Georeferenced via Allmaps', rights: 'Image rights as in the holding collection', url: 'https://allmaps.org/' },
+  gis: { name: 'University map libraries (georeferenced layers)', rights: 'Public layers; see the record for the holder’s terms', url: 'https://hgl.harvard.edu/' },
 };
 
 export interface HistMap {
@@ -42,6 +45,10 @@ export interface HistMap {
   sheets?: number;
   /** Present-day countries the catalogue record says the map shows (lower case). */
   countries?: string[];
+  /** A georeferenced layer served by its library's WMS (already placed on the earth by the library). */
+  wms?: { url: string; layer: string; bbox: [number, number, number, number] };
+  /** A georeferenced scan served as Web Mercator tiles by its publisher ({z}/{y}/{x} template), streamed from there. */
+  xyz?: { url: string; bbox: [number, number, number, number]; /** The server draws it only from this zoom in. */ minzoom?: number };
 }
 
 /** What the image server says about the scan itself (IIIF info.json). */
@@ -148,6 +155,77 @@ export async function searchAllmaps(bbox: [number, number, number, number], sign
     });
 }
 
+// ── University map libraries: public georeferenced layers (static index, WMS) ──
+
+type GisRow = [string, string, number, number, [number, number, number, number], string, string, string, string];
+let gisIndex: Promise<GisRow[]> | undefined;
+const loadGisIndex = () => (gisIndex ??= fetch(`${import.meta.env.BASE_URL}world/maps/georef-index.json`).then((r) => (r.ok ? r.json() : { maps: [] })).then((d: { maps: GisRow[] }) => d.maps).catch(() => { gisIndex = undefined; return []; }));
+
+const bboxKm = (b: [number, number, number, number]) => extentKm([[b[0], b[1]], [b[2], b[3]]]);
+/** WMS GetMap for a layer's whole extent, in Web Mercator so the image lines up with the map as a rectangle. */
+export function wmsImage(w: NonNullable<HistMap['wms']>, width = 1600, transparent = true): { url: string; coordinates: Overlay['coordinates'] } {
+  const [west, south, east, north] = w.bbox;
+  const [x0, y0] = merc([west, south]);
+  const [x1, y1] = merc([east, north]);
+  const height = Math.max(1, Math.min(2048, Math.round((width * (y1 - y0)) / Math.max(1e-9, x1 - x0))));
+  const p = new URLSearchParams({ service: 'WMS', version: '1.1.1', request: 'GetMap', layers: w.layer, styles: '', format: 'image/png', transparent: String(transparent), srs: 'EPSG:3857', bbox: [x0, y0, x1, y1].join(','), width: String(width), height: String(height) });
+  return { url: `${w.url}?${p}`, coordinates: [[west, north], [east, north], [east, south], [west, south]] };
+}
+/** One tile ({z}/{y}/{x} template) showing the middle of a box, at the deepest zoom where the box still fits in it. */
+export function xyzTile(x: NonNullable<HistMap['xyz']>, extraZoom = 0): string {
+  const [west, south, east, north] = x.bbox;
+  const [x0, y0] = merc([west, south]);
+  const [x1, y1] = merc([east, north]);
+  const world = 2 * Math.PI * 6378137;
+  const z = Math.max(x.minzoom ?? 0, Math.min(19, Math.floor(Math.log2(world / Math.max(x1 - x0, y1 - y0, 1))) + extraZoom));
+  const n = 2 ** z;
+  // the box's centre in Web Mercator metres → tile column and row (rows count down from the top)
+  const tx = Math.floor(((x0 + x1) / 2 / world + 0.5) * n);
+  const ty = Math.floor((0.5 - (y0 + y1) / 2 / world) * n);
+  // a WMS served tile by tile ({bbox-epsg-3857}, as MapLibre fills it in)
+  const size = world / n;
+  const tb = [tx * size - world / 2, world / 2 - (ty + 1) * size, (tx + 1) * size - world / 2, world / 2 - ty * size].map((v) => v.toFixed(2)).join(',');
+  return x.url.replace('{z}', String(z)).replace('{y}', String(ty)).replace('{x}', String(tx)).replace('{bbox-epsg-3857}', tb);
+}
+export function wmsOverlay(m: HistMap): Overlay | undefined {
+  if (m.xyz) {
+    const [west, south, east, north] = m.xyz.bbox;
+    return { url: xyzTile(m.xyz), tiles: m.xyz.url, minzoom: m.xyz.minzoom, coordinates: [[west, north], [east, north], [east, south], [west, south]], errorKm: NaN, extentKm: bboxKm(m.xyz.bbox), points: 0,
+      note: `Georeferenced by ${m.holder || 'its publisher'} and streamed from the publisher’s tile server within the map’s stated extent.${m.xyz.minzoom ? ` Its server draws it only close up: zoom in to street level (zoom ${m.xyz.minzoom}) to see it.` : ''} The publisher does not state its error, so check it against coastlines, roads and field boundaries.` };
+  }
+  if (!m.wms) return undefined;
+  const { url, coordinates } = wmsImage(m.wms);
+  return { url, coordinates, errorKm: NaN, extentKm: bboxKm(m.wms.bbox), points: 0,
+    note: `Georeferenced by ${m.holder || 'the holding library'} and served as a map layer; drawn across the layer’s stated extent. The library does not publish its error, so check it against coastlines and rivers.` };
+}
+
+/** Public georeferenced layers covering an area (and, if given, made within the dates), most local first. */
+export async function searchGisIndex(bbox: [number, number, number, number], from?: number, to?: number): Promise<HistMap[]> {
+  const rows = await loadGisIndex();
+  const view = bboxKm(bbox);
+  return rows
+    .filter(([, , y0, y1, b]) => b[0] <= bbox[2] && b[2] >= bbox[0] && b[1] <= bbox[3] && b[3] >= bbox[1] && (from === undefined || (y1 >= from && y0 <= (to ?? Infinity))))
+    .map((r) => ({ r, km: bboxKm(r[4]) }))
+    .filter(({ km }) => km < Math.max(view * 40, 300))
+    .sort((a, b) => a.km - b.km)
+    .slice(0, 20)
+    .map(({ r: [id, title, y0, y1, b, url, layer, holder, page] }) => {
+      if (layer === 'xyz' || layer.startsWith('xyz:')) {
+        // a tiled scan (Web Mercator tiles from its publisher); 'xyz:12' = drawn by the server only from zoom 12
+        const xyz = { url, bbox: b, ...(layer.startsWith('xyz:') ? { minzoom: Number(layer.slice(4)) } : {}) };
+        return {
+          id: `gis:${id}`, title, date: yearFrom(y0 === y1 ? String(y0) : `${y0}–${y1}`), subjects: [], collection: 'gis' as const, holder: holder || COLLECTION.gis.name,
+          thumb: xyzTile(xyz), page, rights: `Image © ${holder || 'its publisher'}; streamed from the publisher’s public tile service`, xyz,
+        };
+      }
+      const wms = { url, layer, bbox: b };
+      return {
+        id: `gis:${id}`, title, date: yearFrom(y0 === y1 ? String(y0) : `${y0}–${y1}`), subjects: [], collection: 'gis' as const, holder: holder || COLLECTION.gis.name,
+        thumb: wmsImage(wms, 300, false).url, page, rights: COLLECTION.gis.rights, wms,
+      };
+    });
+}
+
 /** Look up whether someone georeferenced this map (Allmaps), from its IIIF manifest. */
 export async function findGeoref(map: HistMap, signal?: AbortSignal): Promise<Georef | null> {
   if (map.georef !== undefined) return map.georef;
@@ -196,7 +274,7 @@ function solve(A: number[][], b: number[]): number[] | undefined {
   return M.map((row, i) => row[n] / row[i]);
 }
 
-export interface Overlay { url: string; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; extentKm: number; points: number; note: string }
+export interface Overlay { url: string; /** Tile URL template: drawn as a tiled layer within `coordinates` instead of one image. */ tiles?: string; minzoom?: number; coordinates: [[number, number], [number, number], [number, number], [number, number]]; errorKm: number; extentKm: number; points: number; note: string }
 /** Why a georeferenced map can't be laid over the map (too few points, or too distorted for a simple fit). */
 export type OverlayResult = { ok: true; overlay: Overlay } | { ok: false; reason: string };
 
@@ -309,6 +387,7 @@ export async function searchMaps(opts: { q?: string; bbox?: [number, number, num
     jobs.push(searchRumsey(q, opts.from, opts.to, opts.signal).catch(() => { errors.push('David Rumsey Map Collection couldn’t be reached.'); return []; }));
   }
   if (opts.bbox) jobs.push(searchAllmaps(opts.bbox, opts.signal).catch(() => { errors.push('Allmaps couldn’t be reached.'); return []; }));
+  if (opts.bbox) jobs.push(searchGisIndex(opts.bbox, opts.from, opts.to).catch(() => { errors.push('The georeferenced map index couldn’t be loaded.'); return []; }));
   const all = (await Promise.all(jobs)).flat();
   const inRange = (m: HistMap) => opts.from === undefined || m.date.precision === 'unknown' || ((m.date.latest ?? Infinity) >= opts.from && (m.date.earliest ?? -Infinity) <= (opts.to ?? Infinity));
   const seen = new Set<string>();

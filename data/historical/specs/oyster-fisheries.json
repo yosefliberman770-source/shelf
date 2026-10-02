@@ -1,0 +1,39 @@
+{
+ "id": "oyster-fisheries",
+ "src": "oysters",
+ "public": true,
+ "enabled": true,
+ "title": "Historical oyster habitat and fisheries in English coastal waters (Environment Agency, 2022)",
+ "licence": "Open Government Licence v3.0",
+ "url": "https://environment.data.gov.uk/arcgis/rest/services/EA/HistoricalOysterHabitatAndFisheries/FeatureServer/0",
+ "describe": "Native oyster beds and fisheries around England, the Channel Islands and the Isle of Man as mentioned in historical written sources (government reports, fishery histories, newspapers), each shown in the year or years of the account that mentions it, with the reference.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "oyster-fisheries/original/oysters.geojson"
+ },
+ "fields": {
+  "id": "objectid",
+  "name": "location_o",
+  "type": [
+   "name_of_oy",
+   "confidence"
+  ],
+  "context": [
+   "refer_title"
+  ],
+  "kind": "fishery",
+  "uncertain": {
+   "field": "confidence",
+   "values": [
+    "low"
+   ]
+  }
+ },
+ "dating": {
+  "mode": "fields",
+  "from": "year"
+ },
+ "datingLabel": "year of the historical account"
+}

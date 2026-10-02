@@ -1,4 +1,10 @@
 {
+ "agglomerations-roman/original/agglomerations-EN.csv": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.4678112k/349c80412051f3b0353d4a2277d6cedc797fd0b7",
+  "bytes": 2087092,
+  "sha256": "29c74f3f1d3be528e1063db942a4c62ba03be6cf4a888670ecaaa337b7af6126",
+  "downloaded": "2026-10-01"
+ },
  "al-thurayya/original/DATA-LICENSE.md": {
   "url": "https://raw.githubusercontent.com/althurayya/althurayya.github.io/f244e65ddf782baef08e410870c61c8096ff9f90/DATA-LICENSE.md",
   "bytes": 1071,
@@ -58,6 +64,12 @@
   "bytes": 6689410,
   "sha256": "40dd41ec54cb84b643a4206b8275660ac06752d5114b2c1bcec047845eb462b3",
   "downloaded": "2026-09-29"
+ },
+ "arkas-slovenia/original/1_Najdisca_2023-Apr-12_0708.csv": {
+  "url": "https://zenodo.org/api/records/7820725/files/1_Najdisca_2023-Apr-12_0708.csv/content",
+  "bytes": 15813012,
+  "sha256": "71a19dc17f19abd3ae1a332048006eaf3a6b2093bbf1c64a4c35c98ddf2fae90",
+  "downloaded": "2026-10-01"
  },
  "atlas-fontium-poland/original/akweny.geojson": {
   "url": "https://geonode.ontohgis.pl/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=geonode:akweny&outputFormat=application/json&srsName=EPSG:4326",
@@ -150,6 +162,61 @@
   "sha256": "d799dbeaafe7e00f897696cf828e55146394ae1bdd7618aee3d37d0364291a31",
   "downloaded": "2026-09-30"
  },
+ "canmore-scotland/original/Canmore_Points.zip": {
+  "url": "https://inspire.hes.scot/AtomService/DATA/Canmore_Points.zip",
+  "bytes": 35950191,
+  "sha256": "5a30f1d15645b46927240949603746801048bf78c7d32dda19a3aac54fc6e437",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/edge.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685925?format=original",
+  "bytes": 2343040,
+  "sha256": "d9af6cfa908c49d066011069af34a6de914199f595abbd6ad5c3d4f269b941c7",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/france_cassini_cities.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685920?format=original",
+  "bytes": 1056572,
+  "sha256": "abd1dafe38f8505511e9c2ad5fc9b3a11d5f1d5602589de07572403e88cb7652",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/france_cassini_roads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685921?format=original",
+  "bytes": 5884182,
+  "sha256": "58b6f4b87d439b89dbe16941944d881bd70b20cca48f425fe08ba99d8934dadd",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/node.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685924?format=original",
+  "bytes": 2075239,
+  "sha256": "aaf45c496354e2732fc7b040a8daa70f4d44d9337b35db954bc9ed86d93db0de",
+  "downloaded": "2026-10-01"
+ },
+ "cassini-roads-cities/original/version.csv": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/2685923?format=original",
+  "bytes": 50,
+  "sha256": "8288991abf9a27aaaa795dbc103c653c044a174279c2732850fdfa300fb43124",
+  "downloaded": "2026-10-01"
+ },
+ "cora-torcularia/original/doi-10.34810-data2461.zip": {
+  "url": "https://doi.org/10.34810/data2461",
+  "bytes": 96059490,
+  "sha256": "93485e89d516c2aba22d37c27959fea1102bf7f8021e6bd7f78dac326feea3f4",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
+ "croatia-cultural-goods/original/data.json": {
+  "url": "https://data.gov.hr/ckan/dataset/c0410787-33b1-4299-b92c-9bbf38dd8bbf/resource/c9a9bce6-1b70-45ec-b2cf-d3f93bca7a02/download/data.json",
+  "bytes": 10227091,
+  "sha256": "044edd20bb9fc6861547ec4a76d8c13157237c2a0cc5ffb225fc1724dc3919b3",
+  "downloaded": "2026-10-01"
+ },
+ "croatia-cultural-goods/original/geonames-HR.zip": {
+  "url": "https://download.geonames.org/export/dump/HR.zip",
+  "bytes": 800166,
+  "sha256": "0280b84420ac2e352143e67bee231f5f701d22c6587521e52e77516a436e870a",
+  "downloaded": "2026-10-01"
+ },
  "cshapes/original/CShapes-2.0.csv": {
   "url": "https://icr.ethz.ch/data/cshapes/CShapes-2.0.csv",
   "bytes": 44501172,
@@ -215,6 +282,12 @@
   "bytes": 230734,
   "sha256": "99ec4adfb9de4ca2a37212aab82117903e72bed0dc00da438fcf7cde4a6f02ed",
   "downloaded": "2026-09-30"
+ },
+ "daugava-hillforts/original/hillforts-EN.csv": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.aecdrl48/11369fae61785da8e4fab893f14220dd17d2e6b8",
+  "bytes": 10259,
+  "sha256": "3c0e63ac8b0666043f94aa48c65cda25b0ee6f92e6efbb53dd4fbb214acd2e00",
+  "downloaded": "2026-10-01"
  },
  "dicotopo/original/DT01.xml": {
   "url": "https://github.com/chartes/dico-topo/tree/master/data/DT01",
@@ -534,6 +607,66 @@
   "sha256": "e33f1823350650fb8369abb38ce46585ddc60b442daada0e7cd41e9465364dd4",
   "downloaded": "2026-09-30"
  },
+ "dioceses-dorin/original/diocese1250.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 24178790,
+  "sha256": "b2cd6ff96a2c56387ed1b89ec434b03c1f4e7cb94830ff524e70f0925adb776a",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocese1350.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/1/query (all features, outSR=4326)",
+  "bytes": 24455832,
+  "sha256": "aaa236f305fd5413f5e15b867b14caa10d1f999b4fdb82ef25b5718fafe7fa91",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocese1450.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/2/query (all features, outSR=4326)",
+  "bytes": 26170330,
+  "sha256": "fb2aa4caf188e3b4efa39d834fd0637962b5a0b6798e4c9563da2b6b1c3f49e4",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/diocesemax.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/3/query (all features, outSR=4326)",
+  "bytes": 26182731,
+  "sha256": "dbe1b29c77184f93ee490f0d91906eab10c1d0a002b0cbd39475290c79ad81ab",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1250.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/4/query (all features, outSR=4326)",
+  "bytes": 16761550,
+  "sha256": "261f496c6ca6a58752abe7970ad8f5c57cdf16d0062c4db3e3a89128edd0ecf6",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1350.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/5/query (all features, outSR=4326)",
+  "bytes": 16843765,
+  "sha256": "6eefad9e8ed8e7739fe43d03b6fb61b8e76a025487d9c80f4bbeacffd62fcb2f",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/province1450.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/6/query (all features, outSR=4326)",
+  "bytes": 18733461,
+  "sha256": "c6a5fe0a7058ee264bccc939d03c2e92cdafe1592185fff3e0d9882417e1157d",
+  "downloaded": "2026-10-01"
+ },
+ "dioceses-dorin/original/provincemax.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Digital_Atlas_of_Dioceses_and_Ecclesiastical_Provinces_in_Late_Medieval_Europe_1200_to_1500/FeatureServer/7/query (all features, outSR=4326)",
+  "bytes": 17940470,
+  "sha256": "956d62e61ea4a39bac03f86fb88f948c6111b130bc6db7d194e3c8f0261f3833",
+  "downloaded": "2026-10-01"
+ },
+ "dissiloc-inquisition-places/original/README.md": {
+  "url": "https://zenodo.org/api/records/21031406/files/README.md/content",
+  "bytes": 12548,
+  "sha256": "8d423eb26cf0d72a8b38b5792a8107dbf9f57ec819a86ad8ea04a425bf578fbc",
+  "downloaded": "2026-10-01"
+ },
+ "dissiloc-inquisition-places/original/dissiloc.tsv": {
+  "url": "https://zenodo.org/api/records/21031406/files/dissiloc.tsv/content",
+  "bytes": 1197248,
+  "sha256": "1d0c4d95e32b13c446ba4ec41ae1fac51f91afd93afe421cd1071f9b8daf117b",
+  "downloaded": "2026-10-01"
+ },
  "dk-fund-og-fortidsminder/original/FF.zip": {
   "url": "https://kulturarv.dk/fundogfortidsminder/Download/Filer/FF.zip",
   "bytes": 109119092,
@@ -566,6 +699,12 @@
   "bytes": 220483,
   "sha256": "ee8cc934ec5cfa49127638b35a7ca9a7d29b2422688b1a34217831355bc7c390",
   "downloaded": "2026-09-30"
+ },
+ "early-modern-weather/original/events.geojson": {
+  "url": "https://services.arcgis.com/rGKxabTU9mcXMw7k/arcgis/rest/services/Early_Modern_Weather_Database_Updated/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 5800045,
+  "sha256": "c1f7b9c876a91572bc1583a482c1c59fafde551807b30dd578115c42ac874ecc",
+  "downloaded": "2026-10-01"
  },
  "ebidat/original/pages-00.jsonl.gz": {
   "url": "https://www.ebidat.de/cgi-bin/ebidat.pl?id=1..1000",
@@ -639,17 +778,89 @@
   "sha256": "6af6af82e6ca00bb460444a5d3b9909abfec86edaf4a26a860bf0fce19b4cf5b",
   "downloaded": "2026-09-30"
  },
+ "ees-delta-survey/original/ees_delta_survey.geojson": {
+  "url": "https://services-eu1.arcgis.com/3pnT0aZIJbLTeP2N/arcgis/rest/services/EES_Delta_Survey/FeatureServer/1/query (all features, outSR=4326)",
+  "bytes": 881455,
+  "sha256": "4c4135691f39c9122d919ee6f0da7dfdd57df6a8b822d361f7b19c8f9db1d0c3",
+  "downloaded": "2026-10-01"
+ },
+ "emdigit-waypoints/original/waypoints.geojson": {
+  "url": "https://services2.arcgis.com/V2PQwgZMTFfgM0Xu/arcgis/rest/services/Early_Modern_Digital_Itineraries_(EMDigIt)__Core_Italian_Itinerary_Waypoints/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2088489,
+  "sha256": "51a86fd863152058358161ca2b6cd0daf0316c163561628ba5c9315667f67a7f",
+  "downloaded": "2026-10-01"
+ },
  "engel-hungary/original/Engel2020.zip": {
   "url": "https://tti.abtk.hu/images/kiadvanyok/engel2020/Engel2020.zip",
   "bytes": 51552337,
   "sha256": "27bf997c6a1f0d61409e536d806552fec525c8b7870ecb5f5201ef9f4b50e057",
   "downloaded": "2026-09-30"
  },
+ "fields-on-fire/original/burned-households_town.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8939571?format=original",
+  "bytes": 120187,
+  "sha256": "a0477986bbf06add855bf83ec83001cb59ef3670364d8887877bab4caad0185c",
+  "downloaded": "2026-10-01"
+ },
+ "fields-on-fire/original/burned-households_town.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8939572",
+  "bytes": 144398,
+  "sha256": "d3f703a19178b70b038f3fd171a159957d21d26db0a6b6c8fc537596a930d48d",
+  "downloaded": "2026-10-01"
+ },
  "finland-heritage/original/tutkija.zip": {
   "url": "https://mverkkodatashare.blob.core.windows.net/share/tutkija.zip",
   "bytes": 38319125,
   "sha256": "98c31ac26dc2a7028fd4eabb7579c3a035e163a366d5a148470a115ee93376de",
   "downloaded": "2026-09-30"
+ },
+ "finland-lake-ore/original/PANGAEA.860941.tab": {
+  "url": "https://doi.pangaea.de/10.1594/PANGAEA.860941?format=textfile",
+  "bytes": 9938,
+  "sha256": "a21f3132ce78bfcf50dd71daee0e2b4e557798af31b6a3c78a3a43bb5397c6c4",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 3.0",
+  "note": "Solitander (1882), lake-ore workings of eastern Finland supplying ironworks, per-lake extraction years"
+ },
+ "finland-relics/original/muinaisjaannos_piste.geojson": {
+  "url": "https://geoserver.museovirasto.fi/geoserver/rajapinta_suojellut/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=rajapinta_suojellut:muinaisjaannos_piste&outputFormat=application/json&srsName=EPSG:4326&sortBy=OBJECTID&count=10000 (paged by 10,000)",
+  "bytes": 38360965,
+  "sha256": "62a4facbed2a214705e09e8b77d4cee6171f4ec7c4d0b096e482980a1ef6a32a",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0 (Museovirasto)"
+ },
+ "france-mills-1794-1809/original/moulins.csv": {
+  "url": "https://www.data.gouv.fr/api/1/datasets/r/912c2c2f-9a5f-4316-8671-c2d995f55ca5",
+  "bytes": 5309381,
+  "sha256": "19f8ea19ec02f1b0497cc00471427da1c4d23507d6ce3cb410f6b1bf4be225d2",
+  "downloaded": "2026-10-01",
+  "licence": "Licence Ouverte"
+ },
+ "france-mining-cadastre/original/camino-titres.csv": {
+  "url": "https://api.camino.beta.gouv.fr/titres?format=csv",
+  "bytes": 7275368,
+  "sha256": "ee40023a141f9721fbfab85bed429692a78bf661d10dc141c53399f8130ac73d",
+  "downloaded": "2026-10-01"
+ },
+ "galicia-buildings/original/Galicia_and_Austrian_Silesia_Buildings_v1.7z": {
+  "url": "https://data.mendeley.com/public-files/datasets/md8jp9ny9z/files/c398bd7c-958a-49bf-a20a-90293baf81fe/file_downloaded",
+  "bytes": 16833385,
+  "sha256": "d37f6016f06fc010da0cf727bb7791cce036953f5f00d98cf7860678628c6693",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "galicia-buildings/original/uncertainty_metadata.7z": {
+  "url": "https://data.mendeley.com/public-files/datasets/md8jp9ny9z/files/cd076b07-d952-4ffb-a997-d2a109f0e457/file_downloaded",
+  "bytes": 2722226,
+  "sha256": "50f6a5d705c2b7394e3acb6c21364c88951898a9511175ca342efadae618498e",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "generalkarte-gazetteer/original/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv": {
+  "url": "https://zenodo.org/api/records/8409507/files/Boykov_Gazetteer_Generalkarte_von_Mitteleuropa_v.1.xls.csv/content",
+  "bytes": 1635015,
+  "sha256": "6b568e3d82b9680bb42e710be80de6038c1c65930084ca2a2decedf973c175b2",
+  "downloaded": "2026-10-01"
  },
  "germania-sacra/original/diocese-borders.geojson": {
   "url": "https://api.gs.sub.uni-goettingen.de/v1/monasteries/diocese-borders",
@@ -668,6 +879,13 @@
   "bytes": 3625148,
   "sha256": "b7ddbd4697d094796faffada7cf437367d0038e9fc6006f65f052fa9b53102bd",
   "downloaded": "2026-09-30"
+ },
+ "gobolitide/original/Dataset-Gobolitide.csv": {
+  "url": "https://zenodo.org/api/records/5849856/files/Dataset-Gobolitide.csv/content",
+  "bytes": 112363,
+  "sha256": "3518cd424bcd3a39d70080251bac591879cc90f0609aa91e4fd75f1a34dde189",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
  },
  "gough-map/original/Gough_Map_website_intro.pdf": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-7268-1/dissemination/Gough_Map_website_intro.pdf",
@@ -698,6 +916,26 @@
   "provenance": "Downloaded from the official URL by fetch.py.",
   "corroborated_by": "Downloaded in a browser from the ADS collection page and uploaded to the repository by its owner on 2026-09-30 (commit 2656dbe, data/historical/incoming/gough_way_stations.zip). The uploaded copy is byte-identical."
  },
+ "hajj-forts/original/forts.geojson": {
+  "url": "https://services1.arcgis.com/KUeKSLlMUcWvuPRM/arcgis/rest/services/Fortresses_between_Damascus_and_Medina_(coordinates_from_Andrew_Petersen)/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 12710,
+  "sha256": "3aab90cf7840fb2432abe7a5a728b78cd8ea232a73275949a175516972dce847",
+  "downloaded": "2026-10-01"
+ },
+ "harvard-ghgis/original/GHGIS1820CORE.zip": {
+  "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820CORE)",
+  "bytes": 587090,
+  "sha256": "b0f9e0c6647c41e097dffda07ebad2dea9d12e3c5a443770b0c211863dd0e65a",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
+ "harvard-ghgis/original/GHGIS1820PROVINCES.zip": {
+  "url": "https://hgl.harvard.edu/ (HGIS Germany layer GHGIS1820PROVINCES)",
+  "bytes": 226260,
+  "sha256": "d0390551042b79fc7906b8330e71bf40f5729c5186a7f1456cdc5a3e174fde07",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
  "hced/original/HCED Data v3.csv": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/13390255",
   "bytes": 2171518,
@@ -709,6 +947,12 @@
   "bytes": 2490,
   "sha256": "7cd17664755fdc2a887df22c8bae8b47f722e1339a62fe3f979adfb25cbabe25",
   "downloaded": "2026-09-30"
+ },
+ "hierokles-synekdemos/original/places.geojson": {
+  "url": "https://services.arcgis.com/ycIuRaoIC4UuCDAS/arcgis/rest/services/hierokles_places/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 302956,
+  "sha256": "581f9655793bf1c1e123aca85b177f491c88792bb00ae7235165ca02e4a507e7",
+  "downloaded": "2026-10-01"
  },
  "historic-england/original/Battlefields.gpkg": {
   "url": "https://opendata-historicengland.hub.arcgis.com/api/download/v1/items/767f279327a24845bf47dfe5eae9862b/geoPackage?redirect=true&layers=8",
@@ -752,6 +996,375 @@
   "sha256": "8fde04089945aabc572330739f3f73c43b27b2c9514ce02a6aa624cd7c6eacae",
   "downloaded": "2026-09-29"
  },
+ "historical-urban-population-reba/original/urbanspatial-hist-urban-pop-3700bc-ad2000-xlsx.xlsx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/11815396?format=original",
+  "bytes": 831726,
+  "sha256": "7355dd9d3ce162f98db90b4806cd0cb1f0209dca8e9108a34ee0a336f91f168e",
+  "downloaded": "2026-10-01",
+  "note": "uploaded by the user (browser download, shared via Google Drive) on 2026-10-01"
+ },
+ "hus-och-gard/original/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg": {
+  "url": "https://zenodo.org/api/records/18231456/files/Hus och g\u00e5rd punkter sweref_fixed_location.gpkg/content",
+  "bytes": 385024,
+  "sha256": "25318f7e07c9566547ec0276153b146b8f7f41b590a8de505b6f310316d65118",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "hus-och-gard/original/Hus och g\u00e5rd punkter sweref_not_fixed_location.gpkg": {
+  "url": "https://zenodo.org/api/records/18231456/files/Hus och g\u00e5rd punkter sweref_not_fixed_location.gpkg/content",
+  "bytes": 176128,
+  "sha256": "3adaba03274b2bb0a06aadee4befdf1016e883b11328e77a0b0195b827af1211",
+  "downloaded": "2026-10-01",
+  "licence": "CC BY 4.0"
+ },
+ "imperiia/original/Boundaries_in_1547.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1547/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 13986,
+  "sha256": "8794aa10749b37e6bbe41efc64dde2c55bdfd911202c7b6409c6ef8181473631",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1584.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1584/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 19625,
+  "sha256": "af30440e15867a305e20641ad7efe37a13a41077d40cb04597358f96fd069cab",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1613.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1613/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 34276,
+  "sha256": "bdaf6f940b0b08110bfdb613502ca23dbf8f69d1f975d75ff0a9ac2cef6cf6e8",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1645.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1645/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 44987,
+  "sha256": "72b6934bcc4ebc300e0187292e70342fbbfec2934da87ac9e0e55e06d1785948",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1689.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1689/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 48988,
+  "sha256": "6d6128edac2f0cdccc34e64c8c01a418b99e7f0b68e97cd43ed3a7c846d75911",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1725.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1725/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 50145,
+  "sha256": "58dcd46af58a5935cd2ecadedfb830420a1b243727c43472b0920490f4ae36fe",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1740.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1740/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 136271,
+  "sha256": "d6d97198fd6dc452950b68a4e992e2282a591b9840b09cd599e75aaee36750be",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1762.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1762/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 129358,
+  "sha256": "05f72bafc9b4b5f3fa63d4ff76ff2e193eff569718d29ec049a919d45b6a8f7e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1796.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1796/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 144473,
+  "sha256": "917f867a31e150c2567e6b904aa8dcf2eb3dc86c4d6a946673aef23854fca9de",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1801.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1801/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 131570,
+  "sha256": "9c5ca9544aaefe8e693a4aeb57fdafceb474458672a1e77209e5df61e10f58fe",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1825.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1825/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 149837,
+  "sha256": "ab0c1fc3b97a190cbafafc374f15ad8693ed79b85131143e4962636d3ea490a7",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1855.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1855/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 143813,
+  "sha256": "c225df0455414b462fba57ad033d83c62b4c574eefd93b41041fcccc4553309e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1881.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1881/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 80136,
+  "sha256": "f27f6f5fe738c9780c85110dcf14f0becff40062edb4267348998189ada6e78e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Boundaries_in_1894.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Boundaries_in_1894/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 67848,
+  "sha256": "d84a3d84d3f893b2f33e0644f9ce28851ea96d997abed425369a9b0cf25a8892",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Cossack_Hetmanate_1649_1657.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Cossack_Hetmanate_1649_1657/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 9361,
+  "sha256": "ed0d00569584483bf8025c6cd949ee87a65bb5259f4aa19d365fdb745337014e",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Cossack_villages.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Cossack_villages/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 23871,
+  "sha256": "64fb1247da545d18a297e23be2c8b837138573f48f0bdf5d78212cb6f183405b",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Don_Cossack_Territory.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Don_Cossack_Territory/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 152080,
+  "sha256": "5a4a2c64a99baa93dea09d5b41f423502d38b93ae2a943be84e87174da2b2bec",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Economic_sites_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Economic_sites_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 58542,
+  "sha256": "79b9e707526a3f50b7368c405722343e8e7bda4125da793d3c994e8d1bfe2750",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Fortifications_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Fortifications_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2405,
+  "sha256": "c19ef9fd0283203c4054c039b8b4e9a3bf2862de4ca102249eaea2caae4aa4d5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Fortresses.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Fortresses/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 49967,
+  "sha256": "c224c8c44ddcacff6e4b6a9117b8312e29473ff77ed025b6fd013b4836f71554",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Guberniia_in_1727_with_labels_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Guberniia_in_1727_with_labels_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 156312,
+  "sha256": "680b62bc970bc0afd10a9ec3d345a34bd355a2c80737bba38f7b4ba4cd42a955",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Guberniia_provinces_1820s.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Guberniia_provinces_1820s/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 11369354,
+  "sha256": "e7f0fd58ec9133520f00b77d57202c41e3ca6b762fb8bd5fc234c4bed6180d68",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Gubernskie_goroda_provincial_towns_1827.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Gubernskie_goroda_provincial_towns_1827/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 18375,
+  "sha256": "0c38294256091f99fc74a688cc7417977ef43d8ec3724989bf3ed12e327bbbe5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Households_in_1719.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Households_in_1719/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 73272,
+  "sha256": "51a726238f159ca34a833f4f98276c7ee7b4dcfd3284ef496706d83682cf2e0f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Households_per_uezd_in_1816.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Households_per_uezd_in_1816/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 57120,
+  "sha256": "dec85a82b56ea415498f760937062c7f4aa2a2d2993ab46de97f7dd3ff1a2f73",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Military_sites_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Military_sites_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 105371,
+  "sha256": "e5caf68d08ded5e3b96595c126530232d27b1eb39733b590d200da0aeb301a39",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Monasteries.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Monasteries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 24110,
+  "sha256": "1e6a490230bfc4bd5b80064d3b67a5c626039f39f9793edced054a1293f173d1",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Mosques_1886.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Mosques_1886/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 267445,
+  "sha256": "72c40ab937735bac54724efbb3906e2f2eda84b23f2f03b52af41bccb6041ff9",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Orthodox_Churches_1727.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Orthodox_Churches_1727/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 155306,
+  "sha256": "f3e04fe23a763052059c3474734fb25291664d52c5410cfdc0c4c309a5308124",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Pale_of_Settlement_1825_1887.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Pale_of_Settlement_1825_1887/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 29109,
+  "sha256": "1e37fefc6ad01a26b4c2aa7fd005af2bdd347ccde2c7b334bc9bb6d5d2d31778",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Pale_of_Settlement_in_1791.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Pale_of_Settlement_in_1791/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 383787,
+  "sha256": "2ed51e5d0d474a8889449edbac718bb850afd15efaf6cba8bce966bfb0f0647b",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_1719_revision_by_guberniia.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_1719_revision_by_guberniia/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4883901,
+  "sha256": "1e986c557200fd9eaef1076cfb99ddcf01662321694d7591f1dddd442cad63aa",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_3rd_revision_1781.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_3rd_revision_1781/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76431,
+  "sha256": "653b3db85058ea11904dd0fec22a571b3f2d5d675789e8383eb256322e501fde",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_c_1743_2nd_revision_by_town.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_c_1743_2nd_revision_by_town/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76331,
+  "sha256": "dfdc0e0bb0386ed51095ec92b1043190beaff5618120cf733a74b0f1f4928987",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_figures_1766.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_figures_1766/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 78512,
+  "sha256": "dca4e67f9557d079a9c6e7f1f2fe336fdb5ff6b6f397f5fcc4cfb9d8090df35d",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Population_in_1719_1st_revision_by_town.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Population_in_1719_1st_revision_by_town/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 76285,
+  "sha256": "3900ffed7fa062caec16311025c5e80a4a4e1914fef9654fb1fb7814f5e39ee6",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Post_roads.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Post_roads/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 2098767,
+  "sha256": "73c6cb7da1945ab844dae52df71f5602d6f6ca2ca54de0324baeda50e6b21a8f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Post_stations.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Post_stations/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 1267050,
+  "sha256": "5ed9631854b300ec8ec805ecc644cc4fc058b322c1cf2375219132f28d5a1e97",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Provincial_boundaries_1856.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Provincial_boundaries_1856/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10010143,
+  "sha256": "b887feed8be63cd0c1ea0177ef0f70db59ec2c58057cdb018c0fc59cd7e8e93c",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Region_of_Jewish_restriction_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Region_of_Jewish_restriction_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 711764,
+  "sha256": "bf0358f3a9328a72a67a2421cb0c5a4a72e4ee29b4168a92131543ba4bc5fc45",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Regions_in_1781.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Regions_in_1781/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4266339,
+  "sha256": "f00ba178545659bb2a5a068d242704c76bcabee9d456e1cd39e8ddb7510e8d86",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Second_partition_1793.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Second_partition_1793/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 249647,
+  "sha256": "e605379257bacd9f178c249c363f22bb0016544e46a0041263a68786a4d625c7",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Third_partition_1795.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Third_partition_1795/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 249734,
+  "sha256": "6fcf47c808e483714a54c20d82cde095ff6a6e1ddbbf27206ac9ec922cd8a377",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Tsarist_troop_deployments_1773.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Tsarist_troop_deployments_1773/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 86455,
+  "sha256": "19471ec22323fab6167457ae33922406aeacb23f55d7326b47704a515ea5d2e5",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Tsarist_troop_deployments_1774.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Tsarist_troop_deployments_1774/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 143775,
+  "sha256": "7ce2d7d8dac0fde7e469fee8a4ba700c2485642b42b83557bf951bcc1160bfc6",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezd_boundaries_1792.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezd_boundaries_1792/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 56793,
+  "sha256": "c268aaf31d495c9adfe0e6c7498b7f631236a97fc64b9419f14ed2ecedd34934",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezd_towns_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezd_towns_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 161472,
+  "sha256": "be7abcd55366b9330de93aeb286b584099d24a90fec6e2e2f1ea8ea4ff803521",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uezdy_Voevodstva.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uezdy_Voevodstva/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 18440903,
+  "sha256": "b547710f52084d0297acc00c3ad48e1c9c54002fbc276b58ee47a6e1c08c05f2",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1800_to_1820.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1800_to_1820/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 14063,
+  "sha256": "14bcc3cdadd0587fd9b88a634ec7cfe12386a6e349112d027b18bd62bbc97f57",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1821_to_1840.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1821_to_1840/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "fc6ced06e5de0ef1786b61da61a8d27e464d51883febdf1679b523524156e257",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1841_to_1860.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1841_to_1860/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "c46991106c8fb26604999b5f0e12e9baa95935df3b2449b3b3a739e810effac3",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1861_to_1880.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1861_to_1880/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10801,
+  "sha256": "e0726aa67d62a08782a0076801eb13880e5ea8977d33fc4576b607e88d5ea288",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Unrest_1881_to_1900.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Unrest_1881_to_1900/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 10800,
+  "sha256": "016a8cc68a9158d0abc7bc715e3fc7093191103046b0a1436866d7826a250f1f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Uvarov_s_Expedition_Itinerary_1847_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Uvarov_s_Expedition_Itinerary_1847_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 7495,
+  "sha256": "f9a72275021aa8ae30127ccef86105703e0f2c721ef99e206463e33419c6236f",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Villages_1820s_.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Villages_1820s_/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 1507344,
+  "sha256": "68daecd53f9d94e8751120f26d801f4dba76b299fbe956c772c4df079284520a",
+  "downloaded": "2026-10-01"
+ },
+ "imperiia/original/Wooden_Churches.geojson": {
+  "url": "https://services7.arcgis.com/iEMmryaM5E3wkdnU/arcgis/rest/services/Wooden_Churches/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 622,
+  "sha256": "52498dcb1393349dfcf56141d95bdeb03e49fe83a06d77d7075d20bba75b7791",
+  "downloaded": "2026-10-01"
+ },
+ "index-villaris-1680/original/IndexVillaris1680-v2.0.4.zip": {
+  "url": "https://zenodo.org/api/records/10660024/files/docuracy/IndexVillaris1680-v2.0.4.zip/content",
+  "bytes": 11461666,
+  "sha256": "4832d91c44b45871ff5fe09ae3a81b91eb0d17ed227d0037f6d6a12a68d4c4ac",
+  "downloaded": "2026-10-01"
+ },
+ "index-villaris-1680/original/geonames-GB.zip": {
+  "url": "https://download.geonames.org/export/dump/GB.zip",
+  "bytes": 3639093,
+  "sha256": "e31c630e66e18b72ce29401a2081c5f452e1f894ab1b890ae8eb871f453d0db1",
+  "downloaded": "2026-10-01"
+ },
  "inland-navigation/original/gis/direct_evidence.zip": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-3427-1/dissemination/gis/direct_evidence.zip",
   "bytes": 1115556,
@@ -787,6 +1400,24 @@
   "bytes": 250611,
   "sha256": "a53b2780f11a375ef81d62abdb703a5b7aded9fc0f7f34fe95ce2e130e6f9327",
   "downloaded": "2026-09-30"
+ },
+ "ireland-rail/original/IrishRail_Lines.zip": {
+  "url": "https://www.arcgis.com/sharing/rest/content/items/63612b1edcff44fdb4cf70146eaf6d65/data",
+  "bytes": 1253038,
+  "sha256": "8ba1d7a9905259fee60d6583ea99effd7c96875f1d4d550f7cdb2ad951f5cd4e",
+  "downloaded": "2026-10-01"
+ },
+ "ireland-smr/original/SMROpenData.csv": {
+  "url": "https://heritagedata.maps.arcgis.com/sharing/rest/content/items/63841b2807504a24942e44955119c339/data",
+  "bytes": 169737101,
+  "sha256": "99f171b7b120eb7fbb04525f927d4ed8a8a77ccf6b063dd981e4d14024c23768",
+  "downloaded": "2026-10-01"
+ },
+ "ireland-wrecks/original/wrecks.geojson": {
+  "url": "https://services3.arcgis.com/ArIWe98F0BECP9pn/arcgis/rest/services/Wrecks/FeatureServer/3/query (all features, outSR=4326)",
+  "bytes": 2352015,
+  "sha256": "f7792c70f937ad4d4983bec55ab71d81f05d26fc73d7c225e4b102d878ac9cba",
+  "downloaded": "2026-10-01"
  },
  "itinere/nightly-export/route-segments.ndjson": {
   "url": "https://itiner-e.org/route-segments/download",
@@ -860,6 +1491,54 @@
   "sha256": "a25d03a4240619fe799526f98c4005e28ec34809848bbdb4ec18dc58ac96f606",
   "downloaded": "2026-09-29"
  },
+ "latin-church-1772/original/latin_church_1772-v1.zip": {
+  "url": "https://zenodo.org/records/10912495/files/geo-ecclesiae/latin_church_1772-v1.zip?download=1",
+  "bytes": 4039020,
+  "sha256": "9f7e4d88e7d7daa82eae4784118c6bb6b869babdfaf8607c9292dda06ab02fa4",
+  "downloaded": "2026-10-01"
+ },
+ "latvia-monuments/original/geonames-LV.zip": {
+  "url": "https://download.geonames.org/export/dump/LV.zip",
+  "bytes": 1068796,
+  "sha256": "e0cabc84f888d1fe2d6b37259150abc48723c808ce565647e5da18639017da22",
+  "downloaded": "2026-10-01"
+ },
+ "latvia-monuments/original/monuments.geojson": {
+  "url": "https://services9.arcgis.com/AW5pFI46lnz0wQIw/arcgis/rest/services/kulturas_pieminekli_NKMP_12_2024/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 14856098,
+  "sha256": "f3d43858fda70858971a7d783cbfa685d0cd55246b4b7d4bddfc8d3247919979",
+  "downloaded": "2026-10-01"
+ },
+ "latvia-monuments/original/saraksts.csv": {
+  "url": "https://data.gov.lv/dati/dataset/79e7246f-57cc-41fc-9a10-96521422359c/resource/25583e4e-ca54-430e-b275-b38057a5ee70/download/saraksts.csv",
+  "bytes": 2012570,
+  "sha256": "ae9f294d5fe0baef76146a0e6d7c789e63f56714859b19940d4a3710d6d6d5d8",
+  "downloaded": "2026-10-01"
+ },
+ "list-latin-inscriptions/original/LIST_v1-2.parquet": {
+  "url": "https://zenodo.org/api/records/10473706/files/LIST_v1-2.parquet/content",
+  "bytes": 109990225,
+  "sha256": "01331d6ed96d602b541ffec0e5fe9f4868950272614212dd6d3c3f3e521ac5de",
+  "downloaded": "2026-10-01"
+ },
+ "list-latin-inscriptions/original/LI_metadata.csv": {
+  "url": "https://zenodo.org/api/records/10473706/files/LI_metadata.csv/content",
+  "bytes": 19694,
+  "sha256": "fb0cf394e7ca4f88b5d74fa730d3de10a37f71dc606efbe4cfe3c7ea400ac465",
+  "downloaded": "2026-10-01"
+ },
+ "lithuania-kvr/original/points.geojson": {
+  "url": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD/kvr_taskai_enriched/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 9198862,
+  "sha256": "edb6b0c15bf591de70c69ef7525c82a9c0e36560fec1a1d2faa5f956d5771bd8",
+  "downloaded": "2026-10-01"
+ },
+ "lithuania-kvr/original/polygons.geojson": {
+  "url": "https://osp-sdg.stat.gov.lt/arcgis/rest/services/KPD/kvr_poligonai_enriched/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 21182781,
+  "sha256": "c3f31426d1b72d93e309fd037d8032076d9e06559038613945bfea6a6530ada0",
+  "downloaded": "2026-10-01"
+ },
  "living-with-machines/original/annotations-2024_zenodo-11241371/README.md": {
   "url": "https://zenodo.org/api/records/11241371/files/README.md/content",
   "bytes": 11073,
@@ -926,6 +1605,72 @@
   "sha256": "43cb46b9840c5ee57be68f6011b252e75a0418a4cd37df43f614ece550f3b2da",
   "downloaded": "2026-09-29"
  },
+ "lutsch-roads-1751/original/ROADS LUTSCH.cpg": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208060?format=original",
+  "bytes": 5,
+  "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.dbf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208059?format=original",
+  "bytes": 4409,
+  "sha256": "430f3558a9b2c7feb5882cec1b266d8a0eaa84fc5c04ddd9ef38bd6f73cf6bea",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.prj": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208063?format=original",
+  "bytes": 419,
+  "sha256": "a1321e12a80058c45a08046b66c426d682a9f522c7a7f688591a6463028cf1cb",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.shp": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208062?format=original",
+  "bytes": 18592,
+  "sha256": "ab76e60af35bc3d4a9bb61d382a4a877df9ed9bf7bb090ec42a39a5d733f6d22",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-roads-1751/original/ROADS LUTSCH.shx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7208061?format=original",
+  "bytes": 444,
+  "sha256": "0959e184daee3cf160552bfef83a2d3a29a4792fc942996488c40b2be0a6f292",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/Appendix. Mountain and hill names in 1735 and 1751.doc": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226246?format=original",
+  "bytes": 125440,
+  "sha256": "2e3e0d9c4b5b86bf84f744271e31fe8fb72420e1d51b2f6314ecd61e6d991d53",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.cpg": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226247?format=original",
+  "bytes": 5,
+  "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.dbf": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226249?format=original",
+  "bytes": 49485,
+  "sha256": "d290a0e41e50ec4a8e4f1aa25cdab63cdd4382c8fc2e43912ab7245b194a808c",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.prj": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226251?format=original",
+  "bytes": 419,
+  "sha256": "a1321e12a80058c45a08046b66c426d682a9f522c7a7f688591a6463028cf1cb",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.shp": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226250?format=original",
+  "bytes": 10624,
+  "sha256": "6bc8b4371e2a49d7eef9aae8710b6b29d4266e714020c8bd0a1d342537e9b26d",
+  "downloaded": "2026-10-01"
+ },
+ "lutsch-transylvania-1751/original/POINTS LUTSCH.shx": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/7226248?format=original",
+  "bytes": 3116,
+  "sha256": "01024cf76f3865b9cc91a027eaaaf9fadda3c129e0f22ec23905b7918ea0d73c",
+  "downloaded": "2026-10-01"
+ },
  "markets-fairs/original/MFEngland.txt": {
   "url": "https://sas-space.sas.ac.uk/106/3/MFEngland.txt",
   "bytes": 650667,
@@ -968,6 +1713,18 @@
   "sha256": "1866e937c412e61b462a265de88cd1ab4d525b2667e6c5352e1685a0a6637422",
   "downloaded": "2026-09-30"
  },
+ "ni-smr/original/nismr_10092026.geojson": {
+  "url": "https://admin.opendatani.gov.uk/dataset/46240fa5-db15-469e-b1c8-0460504b951c/resource/a2af36e6-d3f0-4abc-9314-b1b72d5a9e06/download/nismr_10092026.geojson",
+  "bytes": 7209903,
+  "sha256": "cd9e1d825bdff93a639be17e6a68c949bff7f35143f1bc641c7f8bd1c5236948",
+  "downloaded": "2026-10-01"
+ },
+ "nmrw-wales/original/nmrw.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/NMRW/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 93347256,
+  "sha256": "d52810959fe31b7d38706ba8047bdb22f44508900907d41cdcd45b42d88503ca",
+  "downloaded": "2026-10-01"
+ },
  "nordic-spatial-humanities/original/source-data.zip": {
   "url": "https://zenodo.org/api/records/14871254/files/source-data.zip/content",
   "bytes": 14943058,
@@ -1004,11 +1761,66 @@
   "sha256": "f9d0c8cd4cdbe1972153dd23889fd023903927dc2b853d40e618e8024699f855",
   "downloaded": "2026-09-30"
  },
+ "norway-kulturminner/original/kulturminner_dated.geojson": {
+  "url": "https://api.ra.no/kulturminner/collections/kulturminner/items?f=json&limit=1000&filter=datering<>'Uviss tid' AND minnetype<>'ENK'",
+  "bytes": 116206544,
+  "sha256": "4c927a5ec60aec9da457ed386e5bcbf4b2578298c323500f8dceeeee1b190ae0",
+  "downloaded": "2026-10-01",
+  "note": "paged OGC API harvest (offset 0\u2013201,000, 1,000 per page), centre points and 14 fields kept, de-duplicated by lokalitetid"
+ },
+ "oetr-1532-campaign/original/settlements.gpkg": {
+  "url": "https://zenodo.org/api/records/7079747/files/UrbanOccupationsOETR_1532_Ottoman_campaign_1840s_settlements_dataset.gpkg/content",
+  "bytes": 16683008,
+  "sha256": "e90ea2b8fde84ca1d9ac91fba9480c40bae46423e03b7c324c630ce5ca3ab962",
+  "downloaded": "2026-10-01"
+ },
+ "oetr-temettuat/original/temettuat_cultivation_6_region_rural_geosample.xlsx": {
+  "url": "https://zenodo.org/api/records/13220585/files/UrbanOccupationsOETR_temettuat_cultivation_CLC_6_region_rural_geosample.xlsx/content",
+  "bytes": 3320568,
+  "sha256": "91b981925c6672e9029fc88443839216507ca8961d16a20544d073a13bc60879",
+  "downloaded": "2026-10-01"
+ },
+ "orkney-saga-names/original/saga_place_names_2025.geojson": {
+  "url": "https://services6.arcgis.com/VgBELOF6mvRyDvT0/arcgis/rest/services/Place_Names_in_the_Saga_of_the_Earls_of_Orkney_2025_WFL1/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 125208,
+  "sha256": "0a27bf4ddb364bab1f0a3dc6acac6995b715e6ecc44ce6b38fac8c8feafd2e65",
+  "downloaded": "2026-10-01"
+ },
+ "orthodox-monasteries/original/monasteries.geojson": {
+  "url": "https://services1.arcgis.com/qN3V93cYGMKQCOxL/arcgis/rest/services/Orthodox_monasteries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 578750,
+  "sha256": "68ec7bbe836e2865fd46a3ea2606ed26bd309cdb6061cdc33078ef956d3e365c",
+  "downloaded": "2026-10-01"
+ },
+ "ottoman-nfs-gazetteer/original/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx": {
+  "url": "https://zenodo.org/api/records/7351936/files/Kabadayi_Boykov_Sefer_Gerrits_Ottoman_NFS_Gazetteer_23112022_16296_populated_places_version_1.xlsx/content",
+  "bytes": 1721742,
+  "sha256": "b3670e8258aa96f7705745a211064f84c5645e836c3862d1f881436dfb1a65ff",
+  "downloaded": "2026-10-01"
+ },
+ "ottoman-plovdiv/original/Ottoman_Plovdiv_geodata.rar": {
+  "url": "https://zenodo.org/api/records/10046836/files/Ottoman_Plovdiv_geodata.rar/content",
+  "bytes": 1512204,
+  "sha256": "3e0fdaa74cea2ec248ada93d6127a8d5ecfec309f7b3b2600b5a4875bf643c51",
+  "downloaded": "2026-10-01"
+ },
+ "oyster-fisheries/original/oysters.geojson": {
+  "url": "https://environment.data.gov.uk/arcgis/rest/services/EA/HistoricalOysterHabitatAndFisheries/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 153150,
+  "sha256": "1d91978ae39327a83df3a61395900e2c57afc4addda58e21dde41914d477a140",
+  "downloaded": "2026-10-01"
+ },
  "periodo/original/periodo-dataset.json": {
   "url": "https://data.perio.do/d.json",
   "bytes": 7806282,
   "sha256": "5482d0dc72e062dfcbd95671b1c2e07f132e30b5b1caff766c172844984432a9",
   "downloaded": "2026-09-30"
+ },
+ "piemonte-medieval/original/fortifications_and_religious_sites_Piemonte_ver1-0.gpkg": {
+  "url": "https://data.mendeley.com/public-files/datasets/268xx6ddf4/files/c889aac1-215c-4502-8ee4-b19966f95e0a/file_downloaded",
+  "bytes": 147456,
+  "sha256": "42877a94c8cdb13bb4fb09b42d516811de982ef1e3f0805d49d7c82d90869501",
+  "downloaded": "2026-10-01"
  },
  "pleiades/original/dumps/README.txt": {
   "url": "https://atlantides.org/downloads/pleiades/dumps/README.txt",
@@ -1051,6 +1863,30 @@
   "bytes": 136020531,
   "sha256": "514e1f524d07b35a2b88a8e6f7e9ff3e4dbc229d1717599cb87d6bc5be7903d1",
   "downloaded": "2026-09-29"
+ },
+ "poland-nid-register/original/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv": {
+  "url": "https://api.dane.gov.pl/media/resources/20260603/V_OTWARTE_DANE_ZESTAWIENIE_ZRN.csv",
+  "bytes": 29215044,
+  "sha256": "21a9bc12cb8ec6ebfb7104e04da72897d08d3b0cd7ed42e45e233a7579c82f32",
+  "downloaded": "2026-10-01"
+ },
+ "poland-nid-register/original/geonames-PL.zip": {
+  "url": "https://download.geonames.org/export/dump/PL.zip",
+  "bytes": 2017774,
+  "sha256": "9a6daf1d77ef2320e0d4d14e30666b3206d53d056b0d141b8918ea13c6489775",
+  "downloaded": "2026-10-01"
+ },
+ "portic-ports/original/pointcalls.json": {
+  "url": "http://data.portic.fr/api/pointcalls/?params=pointcall_uhgs_id,pointcall_out_date,pointcall_in_date,source_suite&shortenfields=false",
+  "bytes": 18696258,
+  "sha256": "c0af0e088197ad079e0c848027af3bbb94c2c2dde2af7f58fdd803c5fcda8c54",
+  "downloaded": "2026-10-01"
+ },
+ "portic-ports/original/ports.json": {
+  "url": "http://data.portic.fr/api/ports/?srid=4326",
+  "bytes": 1205875,
+  "sha256": "6e9e34fbed3e7561379c443d316a26d2a949a812379d875903aeb5bdff731998",
+  "downloaded": "2026-10-01"
  },
  "princes-townspeople/original/cities_dynasties.tab": {
   "url": "https://dataverse.harvard.edu/api/access/datafile/10047015",
@@ -1694,6 +2530,171 @@
   "sha256": "8480146fa43519579403a54f9d3fbedb2a8827d2a23ca9536c9d2c0107620c3a",
   "downloaded": "2026-09-30"
  },
+ "rohgis-settlements-1904-1913/original/rohgis_setro_0413.csv": {
+  "url": "https://zenodo.org/records/15613857/files/rohgis_setro_0413.csv?download=1",
+  "bytes": 445141,
+  "sha256": "04b20401c9f33f6ecfca3597fcefa325a94721f7bd30cd9cb4c705a1311a9311",
+  "downloaded": "2026-10-01"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-2e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.ebfd81l4/db7bebd861b65458621fea00b9c177779bf580ed",
+  "bytes": 106496,
+  "sha256": "91daf5c6e5c0d72f00b5343abcb22a9567a48213491c75268902ea0a2f25a722",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-3e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.042c52n7/829ddfb67398533254e8d99b4f783f711f7d1f9c",
+  "bytes": 106496,
+  "sha256": "089264fa6cfb9f97e4fdb2478b5bda8b0ed5d2701dcc947e796db30854275023",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-4e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.113fgof6/1711004ded12fa7485b3b40b3417b0d8287e39d8",
+  "bytes": 98304,
+  "sha256": "f948994b114f1c639f5137ec76a82dcd899e8b8b3cc86e38ed0866e2fc71ef59",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z1-xyab-5e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.8abbmf9q/0da53d4100d5b202027fc11ea6d4a92afcaa6f4d",
+  "bytes": 98304,
+  "sha256": "028e1b19058e9feaa684fa4f2f30b2cdf2b9d078575b68ab0ec2d554e6e8ff11",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-2e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.9f4e7s84/b13d2b945fb461ea1c02c8ecfa7b62c46f7eebc8",
+  "bytes": 110592,
+  "sha256": "130747e2223ae43fda7155bc512612793d2e502fb351080bf04cdbd5fd770786",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-3e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.8e09hs7r/b7a60c86febb53173b3f030d4abbce1c15723c94",
+  "bytes": 110592,
+  "sha256": "a3552a3ab38dc07e57d9f91292c16ebccf8044f39c2a2583b4b819104d627988",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-4e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.21c56055/0264723896ebc78b84175ce17b03a66b5c53cfc2",
+  "bytes": 106496,
+  "sha256": "95ae81ea5564071e2618ccc0dc972ef8426e4677b9408ae6070bf3145fbe5fda",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurland-nuss-z2-xysn-5e-s-ap-jc_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.a81fb7id/1e31559e9b0f35b01db868b73a9be65d4d5ef6f2",
+  "bytes": 98304,
+  "sha256": "760c16d1a7b580e16f945de85519b24c6dbecd284a97262afcdb9ca5415813c5",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "rurland/original/rurlandprogramme-vm-sites-archeologiques_EPSG4326.gpkg": {
+  "url": "https://api.nakala.fr/data/10.34847/nkl.b7406gy1/9a65c605a6f60923f7fa00ea307678417773d0ac",
+  "bytes": 172032,
+  "sha256": "909da59e8374cc8d9fa074ce22762d5f05dc66f053be2a8bb157fe10223f90ba",
+  "downloaded": "2026-10-01",
+  "licence": "Etalab 2.0"
+ },
+ "russia-livestock-1864/original/farmlands_provinces.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8545227?format=original",
+  "bytes": 1410432,
+  "sha256": "fd57e77c6a0e2b66af2d4c4646d10397759b45f18d09134a85ca6c753fd21f3a",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_codebook.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544831?format=original",
+  "bytes": 1013,
+  "sha256": "0a9a16cd0cb0481592007b0e88575a85a3c1dfac129d3aa338406b2210158833",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_main.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544829?format=original",
+  "bytes": 25312,
+  "sha256": "7498eee1fd6122d88fcafd317bb0d1bd76028881106beea5623209c439337e2e",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_readme.txt": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8545226?format=original",
+  "bytes": 5148,
+  "sha256": "4ed2926f7ae946af30005737b8025cde63547ab8daac744fe911c23041307896",
+  "downloaded": "2026-10-01"
+ },
+ "russia-livestock-1864/original/livestock_european-russia_1864_totals.tab": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/8544830?format=original",
+  "bytes": 1973,
+  "sha256": "c3cbb2e593cd7014996346918373a8d7312c1a45f1a5f93d95e2c3dc1d507cc8",
+  "downloaded": "2026-10-01"
+ },
+ "russian-3verst-gazetteer/original/Russian_3verst.csv": {
+  "url": "https://zenodo.org/records/8411078/files/Russian_3verst.csv?download=1",
+  "bytes": 506311,
+  "sha256": "fab7bd0f195f9fda8753c993d2460964eae515e65a2f2b89637a7a881180cdd7",
+  "downloaded": "2026-10-01"
+ },
+ "sedd-scania/original/Railroads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3003532",
+  "bytes": 17451,
+  "sha256": "42cb7f051d9ac0c0b78f0035a5b7386612783294f74843bc59770ecf771cd7e9",
+  "downloaded": "2026-10-01"
+ },
+ "sedd-scania/original/Roads.zip": {
+  "url": "https://dataverse.harvard.edu/api/access/datafile/3003533",
+  "bytes": 357408,
+  "sha256": "1a87f854e021a63327551c0fd0e22154152d6c2839ff969616c2848476edc899",
+  "downloaded": "2026-10-01"
+ },
+ "slovenia-rkd-register/original/rnpd.csv": {
+  "url": "https://podatki.gov.si/dataset/6b5bf6d9-d3bd-4231-95ac-3863b6d70c56/resource/24340845-7dfa-48fa-ab7e-4d4e18ec10f9/download/rnpd.csv",
+  "bytes": 24015168,
+  "sha256": "b14c58cbc7de8b597294c4f0b3fd5aa00ecad52a88adef140d8e8f7e9395278e",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Basic_settlement_unit_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Basic_settlement_unit_v1.0.csv/content",
+  "bytes": 2893792,
+  "sha256": "8dc5393f7e4e3f36fb55b85d42a2daebae8a711689eee232a5d65b207b09d7f3",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-ancient_monument_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-ancient_monument_v1.0.csv/content",
+  "bytes": 6776,
+  "sha256": "6ca439ee17cef22a1ccb3d6fa07cf4229f245b05766d44c53c1974f9ee67d0cf",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-church_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-church_v1.0.csv/content",
+  "bytes": 96785,
+  "sha256": "7fefa57e617e6c67ea43aae285c4d497890055b381d6781ae2a53931f74fbdf4",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-industry_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-industry_v1.0.csv/content",
+  "bytes": 26822,
+  "sha256": "5e3b71794611624771c33da46e1077fcc70508ba8bcfd456c63b41c5d4788344",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-watermill_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-watermill_v1.0.csv/content",
+  "bytes": 271155,
+  "sha256": "f8330b02574d3f9c4dfa7c61e40306d78562961ae54bfccbb84aee488fb902c1",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1630-1655/original/Map_object-windmill_v1.0.csv": {
+  "url": "https://zenodo.org/api/records/15121019/files/Map_object-windmill_v1.0.csv/content",
+  "bytes": 48882,
+  "sha256": "d851aa5b19329a26e68491080a6b41ccf77c00a95e717cb3888f54f91da94633",
+  "downloaded": "2026-10-01"
+ },
+ "sweden-geometric-maps-1680-1700/original/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip": {
+  "url": "https://zenodo.org/api/records/15118501/files/Transcriptions-Younger_Geometrical_Maps_1680-1700_v1.0.zip/content",
+  "bytes": 8500526,
+  "sha256": "3b9e8cbe02d56ee331328c5c7f72306ec54694a060b3d4230463c98d848e8191",
+  "downloaded": "2026-10-01"
+ },
  "sweden-lamningar/original/lamningar_sverige.gpkg": {
   "url": "https://pub.raa.se/nedladdning/datauttag/lamningar_v1/l%c3%a4mningar_sverige.gpkg",
   "bytes": 2292899840,
@@ -2036,6 +3037,12 @@
   "sha256": "ebd6ac3540b9c316928d522fcec78d3f70c156d9d9056d17269f469f754f3de0",
   "downloaded": "2026-09-30"
  },
+ "transice-iceland/original/TransIce_dataset_WP1.zip": {
+  "url": "https://zenodo.org/api/records/17537206/files/TransIce_dataset_WP1.zip/content",
+  "bytes": 544608,
+  "sha256": "8a785595a4a0746ce6a5793c70876c4c48254e2d5d63f9e851aacb725a78f471",
+  "downloaded": "2026-10-01"
+ },
  "tribal-hidage/original/Individuals_Data.csv": {
   "url": "https://archaeologydataservice.ac.uk/catalogue/adsdata/arch-8598-1/dissemination/Individuals_Data.csv",
   "bytes": 534736,
@@ -2065,6 +3072,12 @@
   "bytes": 218696,
   "sha256": "c1be803803f71ae91acaf6a54e573ed8ab50625b78165a274d3cf2e8be46fd4b",
   "downloaded": "2026-09-29"
+ },
+ "tyrol-mining-gazetteer/original/historical_place_gazetteer_tyrol_links_202203.csv": {
+  "url": "https://zenodo.org/api/records/6368451/files/historical_place_gazetteer_tyrol_links_202203.csv/content",
+  "bytes": 102114,
+  "sha256": "d1193b6ea0be0e1754d0fbb8deee884a8bd80a3cd60b4f1b630a8f75bfea02cb",
+  "downloaded": "2026-10-01"
  },
  "viabundus/original/Viabundus-2-edges.geojson": {
   "url": "https://zenodo.org/api/records/16611998/files/Viabundus-2-edges.geojson/content",
@@ -2192,6 +3205,90 @@
   "sha256": "798318cca10fa69f7c1e91b0e306c248f0b682c35d9edf4cdf3da895e4210340",
   "downloaded": "2026-09-29"
  },
+ "wales-cantrefs/original/cantrefs.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Cantrefs_of_Wales_1543_Various_Sources/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 58711464,
+  "sha256": "5af3e764bdd5881b4b933bd6df47da4ddd75f24fb5fdaac24cdfda154e1c6380",
+  "downloaded": "2026-10-01"
+ },
+ "wales-cantrefs/original/commotes.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Commotes_of_Wales_1543_Various_Sources/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 80203376,
+  "sha256": "475bffbe4277060cb1b979e26fbbc168433ab325b3051d8d18ecbe0e6460daa9",
+  "downloaded": "2026-10-01"
+ },
+ "wales-civil-parishes/original/parishes_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 166766156,
+  "sha256": "e6dd829f08e74198809ba7daaccd15d00f108af0babd6baed1afb0f1a945a9bb",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/counties_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 48468347,
+  "sha256": "1f7e9aa8a24ed4c23efd207e4fc6adb164c936648cf1477a3f06a471a110938c",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/counties_os2.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Counties_of_Wales_2nd_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 46455067,
+  "sha256": "5ffa58c4cb4c439dc50d5cbcec25d53bf85a1c075a7a473525fbf48a6c4e2437",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/hundreds_other.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Hundreds_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 75672421,
+  "sha256": "24db17e9fc56235056b1652b30448dc0690e0d939e31d52754dbfaa3dcde0878",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/municipal.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Municipal_Boundaries_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4300290,
+  "sha256": "81ef3b58d6f6962d2b13f0080e2f90d81b0d98ecaf0f4082497fd94781d9e02e",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/parishes_os2.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Civil_Parishes_of_Wales_2nd_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 174641250,
+  "sha256": "6c5e78672944be6a6c1c9a487c615aad93bfff22018eecc57d294c071f7400fc",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/parliamentary_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Parliamentary_Boundaries_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 55166107,
+  "sha256": "227f03a6bc70ab478ee2c30296b36a7bda3b4c18dafad4b7ed1ae566afb41cbe",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/poorlaw_unions.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Poor_Law_Unions_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 66019224,
+  "sha256": "b3991081ba4e6188d88fb6b7032fb809bca00f85ee8ca073a428ed581dccaadb",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/townships_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_1st_Edition/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 30316931,
+  "sha256": "6e85ba2cd2108c6428afeadd03884680c58b6efcf907b71dba82962a4b57573f",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/townships_other.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 28289006,
+  "sha256": "2222b7c14231a708ed37bf2b3abe5ef022ecee36d6058a54dabe4ef2fea1eca6",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/townships_pre1840.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Townships_of_Wales_pre_1840/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 86331494,
+  "sha256": "806266f352e9704ccc8750d1f04694505bb2aaeb28f6658f649aa45a57ce61c3",
+  "downloaded": "2026-10-01"
+ },
+ "wales-units/original/wards_os1.geojson": {
+  "url": "https://services7.arcgis.com/YFaBqL5jL3y8fq7s/arcgis/rest/services/Historic_Municipal_Wards_of_Wales/FeatureServer/0/query (all features, outSR=4326)",
+  "bytes": 4309451,
+  "sha256": "bfa067bc8108a65d4a88005351cd6720d4da75842fefee9f1955134071352a6d",
+  "downloaded": "2026-10-01"
+ },
  "western-bohemia-toponyms/original/DATASET_Western_Bohemia_place_names.csv": {
   "url": "https://zenodo.org/records/21479034/files/DATASET_Western_Bohemia_place_names.csv?download=1",
   "bytes": 458894,
@@ -2246,6 +3343,60 @@
   "sha256": "098f7a10ef7800bf28baff20b307cd0272a1c4b8cc3ee6edfa5f8015cb0848ea",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/bridge_late.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge_late.names.rq)",
+  "bytes": 490999,
+  "sha256": "44a3107f60170db581e241e1520a16fea4e4aa949101150df2eb17f7ead8cd3e",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/bridge_late.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge_late.precision.rq)",
+  "bytes": 389789,
+  "sha256": "82e6c617e896423d1493cdca114f160c6bcde3f6872a6864d357b8a50b9e0ef6",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/bridge_late.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/bridge_late.rq)",
+  "bytes": 940798,
+  "sha256": "7838713c5fa7290949062e5cffcde18a91cb1184561c7c1c142a46b642a3ea9c",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/canal.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/canal.names.rq)",
+  "bytes": 40795,
+  "sha256": "c20f4d3698fb1b43b4e9aafcd1f3d3fdc14df38af173b0d93175c955e1cdbf0f",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/canal.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/canal.precision.rq)",
+  "bytes": 25527,
+  "sha256": "86e281fa170d2f551274a94f888c00b50ee5e2c95f08cf2c59b26e5276707698",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/canal.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/canal.rq)",
+  "bytes": 56330,
+  "sha256": "de0f4866d549510b616f4984e9bb767fa0e64bd3d36d4506522d682ed7553b91",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/caravanserai.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.names.rq)",
+  "bytes": 18615,
+  "sha256": "5a5929e31f332156910eed65f9dc535642617984381e075c545e8b57f2106642",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/caravanserai.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.precision.rq)",
+  "bytes": 10551,
+  "sha256": "3d335536233f2e47ae5bfa8ae1ca434f6c643f692150601e258300c5064f658d",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/caravanserai.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/caravanserai.rq)",
+  "bytes": 26446,
+  "sha256": "8e6057ad81e09fab7bd3d24f6471e3e39fc8393d8cbf788d12e75f9343e4120c",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/castle.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/castle.names.rq)",
   "bytes": 3286357,
@@ -2269,6 +3420,24 @@
   "bytes": 490145,
   "sha256": "2edcb632536c8064a7df250bd053e6e9acd383d7e58325cd9e178a3e5cfffa27",
   "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/church.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.names.rq)",
+  "bytes": 6256845,
+  "sha256": "c8103e656fc99a579476a818e8829380b833352d82dccf38f9c5991a81e49416",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/church.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.precision.rq)",
+  "bytes": 4264391,
+  "sha256": "8b8365c6e9dc577a56b0a897df0fc23a8a0575e52543eedb40744bec67a31612",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/church.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/church.rq)",
+  "bytes": 11307022,
+  "sha256": "812fee8894e18ca7d1a135607a675f5dcaf6b667e1c8655a991fbd54b75b53d3",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/city.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/city.names.rq)",
@@ -2312,11 +3481,83 @@
   "sha256": "535520379c1c8bd397b2b758996d6cfa728ef121d3b2dc13359eb822490209ad",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/hillfort.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.names.rq)",
+  "bytes": 19993,
+  "sha256": "3d75b8a5b41ea17d477c74bcfae672c06aee341f5527885d5f6cfbc1bf60d9cd",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/hillfort.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.precision.rq)",
+  "bytes": 11761,
+  "sha256": "950470241ab19010ec29e4396f264c579319235db0bf4dd49d06be5883989f35",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/hillfort.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/hillfort.rq)",
+  "bytes": 31062,
+  "sha256": "ad25528da583ec59e47938cd688564898e891ef50fe57d8056589b8a1fefd795",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/labels.tsv": {
   "url": "https://qlever.dev/api/wikidata (labels of referenced items)",
-  "bytes": 618688,
-  "sha256": "06a24abcd9c66797176c9793936b0e78fc3554eae4e05094bc8382c752aec53b",
-  "downloaded": "2026-09-30"
+  "bytes": 972761,
+  "sha256": "04b8c76db9aaa39e20a3eab3db280f9c8d82609cc7a91b0668e453a656fe7f88",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/lighthouse.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/lighthouse.names.rq)",
+  "bytes": 192974,
+  "sha256": "122567bc557aa0b295c2538af669a28ac3f53681c06e45a8d673ce361f2fc1b9",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/lighthouse.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/lighthouse.precision.rq)",
+  "bytes": 139428,
+  "sha256": "e6e7f58b9b3e35cee9fa72235096530ad8672572c3f67e14d732895af6e8a363",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/lighthouse.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/lighthouse.rq)",
+  "bytes": 335075,
+  "sha256": "70b7f32a8a74b1730c20229a55bd0ad3bce9fef57e0ed70e9a6ec61043b13868",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.names.rq)",
+  "bytes": 546777,
+  "sha256": "9721e9bd55a4148bf6dd092886b5b5a229989c39e387d2d1e02d12d4972afe9a",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.precision.rq)",
+  "bytes": 409205,
+  "sha256": "f427ec61010a7cbafa1eeb58fa3a9b16030b2fcea72c516c5be21fbfbd875b7e",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/manor.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/manor.rq)",
+  "bytes": 970243,
+  "sha256": "66a6fefde9e8f2dc84c9ed03d58bb0e06edda64f6db6c8b89db7f9d49863b9e2",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mine.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mine.names.rq)",
+  "bytes": 47794,
+  "sha256": "58549a0003b3aeea7cc6d45602a5b98e08505a84313b55cefc9029a6f736c073",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mine.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mine.precision.rq)",
+  "bytes": 39727,
+  "sha256": "91b639eb3a582c2b922b81e0e5673c459775d988a3372033d5c8fab7b412497a",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mine.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mine.rq)",
+  "bytes": 91292,
+  "sha256": "9832a291d84351d02366d57621662dc322fab3591764ce6d3abd7179de99ceb3",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/monastery.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/monastery.names.rq)",
@@ -2330,6 +3571,42 @@
   "sha256": "83dbdef5bb8a9267352a43c35ee88c872a0f475325e24578c461ca8b54137c16",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/mosque.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.names.rq)",
+  "bytes": 187165,
+  "sha256": "ad98bf8bf3a5bdb956a13e02c3b306576881dd67f1c8398917e0e5ee8c608634",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mosque.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.precision.rq)",
+  "bytes": 68147,
+  "sha256": "21ee8560d7f03ce7b82bf406558bf6baf15029fd863983a68df85079a8d806ea",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/mosque.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/mosque.rq)",
+  "bytes": 167694,
+  "sha256": "ddd9feaff965e3b8b77c6d889728b6033be87fee2a33310c7359a3972613aa81",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/port.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/port.names.rq)",
+  "bytes": 17337,
+  "sha256": "e878c3403027f19ef3043ecb96dfe22a7b0dd07bc86c493d4bd498b2b6350292",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/port.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/port.precision.rq)",
+  "bytes": 6253,
+  "sha256": "1825624d251fbc0e961ff87f8c696e4c22ade2ab3736af9858a4efe245b67474",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/port.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/port.rq)",
+  "bytes": 15705,
+  "sha256": "31d94e18be30cf9c15a2555f271d84eea918f33bea7cfc45c24c1bc720dae5ed",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/settlement.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/settlement.names.rq)",
   "bytes": 5461892,
@@ -2342,6 +3619,24 @@
   "sha256": "93cdea750dfa508c9d08ff157a892f8b5916be5f8676257855171a47b9d732e9",
   "downloaded": "2026-09-30"
  },
+ "wikidata-medieval/original/settlement_late.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.names.rq)",
+  "bytes": 5037616,
+  "sha256": "3c4081e5ae3e47952d64246fabe62cb1ab5933e09ceb27eb53894821c4e8cf8b",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/settlement_late.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.precision.rq)",
+  "bytes": 2067842,
+  "sha256": "86a2f4df655dd21a15b3a409a81092436d91bd926afc6a4e7faa586db2014ae5",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/settlement_late.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/settlement_late.rq)",
+  "bytes": 4926971,
+  "sha256": "0a8e8d8fac95f9c376f256f70762281ca66fd97f78b9acffeb6a4bc211bbc741",
+  "downloaded": "2026-10-01"
+ },
  "wikidata-medieval/original/siege.names.tsv": {
   "url": "https://qlever.dev/api/wikidata (POST queries/siege.names.rq)",
   "bytes": 276962,
@@ -2353,6 +3648,42 @@
   "bytes": 259403,
   "sha256": "50c7a79d824302c42f9e2f588de3bfcc46265aee2c4b0f70c96a6dc5e1e17e84",
   "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/station.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/station.names.rq)",
+  "bytes": 403252,
+  "sha256": "39d427e52d51845c8e475bc1d6933e9139b9dae6266e71c9d781417090d0819a",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/station.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/station.precision.rq)",
+  "bytes": 188199,
+  "sha256": "47ca87095c88fa949bc087e21733b07e18600a522f6afea4016e0a5405e82aa1",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/station.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/station.rq)",
+  "bytes": 506316,
+  "sha256": "ca45b9a2a55b9593e355c3f52e6406c529a1bb44b387fa8e07f12ad14affa75a",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/synagogue.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.names.rq)",
+  "bytes": 149556,
+  "sha256": "67060de8b59999bf12095276c384271bd7c624e98447853e6c522b57bed7558d",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/synagogue.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.precision.rq)",
+  "bytes": 85649,
+  "sha256": "38ff910d574f03e575e838cc72d0b44547400abe15db329502e505dc698b4bb7",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/synagogue.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/synagogue.rq)",
+  "bytes": 195673,
+  "sha256": "398229bad60e883096b95fc3edcf9d1477b28e428a4b59ba0e728d15946bed5e",
+  "downloaded": "2026-10-01"
  },
  "wikidata-medieval/original/temporal-evidence.json": {
   "url": "https://query.wikidata.org/sparql (queries/temporal-evidence.rq)",
@@ -2383,5 +3714,59 @@
   "bytes": 35094,
   "sha256": "191ea22ccbeac4dccae30cc919e8d09dde1c73e9747e8470cac4defb2245787c",
   "downloaded": "2026-09-30"
+ },
+ "wikidata-medieval/original/watermill.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/watermill.names.rq)",
+  "bytes": 93405,
+  "sha256": "7a47c21ed3a8d9d7104b4dc315e35ca8a1168f5f69a6f63dd290e502cc3d503c",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/watermill.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/watermill.precision.rq)",
+  "bytes": 94557,
+  "sha256": "9000b6cf345a81b6d9a2a7e2ea18f14e63b77e4bafca47e853c1c249cf7bc153",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/watermill.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/watermill.rq)",
+  "bytes": 209655,
+  "sha256": "488d94730c1ddabe16c34fc135d80bc762fb610e44ec2d23ceae28c96bc8b04b",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/windmill.names.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/windmill.names.rq)",
+  "bytes": 77297,
+  "sha256": "6d88167130d6ee7378aeb4be018be00d4840ca7e8a92a9a91a8bf917e926e92f",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/windmill.precision.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/windmill.precision.rq)",
+  "bytes": 78575,
+  "sha256": "e0efc77180fe628805e7cd3eb00a71cb20205c62ee47abd307eff4e3f7c7aa9f",
+  "downloaded": "2026-10-01"
+ },
+ "wikidata-medieval/original/windmill.tsv": {
+  "url": "https://qlever.dev/api/wikidata (POST queries/windmill.rq)",
+  "bytes": 184889,
+  "sha256": "5f98120d4372f947328213b1a164f03fb5e1f0525961570d5905d5169ac65e8d",
+  "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/grobovi-graves.xlsx": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/grob/excel (the web app's own public export; response is base64 of the .xlsx, decoded)",
+  "bytes": 2448557,
+  "sha256": "6948abe5c1302707f3d7762e96e167a14c9469081821d42d6d01e6430f8de733",
+  "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/najdisca-koordinate.json": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/koordinate",
+  "bytes": 472018,
+  "sha256": "a7b27cd4f7551bfeffa6c093776eeda16abe58e5cea3f77af8a4d32de54495cc",
+  "downloaded": "2026-10-01"
+ },
+ "zbiva-full/original/najdisca-sites.xlsx": {
+  "url": "https://zbiva4.zrc-sazu.si/backend-api/api/0/najdisce/excel (the web app's own public export; response is base64 of the .xlsx, decoded)",
+  "bytes": 1041228,
+  "sha256": "7a9c415c7c6d6a00705ecbb0e31948e4578352f29194f5bc07eb942811cb8494",
+  "downloaded": "2026-10-01"
  }
 }

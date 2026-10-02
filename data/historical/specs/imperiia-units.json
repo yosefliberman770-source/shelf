@@ -1,0 +1,421 @@
+{
+ "id": "imperiia-units",
+ "src": "imperiaunits",
+ "public": false,
+ "enabled": true,
+ "geometry": "polygons",
+ "title": "Russian Empire territories: state extent 1547–1894, provinces and districts of the 1820s (Piadyshev atlas), provinces 1856, Pale of Settlement, Cossack lands (Imperiia project, K. O'Neill, Harvard; ArcGIS/WorldMap)",
+ "licence": "none stated on the ArcGIS items — private pack",
+ "url": "https://www.arcgis.com/home/user.html?user=koneill_worldmap",
+ "describe": "Territorial layers of the Imperiia project: the extent of the Russian state at 14 dates (each a snapshot of its year), provinces and districts (uezdy) digitised from V. P. Piadyshev's Geographical Atlas of the Russian Empire (St Petersburg, 1820–1827; shown over those years), provinces in 1856, the Pale of Settlement (1791; 1825–1887) and the Cossack Hetmanate (1649–1657) and Don Cossack territory.",
+ "layers": [
+  "historical-units"
+ ],
+ "parts": [
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1547.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1547,
+    "label": "extent of the Russian state in 1547 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1584.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1584,
+    "label": "extent of the Russian state in 1584 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1613.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1613,
+    "label": "extent of the Russian state in 1613 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1645.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1645,
+    "label": "extent of the Russian state in 1645 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1689.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1689,
+    "label": "extent of the Russian state in 1689 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1725.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1725,
+    "label": "extent of the Russian state in 1725 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1740.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1740,
+    "label": "extent of the Russian state in 1740 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1762.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1762,
+    "label": "extent of the Russian state in 1762 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1796.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1796,
+    "label": "extent of the Russian state in 1796 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1801.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1801,
+    "label": "extent of the Russian state in 1801 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1825.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1825,
+    "label": "extent of the Russian state in 1825 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1855.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1855,
+    "label": "extent of the Russian state in 1855 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1881.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1881,
+    "label": "extent of the Russian state in 1881 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Boundaries_in_1894.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Russian state",
+     "level": "state extent",
+     "minzoom": 2,
+     "simplify": 0.01
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1894,
+    "label": "extent of the Russian state in 1894 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Guberniia_provinces_1820s.geojson"
+   },
+   "dissolve": [
+    {
+     "field": "Guberniia_",
+     "level": "guberniia (province)",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Uezdy_Voevodstva.geojson"
+   },
+   "dissolve": [
+    {
+     "field": [
+      "Gub_ID",
+      "Name_trs"
+     ],
+     "nameField": "Name_trs",
+     "level": "uezd (district)",
+     "minzoom": 5,
+     "simplify": 0.002
+    }
+   ],
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Provincial_boundaries_1856.geojson"
+   },
+   "dissolve": [
+    {
+     "field": "Guberniia",
+     "level": "guberniia (province)",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1856,
+    "label": "provinces of the Russian Empire in 1856 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Uezd_boundaries_1792.geojson"
+   },
+   "dissolve": [
+    {
+     "field": "Uezd",
+     "level": "uezd (district)",
+     "minzoom": 5,
+     "simplify": 0.002
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1792,
+    "label": "districts of Tavrida (Crimea) in 1792 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Pale_of_Settlement_in_1791.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Pale of Settlement",
+     "level": "Pale of Settlement",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "snapshot",
+    "year": 1791,
+    "label": "Pale of Settlement as decreed in 1791 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Pale_of_Settlement_1825_1887.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Pale of Settlement",
+     "level": "Pale of Settlement",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "envelope",
+    "from": 1825,
+    "to": 1887,
+    "label": "Pale of Settlement 1825–1887 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Cossack_Hetmanate_1649_1657.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Cossack Hetmanate",
+     "level": "polity",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "envelope",
+    "from": 1649,
+    "to": 1657,
+    "label": "Cossack Hetmanate under Bohdan Khmelnytsky, 1649–1657 (Imperiia project)"
+   }
+  },
+  {
+   "read": {
+    "path": "imperiia/original/Don_Cossack_Territory.geojson"
+   },
+   "dissolve": [
+    {
+     "constant": "Territory of the Don Cossacks",
+     "level": "territory",
+     "minzoom": 3,
+     "simplify": 0.004
+    }
+   ],
+   "dating": {
+    "mode": "envelope",
+    "from": 1820,
+    "to": 1827,
+    "label": "as mapped in Piadyshev's atlas of the Russian Empire (1820–1827)"
+   }
+  }
+ ]
+}

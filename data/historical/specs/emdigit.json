@@ -1,0 +1,66 @@
+{
+ "id": "emdigit",
+ "src": "emdigit",
+ "public": false,
+ "enabled": true,
+ "title": "Early Modern Digital Itineraries (EMDigIt): waypoints of Italian travel itineraries 1562–1720 (ArcGIS layer)",
+ "licence": "none stated on the ArcGIS layer (the project's Scoto data on Zenodo is CC BY 4.0) — private pack until the layer's licence is confirmed",
+ "url": "https://services2.arcgis.com/V2PQwgZMTFfgM0Xu/arcgis/rest/services/Early_Modern_Digital_Itineraries_(EMDigIt)__Core_Italian_Itinerary_Waypoints/FeatureServer/0",
+ "describe": "Towns, inns, castles, estates and villages named on the routes of eight early-modern itinerary books (1562–1720), each shown in the year of every itinerary that lists it.",
+ "layers": [
+  "gazetteer-settlements",
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "emdigit-waypoints/original/waypoints.geojson"
+ },
+ "fields": {
+  "id": "node_id",
+  "name": "geoname",
+  "context": [
+   "state",
+   "country_code"
+  ],
+  "type": [
+   "features"
+  ],
+  "kind": {
+   "field": "features",
+   "map": {
+    "city": "settlement",
+    "village": "settlement",
+    "estate": "building",
+    "inn": "station",
+    "castle": "castle",
+    "castle|estate": "castle",
+    "estate|village": "settlement",
+    "city|river": "settlement",
+    "city|estate": "settlement"
+   },
+   "default": "settlement"
+  },
+  "approx": {
+   "field": "point_status",
+   "values": [
+    "approximated"
+   ]
+  },
+  "altNames": {
+   "field": "Location_Name"
+  }
+ },
+ "keep": {
+  "field": "features",
+  "notValues": [
+   "Mountain",
+   "River"
+  ]
+ },
+ "dating": {
+  "mode": "attestations",
+  "field": "itinerary_names",
+  "yearRegex": "(\\d{4})",
+  "label": "listed in an itinerary of {year}"
+ },
+ "datingLabel": "years of the itineraries that list it (snapshots)"
+}

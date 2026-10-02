@@ -1,0 +1,72 @@
+{
+ "id": "finland-relics",
+ "src": "firelics",
+ "public": true,
+ "enabled": true,
+ "title": "Ancient monuments register of Finland: Iron Age sites (Museovirasto, muinaisjäännösrekisteri; WFS)",
+ "licence": "CC BY 4.0",
+ "url": "https://geoserver.museovirasto.fi/geoserver/rajapinta_suojellut/wfs",
+ "describe": "Settlements, burial sites, defences, work sites and other ancient monuments of Finland classed Iron Age (rautakautinen) in the register, shown over that period (500 BC–1150, the convention the atlas already uses for the register). Sites classed medieval are already on the map from the same register; 'historical period' (1150–1900) sites are left out because that class is too broad to date a site; Stone/Bronze Age and undated sites are left out.",
+ "layers": [
+  "medieval-archaeology"
+ ],
+ "read": {
+  "path": "finland-relics/original/muinaisjaannos_piste.geojson"
+ },
+ "keep": [
+  {
+   "field": "ajoitus",
+   "notContaining": [
+    "keskiaika"
+   ]
+  }
+ ],
+ "fields": {
+  "id": "mjtunnus",
+  "name": "kohdenimi",
+  "type": [
+   "tyyppi",
+   "alatyyppi"
+  ],
+  "context": [
+   "kunta"
+  ],
+  "kind": {
+   "field": "tyyppi",
+   "map": {
+    "asuinpaikat": "settlement",
+    "puolustusvarustukset": "castle",
+    "kirkolliset kohteet": "church",
+    "kulkuväylät": "road",
+    "kulkuyhteydet": "road",
+    "työ- ja valmistuspaikat": "mill",
+    "hylyt (puu)": "wreck",
+    "hylyt (metalli)": "wreck",
+    "hylyt": "wreck"
+   },
+   "default": "site"
+  }
+ },
+ "dating": {
+  "mode": "periods",
+  "field": "ajoitus",
+  "sep": ",",
+  "label": "register period class; years by the atlas's Finnish period convention",
+  "table": {
+   "rautakautinen": [
+    -500,
+    1150
+   ]
+  },
+  "ignore": [
+   "kivikautinen",
+   "pronssikautinen",
+   "varhaismetallikautinen",
+   "esihistoriallinen",
+   "ajoittamaton",
+   "moderni",
+   "",
+   "historiallinen"
+  ]
+ }
+}
