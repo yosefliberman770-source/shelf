@@ -1,6 +1,6 @@
 # Plan: master list of site types + fixing wrong groupings
 
-Status: **proposal, awaiting approval**. Nothing in the app has changed yet.
+Status: **approved and done** (Care and Learning made two separate groups, as asked). See "What was done" at the end.
 
 Covers options 1 and 2 from the `SITE_TYPES.md` discussion. New icons for each group (option 3) and a filter menu (option 4) are out of scope.
 
@@ -55,3 +55,40 @@ Rules:
 
 - Source wording varies, so some sites may still land in the wrong group. The before and after counts will show how many moved.
 - Another chat is auditing the same map code. If it edits `src/atlas/catalog.ts` at the same time, the two sets of changes may need merging.
+
+## What was done
+
+- The master list is in `src/atlas/site-types.ts`. Tests are in `src/atlas/site-types.test.ts`.
+- There are four new map layers. Each has its own colour and its own on/off switch:
+
+  | Layer | Colour | On at start? |
+  |---|---|---|
+  | Hospitals, almshouses & leper houses | raspberry | on |
+  | Universities, colleges & schools | indigo | on |
+  | Graves, cemeteries & burial mounds | blue-grey | off, like archaeology before |
+  | Mills, mines, quarries & kilns | teal | off, like archaeology before |
+
+### Records moved, counted from the real map tiles
+
+The count covers the 872,634 public site records.
+
+| Move | Records |
+|---|---:|
+| Archaeology → Industry & work | 49,102 |
+| Archaeology → Burial | 23,559 |
+| Religious → Burial | 7,758 |
+| Archaeology → Learning | 3,872 |
+| Archaeology → Care | 1,471 |
+| Religious → Learning (147 of them are Wikidata universities) | 153 |
+| Religious → Care | 36 |
+| Castle → Building (in the archaeology layer) | 11 |
+
+### Notes
+
+- **Country houses.** Only 11 records are pure country houses filed as castles. Almost all the "country houses" under castle are real castles or tower houses that later became houses, so they stay castles. Wikidata "châteaux" carry no type text that can tell a castle from a country house, so they stay castles too.
+- **Mixed records stay with the church.** Examples are "Burial ground, chapel" and "church · former hospital".
+- **Words that only look like a match are skipped:**
+  - clearance, boundary and marker cairns, and cairnfields (field clearance)
+  - "Cistercian", "gravel" and "Knights Hospitallers"
+  - a hospital *cemetery* (Polish *cmentarz przyszpitalny*), which goes to Burial
+- **Speed.** Sorting at display time costs a little time. On the densest tile in the data, all seven site layers together take about 50 ms on a desktop computer. This work runs in the map's background worker. If it ever feels slow on a phone, the group can be stored in the data files at the next rebuild.

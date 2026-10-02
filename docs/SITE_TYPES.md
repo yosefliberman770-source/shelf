@@ -3,7 +3,9 @@
 This list was compiled from the map's actual data. It covers all 1,017,770 map records and the 480,910 places in the place index. Counts are approximate.
 
 - **"In data"** is how many records carry that type. The figure comes from the source's own wording or from Shelf's label for it.
-- **"Drawn on the map as"** is the symbol group Shelf currently uses. Many different types share one symbol.
+- **"Drawn on the map as"** is the symbol group Shelf used when this list was made. Many different types shared one symbol.
+
+**Update:** the official master list of site types and their map groups is now `src/atlas/site-types.ts`. Hospitals, almshouses and leper houses (Care), universities, colleges and schools (Learning), burials, and mills, mines, quarries and kilns (Industry & work) now have their own map layers. See `docs/SITE_TYPES_PLAN.md`.
 
 ## Towns and settlements
 

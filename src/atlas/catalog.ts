@@ -6,6 +6,7 @@ import type { ExpressionSpecification, FilterSpecification, LayerSpecification, 
 import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { eventNear, existedIn, type HistYear, ohmExisted } from './time';
 import { PRIVATE_TILE_PREFIX, privateHas } from './privateData';
+import { inGroupExpr, type SiteGroup } from './site-types';
 
 /** Why a layer can't be shown: each reason is stated as it is, never lumped together as "no data". */
 export type UnavailableKind = 'no-dataset' | 'licence' | 'online-only' | 'not-integrated';
@@ -144,6 +145,7 @@ const C = {
   empire: '#b03a2e', kingdom: '#2e7d32', republic: '#1565c0', otherState: '#7b6a58', province: '#6d4c41', territory: '#8e44ad', border: '#5d4037',
   battle: '#c62828', siege: '#6a1b9a', campaign: '#ef6c00', war: '#000000',
   market: '#b8860b', religious: '#6b3fa0', cultural: '#c0582a', halo: '#fbf7ee',
+  care: '#c2185b', learning: '#3949ab', burial: '#455a64', industry: '#00796b',
 };
 const FONT = ['OpenHistorical'];
 const FONT_BOLD = ['OpenHistorical Bold'];
@@ -389,7 +391,7 @@ export const BEFORE_RECORD_YEARS = 60;
 /** Years either side of a snapshot listing within which the listed place is drawn (lighter); see sitePoints. */
 export const SNAPSHOT_YEARS = 25;
 
-function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number; sources?: string[] }): LayerSpecification[] {
+function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number; sources?: string[] }): LayerSpecification[] {
   // Own dates only (founding / first mention → dissolution, as recorded), or an evidence period (a building-campaign
   // century, a register's period class, a style): shown inside them. Without own evidence at the year nothing is drawn,
   // unless the reader includes undated records — and then:
@@ -399,7 +401,8 @@ function sitePoints(id: string, kinds: string[], color: string, ctx: LayerCtx, o
   //     zoom and only inside the period the record's dataset covers (w0–w1 from the build; older tiles: this layer's
   //     period) — so they never fill the overview map at every date.
   const y = ctx.year;
-  const kind: ExpressionSpecification = ['in', ['get', 'k'], ['literal', kinds]];
+  // A list of kinds, or a map group from the master list of site types (site-types.ts), which also reads the type text.
+  const kind: ExpressionSpecification = Array.isArray(kinds) ? ['in', ['get', 'k'], ['literal', kinds]] : inGroupExpr(kinds.group);
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
   // A snapshot (a gazetteer or register listing the place in one year: 'sn') says only that it existed then; it is drawn,
   // lighter, within SNAPSHOT_YEARS of that year (a stated display tolerance — the record keeps its one year).
@@ -858,7 +861,7 @@ export const LAYERS: AtlasLayerDef[] = [
   {
     id: 'castles', group: 'military', alsoIn: ['places'], label: 'Castles & fortifications (Europe)', datasets: ['wikidata', 'merimee', 'finreg'], defaultOn: true, coverage: SITES,
     hint: 'Castles, tower houses, mottes, town walls and other fortifications from Wikidata, shown from their recorded founding date or first mention. Most castles in Wikidata have no such date (about 5,000 of 32,000 do), so most appear only with “Include undated records” — hollow. France adds castles and fortified houses from the Mérimée register, dated by their main building campaign (lighter dots); Finland adds strongholds its register classes as medieval. Zoom in to see them all.', get sources() { return siteSources(); },
-    specs: (c) => sitePoints('castles', ['castle', 'fortification'], C.fort, c, { labelZoom: 9, radius: 2.8 }),
+    specs: (c) => sitePoints('castles', { group: 'castle' }, C.fort, c, { labelZoom: 9, radius: 2.8 }),
   },
   {
     id: 'wars', group: 'military', label: 'Wars', datasets: ['wikidata'], defaultOn: true,
@@ -951,9 +954,9 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'religious-houses', group: 'economic', alsoIn: ['places'], label: 'Monasteries, churches, cathedrals & universities (Europe)', datasets: ['wikidata', 'wdextra', 'germaniasacra', 'merimee', 'finreg'], defaultOn: true, coverage: SITES,
-    hint: 'Abbeys, priories, convents, friaries and other religious houses, cathedrals, bishops’ sees and early universities, from Wikidata — joined, for the Holy Roman Empire, with Germania Sacra’s monastery database, which dates each order’s tenure of each house. Shown from the recorded founding or first mention to the recorded dissolution. Where no dissolution is recorded the house is drawn on to the present, which is often wrong after the Reformation or secularisation. France adds protected medieval churches, abbeys and cathedrals from the Mérimée register, dated by the century of their main building campaign (lighter dots: the building dates from then — the site may be older); Finland adds churches the national register classes as medieval. Parish churches, mosques and synagogues of any period come from Wikidata where it records a founding date or first mention, at the precision it records it (a church known only to its century is marked as such).', get sources() { return siteSources(); },
-    specs: (c) => sitePoints('religious-houses', ['monastery', 'cathedral', 'diocese', 'university', 'church'], C.religious, c, { labelZoom: 8, radius: 2.8 }),
+    id: 'religious-houses', group: 'economic', alsoIn: ['places'], label: 'Monasteries, churches & cathedrals (Europe)', datasets: ['wikidata', 'wdextra', 'germaniasacra', 'merimee', 'finreg'], defaultOn: true, coverage: SITES,
+    hint: 'Abbeys, priories, convents, friaries and other religious houses, cathedrals and bishops’ sees, from Wikidata — joined, for the Holy Roman Empire, with Germania Sacra’s monastery database, which dates each order’s tenure of each house. Shown from the recorded founding or first mention to the recorded dissolution. Where no dissolution is recorded the house is drawn on to the present, which is often wrong after the Reformation or secularisation. France adds protected medieval churches, abbeys and cathedrals from the Mérimée register, dated by the century of their main building campaign (lighter dots: the building dates from then — the site may be older); Finland adds churches the national register classes as medieval. Parish churches, mosques and synagogues of any period come from Wikidata where it records a founding date or first mention, at the precision it records it (a church known only to its century is marked as such). Hospitals, universities and schools, and graveyards whose record names no church, have their own layers.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('religious-houses', { group: 'religious' }, C.religious, c, { labelZoom: 8, radius: 2.8 }),
   },
   {
     id: 'hre-towns', group: 'political', alsoIn: ['places'], label: 'Towns of the Empire: charters & rulers', datasets: ['hre'], defaultOn: true, coverage: [800, 1806],
@@ -1079,9 +1082,31 @@ export const LAYERS: AtlasLayerDef[] = [
     },
   },
   {
-    id: 'medieval-archaeology', group: 'places', label: 'Archaeology, monuments & works: registers, bridges, mills, mines, ports, lighthouses, canals, stations', datasets: ['finreg', 'bridges1250', 'nokm', 'canmore', 'irlsmr', 'nid', 'wdextra'], defaultOn: false, coverage: SITES,
-    hint: 'Sites national registers date to the Viking Age or Middle Ages — Finland and Norway (burial mounds, house sites, farm mounds, boat landings), each shown for its register period — and England’s bridges and fords attested before c. 1250; Scotland’s monument record (Canmore), each site for the period it names; Ireland’s monuments record (dated only where the monument class names a date — the rest only with “Include undated records”); Poland’s register of monuments, from the century it records for construction (placed at their village or town). Wikidata adds water- and windmills, mines, ports, lighthouses, canals, bridges (1600–1914) and railway stations (opened before 1915) where it records a building or opening date, at the precision it records it. With your private data: Danish, Swedish and Romanian registers, coin hoards (Denmark; Carolingian hoards 751–987) and dated shipwrecks.', get sources() { return siteSources(); },
-    specs: (c) => sitePoints('medieval-archaeology', ['site', 'bridge', 'hoard', 'wreck', 'road', 'mill', 'mine', 'harbour', 'building', 'lighthouse', 'canal', 'station', 'fishery'], C.arch, c, { labelZoom: 10, radius: 2.2 }),
+    id: 'medieval-archaeology', group: 'places', label: 'Archaeology, monuments & works: registers, bridges, ports, lighthouses, canals, stations', datasets: ['finreg', 'bridges1250', 'nokm', 'canmore', 'irlsmr', 'nid', 'wdextra'], defaultOn: false, coverage: SITES,
+    hint: 'Sites national registers date to the Viking Age or Middle Ages — Finland and Norway (house sites, farm mounds, boat landings), each shown for its register period — and England’s bridges and fords attested before c. 1250; Scotland’s monument record (Canmore), each site for the period it names; Ireland’s monuments record (dated only where the monument class names a date — the rest only with “Include undated records”); Poland’s register of monuments, from the century it records for construction (placed at their village or town). Wikidata adds ports, lighthouses, canals, bridges (1600–1914) and railway stations (opened before 1915) where it records a building or opening date, at the precision it records it. With your private data: Danish, Swedish and Romanian registers, coin hoards (Denmark; Carolingian hoards 751–987) and dated shipwrecks. Burials, mills and mines, hospitals and schools from these registers have their own layers.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('medieval-archaeology', { group: 'archaeology' }, C.arch, c, { labelZoom: 10, radius: 2.2 }),
+  },
+  // Four groups split out of the religious-house and archaeology layers by the type each source gives (site-types.ts).
+  // Their datasets are those layers' datasets (set below). A record that also names a church stays with the churches.
+  {
+    id: 'care-houses', group: 'economic', alsoIn: ['places'], label: 'Hospitals, almshouses & leper houses (Europe)', datasets: [], defaultOn: true, coverage: SITES,
+    hint: 'Hospitals, almshouses and leper houses from the national monument registers and Wikidata, sorted by the type each source gives, and shown at the dates those records give. A record that also names a church or chapel (a hospital chapel, say) stays with the churches.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('care-houses', { group: 'care' }, C.care, c, { labelZoom: 9, radius: 2.6 }),
+  },
+  {
+    id: 'learning', group: 'economic', alsoIn: ['places'], label: 'Universities, colleges & schools (Europe)', datasets: [], defaultOn: true, coverage: SITES,
+    hint: 'Early universities from Wikidata, and colleges and schools from the national monument registers, sorted by the type each source gives, and shown at the dates those records give. A record that also names a church or chapel stays with the churches.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('learning', { group: 'learning' }, C.learning, c, { labelZoom: 9, radius: 2.6 }),
+  },
+  {
+    id: 'burial-sites', group: 'places', label: 'Graves, cemeteries & burial mounds (Europe)', datasets: [], defaultOn: false, coverage: SITES,
+    hint: 'Graveyards, cemeteries, graves, barrows, cairns, cists and tombs from the national monument registers, sorted by the type each source gives, and shown at the dates those records give. A graveyard whose record also names its church or chapel stays with the churches; clearance and boundary cairns are not burials and stay under archaeology.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('burial-sites', { group: 'burial' }, C.burial, c, { labelZoom: 10, radius: 2.2 }),
+  },
+  {
+    id: 'industry-sites', group: 'economic', label: 'Mills, mines, quarries & kilns (Europe)', datasets: [], defaultOn: false, coverage: SITES,
+    hint: 'Mills, mines, quarries, kilns, forges, salt works, charcoal pits and fisheries from the national monument registers and mill surveys, sorted by the type each source gives; Wikidata adds water- and windmills and mines where it records a building or opening date, at the precision it records it.', get sources() { return siteSources(); },
+    specs: (c) => sitePoints('industry-sites', { group: 'industry' }, C.industry, c, { labelZoom: 10, radius: 2.2 }),
   },
   {
     id: 'dated-events', group: 'places', label: 'Dated events in sources: battles, earthquakes, storms, floods', datasets: ['nismr' as DatasetId], defaultOn: false, coverage: [400, 1914],
@@ -1116,6 +1141,11 @@ for (const [id, d] of Object.entries(SPEC_DATASETS)) {
     if (l && !l.datasets.includes(id as DatasetId)) l.datasets.push(id as DatasetId);
   }
 }
+// The groups split out of the religious-house and archaeology layers credit the datasets those layers draw from.
+for (const id of ['care-houses', 'learning', 'burial-sites', 'industry-sites']) {
+  const from = ['religious-houses', 'medieval-archaeology'].flatMap((x) => LAYERS.find((l) => l.id === x)!.datasets);
+  LAYERS.find((l) => l.id === id)!.datasets.push(...new Set(from));
+}
 
 export const layerById = (id: string) => LAYERS.find((l) => l.id === id);
 export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable).map((l) => l.id);
@@ -1129,7 +1159,7 @@ export const DEFAULT_LAYERS = LAYERS.filter((l) => l.defaultOn && !l.unavailable
 const LABEL_PRIORITY: Record<string, number> = {
   empires: 100, kingdoms: 99, republics: 98, 'other-states': 97, territories: 90, provinces: 85,
   cities: 80, 'urban-population': 78, ports: 75, settlements: 72, towns: 70, 'islamic-places': 68, 'medieval-places': 66,
-  'religious-houses': 45, castles: 44, 'hre-towns': 64, 'medieval-markets': 42, 'medieval-archaeology': 37, 'dated-events': 41, 'dated-settlements': 38, 'empire-dioceses': 36,
+  'religious-houses': 45, castles: 44, 'care-houses': 43, learning: 43, 'burial-sites': 37, 'industry-sites': 37, 'hre-towns': 64, 'medieval-markets': 42, 'medieval-archaeology': 37, 'dated-events': 41, 'dated-settlements': 38, 'empire-dioceses': 36,
   domesday: 60, battles: 55, sieges: 54, wars: 53, villages: 40,
   // Modern base-map names: river names keep the middle rank they always had (below towns, kingdoms and battles);
   // sea and lake names give way to every historical label.
@@ -1139,6 +1169,6 @@ const LABEL_PRIORITY: Record<string, number> = {
 export const labelKey = (id: string) => (LABEL_PRIORITY[id] ?? 50) * 1000 + Math.max(0, DRAW_ORDER.indexOf(id));
 
 export const DRAW_ORDER = ['terrain', 'lakes', 'empires', 'kingdoms', 'republics', 'other-states', 'territories', 'provinces', 'borders', 'empire-dioceses', 'historical-units', 'poland-1580-units', 'domesday', 'rural-settlement', 'sea-depth', 'reservoirs-past', 'coast-modern', 'coast-ancient', 'poland-1580-landscape', 'rivers', 'water-change', 'water-names', 'mountain-names', 'inland-navigation', 'modern-roads', 'roads', 'roads-ancient', 'roads-roman', 'roads-medieval', 'gough-map', 'roads-cassini', 'trade-routes',
-  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'building-density', 'inscriptions', 'religious-houses', 'castles', 'medieval-dioceses', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
+  'archaeological', 'religious', 'cultural', 'markets', 'tolls-fairs', 'bridges', 'mountains', 'passes', 'forts', 'medieval-archaeology', 'burial-sites', 'industry-sites', 'dated-events', 'dated-settlements', 'gazetteer-settlements', 'building-density', 'inscriptions', 'religious-houses', 'care-houses', 'learning', 'castles', 'medieval-dioceses', 'medieval-markets', 'hre-towns', 'villages', 'towns', 'islamic-places', 'medieval-places', 'ports', 'settlements', 'urban-population', 'cities', 'modern-names', 'political-events', 'expeditions', 'revolts', 'campaigns', 'sieges', 'battles', 'wars'];
 
 export const PALETTE = C;
