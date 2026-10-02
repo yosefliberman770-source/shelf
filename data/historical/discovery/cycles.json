@@ -42,5 +42,21 @@
   "weakUnweightedBefore": 5092,
   "weakUnweightedAfter": 5083,
   "notes": "Footprint-weighted metric 5,622 → 5,604 (unweighted 5,092 → 5,083). Added: full Zbiva, Low Countries mint authorities, Ottoman temettuat villages, Welsh counties/boroughs/wards/constituencies/poor-law unions, 2nd-edition parishes and pre-1840 townships, Early Modern Weather (private), Finnish lake-ore workings, Galicia & Austrian Silesia buildings (density layer) and district censuses, Digital Atlas of Dioceses (c. 1250/1350/1450), Orthodox monasteries (private), French mill surveys 1794–1809, RurLand, English oyster fisheries, Swedish pre-urban houses; 94 Welsh map scans and Flanders land use 1778/1873 as tiled overlays. Rejected: Atlas of Islamic History (unsourced, generated narrative). Fixed: date parser kept only the first year of '1852-62' and '1850s'; investigations file repaired after an interrupted run."
+ },
+ {
+  "cycle": 4,
+  "date": "2026-10-02",
+  "universe": 380823,
+  "investigated": 23459,
+  "integratedSources": 60,
+  "newSources": 9,
+  "rejected": 0,
+  "blocked": 0,
+  "awaiting": 83378,
+  "weakBefore": 5604,
+  "weakAfter": 5495,
+  "weakUnweightedBefore": 5083,
+  "weakUnweightedAfter": 4971,
+  "notes": "Footprint-weighted metric 5,604 → 5,495 (unweighted 5,083 → 4,971). Added: Imperiia project territories and places of the Russian Empire (private), Lithuanian heritage register (KVR), Latvian monuments (private), Finnish Iron Age monuments, Norwegian heritage register sites dated by the official code list, European Russia provinces with the 1864 livestock census (private), and from the user's uploads: world urban population estimates AD 1–1914 (Reba et al.) and German states and Prussian provinces 1820 (HGIS Germany, private). Vaulted, not drawn: Torcularia Hispania wine/oil sites (no coordinates). Not integrated: EAMENA Bani Walid (period names only). Fixed before integration: Norwegian free-text datings ('før 1350', '1800-tallet', 'Eldre enn 100 år') no longer read as single years."
  }
 ]

@@ -10,6 +10,7 @@
  "layers": [
   "gazetteer-settlements"
  ],
+ "placeIndex": false,
  "read": {
   "path": "historical-urban-population-reba/derived/population.csv",
   "derive": "scripts/historical-data/reba_urban.py",

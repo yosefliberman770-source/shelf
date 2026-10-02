@@ -875,6 +875,9 @@ def regional_layers(recs, rows, sites_out):
             return recs, skipped
         return fn
     loaders += tuple((sp['src'], spec_loader(sp)) for sp in GEN.specs(public=True))
+    # Specs that only add evidence about places the gazetteers already hold (e.g. population estimates) are drawn but
+    # kept out of the place-name index, so they never compete with the gazetteers when a name is resolved.
+    no_index = {sp['src'] for sp in GEN.specs(public=None) if sp.get('placeIndex') is False}
     for name, fn in loaders:
         res = fn()
         recs, note = (res if isinstance(res, tuple) else (res, None))
@@ -893,7 +896,7 @@ def regional_layers(recs, rows, sites_out):
                 pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
             register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
             # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
-            if env and x['kind'] not in ('site', 'building') and not common(x['name']) and not x.get('generic'):
+            if env and x['kind'] not in ('site', 'building') and not common(x['name']) and not x.get('generic') and x['src'] not in no_index:
                 extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
                          **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
                 rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
