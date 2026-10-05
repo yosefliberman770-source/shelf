@@ -11,7 +11,7 @@ import { gazetteerInfo, getPlace } from '../../atlas/gazetteer';
 import { useBookPlaceNames } from '../../atlas/readerNames';
 import { choosePlace, type Detection, fromGaz, type ReaderPlace, type Resolution, resolvePlace } from '../../atlas/resolve';
 import { recordVisit, saveBookmark } from '../../atlas/store';
-import { type HistYear, yearLabel } from '../../atlas/time';
+import { type HistYear, recordedYearLabel, yearLabel } from '../../atlas/time';
 import type { TimelineMark } from '../../atlas/Timeline';
 import type { MapBookmarkRow } from '../../db/types';
 import { unionBBox, zoomForBBox } from '../../lib/history/geometry';
@@ -540,7 +540,7 @@ function EventsPanel({ at, year, chapterText, war, eventQ, findMentions, onJump,
         <div>
           <div className="eyebrow">Named in this chapter</div>
           {inText.wars.map((w) => <button key={w.q} className={`atlas-war ${war?.q === w.q ? 'on' : ''}`} onClick={() => onWar(w.q, w.n)}>⚔ {w.n} <span className="faint">{w.f !== null ? yearLabel(w.f) : '?'}–{w.t !== null ? yearLabel(w.t) : '?'}</span></button>)}
-          {inText.events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)}</span></button>)}
+          {inText.events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}</span></button>)}
         </div>
       )}
       <div>

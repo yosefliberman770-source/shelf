@@ -10,6 +10,7 @@ Nothing is dated from a dataset's overall period. Records without dates stay und
 """
 from __future__ import annotations
 
+import dates
 import inputs
 import csv
 import gzip
@@ -1218,8 +1219,8 @@ def _wd_q(cell):
 
 
 def _wd_year(t):
-    m = re.match(r'"?([+-]?\d+)-', t or '')
-    return int(m.group(1)) if m else None
+    """A Wikidata time cell as a historical year (the query service counts a year 0: -0217 is 218 BCE)."""
+    return dates.wd_year(t)
 
 
 def wd_window(y, prec):

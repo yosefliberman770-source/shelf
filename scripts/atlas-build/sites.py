@@ -26,6 +26,7 @@ written about a place (Wikipedia sitelinks are not used).
 """
 from __future__ import annotations
 
+import dates
 import inputs
 import csv
 import json
@@ -96,8 +97,8 @@ def latin(s: str) -> bool:
 
 
 def year(v: str):
-    m = re.match(r'^"?(-?\d{1,4})-', v or '')
-    return int(m.group(1)) if m else None
+    """A Wikidata time cell as a historical year (the query service counts a year 0: -0217 is 218 BCE)."""
+    return dates.wd_year(v)
 
 
 def qid(v: str) -> str:

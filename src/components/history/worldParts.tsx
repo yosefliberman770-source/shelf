@@ -6,7 +6,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { complete } from '../../ai/client';
 import { nearbyPlaces } from '../../atlas/gazetteer';
 import type { ReaderPlace } from '../../atlas/resolve';
-import { type HistYear, yearLabel } from '../../atlas/time';
+import { type HistYear, recordedYearLabel, yearLabel } from '../../atlas/time';
 import { DATA_TYPES, type DataType, PERIODS, periodLabel, QUALITY_LABEL, QUALITY_MARK, regionAt, regionLabel } from '../../world/axes';
 import type { BookWorldRow } from '../../db/types';
 import { cellAt, cell } from '../../world/coverage';
@@ -487,7 +487,7 @@ export function BookWorldPanel({ row, profile, building, progress, onBuild, onSh
         {profile.polities.length > 0 && <><dt>Political entities then</dt><dd>{profile.polities.slice(0, 8).map((p) => p.n).join(' · ')} <span className="tiny faint">(Cliopatria, around {yearLabel(profile.period.preferred ?? year)})</span></dd></>}
       </dl>
       {profile.wars.length > 0 && <div><div className="eyebrow">Wars the book names</div>{profile.wars.map((w) => <button key={w.q} className="atlas-war" onClick={() => onWar(w.q, w.n)}>⚔ {w.n} <span className="faint">named in {w.chapters.length} section{w.chapters.length === 1 ? '' : 's'}</span></button>)}</div>}
-      {profile.events.length > 0 && <div><div className="eyebrow">Events the book names</div><div className="small">{profile.events.slice(0, 12).map((e) => `${e.n} (${yearLabel(e.y)})`).join(' · ')}</div></div>}
+      {profile.events.length > 0 && <div><div className="eyebrow">Events the book names</div><div className="small">{profile.events.slice(0, 12).map((e) => `${e.n} (${recordedYearLabel(e.y)})`).join(' · ')}</div></div>}
       <div>
         <div className="eyebrow">Places in the book ({profile.places.length})</div>
         <div className="col" style={{ gap: 2 }}>

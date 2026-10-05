@@ -3,54 +3,31 @@
 // OpenHistoricalMap (like ISO 8601) counts a year zero, so it gets its own
 // conversion in toOhmYear(): 1 BCE → 0, 218 BCE → -217.
 
+import { parseDate } from '../../world/histdate';
+
 export interface HistoricalDate {
   year: number;
   /** "c. 218 BC", "the 3rd century BC", a decade… */
   approximate?: boolean;
 }
 
-const ERA_BCE = /^(b\.?\s?c\.?\s?e?\.?|bce|bc)$/i;
-const ERA_CE = /^(a\.?\s?d\.?|c\.?\s?e\.?|ce|ad)$/i;
-
 /**
- * Parse a written date: "218 BC", "218 BCE", "c. 50 B.C.", "AD 43", "43 CE",
- * "1066", "-218", "3rd century BC". Returns undefined for anything else
- * (and for year 0, which does not exist).
+ * Parse a written date for the year box: "218 BC", "500 v. Chr.", "c. 50 B.C.", "AD 43", "1066", "-218",
+ * "3rd century BC", "AH 600". The same grammar as the map archive and the build (src/world/histdate.ts parseDate);
+ * a bare number is a year here ("43"). Anything but one exact year is marked approximate: a century or span gives its
+ * middle, "before"/"after" its stated year. Undefined for anything else (and for year 0, which does not exist).
  */
 export function parseHistoricalDate(input: string): HistoricalDate | undefined {
   const s = input.trim().replace(/\s+/g, ' ');
-  if (!s) return undefined;
-  const approx = /^(c\.|ca\.?|circa|about|around)\s*/i.test(s);
-  const body = s.replace(/^(c\.|ca\.?|circa|about|around)\s*/i, '');
-
-  // Centuries: "3rd century BC" → middle of the century, marked approximate.
-  const cent = /^(\d{1,2})(?:st|nd|rd|th)\s+century(?:\s+(.+))?$/i.exec(body);
-  if (cent) {
-    const n = Number(cent[1]);
-    const era = cent[2]?.trim() ?? '';
-    if (!n || (era && !ERA_BCE.test(era) && !ERA_CE.test(era))) return undefined;
-    return ERA_BCE.test(era) ? { year: -(n * 100 - 50), approximate: true } : { year: n * 100 - 50, approximate: true };
-  }
-
-  // Signed number: "-218" means 218 BCE in this app's convention.
-  const signed = /^(-?)(\d{1,5})$/.exec(body);
-  if (signed) {
-    const n = Number(signed[2]);
-    if (!n) return undefined;
-    return { year: signed[1] ? -n : n, approximate: approx || undefined };
-  }
-
-  // Era before the number ("AD 43", "BC 218") or after ("218 BC", "43 C.E.").
-  const pre = /^([a-z. ]{2,6})\s*(\d{1,5})$/i.exec(body);
-  const post = /^(\d{1,5})\s*([a-z. ]{2,7})$/i.exec(body);
-  const m = post ? { n: post[1], era: post[2] } : pre ? { n: pre[2], era: pre[1] } : undefined;
-  if (!m) return undefined;
-  const n = Number(m.n);
-  const era = m.era.trim();
-  if (!n) return undefined;
-  if (ERA_BCE.test(era)) return { year: -n, approximate: approx || undefined };
-  if (ERA_CE.test(era)) return { year: n, approximate: approx || undefined };
-  return undefined;
+  const bare = /^(\d{1,5})$/.exec(s);
+  if (bare) return Number(bare[1]) ? { year: Number(bare[1]) } : undefined;
+  const d = parseDate(s);
+  if (!d || d.precision === 'unknown') return undefined;
+  if (d.precision === 'year' || d.precision === 'day') return { year: d.preferred ?? d.earliest! };
+  if (d.preferred !== undefined) return { year: d.preferred, approximate: true };
+  if (d.earliest !== undefined && d.latest !== undefined) return { year: Math.trunc((d.earliest + d.latest) / 2) || d.latest, approximate: true };
+  const y = d.earliest ?? d.latest;
+  return y === undefined ? undefined : { year: y, approximate: true };
 }
 
 /** -218 → "218 BCE", 1066 → "1066 CE". Style "bc" gives BC/AD instead. */

@@ -9,7 +9,7 @@ import { dateBasisNote, existedAround, gazetteerInfo, type GazPlace, nearbyPlace
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
-import { type HistYear, shiftYear, yearLabel } from '../../atlas/time';
+import { type HistYear, recordedYearLabel, shiftYear, yearLabel } from '../../atlas/time';
 import { db } from '../../db/db';
 import type { MapBookmarkRow, PlaceVisitRow } from '../../db/types';
 import { formatCoords } from '../../lib/history/geometry';
@@ -155,7 +155,7 @@ export function CompareDates({ at, year, onShow }: { at?: { name: string; lat: n
         <ul className="atlas-facts">
           <li><span>{at.name}, {yearLabel(a)}</span>{names(res.pa)}<small>Cliopatria</small></li>
           <li><span>{at.name}, {yearLabel(b)}</span>{names(res.pb)}<small>Cliopatria</small></li>
-          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${yearLabel(e.y)})`).join('; ') : 'none recorded'}<small>Wikidata</small></li>
+          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${recordedYearLabel(e.y)})`).join('; ') : 'none recorded'}<small>Wikidata</small></li>
         </ul>
       )}
       <div className="tiny faint">Borders are reconstructions with approximate dates: a change between two years shows the datasets differ, not the exact moment it happened.</div>
@@ -218,7 +218,7 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         <div className="mt-8">
           <div className="eyebrow">Recorded events within 20 miles</div>
           <div className="col" style={{ gap: 2 }}>
-            {events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)}{e.wn ? ` · ${e.wn}` : ''}</span></button>)}
+            {events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}{e.wn ? ` · ${e.wn}` : ''}</span></button>)}
           </div>
           <div className="tiny faint">Wikidata items with a location and date near here.</div>
         </div>
@@ -301,7 +301,7 @@ export function EventCard({ q, onShow, mentions, onJump, onWar, onClose }: { q: 
     <div className="card tight">
       <div className="row between"><b>{ev.n}</b><button className="btn xs ghost" onClick={onClose} aria-label="Close">✕</button></div>
       <dl className="hmap-facts">
-        <dt>Date</dt><dd>{yearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
+        <dt>Date</dt><dd>{recordedYearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
         <dt>Location</dt><dd>{det && det !== 'failed' && det.locationName ? `${det.locationName} · ` : ''}{formatCoords(ev.pos[1], ev.pos[0])}</dd>
         <dt>Type</dt><dd>{ev.k}</dd>
         {ev.wn && <><dt>Part of</dt><dd><button className="why-link" onClick={() => onWar(ev.w!)}>{ev.wn}</button></dd></>}
@@ -325,7 +325,7 @@ export function WarEvents({ q, name, onEvent }: { q: string; name: string; onEve
     <div>
       <div className="eyebrow">{name} · {list.length} recorded battles & sieges</div>
       <ol className="atlas-seq">
-        {list.map((e) => <li key={e.q}><button className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)}</span></button></li>)}
+        {list.map((e) => <li key={e.q}><button className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}</span></button></li>)}
       </ol>
       <div className="tiny faint">Numbered by date on the map. The numbers are not the route armies took.</div>
     </div>
@@ -403,7 +403,7 @@ export function NearbyPanel({ at, year, radiusMi, setRadiusMi, onResults, onOpen
       {events.length > 0 && (
         <div>
           <div className="eyebrow">Battles & sieges</div>
-          <div className="col" style={{ gap: 2 }}>{events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)} · {kmLabel(e.km)}</span></button>)}</div>
+          <div className="col" style={{ gap: 2 }}>{events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)} · {kmLabel(e.km)}</span></button>)}</div>
         </div>
       )}
       <div className="tiny faint">From Pleiades (places, including ones that no longer exist; roads and rivers), AWMC (roads) and Wikidata (battles). ● precise location · ○ rough location.</div>

@@ -37,19 +37,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RAW = os.path.join(HERE, '..', '..', 'data', 'historical', 'raw')
 SPECS = os.path.join(HERE, '..', '..', 'data', 'historical', 'specs')
 
-ROMAN = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10, 'xi': 11, 'xii': 12, 'xiii': 13,
-         'xiv': 14, 'xv': 15, 'xvi': 16, 'xvii': 17, 'xviii': 18, 'xix': 19, 'xx': 20, 'xxi': 21}
-PART = {'early': (0, 33), 'first half': (0, 50), '1st half': (0, 50), 'mid': (33, 66), 'middle': (33, 66), 'second half': (50, 100),
-        '2nd half': (50, 100), 'late': (66, 100), 'end': (75, 100), 'beginning': (0, 25), 'start': (0, 25)}
-BCE = re.compile(r'\b(bc|bce|b\.c\.|v\.\s?chr|av\.?\s?j\.?-?c|pr\.\s?n\.\s?l|př\.\s?n\.\s?l|i\.\s?e\.|до н\.\s?э)', re.I)
-
-
-def _century_window(n, bce=False, part=None):
-    a, b = (n - 1) * 100 + 1, n * 100
-    if part:
-        p0, p1 = PART[part]
-        a, b = a + p0, a + p1 - 1 if p1 < 100 else b
-    return (-b, -a) if bce else (a, b)
+from dates import BCE, PART, ROMAN, parse_dating  # noqa: F401  (the shared date grammar; BCE and PART are used by readers)
+from dates import century_window as _century_window
 
 
 def _signed_range(text):
@@ -159,64 +148,6 @@ def lv_dating(text):
     t = re.sub(r'\b(\d{1,2})\.?\s*[-–/]\s*(?=\s*(?:early |late |mid |first half |second half )?\d+th century)', lambda m: f'{int(m.group(1))}th century - ', t)
     return re.sub(r'\s+', ' ', t).strip()
 
-
-
-def parse_dating(text) -> tuple[int | None, int | None, str] | None:
-    """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
-    if text is None:
-        return None
-    if isinstance(text, (int, float)) and not (isinstance(text, float) and math.isnan(text)):
-        y = int(text)
-        return (y, y, 'year') if -3000 <= y <= 2100 and y != 0 else None
-    t = str(text).strip()
-    if not t or t.lower() in ('nan', 'none', 'null', 'unknown', 'undetermined', 'neznámé', 'unbekannt', 'inconnu', '-', '?'):
-        return None
-    low = t.lower()
-    bce = bool(BCE.search(low))
-    # centuries: "13th c.", "13th century", "13. Jh.", "XIII. sz.", "XIIIe siècle", "XIII w.", "13. stol." — with an optional part
-    cents = []
-    CW = r'(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|siecle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)'
-    # century ranges: "5th-7th c.", "14-15 c.", "XII-XIII w."
-    for m in re.finditer(r'\b(\d{1,2})(?:st|nd|rd|th|\.)?\s*[-–/]\s*(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*' + CW, low):
-        a_, b_ = int(m.group(1)), int(m.group(2))
-        if 1 <= a_ <= b_ <= 21:
-            cents.append((_century_window(a_, bce)[0] if not bce else -b_ * 100, _century_window(b_, bce)[1] if not bce else -(a_ - 1) * 100 - 1))
-    for m in re.finditer(r'\b([ivxl]{1,6})\.?\s*[-–/]\s*([ivxl]{1,6})\.?\s*' + CW, low):
-        a_, b_ = ROMAN.get(m.group(1)), ROMAN.get(m.group(2))
-        if a_ and b_ and a_ <= b_:
-            cents.append((_century_window(a_, bce)[0], _century_window(b_, bce)[1]))
-    for m in re.finditer(r'(?:(early|late|mid|middle|first half|1st half|second half|2nd half|end|beginning)(?:\s+of)?\s+(?:the\s+)?)?'
-                         r'\b(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)', low):
-        part = (m.group(1) or '').strip() or None
-        cents.append(_century_window(int(m.group(2)), bce, part if part in PART else None))
-    for m in re.finditer(r'\b([ivxl]{1,6})\.?\s*(?:c\b|c\.|cent|century|jh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|st\.|vek|век|e\b|ème)', low):
-        n = ROMAN.get(m.group(1))
-        if n:
-            cents.append(_century_window(n, bce))
-    years = [int(y) for y in re.findall(r'(?<![\d.,])(\d{3,4})(?![\d.,])', t) if 100 <= int(y) <= 2100]
-    # an abbreviated end year ("1852-62", "1863-4") belongs to the same century as its start
-    for m in re.finditer(r'(?<![\d.,/-])(\d{4})\s*[-–/]\s*(\d{1,2})(?![\d.,])(?!\s*[-–/.]\s*\d)', t):  # not a full date (1801-12-05)
-        a_, b_ = int(m.group(1)), m.group(2)
-        end = int(str(a_)[:4 - len(b_)] + b_)
-        if a_ < end <= 2100:
-            years.append(end)
-    # a decade ("1850s", "the 1850's"): its ten years
-    for m in re.finditer(r'(?<![\d.,])(\d{3})0\'?s\b', t):
-        years += [int(m.group(1) + '0'), int(m.group(1) + '9')]
-    if bce:
-        years = [-y for y in years]
-    if cents and not years:
-        return min(a for a, _ in cents), max(b for _, b in cents), 'century'
-    if years:
-        lo, hi = min(years), max(years)
-        if cents:
-            lo, hi = min(lo, min(a for a, _ in cents)), max(hi, max(b for _, b in cents))
-        if re.search(r'\b(after|post|nach|après|po|od|from|since|seit)\b', low) and len(years) == 1:
-            return lo, None, 'from year'
-        if re.search(r'\b(before|ante|vor|avant|przed|do|until|bis)\b', low) and len(years) == 1 and not re.search(r'\bod\b', low):
-            return None, hi, 'until year'
-        return lo, hi, 'years' if lo != hi else 'year'
-    return None
 
 
 # ── readers ───────────────────────────────────────────────────────────────

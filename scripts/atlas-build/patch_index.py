@@ -6,6 +6,7 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py cassini     # A19-001: Latin-1 names decoded correctly
   python3 scripts/atlas-build/patch_index.py hurbpop     # A18-001: world cities no gazetteer holds become findable
   python3 scripts/atlas-build/patch_index.py words       # A23-001: places whose name is an English word (Wells, Newton…)
+  python3 scripts/atlas-build/patch_index.py wdbce       # A8-009: Wikidata BCE founding dates one year late
 """
 from __future__ import annotations
 
@@ -101,7 +102,36 @@ def words():
     return out
 
 
+def wdbce():
+    """Wikidata sites dated BCE: the snapshot's years were read without the query service's year 0 (-0217 as 217 BCE, not
+    218 BCE). Each row's start and end are re-read from the snapshot with dates.wd_year; only Wikidata-dated ends change."""
+    import sites
+    recs = sites.wd_records(sites.KINDS + ['city', 'town'])
+    have = current_rows('wikidata')
+    changed, examples = 0, []
+    for r in have:
+        w = recs.get(str(r[1]))
+        fb = (r[13] or {}).get('fb') if isinstance(r[13], dict) else None
+        if not w or fb not in ('founded', 'first mention', 'recorded start (Wikidata inception)'):
+            continue
+        start = min((x for x in (w['inc'], w['fm']) if x is not None), default=None)
+        end = w['dis']
+        new = list(r)
+        if r[7] is not None and r[7] <= 0 and start is not None and start == r[7] - 1:
+            new[7] = start
+        if r[8] is not None and r[8] <= 0 and end is not None and end == r[8] - 1:
+            new[8] = end
+        if new != r:
+            changed += 1
+            if len(examples) < 6:
+                examples.append(f'{r[2]}: {r[7]} → {new[7]}')
+            r[:] = new
+    if changed:
+        world.replace_source_rows('wikidata', have, BASE)
+    return {'changed': changed, 'examples': examples}
+
+
 if __name__ == '__main__':
-    steps = {'cassini': cassini, 'hurbpop': hurbpop, 'words': words}
+    steps = {'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
