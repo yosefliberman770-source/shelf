@@ -9,7 +9,7 @@ import { dateBasisNote, existedAround, gazetteerInfo, type GazPlace, nearbyPlace
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
-import { type HistYear, shiftYear, yearLabel } from '../../atlas/time';
+import { type HistYear, recordedYearLabel, shiftYear, yearLabel } from '../../atlas/time';
 import { db } from '../../db/db';
 import type { MapBookmarkRow, PlaceVisitRow } from '../../db/types';
 import { formatCoords } from '../../lib/history/geometry';
@@ -155,7 +155,7 @@ export function CompareDates({ at, year, onShow }: { at?: { name: string; lat: n
         <ul className="atlas-facts">
           <li><span>{at.name}, {yearLabel(a)}</span>{names(res.pa)}<small>Cliopatria</small></li>
           <li><span>{at.name}, {yearLabel(b)}</span>{names(res.pb)}<small>Cliopatria</small></li>
-          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${yearLabel(e.y)})`).join('; ') : 'none recorded'}<small>Wikidata</small></li>
+          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${recordedYearLabel(e.y)})`).join('; ') : 'none recorded'}<small>Wikidata</small></li>
         </ul>
       )}
       <div className="tiny faint">Borders are reconstructions with approximate dates: a change between two years shows the datasets differ, not the exact moment it happened.</div>
@@ -202,10 +202,13 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         {nowNames.length > 0 && <><dt>Names{place.gaz ? ` around ${yearLabel(year)}` : ''}</dt><dd>{nowNames.slice(0, 8).map(nameLine)}</dd></>}
         {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine)}</dd></>}
         <dt>Date range</dt><dd>{span(place.from, place.gaz?.datesAsWritten?.to && place.gaz.to === undefined ? undefined : place.to)}{place.gaz ? <span className="tiny faint"> ({dateBasisNote(place.gaz)})</span> : null}
-          {place.gaz?.datesAsWritten && <div className="tiny faint">The source writes: {place.gaz.datesAsWritten.from ?? '…'} – {place.gaz.datesAsWritten.to ?? '…'}</div>}</dd>
+          {place.gaz?.datesAsWritten && <div className="tiny faint">The source writes: {place.gaz.datesAsWritten.from ?? '…'} – {place.gaz.datesAsWritten.to ?? '…'}</div>}
+          {place.gaz?.meaningUnknown && <div className="tiny faint">{place.gaz.meaningUnknown}</div>}</dd>
         {(place.gaz?.sourceType || place.gaz?.sourcePeriod) && <><dt>In the source</dt><dd>{[place.gaz.sourceType, place.gaz.sourcePeriod].filter(Boolean).join(' · ')}{place.gaz.typeDoubt ? <span className="tiny faint"> (the source is not sure of the type)</span> : null}</dd></>}
         {place.gaz && <><dt>At {yearLabel(year)}</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place.gaz, year))]}</dd></>}
-        <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{CERTAINTY_LABEL[place.certainty]}</span></dd>
+        <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{place.gaz?.meaningUnknown ? 'as the source gives it (its precision is not documented)' : CERTAINTY_LABEL[place.certainty]}</span></dd>
+        {place.gaz?.note && <><dt>Correction</dt><dd className="small">{place.gaz.note}</dd></>}
+        {place.gaz?.qa && <><dt>Data check</dt><dd className="small">{place.gaz.qa}</dd></>}
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>
           {pol && pol.length > 0 && <div>{politiesLine(pol)} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}
           {place.gaz?.rulers?.length
@@ -218,7 +221,7 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         <div className="mt-8">
           <div className="eyebrow">Recorded events within 20 miles</div>
           <div className="col" style={{ gap: 2 }}>
-            {events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)}{e.wn ? ` · ${e.wn}` : ''}</span></button>)}
+            {events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}{e.wn ? ` · ${e.wn}` : ''}</span></button>)}
           </div>
           <div className="tiny faint">Wikidata items with a location and date near here.</div>
         </div>
@@ -301,7 +304,7 @@ export function EventCard({ q, onShow, mentions, onJump, onWar, onClose }: { q: 
     <div className="card tight">
       <div className="row between"><b>{ev.n}</b><button className="btn xs ghost" onClick={onClose} aria-label="Close">✕</button></div>
       <dl className="hmap-facts">
-        <dt>Date</dt><dd>{yearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
+        <dt>Date</dt><dd>{recordedYearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
         <dt>Location</dt><dd>{det && det !== 'failed' && det.locationName ? `${det.locationName} · ` : ''}{formatCoords(ev.pos[1], ev.pos[0])}</dd>
         <dt>Type</dt><dd>{ev.k}</dd>
         {ev.wn && <><dt>Part of</dt><dd><button className="why-link" onClick={() => onWar(ev.w!)}>{ev.wn}</button></dd></>}
@@ -325,7 +328,7 @@ export function WarEvents({ q, name, onEvent }: { q: string; name: string; onEve
     <div>
       <div className="eyebrow">{name} · {list.length} recorded battles & sieges</div>
       <ol className="atlas-seq">
-        {list.map((e) => <li key={e.q}><button className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)}</span></button></li>)}
+        {list.map((e) => <li key={e.q}><button className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}</span></button></li>)}
       </ol>
       <div className="tiny faint">Numbered by date on the map. The numbers are not the route armies took.</div>
     </div>
@@ -403,7 +406,7 @@ export function NearbyPanel({ at, year, radiusMi, setRadiusMi, onResults, onOpen
       {events.length > 0 && (
         <div>
           <div className="eyebrow">Battles & sieges</div>
-          <div className="col" style={{ gap: 2 }}>{events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{yearLabel(e.y)} · {kmLabel(e.km)}</span></button>)}</div>
+          <div className="col" style={{ gap: 2 }}>{events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)} · {kmLabel(e.km)}</span></button>)}</div>
         </div>
       )}
       <div className="tiny faint">From Pleiades (places, including ones that no longer exist; roads and rivers), AWMC (roads) and Wikidata (battles). ● precise location · ○ rough location.</div>

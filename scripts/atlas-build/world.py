@@ -258,7 +258,8 @@ def places_index(rows, base=None, registry=None):
             qa = plausibility(src, title, lon, lat, r[7], r[8], registry)
             if qa:
                 r = list(r)
-                r[13] = {**(r[13] or {}), 'qa': '; '.join(qa)}
+                own = (r[13] or {}).get('qa')  # what the loader already found (ingestion_checks) is kept
+                r[13] = {**(r[13] or {}), 'qa': '; '.join(([own] if own else []) + [q for q in qa if q not in (own or '')])}
                 flagged.append({'src': src, 'id': pid, 'title': title, 'reason': '; '.join(qa)})
             c = cell_of(lon, lat)
             entries = []

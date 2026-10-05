@@ -8,6 +8,7 @@ and says so; it never "corrects" a value unless the correction is unambiguous an
 from __future__ import annotations
 
 import math
+import re
 
 # Impossible years: before the oldest archaeological sites (Pleiades dates Palaeolithic sites from 2.6 million years ago)
 # or in the future. Year 0 does not exist (1 BCE = -1).
@@ -55,6 +56,63 @@ def in_box(lon, lat, box, margin=1.0) -> bool:
 def swapped(lon, lat, box, margin=1.0) -> bool:
     """Outside the dataset's box, but inside it with latitude and longitude exchanged: a swapped pair."""
     return not in_box(lon, lat, box, margin) and in_box(lat, lon, box, margin) and position_problem(lat, lon) is None
+
+
+_LAND = {}
+
+
+def land_distance(root: str | None = None):
+    """Distance (km, approximate) from a point to the nearest land in Natural Earth's land polygons; 0 on land.
+    None when shapely is not installed. Answers are kept per 0.01° cell, so a source's repeated positions cost nothing."""
+    import json
+    import os
+    root = root or os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+    if root in _LAND:
+        return _LAND[root]
+    try:
+        from shapely.geometry import Point, shape
+        from shapely.strtree import STRtree
+    except ImportError:
+        _LAND[root] = None
+        return None
+    polys = []
+    for f in json.load(open(os.path.join(root, 'public', 'atlas', 'ne-land.json'), encoding='utf-8'))['features']:
+        g = shape(f['geometry'])
+        polys.extend(getattr(g, 'geoms', [g]))
+    tree = STRtree(polys)
+    memo = {}
+
+    def dist(lon, lat):
+        k = (round(lon, 2), round(lat, 2))
+        if k not in memo:
+            p = Point(lon, lat)
+            if any(polys[i].contains(p) for i in tree.query(p)):
+                memo[k] = 0.0
+            else:
+                memo[k] = polys[tree.nearest(p)].distance(p) * 111.0 * max(0.3, math.cos(math.radians(lat)) ** 0.5)
+        return memo[k]
+    _LAND[root] = dist
+    return dist
+
+
+# Kinds of record that belong on the water: never flagged for lying at sea.
+WATER_KINDS = {'wreck', 'harbour', 'harbor', 'port', 'island', 'lighthouse', 'fishery', 'anchorage', 'reef', 'shoal', 'sea', 'bay',
+               'strait', 'ford', 'lake', 'river', 'canal', 'bridge', 'crannog', 'oyster bed'}
+# UTF-8 text decoded as Latin-1/Windows-1252 ("CrÃ©py", "â€™"), or characters lost to decoding (U+FFFD).
+MOJIBAKE = re.compile(r'Ã[\u0080-\u00bf]|Â[\u00a0-\u00bf]|â€|\ufffd')
+
+
+def text_problem(text) -> str | None:
+    """Why a name looks corrupted, or None."""
+    if not isinstance(text, str):
+        return None
+    if '\ufffd' in text:
+        return 'garbled characters (�): the source was decoded with the wrong encoding'
+    if MOJIBAKE.search(text):
+        return 'mis-decoded text (UTF-8 read as Windows-1252, e.g. "Ã©" for "é")'
+    if any(ord(c) < 32 and c not in '\t\n\r' for c in text):
+        return 'control characters in the text'
+    return None
 
 
 def date_problem(start, end) -> str | None:

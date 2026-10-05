@@ -22,6 +22,7 @@ Needs:  python3 -m pip install -r scripts/atlas-build/requirements.txt  (pinned 
 """
 from __future__ import annotations
 
+import dates
 import csv
 import io
 import json
@@ -540,14 +541,8 @@ def sparql(query: str):
 
 
 def wd_year(v: str | None, precision: str | None = None):
-    """'-0217-01-01T00:00:00Z' → -218 (Wikidata stores 218 BCE as -0217 astronomically)."""
-    if not v:
-        return None
-    m = re.match(r'^([+-]?)(\d+)-', v)
-    if not m:
-        return None
-    y = int(m.group(2)) * (-1 if m.group(1) == '-' else 1)
-    return y - 1 if y <= 0 else y  # astronomical → historical (no year 0)
+    """'-0217-01-01T00:00:00Z' → -218 (Wikidata stores 218 BCE as -0217 astronomically). The shared reader in dates.py."""
+    return dates.wd_year(v)
 
 
 def wikidata_events():

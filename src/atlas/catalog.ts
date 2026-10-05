@@ -425,6 +425,11 @@ export const BEFORE_RECORD_YEARS = 60;
 /** Years either side of a snapshot listing within which the listed place is drawn (lighter); see sitePoints. */
 export const SNAPSHOT_YEARS = 25;
 
+/** Records that share one position in their source (sk = how many, from the tiler): drawn larger, and counted from zoom 8. */
+const STACKED: ExpressionSpecification = ['>', ['coalesce', ['get', 'sk'], 1], 1];
+const STACK_SCALE: ExpressionSpecification = ['interpolate', ['linear'], ['coalesce', ['get', 'sk'], 1], 1, 1, 10, 1.5, 100, 2, 1000, 2.6];
+export const STACK_LABEL_ZOOM = 8;
+
 function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number; sources?: string[] }): LayerSpecification[] {
   // Own dates only (founding / first mention → dissolution, as recorded), or an evidence period (a building-campaign
   // century, a register's period class, a style): shown inside them. Without own evidence at the year nothing is drawn,
@@ -457,9 +462,12 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
     const sfx = source === 'medieval-sites' ? '' : source === 'private-sites' ? '-private' : `-${source}`;
     return [
       { id: `${id}-pt${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],
-        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, 0.8, 1.4],
-        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5] } },
+        // a stack of records on one point is drawn larger (and counted below), an approximate position blurred
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, ['*', opts.radius * 0.6, STACK_SCALE], 10, ['*', opts.radius * 1.4, STACK_SCALE]],
+        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, ['case', STACKED, 1.6, 0.8], 1.4],
+        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5], 'circle-blur': ['case', ['==', ['get', 'u'], 1], 0.6, 0] } },
+      { id: `${id}-stack${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter: ['all', filter, STACKED] as FilterSpecification, minzoom: STACK_LABEL_ZOOM, layout: {
+        'text-field': ['concat', '×', ['to-string', ['get', 'sk']]], 'text-font': FONT_BOLD, 'text-size': 9.5, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': C.halo, 'text-halo-color': color, 'text-halo-width': 1.2 } },
       { id: `${id}-label${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter, minzoom: opts.labelZoom, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true, 'text-max-width': 9 }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ...(ctx.showUndated ? [
         { id: `${id}-undated${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter: undatedFilter, minzoom: UNDATED_MINZOOM, paint: {
@@ -562,12 +570,15 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'urban-population', group: 'places', label: 'Towns by estimated population (Europe)', datasets: ['buringh'], defaultOn: true, coverage: BURINGH,
-    hint: 'About 2,200 European towns with Buringh’s estimate of their population in each century from 700 (half-centuries after 1500), straight-line between sample years. Dot size = estimated inhabitants; a town is drawn only while its estimate is above zero (zero means below the dataset’s threshold, not that nothing was there). Many figures are proxies or imputations. English names are matched to Wikidata; unmatched towns keep the dataset’s own spelling.', sources: ['urban-population'],
+    hint: 'About 2,200 European towns with Buringh’s estimate of their population in each century from 700 (half-centuries after 1500), straight-line between sample years. Dot size = estimated inhabitants. An estimate of zero means the town was below the dataset’s threshold, never that nothing was there: from zoom 6 such towns are drawn as an empty ring. Many figures are proxies or imputations. English names are matched to Wikidata; unmatched towns keep the dataset’s own spelling.', sources: ['urban-population'],
     specs: (c) => {
       const pop = urbanPopulation(c.year);
       const filter = ['all', inWindow(c.year, BURINGH), ['>', pop, 0]] as FilterSpecification;
+      // zero = below the threshold (SS-2): the town is there, its size is not estimated
+      const below = ['all', inWindow(c.year, BURINGH), ['==', pop, 0]] as FilterSpecification;
       const r: ExpressionSpecification = ['interpolate', ['linear'], pop, 1, 2.2, 10, 3.6, 40, 5.8, 100, 8, 400, 12];
       return [
+        { id: 'urban-population-below', type: 'circle', source: 'urban-population', 'source-layer': 'towns', filter: below, minzoom: 6, paint: { 'circle-radius': 2.6, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': C.city, 'circle-stroke-width': 1, 'circle-stroke-opacity': 0.6 } },
         { id: 'urban-population-pt', type: 'circle', source: 'urban-population', 'source-layer': 'towns', filter, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, ['*', 0.7, r], 8, ['*', 1.2, r]], 'circle-color': C.city, 'circle-opacity': 0.75, 'circle-stroke-color': C.halo, 'circle-stroke-width': 1 } },
         { id: 'urban-population-label', type: 'symbol', source: 'urban-population', 'source-layer': 'towns', filter, minzoom: 4, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_BOLD, 'text-size': ['interpolate', ['linear'], pop, 5, 10.5, 50, 12.5, 200, 14], 'symbol-sort-key': ['-', 0, pop], 'text-offset': [0, 0.9], 'text-anchor': 'top', 'text-optional': true }, paint: { 'text-color': C.city, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
       ];

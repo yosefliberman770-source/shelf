@@ -410,7 +410,7 @@ export function AtlasMap({ view, year, onYearChange, focus, pins, marks, classNa
     // Points before lines before areas.
     const rank = (f: MapGeoJSONFeature) => (f.layer.type === 'circle' ? 0 : f.layer.type === 'symbol' ? 1 : f.layer.type === 'line' ? 2 : 3);
     const f = hits.sort((a, b) => rank(a) - rank(b))[0];
-    setInfo(f ? describe(f, ctxRef.current.year) : null);
+    setInfo(f ? withPosition(describe(f, ctxRef.current.year), f) : null);
   };
 
   const toggle = (id: string) => setEnabled((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
@@ -459,6 +459,7 @@ function LayerPanel({ enabled, toggle, year, eventWindow, setEventWindow, war, s
         <input type="checkbox" checked={showUndated} onChange={(e) => setShowUndated(e.target.checked)} aria-label="Include undated records" />
         <span>Include undated records <span className="tiny faint">— records with no temporal evidence at all (no dates, nothing dated linked to them, no source period). Shown faint at any date and marked undated. Off by default: such a record isn’t evidence that something existed in {yearLabel(year)}. Records without exact dates but with a known period (e.g. a place from the Barrington Atlas, or a village with a dated temple) are shown inside that period anyway.</span></span>
       </label>
+      <div className="tiny faint">How positions are drawn: a blurred dot is a position the source gives only roughly; a larger dot with “×12” is 12 records the source puts on one point (a parish, a grid square), not 12 sites side by side.</div>
       {GROUPS.map((g) => {
         const defs = LAYERS.filter((l) => l.group === g.id || l.alsoIn?.includes(g.id));
         return (
@@ -549,6 +550,19 @@ interface Info { title: string; lines: string[]; link?: { href: string; label: s
 const PERIOD_NAMES: Record<string, string> = { A: 'Archaic', C: 'Classical', H: 'Hellenistic', R: 'Roman', L: 'Late Antique' };
 const periodLabel = (code?: string) => (code ? code.replace('?', '').split('').map((c) => PERIOD_NAMES[c]).filter(Boolean).join(', ') + (code.includes('?') ? ' (uncertain)' : '') : '');
 const range = (f?: number, t?: number) => (f === undefined && t === undefined ? 'Dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
+
+/** What the dot's position is: one of a stack of records the source puts on one point, or approximate (A10-005, A11-008). */
+export function positionNote(props: Record<string, unknown>): string | undefined {
+  const sk = typeof props.sk === 'number' ? props.sk : 0;
+  const stack = sk > 1 ? `${sk.toLocaleString()} records in the source share this exact position — the source's reference point (a parish, a grid square, a town), not each site's own location.` : '';
+  const rough = props.u === 1 ? 'The source gives this position only approximately.' : '';
+  return [stack, rough].filter(Boolean).join(' ') || undefined;
+}
+
+function withPosition(info: Info, f: MapGeoJSONFeature): Info {
+  const note = positionNote(f.properties as Record<string, unknown>);
+  return note ? { ...info, caution: [info.caution, note].filter(Boolean).join(' ') } : info;
+}
 
 function describe(f: MapGeoJSONFeature, year: HistYear): Info {
   const p = f.properties as Record<string, unknown>;
@@ -721,13 +735,14 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       };
     }
     case 'urban-population': {
-      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`) ?? 0] as const);
-      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : '—'}`);
+      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`)] as const);
+      // 0 = below the dataset's threshold (the town existed; its size is not estimated); no figure = not recorded (SS-2)
+      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : v === 0 ? 'below threshold' : 'no estimate'}`);
       return {
         title: str('n') ?? 'Town', lines: [`${str('c') ?? ''}${str('a') ? ` · “${str('a')}” in the dataset` : ''}`, `Estimated inhabitants (thousands) — ${near.join(' · ')}`],
         pick: pt && str('i') ? { key: `buringh:${str('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.17026/dans-xzy-u62q', label: 'Dataset ↗' }, source: credit('buringh'),
-        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “—” = below the dataset’s threshold.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
+        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “Below threshold” means too small for the dataset to estimate, not that the town did not exist.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
       };
     }
     case 'hre-towns': {

@@ -6,6 +6,8 @@
  "title": "National Monuments Record of Wales (RCAHMW, Coflein)",
  "licence": "Open Government Licence v3.0",
  "url": "https://coflein.gov.uk/",
+ "meaning": "unknown",
+ "meaningNote": "The record publishes no documentation of what its periods and grid references mean (how a period was assigned, how precise a position is), so its dates are shown as written and its positions without a precision claim.",
  "describe": "Sites in the National Monuments Record of Wales with the periods the record gives; years from the FISH period thesaurus shared by the national monument records of Britain (stated in each label). Records of unknown, general or only prehistoric date are left out.",
  "layers": [
   "medieval-archaeology"

@@ -46,7 +46,10 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
         <dt>Historical date</dt>
         <dd>{year !== undefined ? <>{yearLabel(year)}{date.approximate ? ' (approx.)' : ''} <span className="tiny" style={{ color: colors.muted }}>· {DATE_SOURCE_LABEL[date.source]}</span></> : <span style={{ color: colors.muted }}>Not given by the book — set it on the map</span>}</dd>
         <dt>Recorded</dt><dd>{span(place.from, place.to)} <span className="tiny" style={{ color: colors.muted }}>({dateBasisNote(place)})</span>
-          {place.datesAsWritten && <div className="tiny" style={{ color: colors.muted }}>The source writes: {place.datesAsWritten.from ?? '…'} – {place.datesAsWritten.to ?? '…'}</div>}</dd>
+          {place.datesAsWritten && <div className="tiny" style={{ color: colors.muted }}>The source writes: {place.datesAsWritten.from ?? '…'} – {place.datesAsWritten.to ?? '…'}</div>}
+          {place.meaningUnknown && <div className="tiny" style={{ color: colors.muted }}>{place.meaningUnknown}</div>}</dd>
+        {place.note && <><dt>Correction</dt><dd className="tiny">{place.note}</dd></>}
+        {place.qa && <><dt>Data check</dt><dd className="tiny">{place.qa}</dd></>}
         {place.sourceType && <><dt>In the source</dt><dd>{place.sourceType}{place.typeDoubt ? <span className="tiny" style={{ color: colors.muted }}> (the source is not sure of the type)</span> : null}</dd></>}
         {year !== undefined && <><dt>At this date</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place, year))]}</dd></>}
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && (
@@ -62,7 +65,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
           <div>Matched from: “{written}” → <b><bdi>{place.title}</bdi></b> in {info.name}.</div>
           {reason && <div>{reason}</div>}
           <div>{DETECTION_LABEL[detection]}.</div>
-          <div>{CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license})</div>
+          <div>{place.meaningUnknown ? 'Position as the source gives it; the source does not document its precision' : CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license})</div>
           <div>Matched automatically; the dataset — not AI — supplies the location, names and dates.</div>
         </div>
       )}

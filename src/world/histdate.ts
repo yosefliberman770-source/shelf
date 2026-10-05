@@ -4,7 +4,7 @@
 // "c. 1200" stays "about 1200" (earliest 1175, latest 1225, precision
 // "circa"); "12th century" stays a century; a source's broad period stays a
 // period. Years follow the app's convention: -218 = 218 BCE, no year 0.
-import { shiftYear, yearLabel, type HistYear } from '../atlas/time';
+import { chronologyDependent, shiftYear, yearLabel, type HistYear } from '../atlas/time';
 
 export type DatePrecision = 'day' | 'year' | 'circa' | 'decade' | 'century' | 'range' | 'period' | 'unknown';
 export type DateQualifier = 'exact' | 'circa' | 'before' | 'after' | 'between' | 'during';
@@ -24,6 +24,8 @@ export interface HistDate {
   source?: string;
   /** Other sources' dates for the same thing, kept rather than averaged. */
   conflicts?: HistDate[];
+  /** The calendar the source wrote it in, when not the Gregorian/Julian year count (a Hijri year is converted, and says so). */
+  calendar?: 'hijri';
 }
 
 export const UNKNOWN_DATE: HistDate = { precision: 'unknown', qualifier: 'exact' };
@@ -62,14 +64,19 @@ export function relation(d: HistDate | undefined, year: HistYear): DateRelation 
   return 'possible';
 }
 
-/** Plain wording that keeps the uncertainty. */
+/** Plain wording that keeps the uncertainty; a year before 763 BCE is marked chronology-dependent (AR-7). */
 export function formatDate(d: HistDate | undefined): string {
   if (!d || d.precision === 'unknown') return 'date not recorded';
+  const body = formatBody(d);
+  return chronologyDependent(d.earliest ?? d.latest) ? `${body} (chronology-dependent)` : body;
+}
+
+function formatBody(d: HistDate): string {
   const Y = yearLabel;
   switch (d.precision) {
     case 'day':
     case 'year': return d.preferred !== undefined ? Y(d.preferred) : Y(d.earliest!);
-    case 'circa': return `about ${Y(d.preferred ?? d.earliest!)}`;
+    case 'circa': return `about ${Y(d.preferred ?? d.earliest!)}${d.calendar === 'hijri' && d.label ? ` (${d.label.split(' (')[0]})` : ''}`;
     case 'decade':
     case 'century': return d.label ?? `${Y(d.earliest!)}–${Y(d.latest!)}`;
     case 'period':
@@ -79,72 +86,172 @@ export function formatDate(d: HistDate | undefined): string {
       if (d.qualifier === 'after') return `after ${Y(d.earliest!)}`;
       return d.precision === 'period' ? `${d.label ? `${d.label}: ` : ''}${body} (broad period)` : body;
     }
+    default: return 'date not recorded';
   }
 }
 
 // ── Reading dates out of text and sources ────────────────────────────────
+//
+// One grammar with the build (scripts/atlas-build/dates.py): src/world/date-battery.json holds both to the same answer
+// for every case, so a map, a card and the build never read the same words differently (TM-1). The order of the steps and
+// every pattern below mirror the Python; change both together.
 
-const ERA_BCE = /\b(?:BCE|B\.C\.E\.|BC|B\.C\.)/i;
+const ROMAN: Record<string, number> = { i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12, xiii: 13, xiv: 14, xv: 15, xvi: 16, xvii: 17, xviii: 18, xix: 19, xx: 20, xxi: 21 };
+const PART: Record<string, [number, number]> = { early: [0, 33], 'first half': [0, 50], '1st half': [0, 50], mid: [33, 66], middle: [33, 66], 'second half': [50, 100], '2nd half': [50, 100], late: [66, 100], end: [75, 100], beginning: [0, 25], start: [0, 25] };
 const WORDS: Record<string, number> = { first: 1, second: 2, third: 3, fourth: 4, fifth: 5, sixth: 6, seventh: 7, eighth: 8, ninth: 9, tenth: 10, eleventh: 11, twelfth: 12, thirteenth: 13, fourteenth: 14, fifteenth: 15, sixteenth: 16, seventeenth: 17, eighteenth: 18, nineteenth: 19, twentieth: 20, 'twenty-first': 21 };
+// Before Christ in English, German (v. Chr.), Latin (a. Chr.), Italian/Spanish (a.C.), French (av. J.-C.), Czech/Slovak (př. n. l.),
+// Polish (p.n.e.), Scandinavian (f.Kr.), Russian (до н. э.), Hungarian (i. e.).
+const BCE = /(?<![a-z])(bc|bce|b\.\s?c\.?(?:\s?e\.?)?(?![a-z])|v\.\s?chr|a\.\s?chr|a\.\s?c\.?(?![a-z])|av\.?\s?j\.?-?\s?c|av\.\s?n\.\s?è|pr\.\s?n\.\s?l|př\.\s?n\.\s?l|p\.\s?n\.\s?e|f\.\s?kr|до н\.\s?э|i\.\s?e\.)/i;
+const CE = /(?<![a-z])(ad|ce|a\.\s?d\.?|c\.\s?e\.|n\.\s?chr|d\.\s?c\.|ap\.\s?j\.?-?\s?c|n\.\s?e\.|e\.\s?kr|n\.\s?l\.)(?![a-z])/i;
+const CIRCA = /(?<![a-z])(circa|about|around|approximately|approx\.?|um|gegen|vers|environ|około|ок\.?|cca\.?|~)(?![a-z])/i;
+const NOT_BEFORE = /\b(not before|nicht vor|non ante|pas avant)\b/i;
+const NOT_AFTER = /\b(not after|nicht nach|non post|pas après)(?![a-z])/i;
+const AFTER = /(?<![a-zà-ÿ])(after|post|nach|après|apres|po|od|from|since|seit)(?![a-zà-ÿ])/i;
+const BEFORE = /\b(before|ante|vor|avant|przed|do|until|bis)\b/i;
+const NO_DATE = new Set(['nan', 'none', 'null', 'unknown', 'undetermined', 'neznámé', 'unbekannt', 'inconnu', '-', '?', 'n.d.', 'n. d.', 's.d.', 'o.j.', 'sine anno', 's.a.']);
+const CW = String.raw`(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|siecle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)`;
+const HIJRI = /\bA\.?\s?H\.?\s*(\d{1,4})\b|\b(\d{1,4})\s*(?:A\.?\s?H\.?|H\.)(?=\s|$|[,;)])/;
+const ROMAN_YEAR = /^M{1,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+
+function centuryWindow(n: number, bce = false, part?: string): [number, number] {
+  let a = (n - 1) * 100 + 1;
+  let b = n * 100;
+  if (part) {
+    const [p0, p1] = PART[part];
+    [a, b] = [a + p0, p1 < 100 ? a + p1 - 1 : b];
+  }
+  return bce ? [-b, -a] : [a, b];
+}
+
+/** The Common Era year in which most of Hijri year ah falls. */
+export const hijriToCe = (ah: number) => Math.floor(ah * 0.970229 + 621.5643 + 0.5);
+
+function romanValue(s: string) {
+  const v: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+  let n = 0;
+  for (let i = 0; i < s.length; i++) n += i + 1 < s.length && v[s[i + 1]] > v[s[i]] ? -v[s[i]] : v[s[i]];
+  return n;
+}
+
+function normalise(text: string) {
+  let t = text.trim().replace(/(^|[\s(\[:;,])[−‒–—](?=\d)/g, '$1-');
+  let m = t.match(/^\[(.*)\]$/);
+  if (m) t = m[1].trim();
+  m = t.match(/^(\d{1,2}),(\d{3})$/);
+  if (m) t = m[1] + m[2];
+  m = t.match(/^(-?\d{1,4})\.0+$/);
+  if (m) t = m[1];
+  return t;
+}
+
+type Parsed = [number | undefined, number | undefined, 'year' | 'circa' | 'years' | 'century' | 'from year' | 'until year'];
+
+/** The shared grammar's answer, as the Python gives it: (from, to, how), or undefined for no date. */
+export function parseDating(text: string): Parsed | undefined {
+  let t = normalise(text);
+  if (!t || NO_DATE.has(t.toLowerCase())) return undefined;
+  let m = t.match(/^(-?\d{1,4})[-/](\d{1,2})[-/](\d{1,2})(?:[T ].*)?$/);
+  if (m && Number(m[2]) >= 1 && Number(m[2]) <= 12) {
+    const y = Number(m[1]);
+    return y ? [y, y, 'year'] : undefined;
+  }
+  m = t.match(/^(-?\d{1,4})\s*(?:(?:[–—:]|\s-\s|\bto\b)\s*(-?\d{1,4}))?$/);
+  if (m && (t.startsWith('-') || (m[2] ?? '').startsWith('-'))) {
+    const a = Number(m[1]);
+    const b = m[2] ? Number(m[2]) : a;
+    if (a === 0 || b === 0 || a > b) return undefined;
+    return [a, b, a !== b ? 'years' : 'year'];
+  }
+  if (ROMAN_YEAR.test(t)) {
+    const y = romanValue(t);
+    return [y, y, 'year'];
+  }
+  m = t.match(HIJRI);
+  if (m) {
+    const ce = hijriToCe(Number(m[1] ?? m[2]));
+    return [ce, ce, 'circa'];
+  }
+  if ((m = t.match(/^(\d{2})--\??$/))) return [Number(m[1]) * 100, Number(m[1]) * 100 + 99, 'years'];
+  if ((m = t.match(/^(\d{3})-\??$/))) return [Number(m[1]) * 10, Number(m[1]) * 10 + 9, 'years'];
+  if ((m = t.match(/^c(\d{3,4})\??$/i) ?? t.match(/^(\d{3,4})\s*\?$/))) return [Number(m[1]), Number(m[1]), 'circa'];
+  let low = t.toLowerCase();
+  const bce = BCE.test(low);
+  const era = bce || CE.test(low);
+  t = t.replace(/(?<![A-Za-z])(?:ca|c)\.?\s*(?=\d)/gi, 'circa ');
+  low = t.toLowerCase();
+  const cents: [number, number][] = [];
+  for (const c of low.matchAll(new RegExp(String.raw`\b(\d{1,2})(?:st|nd|rd|th|\.)?\s*[-–/]\s*(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*` + CW, 'g'))) {
+    const [a, b] = [Number(c[1]), Number(c[2])];
+    if (a >= 1 && a <= b && b <= 21) cents.push([!bce ? centuryWindow(a)[0] : -b * 100, !bce ? centuryWindow(b)[1] : -(a - 1) * 100 - 1]);
+  }
+  for (const c of low.matchAll(new RegExp(String.raw`\b([ivxl]{1,6})\.?\s*[-–/]\s*([ivxl]{1,6})\.?\s*` + CW, 'g'))) {
+    const [a, b] = [ROMAN[c[1]], ROMAN[c[2]]];
+    if (a && b && a <= b) cents.push([centuryWindow(a, bce)[0], centuryWindow(b, bce)[1]]);
+  }
+  for (const c of low.matchAll(new RegExp(String.raw`(?:(early|late|mid|middle|first half|1st half|second half|2nd half|end|beginning)(?:\s+of)?\s+(?:the\s+)?)?\b(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*` + CW, 'g'))) {
+    const part = c[1]?.trim();
+    cents.push(centuryWindow(Number(c[2]), bce, part && part in PART ? part : undefined));
+  }
+  for (const c of low.matchAll(new RegExp(String.raw`\b(${Object.keys(WORDS).join('|')})\s+century`, 'g'))) cents.push(centuryWindow(WORDS[c[1]], bce));
+  for (const c of low.matchAll(/\b([ivxl]{1,6})\.?\s*(?:c\b|c\.|cent|century|jh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|st\.|vek|век|e\b|ème)/g)) {
+    const n = ROMAN[c[1]];
+    if (n) cents.push(centuryWindow(n, bce));
+  }
+  let years = [...t.matchAll(/(?<![\d.,])(\d{3,4})(?![\d.,])/g)].map((x) => Number(x[1])).filter((y) => y >= 100 && y <= 2100);
+  if (era) years.push(...[...t.matchAll(/(?<![\d.,\p{L}\p{N}_])(\d{1,2})(?![\d.,]|\s*(?:st|nd|rd|th|e|er|ème)\b|\p{L})/gu)].map((x) => Number(x[1])).filter((y) => y > 0));
+  for (const x of t.matchAll(/(?<![\d.,/-])(\d{4})\s*[-–/]\s*(\d{1,2})(?![\d.,])(?!\s*[-–/.]\s*\d)/g)) {
+    const a = Number(x[1]);
+    let end = Number(x[1].slice(0, 4 - x[2].length) + x[2]);
+    if (end <= a) end += 10 ** x[2].length;
+    if (a < end && end <= 2100) years.push(end);
+  }
+  for (const x of t.matchAll(/(?<![\d.,])(\d{3})0'?s\b/g)) years.push(Number(`${x[1]}0`), Number(`${x[1]}9`));
+  if (bce) years = years.map((y) => -y);
+  if (cents.length && !years.length) return [Math.min(...cents.map((c) => c[0])), Math.max(...cents.map((c) => c[1])), 'century'];
+  if (!years.length) return undefined;
+  let lo = Math.min(...years);
+  let hi = Math.max(...years);
+  if (cents.length) [lo, hi] = [Math.min(lo, ...cents.map((c) => c[0])), Math.max(hi, ...cents.map((c) => c[1]))];
+  if (new Set(years).size === 1 && !cents.length) {
+    if (NOT_BEFORE.test(low)) return [lo, undefined, 'from year'];
+    if (NOT_AFTER.test(low)) return [undefined, hi, 'until year'];
+    if (AFTER.test(low)) return [lo, undefined, 'from year'];
+    if (BEFORE.test(low) && !/\bod\b/.test(low)) return [undefined, hi, 'until year'];
+    if (CIRCA.test(low) || /\d\s*\?/.test(low)) return [lo, hi, 'circa'];
+  }
+  return [lo, hi, lo !== hi ? 'years' : 'year'];
+}
 
 /**
- * Parse a date phrase: "218 BC", "c. 1200", "circa 1200 AD", "12th century",
- * "the third century BC", "218–201 BC", "1350s", "before 500", "after 1066".
- * Returns undefined when nothing is recognised — never a guess.
+ * Parse a date phrase: "218 BC", "500 v. Chr.", "c. 1200", "12th century", "218–201 BC", "1350s", "before 500",
+ * "nach 1300", "1750 or 1751", "AH 600", "[18--]". Returns undefined when nothing is recognised — never a guess.
  */
 export function parseDate(text: string, source?: string): HistDate | undefined {
-  // Typographic minus signs (−, –, ‒, —) before a lone year are minus signs, not ranges (PA-014).
-  const t = text.trim().replace(/(^|[\s(\[])[\u2212\u2012\u2013\u2014](?=\d)/g, '$1-');
-  // Hijri years ("AH 600", "600 AH", "1099 H.") are converted, never read as CE (PA-014).
-  const hijri = t.match(/\bA\.?\s?H\.?\s*(\d{1,4})\b|\b(\d{1,4})\s*(?:A\.?\s?H\.?|H\.)(?=\s|$|[,;)])/);
-  if (hijri) {
-    const ah = Number(hijri[1] ?? hijri[2]);
-    const ce = Math.round(ah * 0.970229 + 621.5643);
-    return { ...circa(ce, 1, source), label: `${ah} AH (about ${ce} CE)` };
+  const p = parseDating(text);
+  if (!p) return undefined;
+  const [a, b, how] = p;
+  const t = normalise(text);
+  if (how === 'year') return exactYear(a!, source);
+  if (how === 'circa') {
+    const hijri = t.match(HIJRI);
+    if (hijri) return { ...circa(a!, 1, source), label: `${hijri[1] ?? hijri[2]} AH (about ${a} CE)`, calendar: 'hijri' };
+    return circa(a!, /^c\d|\?$/i.test(t) ? 5 : 25, source);
   }
-  // A lone negative number is a BCE year ("-500"), as in the build's data.
-  const neg = t.match(/^-(\d{1,4})$/);
-  if (neg) return exactYear(-Number(neg[1]), source);
-  // Catalogue conventions (map libraries): "[18--]" / "18--" a century, "176-?" / "176-" a decade, "c1760", "[1760?]".
-  let c = t.match(/^\[?(\d{2})--\??\]?$/);
-  if (c) return { earliest: Number(c[1]) * 100, latest: Number(c[1]) * 100 + 99, precision: 'century', qualifier: 'between', label: `${c[1]}00s`, source };
-  c = t.match(/^\[?(\d{3})-\??\]?$/);
-  if (c) return { ...decade(Number(c[1]) * 10, source), label: `${c[1]}0s${t.includes('?') ? ' (uncertain)' : ''}` };
-  c = t.match(/^\[?c(\d{3,4})\??\]?$/i) ?? t.match(/^\[(\d{3,4})\?\]$/);
-  if (c) return circa(Number(c[1]), 5, source);
-  // An abbreviated range: "1760-65" is 1760–1765, "1066–87" 1066–1087, "1798-02" 1798–1802 (PA-013).
-  const ab = t.match(/^\[?(\d{3,4})\s*[–—-]\s*(\d{1,2})\]?$/);
-  if (ab && !ERA_BCE.test(t)) {
-    const a = Number(ab[1]);
-    let b = Number(ab[1].slice(0, ab[1].length - ab[2].length) + ab[2]);
-    if (b < a) b += 10 ** ab[2].length;
-    return { earliest: a, latest: b, precision: 'range', qualifier: 'between', source };
+  if (how === 'from year') return { earliest: a, precision: 'range', qualifier: 'after', source };
+  if (how === 'until year') return { latest: b, precision: 'range', qualifier: 'before', source };
+  if (/^\d{2}--\??$/.test(t)) return { earliest: a, latest: b, precision: 'century', qualifier: 'between', label: `${t.slice(0, 2)}00s`, source };
+  if (/^\d{3}-\??$/.test(t)) return { ...decade(a!, source), label: `${t.slice(0, 3)}0s${t.includes('?') ? ' (uncertain)' : ''}` };
+  if (how === 'century') {
+    for (let n = 1; n <= 21; n++) {
+      for (const bce of [false, true]) {
+        const c = century(n, bce, source);
+        if (c.earliest === a && c.latest === b) return c;
+      }
+    }
+    return { earliest: a, latest: b, precision: 'century', qualifier: 'during', label: t, source };
   }
-  const bce = ERA_BCE.test(t);
-  const sign = (n: number) => (bce ? -n : n);
-  let m = t.match(/(\d{1,2})(?:st|nd|rd|th)\s+century/i) ?? t.match(new RegExp(`\\b(${Object.keys(WORDS).join('|')})\\s+century`, 'i'));
-  if (m) {
-    const n = /\d/.test(m[1]) ? Number(m[1]) : WORDS[m[1].toLowerCase()];
-    return century(n, bce, source);
-  }
-  m = t.match(/\b(\d{3,4})s\b/);
-  if (m && !bce) return decade(Number(m[1]), source);
-  m = t.match(/\b(\d{1,4})\s*(?:[–—-]|to)\s*(\d{1,4})\b/);
-  if (m) {
-    let a = Number(m[1]);
-    let b = Number(m[2]);
-    if (bce) { [a, b] = [-a, -b]; }
-    return { earliest: Math.min(a, b), latest: Math.max(a, b), precision: 'range', qualifier: 'between', source };
-  }
-  m = t.match(/\b(?:c\.|ca\.|circa|about|around|approximately)\s*(\d{1,4})\b/i);
-  if (m) return circa(sign(Number(m[1])), 25, source);
-  m = t.match(/\bbefore\s+(\d{1,4})\b/i);
-  if (m) return { latest: sign(Number(m[1])), precision: 'range', qualifier: 'before', source };
-  m = t.match(/\bafter\s+(\d{1,4})\b/i);
-  if (m) return { earliest: sign(Number(m[1])), precision: 'range', qualifier: 'after', source };
-  m = t.match(/\b(\d{1,4})\b/);
-  if (m && (bce || /\b(?:AD|CE|A\.D\.)\b/i.test(t) || m[1].length >= 3)) return exactYear(sign(Number(m[1])), source);
-  return undefined;
+  if (b! - a! === 9 && a! % 10 === 0 && /\d0'?s\b/.test(t)) return decade(a!, source);
+  return { earliest: a, latest: b, precision: 'range', qualifier: 'between', source };
 }
 
 /** CHGIS/TGAZ "889 ~ 892" (BCE years are negative). */

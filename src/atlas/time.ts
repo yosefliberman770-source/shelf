@@ -19,6 +19,18 @@ export function yearLabel(y: HistYear): string {
   return y < 0 ? `${-y} BCE` : `${y} CE`;
 }
 
+/**
+ * The earliest absolutely fixed year: the eclipse in the Assyrian eponym lists (763 BCE). An earlier year in a source rests
+ * on one of several competing chronologies (Egypt's high/low, Mesopotamia's middle/short) and can move by years or
+ * decades between them (AR-7).
+ */
+export const SECURE_FROM: HistYear = -763;
+export const chronologyDependent = (y: HistYear | undefined) => y !== undefined && y < SECURE_FROM;
+/** A year a source records (an event, a founding): before 763 BCE it is shown as about that year, chronology-dependent. */
+export function recordedYearLabel(y: HistYear): string {
+  return chronologyDependent(y) ? `c. ${yearLabel(y)} (chronology-dependent)` : yearLabel(y);
+}
+
 export const MIN_YEAR: HistYear = -3400;
 export const MAX_YEAR: HistYear = new Date().getFullYear();
 export const clampYear = (y: HistYear) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, y === 0 ? 1 : y));

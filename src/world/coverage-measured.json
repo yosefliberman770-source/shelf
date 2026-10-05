@@ -16,8 +16,8 @@
   },
   "arabia": {
    "dated": {
-    "bronze-iron": 202,
-    "classical": 453,
+    "bronze-iron": 203,
+    "classical": 452,
     "early-medieval": 196,
     "early-modern": 38,
     "long-19th": 31,
@@ -29,8 +29,8 @@
   },
   "balkans-greece": {
    "dated": {
-    "bronze-iron": 3094,
-    "classical": 6065,
+    "bronze-iron": 3095,
+    "classical": 6064,
     "early-medieval": 2632,
     "early-modern": 4067,
     "long-19th": 48308,
@@ -42,7 +42,7 @@
   },
   "british-isles": {
    "dated": {
-    "bronze-iron": 2819,
+    "bronze-iron": 2820,
     "classical": 6271,
     "early-medieval": 10202,
     "early-modern": 79818,
@@ -118,8 +118,8 @@
   },
   "france-low-countries": {
    "dated": {
-    "bronze-iron": 157,
-    "classical": 2958,
+    "bronze-iron": 158,
+    "classical": 2957,
     "early-medieval": 4166,
     "early-modern": 7938,
     "long-19th": 8744,
@@ -178,14 +178,14 @@
   },
   "mesopotamia-iran": {
    "dated": {
-    "bronze-iron": 197,
+    "bronze-iron": 195,
     "classical": 481,
     "early-medieval": 361,
     "early-modern": 127,
     "long-19th": 115,
     "medieval": 144,
     "modern": 37,
-    "prehistory": 29
+    "prehistory": 31
    },
    "undated": 716
   },

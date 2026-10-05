@@ -179,26 +179,8 @@ def audit_index(base, reg, land, label):
 
 
 def land_distance():
-    """Distance (km, approximate) from a point to the nearest land in Natural Earth's land polygons; 0 on land."""
-    try:
-        from shapely.geometry import Point, shape
-        from shapely.strtree import STRtree
-    except ImportError:
-        return None
-    polys = []
-    for f in json.load(open(os.path.join(ROOT, 'public', 'atlas', 'ne-land.json'), encoding='utf-8'))['features']:
-        g = shape(f['geometry'])
-        polys.extend(getattr(g, 'geoms', [g]))
-    tree = STRtree(polys)
-
-    def dist(lon, lat):
-        p = Point(lon, lat)
-        for i in tree.query(p):
-            if polys[i].contains(p):
-                return 0.0
-        i = tree.nearest(p)
-        return polys[i].distance(p) * 111.0 * max(0.3, math.cos(math.radians(lat)) ** 0.5)
-    return dist
+    """Distance (km) from a point to the nearest land; 0 on land (quality.land_distance, shared with the loader)."""
+    return quality.land_distance(ROOT)
 
 
 # ── Tiles ──────────────────────────────────────────────────────────────────

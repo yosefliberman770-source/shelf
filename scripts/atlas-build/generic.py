@@ -37,19 +37,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RAW = os.path.join(HERE, '..', '..', 'data', 'historical', 'raw')
 SPECS = os.path.join(HERE, '..', '..', 'data', 'historical', 'specs')
 
-ROMAN = {'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10, 'xi': 11, 'xii': 12, 'xiii': 13,
-         'xiv': 14, 'xv': 15, 'xvi': 16, 'xvii': 17, 'xviii': 18, 'xix': 19, 'xx': 20, 'xxi': 21}
-PART = {'early': (0, 33), 'first half': (0, 50), '1st half': (0, 50), 'mid': (33, 66), 'middle': (33, 66), 'second half': (50, 100),
-        '2nd half': (50, 100), 'late': (66, 100), 'end': (75, 100), 'beginning': (0, 25), 'start': (0, 25)}
-BCE = re.compile(r'\b(bc|bce|b\.c\.|v\.\s?chr|av\.?\s?j\.?-?c|pr\.\s?n\.\s?l|př\.\s?n\.\s?l|i\.\s?e\.|до н\.\s?э)', re.I)
-
-
-def _century_window(n, bce=False, part=None):
-    a, b = (n - 1) * 100 + 1, n * 100
-    if part:
-        p0, p1 = PART[part]
-        a, b = a + p0, a + p1 - 1 if p1 < 100 else b
-    return (-b, -a) if bce else (a, b)
+from dates import BCE, PART, ROMAN, THIS_YEAR, cap_future, parse_dating  # noqa: F401  (the shared date grammar; BCE and PART are used by readers)
+from dates import century_window as _century_window
 
 
 def _signed_range(text):
@@ -161,64 +150,6 @@ def lv_dating(text):
 
 
 
-def parse_dating(text) -> tuple[int | None, int | None, str] | None:
-    """(from, to, how) from a free-text dating, or None if it holds no date. Never more precise than the text."""
-    if text is None:
-        return None
-    if isinstance(text, (int, float)) and not (isinstance(text, float) and math.isnan(text)):
-        y = int(text)
-        return (y, y, 'year') if -3000 <= y <= 2100 and y != 0 else None
-    t = str(text).strip()
-    if not t or t.lower() in ('nan', 'none', 'null', 'unknown', 'undetermined', 'neznámé', 'unbekannt', 'inconnu', '-', '?'):
-        return None
-    low = t.lower()
-    bce = bool(BCE.search(low))
-    # centuries: "13th c.", "13th century", "13. Jh.", "XIII. sz.", "XIIIe siècle", "XIII w.", "13. stol." — with an optional part
-    cents = []
-    CW = r'(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|siecle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)'
-    # century ranges: "5th-7th c.", "14-15 c.", "XII-XIII w."
-    for m in re.finditer(r'\b(\d{1,2})(?:st|nd|rd|th|\.)?\s*[-–/]\s*(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*' + CW, low):
-        a_, b_ = int(m.group(1)), int(m.group(2))
-        if 1 <= a_ <= b_ <= 21:
-            cents.append((_century_window(a_, bce)[0] if not bce else -b_ * 100, _century_window(b_, bce)[1] if not bce else -(a_ - 1) * 100 - 1))
-    for m in re.finditer(r'\b([ivxl]{1,6})\.?\s*[-–/]\s*([ivxl]{1,6})\.?\s*' + CW, low):
-        a_, b_ = ROMAN.get(m.group(1)), ROMAN.get(m.group(2))
-        if a_ and b_ and a_ <= b_:
-            cents.append((_century_window(a_, bce)[0], _century_window(b_, bce)[1]))
-    for m in re.finditer(r'(?:(early|late|mid|middle|first half|1st half|second half|2nd half|end|beginning)(?:\s+of)?\s+(?:the\s+)?)?'
-                         r'\b(\d{1,2})(?:st|nd|rd|th|\.|e|er|ème)?\s*(?:c\b|c\.|cent|century|centuries|jh|jahrh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|století|stor|st\.|vek|век)', low):
-        part = (m.group(1) or '').strip() or None
-        cents.append(_century_window(int(m.group(2)), bce, part if part in PART else None))
-    for m in re.finditer(r'\b([ivxl]{1,6})\.?\s*(?:c\b|c\.|cent|century|jh|siècle|s\.|sec|secolo|siglo|sz|század|w\.|wiek|stol|st\.|vek|век|e\b|ème)', low):
-        n = ROMAN.get(m.group(1))
-        if n:
-            cents.append(_century_window(n, bce))
-    years = [int(y) for y in re.findall(r'(?<![\d.,])(\d{3,4})(?![\d.,])', t) if 100 <= int(y) <= 2100]
-    # an abbreviated end year ("1852-62", "1863-4") belongs to the same century as its start
-    for m in re.finditer(r'(?<![\d.,/-])(\d{4})\s*[-–/]\s*(\d{1,2})(?![\d.,])(?!\s*[-–/.]\s*\d)', t):  # not a full date (1801-12-05)
-        a_, b_ = int(m.group(1)), m.group(2)
-        end = int(str(a_)[:4 - len(b_)] + b_)
-        if a_ < end <= 2100:
-            years.append(end)
-    # a decade ("1850s", "the 1850's"): its ten years
-    for m in re.finditer(r'(?<![\d.,])(\d{3})0\'?s\b', t):
-        years += [int(m.group(1) + '0'), int(m.group(1) + '9')]
-    if bce:
-        years = [-y for y in years]
-    if cents and not years:
-        return min(a for a, _ in cents), max(b for _, b in cents), 'century'
-    if years:
-        lo, hi = min(years), max(years)
-        if cents:
-            lo, hi = min(lo, min(a for a, _ in cents)), max(hi, max(b for _, b in cents))
-        if re.search(r'\b(after|post|nach|après|po|od|from|since|seit)\b', low) and len(years) == 1:
-            return lo, None, 'from year'
-        if re.search(r'\b(before|ante|vor|avant|przed|do|until|bis)\b', low) and len(years) == 1 and not re.search(r'\bod\b', low):
-            return None, hi, 'until year'
-        return lo, hi, 'years' if lo != hi else 'year'
-    return None
-
-
 # ── readers ───────────────────────────────────────────────────────────────
 
 def _raw(path):
@@ -247,6 +178,27 @@ def _open_bytes(read):
     return open(p, 'rb').read(), p
 
 
+DECODE_NOTES: dict[str, int] = {}
+
+
+def decode_text(b: bytes, name: str = '') -> str:
+    """A text file that should be UTF-8. When some lines are not (a file put together from several sources), each such
+    line is read as Windows-1252 instead of having its letters replaced by '�', and the count is kept for the report."""
+    try:
+        return b.decode('utf-8-sig')
+    except UnicodeDecodeError:
+        pass
+    lines, bad = [], 0
+    for ln in b.split(b'\n'):
+        try:
+            lines.append(ln.decode('utf-8'))
+        except UnicodeDecodeError:
+            lines.append(ln.decode('cp1252', 'replace'))
+            bad += 1
+    DECODE_NOTES[name] = DECODE_NOTES.get(name, 0) + bad
+    return '\n'.join(lines).lstrip('\ufeff')
+
+
 def _rows_table(b, name, read):
     e = name.lower().rsplit('.', 1)[-1]
     if e == 'xlsx':
@@ -256,7 +208,8 @@ def _rows_table(b, name, read):
         rr = [list(r) for r in ws.iter_rows(values_only=True)]
         cols = [str(c or '') for c in rr[0]]
         return [dict(zip(cols, r)) for r in rr[1:]]
-    t = b.decode(read.get('encoding', 'utf-8-sig'), 'replace')
+    enc = read.get('encoding', 'utf-8-sig')
+    t = decode_text(b, name) if enc.lower().replace('_', '-') in ('utf-8', 'utf-8-sig', 'utf8') else b.decode(enc, 'replace')
     csv.field_size_limit(1 << 30)  # geometry columns (GeoJSON text) can be large
     if read.get('headerAfter'):  # a metadata block before the table (PANGAEA "/* … */"): the table starts on the next line
         t = t.split(read['headerAfter'], 1)[1].lstrip('\r\n')
@@ -584,7 +537,10 @@ def records(spec):
         if f.get('generic') or generic_name or (f.get('genericIfEquals') and name.strip().lower() == str(p.get(f['genericIfEquals']) or '').strip().lower()) or (f.get('genericPattern') and re.fullmatch(f['genericPattern'], name)) or (f.get('nameSplitRequired') and name[:1].islower()):  # "reputedly site of a massacre…" is a note, not a name
             rec['generic'] = 1  # the name is only the monument type ("Rath"): drawn and searchable by type, not a place name
         ap = f.get('approx')
-        rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx')
+        # a source that does not document what its values mean ("meaning": "unknown", C8) makes no precision claim
+        rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx') and spec.get('meaning') != 'unknown'
+        if ap and ap.get('note') and str(p.get(ap['field'])) in ap['note']:
+            rec['pq'] = ap['note'][str(p.get(ap['field']))]  # what the source's precision code means, shown on the card (PA-010)
         uncertain = False
         dt = spec['dating']  # per record (a fallback below may switch this record's mode)
         if dt['mode'] == 'textOrPeriods':
@@ -625,6 +581,10 @@ def records(spec):
                     rng = dt['table'][key]
                     if rng is None:  # a class the spec names but does not draw (too broad, or shown by another dataset)
                         skipped[f'period not drawn: {key}'] += 1
+                        continue
+                    rng = cap_future(*rng)  # "modern" 1901–2050 ends this year (PA-009)
+                    if rng is None:
+                        skipped[f'period in the future: {key}'] += 1
                         continue
                     if rng[1] < dt.get('min', 1) or rng[0] > dt.get('max', 1914):
                         continue
@@ -738,9 +698,57 @@ def records(spec):
                 rec['env'] = (lo, hi)
             rec['per'] = f"{raw_label}{' (uncertain in the source)' if uncertain and '?' not in raw_label else ''} ({spec.get('datingLabel', 'source dating')})"[:120]
         out.append(rec)
+    ingestion_checks(out, spec, skipped)
     if spec.get('groupBy'):
         out = _group_phases(out, spec, skipped)
     return out, dict(skipped)
+
+
+_REGISTRY = {}
+
+
+def ingestion_checks(out, spec, skipped):
+    """What a source gets wrong is reported, not passed on silently (A19-003, A19-005, PA-004): lines that were not UTF-8,
+    duplicate source ids (kept under a unique id), corrupted names, latitude/longitude given the wrong way round
+    (exchanged only when unambiguous: the given point is at sea and the exchanged one on land in the dataset's region)
+    and positions at sea. Every finding is counted under 'warning: …' in the dataset's report and kept on the record
+    (rec['qa']), which the place index shows."""
+    import quality
+    for name, n in sorted(DECODE_NOTES.items()):
+        if n:
+            skipped[f'warning: {n} line(s) of {os.path.basename(name)} not UTF-8 (read as Windows-1252)'] += n
+    DECODE_NOTES.clear()
+    if 'reg' not in _REGISTRY:
+        _REGISTRY['reg'] = quality.dataset_registry(os.path.normpath(os.path.join(HERE, '..', '..')))
+    box = (_REGISTRY['reg'].get(spec.get('src')) or {}).get('box')
+    land = quality.land_distance() if not spec.get('noLandCheck') else None
+    seen = {}
+    for r in out:
+        qa = []
+        n = seen.get(r['id'], 0) + 1
+        seen[r['id']] = n
+        if n > 1:
+            r['id'] = f"{r['id']}~{n}"
+            skipped['warning: duplicate source id (kept under id~2, id~3 …)'] += 1
+            qa.append('the source uses this id for more than one record')
+        tp = quality.text_problem(r['name'])
+        if tp:
+            skipped['warning: ' + tp.split(':')[0].split(' (')[0]] += 1
+            qa.append(tp)
+        env = r.get('env')
+        if env and env[1] is not None and env[1] > THIS_YEAR:
+            r['env'] = (env[0], THIS_YEAR) if env[0] is None or env[0] <= THIS_YEAR else None
+            skipped['note: a date span ending after this year ends now'] += 1
+        lon, lat = r['lon'], r['lat']
+        if box and land and quality.swapped(lon, lat, box) and land(lon, lat) > 25 and land(lat, lon) == 0:
+            r['lon'], r['lat'] = lat, lon
+            skipped['warning: latitude/longitude swapped in the source (exchanged)'] += 1
+            qa.append(f'the source gives latitude and longitude the wrong way round ({lon}, {lat}); exchanged')
+        elif land and str(r.get('kind', '')).lower() not in quality.WATER_KINDS and land(lon, lat) > 25:
+            skipped['warning: position at sea, over 25 km from land (kept, flagged)'] += 1
+            qa.append('the position lies at sea, more than 25 km from land')
+        if qa:
+            r['qa'] = '; '.join(([r['qa']] if r.get('qa') else []) + qa)
 
 
 def _group_phases(recs, spec, skipped):
@@ -814,11 +822,13 @@ def write_app_module(loaded):
         else:
             ys = [y for r in recs for y in ((r.get('env') or (None, None)) + ((r['snap'], r['snap']) if r.get('snap') else ())) if y is not None]
             lons, lats = [r['lon'] for r in recs], [r['lat'] for r in recs]
-        cov = [min(ys), max(ys)] if ys else [1, 1914]
+        cov = [min(ys), min(max(ys), THIS_YEAR)] if ys else [1, 1914]  # nothing is covered after this year (PA-009)
+        core = [s.get('core', cov)[0], min(s.get('core', cov)[1], THIS_YEAR)]
+        meaning = (f", meaning: {q(s['meaning'])}" + (f", meaningNote: {q(s['meaningNote'])}" if s.get('meaningNote') else '')) if s.get('meaning') else ''
         box = [round(min(lons), 1), round(min(lats), 1), round(max(lons), 1), round(max(lats), 1)] if recs else [-25, 27, 62, 72]
         lines.append(f"  {s['src']}: {{ name: {q(s['title'])}, license: {q(s['licence'])}, url: {q(s['url'])}, coverage: [{cov[0]}, {cov[1]}] as [number, number], "
-                     f"core: [{s.get('core', cov)[0]}, {s.get('core', cov)[1]}] as [number, number], box: [{', '.join(map(str, box))}] as [number, number, number, number], "
-                     f"describe: {q(s.get('describe') or s['title'])}, public: {'true' if s.get('public') else 'false'}, layers: {q(s.get('layers') or ['medieval-archaeology'])} as string[] }},")
+                     f"core: [{core[0]}, {core[1]}] as [number, number], box: [{', '.join(map(str, box))}] as [number, number, number, number], "
+                     f"describe: {q(s.get('describe') or s['title'])}, public: {'true' if s.get('public') else 'false'}, layers: {q(s.get('layers') or ['medieval-archaeology'])} as string[]{meaning} }},")
     lines += ['} as const;', 'export type SpecDatasetId = keyof typeof SPEC_DATASETS;', '']
     text = '\n'.join(lines)
     old = open(APP_MODULE, encoding='utf-8').read() if os.path.exists(APP_MODULE) else None
