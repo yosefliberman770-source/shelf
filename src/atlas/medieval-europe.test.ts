@@ -20,7 +20,8 @@ vi.stubGlobal('fetch', async (input: string) => {
 
 const ctx = (year: number, showUndated = false): LayerCtx => ({ year, base: '/atlas/', showUndated } as LayerCtx);
 const layerFilter = (id: string, year: number, showUndated = false) => {
-  const spec = LAYERS.find((l) => l.id === id)!.specs(ctx(year, showUndated)).find((s) => s.type === 'circle')! as { filter: unknown };
+  const specs = LAYERS.find((l) => l.id === id)!.specs(ctx(year, showUndated));
+  const spec = (specs.find((s) => s.id === `${id}-pt`) ?? specs.find((s) => s.type === 'circle'))! as { filter: unknown };
   return (props: Record<string, unknown>) => featureFilter(spec.filter as never).filter({ zoom: 8 } as never, { type: 1, properties: props } as never);
 };
 /** The grey "?" layer for sites with no date (drawn only when undated records are included, from town-level zoom). */
@@ -100,6 +101,15 @@ describe('towns: English names, estimates, and source errors', () => {
     const at900 = layerFilter('urban-population', 900);
     expect(at900({ p900: 1, p1000: 2 })).toBe(true);
     expect(at900({ p1000: 2 })).toBe(false);
+  });
+  it('[rule] KB-BURINGH-0: an estimate of zero is “below the threshold”, drawn as an empty ring, never as absence', () => {
+    const specs = LAYERS.find((l) => l.id === 'urban-population')!.specs(ctx(900, false));
+    const ring = specs.find((s) => s.id === 'urban-population-below')! as { filter: unknown; minzoom: number };
+    const below = (props: Record<string, unknown>) => featureFilter(ring.filter as never).filter({ zoom: 8 } as never, { type: 1, properties: props } as never);
+    expect(below({ p900: 0, p1000: 0, p1100: 5 })).toBe(true);
+    expect(below({ p900: 3, p1000: 4 })).toBe(false);
+    expect(ring.minzoom).toBe(6);
+    expect(LAYERS.find((l) => l.id === 'urban-population')!.hint).toMatch(/never that nothing was there/);
   });
 });
 

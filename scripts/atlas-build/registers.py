@@ -71,6 +71,12 @@ ORD = {'1ST': 1, '2ND': 2, '3RD': 3}
 
 
 def scapa_period(term):
+    """A Canmore period term's years (ScAPA), never ending after this year."""
+    p = _scapa_period(term)
+    return dates.cap_future(*p) if p else None
+
+
+def _scapa_period(term):
     t = term.strip().upper()
     if t in SCAPA:
         return SCAPA[t]

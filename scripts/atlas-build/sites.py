@@ -412,7 +412,7 @@ def index_row(x, common, no_index):
         return None, 'the name is only a word for the thing (generic)'
     extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
              **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {}),
-             **({'ev': 1} if x['src'] in no_index else {})}
+             **({'ev': 1} if x['src'] in no_index else {}), **({'qa': x['qa']} if x.get('qa') else {})}
     return [x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
             [list(n) for n in x['names'] if n[0] and not (common(n[0]) and generic_name(n[0], x['kind'], x.get('ty', '')))][:6], x['ctx'][:2], [], extra], None
 

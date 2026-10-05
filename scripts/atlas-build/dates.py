@@ -43,6 +43,17 @@ def century_window(n, bce=False, part=None):
     return (-b, -a) if bce else (a, b)
 
 
+THIS_YEAR = __import__('datetime').date.today().year
+
+
+def cap_future(a, b):
+    """A period table's span as evidence: its end is never later than this year ("modern" 1901–2050, "21st century"
+    2000–2099 end now, PA-009). None when the whole span lies in the future."""
+    if a is not None and a > THIS_YEAR:
+        return None
+    return a, (min(b, THIS_YEAR) if b is not None else b)
+
+
 def hijri_to_ce(ah: int) -> int:
     """The Common Era year in which most of Hijri year ah falls (the same rounding as the app)."""
     return math.floor(ah * 0.970229 + 621.5643 + 0.5)

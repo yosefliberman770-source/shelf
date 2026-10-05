@@ -7,6 +7,8 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py hurbpop     # A18-001: world cities no gazetteer holds become findable
   python3 scripts/atlas-build/patch_index.py words       # A23-001: places whose name is an English word (Wells, Newton…)
   python3 scripts/atlas-build/patch_index.py wdbce       # A8-009: Wikidata BCE founding dates one year late
+  python3 scripts/atlas-build/patch_index.py future      # PA-009: period tables ending in the future ("modern" 1901–2050)
+  python3 scripts/atlas-build/patch_index.py meaning     # C8/SS-5: a source with undocumented meaning claims no precision
 """
 from __future__ import annotations
 
@@ -131,7 +133,46 @@ def wdbce():
     return {'changed': changed, 'examples': examples}
 
 
+def future():
+    """Spans that end after this year (a period table's "modern" 1901–2050, "21st century" 2001–2100) end now, as the
+    loader now does for every record (generic.ingestion_checks, dates.cap_future)."""
+    from dates import THIS_YEAR
+    out = {}
+    for src in ('nmrw', 'canmore', 'frmines', 'ltkvr'):
+        have = current_rows(src)
+        n = 0
+        for r in have:
+            e = r[13] if isinstance(r[13], dict) else None
+            if r[8] is not None and r[8] > THIS_YEAR:
+                r[8] = THIS_YEAR
+                n += 1
+            if e and e.get('env') and e['env'][1] is not None and e['env'][1] > THIS_YEAR:
+                e['env'] = [e['env'][0], THIS_YEAR, *e['env'][2:]]
+                n += 1
+        if n:
+            world.replace_source_rows(src, have, BASE)
+        out[src] = n
+    return out
+
+
+def meaning():
+    """Records of a spec declared "meaning": "unknown" make no precision claim (precise 0, as the loader now writes them)."""
+    import generic
+    out = {}
+    for spec in generic.specs(geometry=None):
+        if spec.get('meaning') != 'unknown':
+            continue
+        have = current_rows(spec['src'])
+        n = sum(1 for r in have if r[5] == 1)
+        for r in have:
+            r[5], r[9] = 0, max(r[9] or 0, 1)
+        if n:
+            world.replace_source_rows(spec['src'], have, BASE)
+        out[spec['src']] = n
+    return out
+
+
 if __name__ == '__main__':
-    steps = {'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce}
+    steps = {'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))

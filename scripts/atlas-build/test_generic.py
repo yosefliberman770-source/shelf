@@ -215,5 +215,52 @@ class Areas(unittest.TestCase):
         self.assertEqual(out['Teschen']['per'], 'census 1857')  # no figure given: none invented
 
 
+class IngestionChecks(unittest.TestCase):
+    """Bad input is reported, never passed on silently (A19-003, A19-005, PA-004)."""
+
+    def _recs(self, feats, src='canmore', kind='settlement'):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            json.dump({'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': c}, 'properties': p}
+                                                                 for c, p in feats]}, open(os.path.join(d, 'x.geojson'), 'w'))
+            spec = {'src': src, 'read': {'path': os.path.join(d, 'x.geojson')}, 'fields': {'id': 'id', 'name': 'n', 'kind': kind},
+                    'dating': {'mode': 'snapshot', 'year': 1800}}
+            return generic.records(spec)
+
+    def test_duplicate_ids_are_kept_apart_and_reported(self):
+        recs, sk = self._recs([([-3.19, 55.95], {'id': 'A1', 'n': 'Edinburgh'}), ([-4.25, 55.86], {'id': 'A1', 'n': 'Glasgow'})])
+        self.assertEqual([r['id'] for r in recs], ['A1', 'A1~2'])
+        self.assertEqual(sk['warning: duplicate source id (kept under id~2, id~3 …)'], 1)
+        self.assertIn('more than one record', recs[1]['qa'])
+
+    def test_corrupted_names_are_flagged(self):
+        recs, sk = self._recs([([-3.19, 55.95], {'id': 1, 'n': 'CrÃ©py'}), ([-4.25, 55.86], {'id': 2, 'n': 'Cr\ufffdpy'}), ([-4.2, 55.8], {'id': 3, 'n': 'Crépy'})])
+        self.assertIn('mis-decoded', recs[0]['qa'])
+        self.assertIn('garbled', recs[1]['qa'])
+        self.assertNotIn('qa', recs[2])
+        self.assertEqual(sum(v for k, v in sk.items() if k.startswith('warning: ')), 2)
+
+    def test_swapped_pair_is_exchanged_and_said(self):
+        # Edinburgh given as (55.95, -3.19): in the sea off Somalia's latitude band, on land in Scotland when exchanged
+        recs, sk = self._recs([([55.95, -3.19], {'id': 1, 'n': 'Edinburgh'})])
+        self.assertEqual((recs[0]['lon'], recs[0]['lat']), (-3.19, 55.95))
+        self.assertIn('wrong way round', recs[0]['qa'])
+        self.assertEqual(sk['warning: latitude/longitude swapped in the source (exchanged)'], 1)
+
+    def test_positions_at_sea_are_flagged_but_wrecks_are_not(self):
+        recs, sk = self._recs([([-12.0, 57.0], {'id': 1, 'n': 'Nowhere'})])
+        self.assertIn('at sea', recs[0]['qa'])
+        recs, sk = self._recs([([-12.0, 57.0], {'id': 1, 'n': 'HMS Somewhere'})], kind='wreck')
+        self.assertNotIn('qa', recs[0])
+
+    def test_mixed_encoding_lines_are_read_as_windows_1252(self):
+        b = 'name;year\nZürich;1800\n'.encode('utf-8') + 'Besançon;1800\n'.encode('cp1252')
+        t = generic.decode_text(b, 'mixed.csv')
+        self.assertIn('Zürich', t)
+        self.assertIn('Besançon', t)
+        self.assertEqual(generic.DECODE_NOTES.pop('mixed.csv'), 1)
+
+
 if __name__ == '__main__':
     unittest.main()

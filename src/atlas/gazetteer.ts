@@ -55,6 +55,10 @@ export interface GazPlace {
   population?: { year: number; thousands: number; estimate?: string }[];
   /** A correction the build made to the source, stated. */
   note?: string;
+  /** What the build's checks found wrong in the source record (swapped position, at sea, garbled name, reused id). */
+  qa?: string;
+  /** The source does not document what its values mean: why, in a sentence (no precision is claimed). */
+  meaningUnknown?: string;
   /** The record's id in its source (differs from `id` only when several records share one source id). */
   sourceId?: number | string;
   url: string;
@@ -100,6 +104,10 @@ export interface GazetteerInfo {
   /** Only attests places mentioned in its documents (a register's index of names): it corroborates and dates a
    *  place, but is never the record shown for it, and its name forms never decide between places. */
   attests?: true;
+  /** The source does not document what its values mean (C8, SS-5): its dates are shown as written and its positions
+   *  without a precision claim; the note says why. */
+  meaning?: 'unknown';
+  meaningNote?: string;
 }
 
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
@@ -152,6 +160,7 @@ export const GAZETTEERS: GazetteerInfo[] = [
   ...(Object.entries(SPEC_DATASETS) as [SpecDatasetId, (typeof SPEC_DATASETS)[SpecDatasetId]][]).map(([id, d]): GazetteerInfo => ({
     id, name: d.public ? d.name : `${d.name} (private data)`, license: d.license, url: d.url, coverage: [...d.coverage], core: [...d.core], box: [...d.box],
     describe: d.describe, record: () => d.url,
+    ...('meaning' in d ? { meaning: d.meaning, meaningNote: d.meaningNote } : {}),
   })),
 ];
 export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id === id)!;
@@ -196,6 +205,8 @@ interface RowExtra {
   per?: string;
   rule?: [string, number | null, number | null][];
   go?: [string, number | null, number | null, string | null, string | null][];
+  /** What the build's checks found wrong in the source record. */
+  qa?: string;
 }
 type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
@@ -237,6 +248,8 @@ function toPlace(r: Row): GazPlace {
     startKind: extra?.fb === 'founded' ? 'founded' : 'attested',
     population: extra?.pop ? Object.entries(extra.pop).map(([y, v]) => ({ year: Number(y), thousands: v, estimate: extra.est?.[y] })) : undefined,
     note: [extra?.fix, extra?.pq].filter(Boolean).join('; ') || undefined,
+    qa: typeof extra?.qa === 'string' ? extra.qa : undefined,
+    meaningUnknown: info.meaning === 'unknown' ? info.meaningNote ?? 'The source does not document what its values mean.' : undefined,
     sourceType: typeof extra?.st === 'string' ? extra.st : undefined,
     typeDoubt: typeDoubtOf(typeof extra?.st === 'string' ? extra.st : undefined),
     sourcePeriod: typeof extra?.per === 'string' ? extra.per : undefined,

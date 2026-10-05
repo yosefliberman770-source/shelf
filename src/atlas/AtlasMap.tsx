@@ -721,13 +721,14 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       };
     }
     case 'urban-population': {
-      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`) ?? 0] as const);
-      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : '—'}`);
+      const pop = BURINGH_YEARS.map((y) => [y, num(`p${y}`)] as const);
+      // 0 = below the dataset's threshold (the town existed; its size is not estimated); no figure = not recorded (SS-2)
+      const near = pop.filter(([y]) => Math.abs(y - year) <= 150 || y === pop[0][0]).map(([y, v]) => `${y}: ${v ? `${v.toLocaleString()}k` : v === 0 ? 'below threshold' : 'no estimate'}`);
       return {
         title: str('n') ?? 'Town', lines: [`${str('c') ?? ''}${str('a') ? ` · “${str('a')}” in the dataset` : ''}`, `Estimated inhabitants (thousands) — ${near.join(' · ')}`],
         pick: pt && str('i') ? { key: `buringh:${str('i')}`, name: str('n') ?? 'Town', lon: pt[0], lat: pt[1] } : undefined,
         link: str('q') ? { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' } : { href: 'https://doi.org/10.17026/dans-xzy-u62q', label: 'Dataset ↗' }, source: credit('buringh'),
-        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “—” = below the dataset’s threshold.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
+        caution: `Estimates, many proxied or imputed from other towns; the figure for the chosen year is interpolated between sample years. “Below threshold” means too small for the dataset to estimate, not that the town did not exist.${num('fx') ? ' The dataset’s coordinates for this town were wrong; the position was taken from Wikidata.' : ''}`,
       };
     }
     case 'hre-towns': {
