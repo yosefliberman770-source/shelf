@@ -60,7 +60,27 @@ const CASES: [string, string, string][] = [
   ['castle', 'dwór · XVI - XVIII', 'archaeology'],
   ['castle', 'COUNTRY HOUSE (19TH CENTURY), TOWER HOUSE (MEDIEVAL)', 'castle'],
   ['castle', 'castle ruin', 'castle'],
-  ['fortification', 'ringfort - rath', 'castle'],
+  // Prehistoric and early medieval forts and enclosures are archaeology, not castles (A11-016)
+  ['fortification', 'ringfort - rath', 'archaeology'],
+  ['fortification', 'ringfort - cashel', 'archaeology'],
+  ['fortification', 'BROCH (IRON AGE)(POSSIBLE)', 'archaeology'],
+  ['fortification', 'DUN (LATER PREHISTORIC)(POSSIBLE)', 'archaeology'],
+  ['castle', 'hillfort; defended enclosure', 'archaeology'],
+  ['fortification', 'promontory fort - coastal', 'archaeology'],
+  ['castle', 'CASTLE (MEDIEVAL), FORT (IRON AGE), GALLERIED DUN (IRON AGE)', 'castle'],
+  ['site', 'rath & motte', 'archaeology'],
+  // A churchyard is not a church (A11-005); a church with its churchyard is
+  ['church', 'churchyard', 'burial'],
+  ['church', 'CHURCH (19TH CENTURY), CHURCHYARD (19TH CENTURY)', 'religious'],
+  // Finds are not settlements, markets, castles or churches (A10-002, A11-013, A8-019)
+  ['market', 'coin hoard; weight (lead)', 'archaeology'],
+  ['settlement', 'cropmark(s) (period unknown), ring ditch(s)', 'archaeology'],
+  ['castle', 'CASTLE (MEDIEVAL), COIN(S) (13TH CENTURY)', 'castle'],
+  ['church', 'candlestick (period unknown), coin(s) (period unknown)', 'archaeology'],
+  // What a "wreck" record really is (A8-022)
+  ['wreck', 'SHIP BURIAL (VIKING)(POSSIBLE)', 'burial'],
+  ['wreck', 'AIRCRAFT HANGAR (20TH CENTURY)', 'archaeology'],
+  ['wreck', 'wreck', 'archaeology'],
 ];
 
 describe('the master list of site types', () => {
@@ -77,6 +97,11 @@ describe('the master list of site types', () => {
     expect(siteGroup({ k: 'settlement', n: 'Millton', st: 'village' })).toBeUndefined();
     expect(exprGroup({ k: 'settlement', n: 'Millton', st: 'village' })).toBe('');
     expect(siteGroup({ k: 'site', n: 'Hospital Farm', st: 'FARMSTEAD' })).toBe('archaeology');
+  });
+  it('a settlement that also lists finds stays a settlement; one that is only finds does not', () => {
+    expect(siteGroup({ k: 'settlement', st: 'ENCLOSED SETTLEMENT (IRON AGE), COIN(S) (ROMAN)(POSSIBLE)' })).toBeUndefined();
+    expect(exprGroup({ k: 'settlement', st: 'ENCLOSED SETTLEMENT (IRON AGE), COIN(S) (ROMAN)(POSSIBLE)' })).toBe('');
+    expect(siteGroup({ k: 'settlement', st: 'stray find · dated by artefact typology' })).toBe('archaeology');
   });
 });
 

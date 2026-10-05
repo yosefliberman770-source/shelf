@@ -105,9 +105,13 @@ const sourceWeight = (family: string, kind: Claim['kind']) => (kind === 'gazette
 const NAME_FACTOR = { exact: 1, variant: 0.9, none: 0.5 } as const;
 const DATE_FACTOR: Record<DateFit, number> = { within: 1, possible: 0.85, unknown: 0.6, outside: 0.15 };
 
-function fit(spans: [number, number][], year: number | undefined, broad: boolean): DateFit {
+function fit(spans: [number, number][], year: number | undefined, broad: boolean, founded = true): DateFit {
   if (year === undefined || !spans.length) return 'unknown';
-  if (!spans.some(([a, b]) => a - SLACK <= year && year <= b + SLACK)) return 'outside';
+  if (!spans.some(([a, b]) => a - SLACK <= year && year <= b + SLACK)) {
+    // Before a first attestation the evidence has not begun: unknown, not ruled out — only a founding rules out earlier years (A9-019, TM-5).
+    if (!founded && spans.every(([a]) => year < a - SLACK)) return 'unknown';
+    return 'outside';
+  }
   return broad ? 'possible' : 'within';
 }
 
@@ -119,7 +123,7 @@ export function claimFromGaz(p: GazPlace, written: string, year?: number): Claim
   const w = norm(written);
   const nameMatch = norm(p.title) === w ? 'exact' : p.names.some((n) => norm(n.name) === w) ? 'variant' : 'none';
   // Pleiades periods and dataset-wide periods are broad: they make a date "possible", not certain.
-  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.envelope);
+  const dateFit = fit(spans, year, p.gazetteer === 'pleiades' || !!p.envelope, p.startKind === 'founded' && p.envelope === undefined);
   return {
     family: p.gazetteer, source: info.name, kind: 'gazetteer', id: p.key, title: p.title, names: p.names.map((n) => n.name),
     lat: p.lat, lon: p.lon, spans, periodOnly: !!p.envelope, types: p.types, url: p.url, licence: info.license, nameMatch, dateFit,

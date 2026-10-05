@@ -59,3 +59,17 @@ describe('place detection and date context', () => {
     expect(dateContextFor({ bookId: 'x1' })).toEqual({ source: 'none' });
   });
 });
+
+describe('spans in a passage are read whole (A12-008)', () => {
+  it.each([
+    ['The abbey was rebuilt between 1270 and 1290 by the monks.', 1280, 1270, 1290],
+    ['In the 12th–13th centuries the town grew.', 1200, 1101, 1300],
+    ['The war of 218–201 BC ended at Zama.', -209, -218, -201],
+  ])('%s', (text, year, from, to) => {
+    const [d] = findDatesInText(text);
+    expect(d).toMatchObject({ year, approximate: true, from, to });
+  });
+  it('a lone year next to a span is still found', () => {
+    expect(findDatesInText('Built between 1270 and 1290; burned in 1340.').map((d) => d.year)).toEqual([1280, 1340]);
+  });
+});

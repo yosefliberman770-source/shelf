@@ -7,7 +7,7 @@ import { type AtlasLayerDef, BURINGH_YEARS, credit, DATASET_CREDIT, type Dataset
 import { assembleParts, installPrivateData, loadPrivateData, PrivateDataError, privateHeader, privateLoadError, privateTileSource, privateTiles, removePrivateData } from './privateData';
 import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
-import { ENVELOPE_LABEL, type EnvelopeBasis, type HistYear, yearLabel } from './time';
+import { type EnvelopeBasis, envelopeWords, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
 
 export interface AtlasFocus { name: string; lat: number; lon: number; certainty?: 'known' | 'approximate' | 'uncertain' | 'disputed'; note?: string }
@@ -577,7 +577,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'pleiades-provinces': {
       const env = str('eo') as EnvelopeBasis | undefined;
       const lines = [str('ty')?.split(',').join(', ') ?? str('k') ?? '',
-        env ? `No dates of its own. Shown for ${range(num('ef'), num('et'))} — the period of ${ENVELOPE_LABEL[env]}`
+        env ? `${((w) => w[0].toUpperCase() + w.slice(1))(envelopeWords(env))}. Shown for ${range(num('ef'), num('et'))}`
           : num('f') === undefined && num('t') === undefined && src === 'pleiades-places' ? 'Undated: no dates, and nothing dated is linked to it'
           : `Attested: ${range(num('f'), num('t'))}${str('db') === 'names' ? ' (from name records)' : ''}`];
       if (str('a')) lines.push(`Also: ${str('a')!.split('|').join(' · ')}`);
@@ -730,8 +730,10 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
         caution: byPeriod ? (src === 'merimee' ? 'The date is when the present building was mainly built; the site may be older, and the building is shown from the start of that century.' : 'Dated only by the register’s broad period class, so it is shown for the whole period.')
           : num('u') ? 'The identification of this location is uncertain in the source.'
           : f0 === undefined && num('t') === undefined ? 'Shown because “Include undated records” is on — there is no recorded date for it.'
-          : notYet ? `Not yet recorded in ${yearLabel(year)}: the first record is from ${yearLabel(f0!)}. It may be older, but nothing places it at this date — shown because “Include undated records” is on.`
-          : num('t') === undefined ? 'No end is recorded, so it is drawn to the present; many houses and castles ended earlier than their record says.' : undefined,
+          : notYet ? `Not yet recorded in ${yearLabel(year)}: the first record is from ${yearLabel(f0!)}${fb && fb !== 'first mention' ? ` (${fb})` : ''}. It may be older, but nothing places it at this date — shown because “Include undated records” is on.`
+          : num('t') !== undefined && num('t')! < year ? `Its recorded end (${yearLabel(num('t')!)}) is when it stopped being used; ruins may remain, so it is drawn faint for a century after.`
+          : num('t') === undefined && f0 !== undefined && fb !== 'founded' && year > f0 + 100 ? `Recorded from ${yearLabel(f0)}; nothing records it in ${yearLabel(year)} — places usually persist, so it is drawn lighter, not as recorded then.`
+          : num('t') === undefined ? 'No end is recorded, so it is drawn to the end of its dataset’s period; many houses and castles ended earlier than their record says.' : undefined,
       };
     }
     case 'urban-population': {

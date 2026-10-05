@@ -47,12 +47,13 @@ export async function bookGeoContext(opts: { bookId?: string; nearby?: string[];
     ]);
     for (const c of choices) { const p = c.place as { latitude?: number; longitude?: number }; add(p.longitude, p.latitude, 'places you chose in this book'); }
     for (const v of visits) add(v.lon, v.lat, 'places you opened from this book');
-    for (const [name, r] of Object.entries(world?.resolved ?? {})) if (r && name !== opts.exclude && (r.status === 'HIGH' || r.status === 'MEDIUM')) add(r.lon, r.lat, 'places identified in this book');
+    // Only the book's certain identifications: a probable one that is wrong would pull every later name after it (A12-013).
+    for (const [name, r] of Object.entries(world?.resolved ?? {})) if (r && name !== opts.exclude && r.status === 'HIGH') add(r.lon, r.lat, 'places identified in this book');
   }
   // Other names in the same passage that the offline gazetteers identify without doubt.
   for (const n of (opts.nearby ?? []).filter((x) => x !== opts.exclude).slice(0, 8)) {
     const m = await matchName(n, opts.year).catch(() => undefined);
-    if (m?.status === 'unique' && m.place && m.candidates.length === 1) add(m.place.lon, m.place.lat, 'other places named nearby in the text');
+    if (m?.status === 'unique' && m.place && m.candidates.length === 1 && (m.confidence === 'certain' || m.confidence === 'probable')) add(m.place.lon, m.place.lat, 'other places named nearby in the text');
   }
   return { points: points.slice(0, 200), from: [...from] };
 }

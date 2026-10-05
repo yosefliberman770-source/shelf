@@ -5,7 +5,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
-import { dateBasisNote, existedAround, gazetteerInfo, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, rulerAt, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
+import { dateBasisNote, gazetteerInfo, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, rulerAt, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
+import { formatDate } from '../../world/histdate';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
@@ -19,6 +20,8 @@ import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
 import { EmptyNote } from './worldParts';
 
+/** How a listed place relates to the year: only "recorded at it" goes unmarked; an evidence period is not existence (A12-025). */
+const AT_YEAR_NOTE: Record<string, string> = { period: ' · only its evidence period covers this date', earlier: ' · recorded before this date', unattested: ' · first recorded later', undated: ' · undated', near: ' · recorded close to this date' };
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 const polityType = (c?: string) => (c ? ` (${c})` : '');
 export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (a detached piece of its outline in the source)' : ''}`;
@@ -203,7 +206,8 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine)}</dd></>}
         <dt>Date range</dt><dd>{span(place.from, place.gaz?.datesAsWritten?.to && place.gaz.to === undefined ? undefined : place.to)}{place.gaz ? <span className="tiny faint"> ({dateBasisNote(place.gaz)})</span> : null}
           {place.gaz?.datesAsWritten && <div className="tiny faint">The source writes: {place.gaz.datesAsWritten.from ?? '…'} – {place.gaz.datesAsWritten.to ?? '…'}</div>}
-          {place.gaz?.meaningUnknown && <div className="tiny faint">{place.gaz.meaningUnknown}</div>}</dd>
+          {place.gaz?.meaningUnknown && <div className="tiny faint">{place.gaz.meaningUnknown}</div>}
+          {place.when?.conflicts?.length ? <div className="tiny faint">Other records date it differently: {place.when.conflicts.slice(0, 3).map((d) => `${formatDate(d)}${d.source ? ` (${d.source})` : ''}`).join('; ')}</div> : null}</dd>
         {(place.gaz?.sourceType || place.gaz?.sourcePeriod) && <><dt>In the source</dt><dd>{[place.gaz.sourceType, place.gaz.sourcePeriod].filter(Boolean).join(' · ')}{place.gaz.typeDoubt ? <span className="tiny faint"> (the source is not sure of the type)</span> : null}</dd></>}
         {place.gaz && <><dt>At {yearLabel(year)}</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place.gaz, year))]}</dd></>}
         <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{place.gaz?.meaningUnknown ? 'as the source gives it (its precision is not documented)' : CERTAINTY_LABEL[place.certainty]}</span></dd>
@@ -389,7 +393,7 @@ export function NearbyPanel({ at, year, radiusMi, setRadiusMi, onResults, onOpen
         <div className="col" style={{ gap: 2 }}>
           {shown.slice(0, 60).map(({ place: p, km }) => (
             <button key={p.key} className="atlas-war" onClick={() => onOpenPlace(p.key, p.title)}>
-              <span style={{ opacity: p.precise ? 1 : 0.75 }}>{p.precise ? '●' : '○'} {p.title}</span> <span className="faint">{kmLabel(km)} · {p.types.slice(0, 2).join(', ') || 'type not recorded'} · {span(p.from, p.to)}{existedAround(p, year) ? '' : ''}</span>
+              <span style={{ opacity: p.precise ? 1 : 0.75 }}>{p.precise ? '●' : '○'} {p.title}</span> <span className="faint">{kmLabel(km)} · {p.types.slice(0, 2).join(', ') || 'type not recorded'} · {span(p.from, p.to)}{AT_YEAR_NOTE[String(recordFit(p, year))] ?? ''}</span>
             </button>
           ))}
           {shown.length > 60 && <div className="tiny faint">…and {shown.length - 60} more on the map.</div>}

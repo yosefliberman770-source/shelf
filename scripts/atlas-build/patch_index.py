@@ -10,6 +10,8 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py future      # PA-009: period tables ending in the future ("modern" 1901–2050)
   python3 scripts/atlas-build/patch_index.py meaning     # C8/SS-5: a source with undocumented meaning claims no precision
   python3 scripts/atlas-build/patch_index.py halc        # PA-010: HALC "estimate within 1 km" is not a precise position
+  python3 scripts/atlas-build/patch_index.py kinds       # A8-022/A8-023: burial grounds are not churches, ship burials not wrecks
+  python3 scripts/atlas-build/patch_index.py archaeology # A8-039: prehistoric evidence is not a town's "first mention"
 """
 from __future__ import annotations
 
@@ -206,8 +208,48 @@ def stamp(what: str):
     world.write_json(path, m)
 
 
+def kinds():
+    """Canmore records whose kind the new rules change to a plain site (a burial ground with no church, a ship burial, an
+    aircraft hangar filed as a wreck) leave name search, as a rebuild leaves them out (sites are drawn, not indexed)."""
+    import re
+    have = current_rows('canmore')
+    burial_only = re.compile(r'\b(BURIAL GROUND|CHURCHYARD|GRAVEYARD|CEMETERY)\b')
+    church = re.compile(r'\b(CHURCH|CHAPEL|KIRK|CATHEDRAL|ABBEY|PRIORY)\b')
+    not_wreck = re.compile(r'\b(SHIP|BOAT) BURIAL\b|\b(HANGAR|YARD|FACTORY|SHOP|HOUSE|STATION|BATTERY|SHED)\b')
+    keep, gone = [], {'burial ground filed as a church': 0, 'ship burial or building filed as a wreck': 0}
+    for r in have:
+        st = str((r[13] or {}).get('st', '')).upper()
+        k = r[6].split(',')[0]
+        if k == 'church' and burial_only.search(st) and not church.search(st):
+            gone['burial ground filed as a church'] += 1
+        elif k == 'wreck' and not_wreck.search(st) and not re.search(r'\bWRECK\b', st):
+            gone['ship burial or building filed as a wreck'] += 1
+        else:
+            keep.append(r)
+    world.replace_source_rows('canmore', keep, BASE)
+    return gone
+
+
+def archaeology():
+    """Town records whose "first mention" is thousands of years BCE: relabelled as archaeological evidence."""
+    import sites
+    out = {}
+    for src in ('hre', 'buringh'):
+        have = current_rows(src)
+        n = 0
+        for r in have:
+            e = r[13] if isinstance(r[13], dict) else None
+            if e and 'first mention' in str(e.get('fb', '')) and r[7] is not None and r[7] < sites.EARLIEST_WRITTEN:
+                e['fb'] = sites.ARCH_EVIDENCE
+                n += 1
+        if n:
+            world.replace_source_rows(src, have, BASE)
+        out[src] = n
+    return out
+
+
 if __name__ == '__main__':
-    steps = {'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
         stamp(f'place index: {step}')

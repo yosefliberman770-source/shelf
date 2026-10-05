@@ -6,7 +6,7 @@ import type { ExpressionSpecification, FilterSpecification, LayerSpecification, 
 import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { eventNear, existedIn, type HistYear, ohmExisted, toAstro, yearLabel } from './time';
 import { PRIVATE_TILE_PREFIX, privateHas } from './privateData';
-import { inGroupExpr, type SiteGroup } from './site-types';
+import { inGroupExpr, type SiteGroup, siteGroupExpr } from './site-types';
 
 /** Why a layer can't be shown: each reason is stated as it is, never lumped together as "no data". */
 export type UnavailableKind = 'no-dataset' | 'licence' | 'online-only' | 'not-integrated';
@@ -425,6 +425,9 @@ export const BEFORE_RECORD_YEARS = 60;
 /** Years either side of a snapshot listing within which the listed place is drawn (lighter); see sitePoints. */
 export const SNAPSHOT_YEARS = 25;
 
+/** Wikidata statements that date evidence for a place, not its beginning (quality.EVIDENCE_BASIS in the build). */
+const EVIDENCE_BASES = ['dated event recorded in Wikidata', 'official opening recorded in Wikidata', 'start of its recorded use (Wikidata)'];
+
 /** Records that share one position in their source (sk = how many, from the tiler): drawn larger, and counted from zoom 8. */
 const STACKED: ExpressionSpecification = ['>', ['coalesce', ['get', 'sk'], 1], 1];
 const STACK_SCALE: ExpressionSpecification = ['interpolate', ['linear'], ['coalesce', ['get', 'sk'], 1], 1, 1, 10, 1.5, 100, 2, 1000, 2.6];
@@ -441,22 +444,38 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
   //     period) — so they never fill the overview map at every date.
   const y = ctx.year;
   // A list of kinds, or a map group from the master list of site types (site-types.ts), which also reads the type text.
-  const kind: ExpressionSpecification = Array.isArray(kinds) ? ['in', ['get', 'k'], ['literal', kinds]] : inGroupExpr(kinds.group);
+  // A list of kinds leaves out records whose type says they are only finds (a coin is not a market, A10-002).
+  const kind: ExpressionSpecification = Array.isArray(kinds) ? ['all', ['in', ['get', 'k'], ['literal', kinds]], ['!=', siteGroupExpr(), 'archaeology']] : inGroupExpr(kinds.group);
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
   // A snapshot (a gazetteer or register listing the place in one year: 'sn') says only that it existed then; it is drawn,
   // lighter, within SNAPSHOT_YEARS of that year (a stated display tolerance — the record keeps its one year).
   const snapshot: ExpressionSpecification = ['all', ['has', 'sn'], ['<=', ['abs', ['-', y, ['get', 'ef']]], SNAPSHOT_YEARS]];
-  const when: ExpressionSpecification = ['any', snapshot, ['all', ['!', ['has', 'sn']], existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly]]];
+  // A start that is only a dated Wikidata statement (an event, an opening) is evidence for that year, not a beginning:
+  // a medieval castle with a 1944 event is not "first recorded 1944" on the map — it is undated before it (A8-013, X-16).
+  const evidenceOnly: ExpressionSpecification = ['all', ['has', 'f'], ['in', ['coalesce', ['get', 'fb'], ''], ['literal', EVIDENCE_BASES]]];
+  // A start-only record is not drawn past its dataset's window (as the place search stops it, A12-010).
+  const inOwnWindow: ExpressionSpecification = ['any', ['has', 't'], ['!', ['has', 'f']], ['<=', y, ['coalesce', ['get', 'w1'], SITES[1]]]];
+  // A castle's recorded end (dissolved, abandoned) ends its use, not its ruins: drawn faint for a century after (A8-024).
+  const castleKind: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['castle', 'fortification']]];
+  const afterEnd: ExpressionSpecification = ['all', castleKind, ['has', 't'], ['<', ['get', 't'], y], ['<=', y, ['+', ['get', 't'], 100]], ['any', ['!', ['has', 'f']], ['<=', ['get', 'f'], y]]];
+  const when: ExpressionSpecification = ['any', snapshot, afterEnd, ['all', ['!', ['has', 'sn']], ['!', ['all', evidenceOnly, ['>', ['get', 'f'], y]]], existedIn(y, { undated: 'hide', envelope: { from: 'ef', to: 'et' } }), ['!', endOnly], inOwnWindow]];
   const soon = (field: string): ExpressionSpecification => ['all', ['>', ['get', field], y], ['<=', ['-', ['get', field], BEFORE_RECORD_YEARS], y]];
   const recordedSoon: ExpressionSpecification = ['any',
     ['all', ['has', 'f'], ['!=', ['coalesce', ['get', 'fb'], ''], 'founded'], soon('f'), ['any', ['!', ['has', 't']], ['>=', ['get', 't'], y]]],
     ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['has', 'ef'], soon('ef')]];
   const inWindow: ExpressionSpecification = ['all', ['<=', ['coalesce', ['get', 'w0'], SITES[0]], y], ['>=', ['coalesce', ['get', 'w1'], SITES[1]], y]];
-  const noStart: ExpressionSpecification = ['any', ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]], endOnly];
-  const filter = ['all', kind, ctx.showUndated ? ['any', when, recordedSoon] : when] as FilterSpecification;
-  const undatedFilter = ['all', kind, inWindow, noStart] as FilterSpecification;
+  const noStart: ExpressionSpecification = ['any', ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]], endOnly, ['all', evidenceOnly, ['>', ['get', 'f'], y]]];
+  // A shipwreck dated only by a period (a register's "post-medieval") is one sinking somewhere in it, not a place
+  // present for the whole period: drawn only with its own date, or as undated (A8-021).
+  const periodOnlyWreck: ExpressionSpecification = ['all', ['==', ['get', 'k'], 'wreck'], ['!', ['any', ['has', 'f'], ['has', 't']]]];
+  const filter = ['all', kind, ['!', periodOnlyWreck], ctx.showUndated ? ['any', when, recordedSoon] : when] as FilterSpecification;
+  const undatedFilter = ['all', kind, inWindow, ['any', noStart, periodOnlyWreck]] as FilterSpecification;
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
-  const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];
+  // Solid only near its own record: a first record long before the year (a century or more, no end) is persisting, not
+  // attested, and is drawn lighter (A10-004); a castle after its recorded end lighter still.
+  const dated: ExpressionSpecification = ['all', ['!', afterEnd], ['any',
+    ['all', ['has', 'f'], ['<=', ['get', 'f'], y], ['any', ['has', 't'], ['==', ['coalesce', ['get', 'fb'], ''], 'founded'], ['<=', y, ['+', ['get', 'f'], 100]]]],
+    ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]]];
   const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']], ['<=', ['coalesce', ['get', 'ef'], -99999], y]];
   return (opts.sources ?? siteSources()).flatMap((source): LayerSpecification[] => {
     const sfx = source === 'medieval-sites' ? '' : source === 'private-sites' ? '-private' : `-${source}`;
@@ -490,7 +509,9 @@ export function urbanPopulation(year: HistYear): ExpressionSpecification {
   const a = BURINGH_YEARS[Math.max(0, BURINGH_YEARS.indexOf(b) - 1)];
   const w = b === a ? 1 : (y - a) / (b - a);
   const at = (k: number): ExpressionSpecification => ['coalesce', ['get', `p${k}`], 0];
-  return ['+', ['*', 1 - w, at(a)], ['*', w, at(b)]];
+  // From or to "below the threshold" (0) there is no line to draw: a town that first reaches an estimate in 1300 is not
+  // half its size in 1250 — it is below the threshold until the sample year (A11-015, X-27).
+  return ['case', ['any', ['==', at(a), 0], ['==', at(b), 0]], w === 1 ? at(b) : at(a), ['+', ['*', 1 - w, at(a)], ['*', w, at(b)]]];
 }
 
 /** Viabundus covers 1350–1650 (a little either side is kept so the edges of the period still show). */
@@ -508,17 +529,25 @@ const NAVIGATION: [HistYear, HistYear] = [1000, 1348];
 const inWindow = (y: HistYear, w: [HistYear, HistYear]): FilterSpecification => (y >= w[0] && y <= w[1] ? ['boolean', true] : ['boolean', false]) as FilterSpecification;
 
 /** Itiner-e segments: shown when the year falls within the segment's dates widened by the dataset's own error margins. */
+/** Itiner-e's own period: a segment with no recorded end is not drawn past it (A11-024). */
+const ITINERE_END = 700;
+/** Undated segments (most of the dataset) are the network of the Roman state: drawn from the late Republic to the end
+ *  of the western empire only, never in archaic Greece (A11-025). */
+export const ITINERE_UNDATED: [HistYear, HistYear] = [-200, 500];
+/** Itiner-e segments: shown when the year falls within the segment's dates widened by the dataset's own error margins. */
 function itinereFilter(y: HistYear): ExpressionSpecification {
   const lo: ExpressionSpecification = ['-', ['coalesce', ['get', 'f'], -99999], ['coalesce', ['get', 'fe'], 0]];
-  const hi: ExpressionSpecification = ['+', ['coalesce', ['get', 't'], 99999], ['coalesce', ['get', 'te'], 0]];
+  const hi: ExpressionSpecification = ['+', ['coalesce', ['get', 't'], ITINERE_END], ['coalesce', ['get', 'te'], 0]];
   const dated: ExpressionSpecification = ['any', ['has', 'f'], ['has', 't']];
-  return ['any', ['all', dated, ['<=', lo, y], ['>=', hi, y]], ['all', ['!', dated], ['boolean', y >= -800 && y <= 700]]];
+  return ['any', ['all', dated, ['<=', lo, y], ['>=', hi, y]], ['all', ['!', dated], ['boolean', y >= ITINERE_UNDATED[0] && y <= ITINERE_UNDATED[1]]]];
 }
-/** Fainter when only the error margin (not the core dates) reaches the year, or when undated. */
+/** Fainter when only the error margin (not the core dates) reaches the year, when undated, or when only a construction
+ *  date is known and the year is long after it (in use is likely, not recorded). */
 function itinereOpacity(y: HistYear): ExpressionSpecification {
   return ['case',
     ['!', ['any', ['has', 'f'], ['has', 't']]], 0.35,
-    ['all', ['<=', ['coalesce', ['get', 'f'], -99999], y], ['>=', ['coalesce', ['get', 't'], 99999], y]], ['match', ['get', 'c'], 'Certain', 0.95, 'Conjectured', 0.75, 0.45],
+    ['all', ['has', 'f'], ['!', ['has', 't']], ['>', y, ['+', ['get', 'f'], 100]]], 0.45,
+    ['all', ['<=', ['coalesce', ['get', 'f'], -99999], y], ['>=', ['coalesce', ['get', 't'], ITINERE_END], y]], ['match', ['get', 'c'], 'Certain', 0.95, 'Conjectured', 0.75, 0.45],
     0.4];
 }
 
@@ -774,7 +803,7 @@ export const LAYERS: AtlasLayerDef[] = [
   // INFRASTRUCTURE
   {
     id: 'roads-roman', group: 'infrastructure', label: 'Roman roads (Itiner-e)', datasets: ['itinere'], defaultOn: true, coverage: [-800, 700],
-    hint: 'The most detailed open dataset of Roman roads (Itiner-e). Each segment has its own dates with error margins: it appears when the year falls within them — faded if only the error margin reaches the year. Solid = certain, lighter = conjectured, dashed = hypothetical; blue = river and sea lanes. Tap a road for its sources.', sources: ['itinere'],
+    hint: 'The most detailed open dataset of Roman roads (Itiner-e). Each segment has its own dates with error margins: it appears when the year falls within them — faded if only the error margin reaches the year, or if only its construction date is known and the year is long after it. Most segments carry no date: they are shown faint, 200 BCE–500 CE only. Solid = certain, lighter = conjectured, dashed = hypothetical; blue = river and sea lanes. Tap a road for its sources.', sources: ['itinere'],
     specs: (c) => {
       const filter = itinereFilter(c.year) as FilterSpecification;
       const water: ExpressionSpecification = ['in', ['get', 'k'], ['literal', ['River', 'Sea Lane']]];

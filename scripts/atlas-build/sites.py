@@ -394,6 +394,11 @@ def match_english(towns, recs, repair=True):
 
 # ── Build ─────────────────────────────────────────────────────────────────
 
+# Before this, a "first mention" of a European town is archaeological evidence, not a document (A8-039).
+EARLIEST_WRITTEN = -500
+ARCH_EVIDENCE = 'earliest archaeological evidence (not a written mention)'
+
+
 def index_row(x, common, no_index):
     """The place-index row for a register or spec record, or (None, reason) when it stays out of name search.
 
@@ -784,6 +789,8 @@ def regional_layers(recs, rows, sites_out):
         dated = [(y, b) for y, b in ((t['founded'], 'founded'), (t['mention'], 'first mention'), (t['charter'], 'first mention'),
                                      (t['character'], 'first mention')) if y is not None and y != 0]  # 0 = an empty field
         start, basis = min(dated, key=lambda d: (d[0], d[1] != 'founded')) if dated else (None, None)
+        if basis == 'first mention' and start is not None and start < EARLIEST_WRITTEN:
+            basis = ARCH_EVIDENCE  # Potsdam "-10000": archaeology, not a written mention (A8-039)
         extra = {'k': 'town', **({'fb': basis} if basis else {}), **({'tn': 0} if title != t['name'] else {}),
                  **({'q': a['q']} if a.get('q') else {}), 'ch': t['charter'], 'lf': t['legal'], 'fm1': t['firstMarket'],
                  'rule': rule[:40]}

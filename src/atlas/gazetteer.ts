@@ -14,7 +14,7 @@ import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
 import { placeCoverageAt } from '../world/measured';
 import type { EntityKind } from './mention';
-import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, type HistYear, type StartKind, timeFit, type TimeFit } from './time';
+import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, envelopeWords, type HistYear, type StartKind, timeFit, type TimeFit } from './time';
 
 export interface GazName { name: string; from?: HistYear; to?: HistYear; lang?: string }
 export type GazetteerId = 'pleiades' | 'viabundus' | 'althurayya' | 'wikidata' | 'germaniasacra' | 'buringh' | 'hre' | 'merimee' | 'finreg' | 'wbohemia' | 'bridges1250'
@@ -104,6 +104,9 @@ export interface GazetteerInfo {
   /** Only attests places mentioned in its documents (a register's index of names): it corroborates and dates a
    *  place, but is never the record shown for it, and its name forms never decide between places. */
   attests?: true;
+  /** The dataset documents that a record without an end holds for its whole period (Viabundus), so a first record is
+   *  not only evidence for its own date. */
+  continuous?: true;
   /** The source does not document what its values mean (C8, SS-5): its dates are shown as written and its positions
    *  without a precision claim; the note says why. */
   meaning?: 'unknown';
@@ -113,7 +116,7 @@ export interface GazetteerInfo {
 /** The gazetteer registry (see also src/world/registry.ts). A new dataset is one entry plus its rows in the index. */
 export const GAZETTEERS: GazetteerInfo[] = [
   { id: 'pleiades', name: 'Pleiades', license: 'CC BY 3.0', url: 'https://pleiades.stoa.org/', coverage: [-3000, 1500], core: [-750, 640], box: [-20, -25, 120, 65], describe: 'Ancient places, their names and dates.', record: (id) => `https://pleiades.stoa.org/places/${id}` },
-  { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], core: [1350, 1650], box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
+  { id: 'viabundus', name: 'Viabundus', license: 'CC BY 4.0', url: 'https://www.viabundus.eu/', coverage: [1250, 1700], core: [1350, 1650], continuous: true, box: [-2, 45, 32, 66], describe: 'Towns, settlements, tolls, fairs and harbours of northern Europe, 1350–1650.', record: () => 'https://www.viabundus.eu/' },
   { id: 'althurayya', name: 'al-Ṯurayyā', license: 'Apache-2.0 (after G. Cornu)', url: 'https://althurayya.github.io/', coverage: [700, 1100], core: [800, 1000], box: [-10, 5, 85, 56], describe: 'Places of the early Islamic world (9th–10th c.), after Cornu’s atlas.', record: () => 'https://althurayya.github.io/' },
   { id: 'wikidata', name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', coverage: [300, 1900], core: [500, 1650], box: [-32, 24, 62, 72], describe: 'Castles, monasteries, cathedrals, dioceses, fortifications, bridges and settlements with a recorded founding date or first mention, across Europe and the Mediterranean (snapshot).', record: (id) => `https://www.wikidata.org/wiki/${id}` },
   { id: 'germaniasacra', name: 'Germania Sacra', license: 'CC BY-SA 3.0', url: 'https://klosterdatenbank.germania-sacra.de/', coverage: [400, 1810], core: [700, 1803], box: [-4, 41, 28, 60], describe: 'Monasteries and canonries of the Holy Roman Empire with the dated tenure of each religious order.', record: (id) => `https://klosterdatenbank.germania-sacra.de/gsn/${id}` },
@@ -473,12 +476,34 @@ export function temporalSupport(fit: TimeFit | 'no-year'): TemporalSupport {
  *   unresolved — no defensible candidate (none of that name, or every one began after the date)
  */
 export type PlaceConfidence = 'certain' | 'probable' | 'possible' | 'ambiguous' | 'unresolved';
+/** Records that are not places a book names (A8-040, SS-3): what they are, or undefined for a place. */
+const NOT_A_PLACE: [RegExp, string][] = [
+  [/\b(?:find ?spots?|stray finds?|single finds?|coins?|hoards?|scatter|hack-?silver|metal[- ]detect|activity area)\b/i, 'a find spot'],
+  [/\b(?:graves?|burials?|cemetery|graveyard|churchyard|cist|barrow cemetery)\b/i, 'a burial place'],
+  [/\b(?:battle ?site|battlefield)\b/i, 'a battle site'],
+  [/\b(?:railway|train|petrol|lifeboat|fishing|coastguard|pumping|power) station\b/i, 'a station named after a place'],
+  [/\b(?:oyster|fishery|fishing ground|mussel)\b/i, 'a fishery'],
+];
+export function notAPlace(p: Pick<GazPlace, 'types' | 'sourceType'>): string | undefined {
+  if (p.types.includes('wreck')) return /\b(?:hangar|boat ?yard|shipyard|factory|shop|boat ?house|burial)\b/i.test(p.sourceType ?? '') ? undefined : 'a shipwreck (a ship of that name)';
+  if (p.types.includes('hoard')) return 'a find spot';
+  if (p.types.includes('fishery')) return 'a fishery';
+  if (p.types.includes('battle')) return 'a battle site';
+  const t = p.sourceType ?? '';
+  // only when the type names nothing that is a place (a "settlement; grave" is a settlement)
+  if (!t || /\b(?:settlement|village|town|city|township|farm|church|chapel|abbey|priory|castle|fort|manor|parish|monastery|harbour|port)\b/i.test(t)) return undefined;
+  return NOT_A_PLACE.find(([re]) => re.test(t))?.[1];
+}
+const list = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} or ${xs[xs.length - 1]}`);
+
 export function placeConfidence(a: { identity: MatchStatus; basis?: MatchBasis; liveRivals: number; support: TemporalSupport; fitsBook: boolean }): PlaceConfidence {
   if (a.identity === 'none' || a.support === 'incompatible') return 'unresolved';
   if (a.identity === 'ambiguous') return 'ambiguous';
   // Identity settled without leaning on dates: no rival attested at the date, and not chosen *because* rivals lack dates.
   const settled = a.liveRivals === 0 && (a.basis === 'only' || a.basis === 'context');
   switch (a.support) {
+    // Without a date from the book the record's dates were never checked: a good identification, not a certain one (A12-017, A12-018).
+    case 'no-date': return 'probable';
     case 'not-yet-attested': return 'possible';
     case 'no-evidence': return a.fitsBook ? 'probable' : 'possible';
     case 'persisting':
@@ -553,7 +578,7 @@ const COMPATIBLE: Record<EntityKind, EntityKind[]> = {
 
 /** What a record's dates mean, in a few words, from its own dataset (a first mention is not a founding date). */
 export function dateBasisNote(p: GazPlace): string {
-  if (p.from === undefined && p.to === undefined) return p.envelope ? `no dates of its own — the period of ${ENVELOPE_LABEL[p.envelope.basis]}` : 'no dates in the source';
+  if (p.from === undefined && p.to === undefined) return p.envelope ? envelopeWords(p.envelope.basis) : 'no dates in the source';
   if (p.gazetteer === 'pleiades') return 'Pleiades attestation periods, not founding dates';
   if (p.from === undefined) return 'only its end is recorded';
   const basis = p.dateBasis ? `${p.dateBasis}, ` : '';
@@ -567,9 +592,16 @@ export function inDatasetScope(p: { gazetteer: GazetteerId; lon: number; lat: nu
 }
 
 /** How a record's own dates relate to the year being read about. */
-export function recordFit(p: GazPlace, year?: HistYear): TimeFit | 'no-year' {
+export function recordFit(p: GazPlace, year?: HistYear, byOtherName = false): TimeFit | 'no-year' {
   if (year === undefined) return 'no-year';
-  return timeFit(p, year, { slack: 50, window: gazetteerInfo(p.gazetteer).coverage });
+  // A founding date dates what the record's title names. Found by a shorter or other name ("Lindisfarne" → Lindisfarne
+  // Priory, refounded 1093), it dates the building, not the place the book names, which can be older (Lindisfarne in
+  // 793): before it the place is not yet attested, never ruled out (A12-014, TM-5).
+  const span = byOtherName && p.startKind === 'founded' && kindOf(p) !== 'settlement' ? { ...p, startKind: 'attested' as const } : p;
+  // A first record is evidence for its own date only, unless the dataset documents that its records hold for its whole
+  // period (Viabundus: a town is a town 1350–1650 unless an end is given).
+  const info = gazetteerInfo(p.gazetteer);
+  return timeFit(span, year, { slack: 50, window: info.coverage, firstRecordOnly: !info.continuous });
 }
 
 export interface MatchOptions {
@@ -600,17 +632,20 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
       reason: `Shelf couldn’t load its place data just now (offline, or a network problem), so it can’t say whether “${written}” is recorded. Try again when the connection is back.` };
   }
   if (!all.length) return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], reason: absenceReason(written, year, opts.context) };
-  const notLater = all.filter((h) => recordFit(h.place, year) !== 'later');
+  const fitOf = (h: { place: GazPlace; isTitle: boolean }) => recordFit(h.place, year, !h.isTitle);
+  const notLater = all.filter((h) => fitOf(h) !== 'later');
   if (!notLater.length) return { status: 'none', confidence: 'unresolved', temporal: 'incompatible', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
   const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
   const anyPool = typed.length ? typed : notLater;
-  // A shipwreck is a ship's name, not a place: it never answers a place name read in a book (Florence → a wreck off
-  // Wales, "Russia" in 1700 → a Welsh wreck). It is offered only when nothing else has the name (A20-006, RM-01).
-  const isWreck = (h: { place: GazPlace }) => h.place.types.includes('wreck');
-  const pool = anyPool.some((h) => !isWreck(h)) ? anyPool.filter((h) => !isWreck(h)) : anyPool;
-  if (pool.length && pool.every(isWreck)) {
+  // A shipwreck is a ship's name, a find or a grave is an object, a battle site or a railway station is named after
+  // something else, a fishery after the coast it works: none answers a place name read in a book (Florence → a wreck
+  // off Wales, "Holy Island" in 793 → an oyster fishery, a battle → a station named after it). Such a record is
+  // offered only when nothing else has the name, and never as the answer (A20-006, A8-040, SS-3, X-04).
+  const pool = anyPool.some((h) => !notAPlace(h.place)) ? anyPool.filter((h) => !notAPlace(h.place)) : anyPool;
+  if (pool.length && pool.every((h) => notAPlace(h.place))) {
+    const what = [...new Set(pool.map((h) => notAPlace(h.place)!))];
     return { status: 'ambiguous', confidence: 'ambiguous', candidates: pool.map((h) => h.place).slice(0, 12), corroborating: [],
-      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are shipwrecks' : 'is a shipwreck'} (a ship of that name), not a place. Shelf may not hold the place meant.` };
+      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are' : 'is'} ${list(what)}, not a place of that name. Shelf may not hold the place meant.` };
   }
   // Group records that are the same place: different datasets within a few km.
   const groups: { place: GazPlace; isTitle: boolean }[][] = [];
@@ -619,7 +654,7 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
     if (g) g.push(h); else groups.push([h]);
   }
   // The record to show from a group: attested at the year first, titled first.
-  const fitRank = (p: GazPlace) => ({ within: 0, near: 1, period: 2, 'no-year': 3, undated: 4, earlier: 5, unattested: 6, later: 7 })[recordFit(p, year)];
+  const fitRank = (h: { place: GazPlace; isTitle: boolean }) => ({ within: 0, near: 1, period: 2, 'no-year': 3, undated: 4, earlier: 5, unattested: 6, later: 7 })[fitOf(h)];
   // Then a record with dates of its own over one dated only by its dataset's period (a Buringh town).
   const ownDates = (p: GazPlace) => (p.from !== undefined || p.to !== undefined ? 0 : p.datasetPeriod ? 2 : 1);
   // A record inside the region its dataset is about comes before an incidental one elsewhere (a Nordic dataset's
@@ -630,7 +665,7 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   // Datasets that only attest places mentioned in their documents rank with it.
   const attestsOnly = (p: GazPlace) => !!GAZETTEERS.find((x) => x.id === p.gazetteer)?.attests;
   const aggregator = (p: GazPlace) => (p.gazetteer === 'wikidata' || attestsOnly(p) ? 1 : 0);
-  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || aggregator(a.place) - aggregator(b.place) || fitRank(a.place) - fitRank(b.place) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
+  const lead = (gr: { place: GazPlace; isTitle: boolean }[]) => [...gr].sort((a, b) => scope(a.place) - scope(b.place) || aggregator(a.place) - aggregator(b.place) || fitRank(a) - fitRank(b) || Number(b.isTitle) - Number(a.isTitle) || ownDates(a.place) - ownDates(b.place))[0];
   const k = normName(written);
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
   let why = '';
@@ -657,9 +692,10 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
     if (!chosen) {
       // Evidence at the date beats absence of evidence: when only one place of that name is attested around
       // the year and every other one is first recorded later, the attested one is meant.
-      const attestedNow = (g: { place: GazPlace }[]) => g.some((x) => ['within', 'near', 'period'].includes(recordFit(x.place, year)));
+      // recorded before the date (persisting) counts too: it may be meant; a place first recorded later may not
+      const attestedNow = (g: { place: GazPlace; isTitle: boolean }[]) => g.some((x) => ['within', 'near', 'period', 'earlier'].includes(fitOf(x)));
       const live = groups.filter(attestedNow);
-      if (year !== undefined && live.length === 1 && groups.every((g) => g === live[0] || g.every((x) => recordFit(x.place, year) === 'unattested'))) {
+      if (year !== undefined && live.length === 1 && groups.every((g) => g === live[0] || g.every((x) => fitOf(x) === 'unattested'))) {
         chosen = live[0];
         basis = 'attested-at-date';
         why = `The only place called “${written}” attested around ${year < 0 ? `${-year} BCE` : `${year} CE`}; the other${groups.length > 2 ? 's are' : ' is'} first recorded later.`;
@@ -677,8 +713,9 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   const nm = main.isTitle ? { name: main.place.title, isTitle: true } : { ...(main.place.names.find((n) => normName(n.name) === k) ?? { name: written }), isTitle: false };
   const others = chosen.filter((x) => x !== main).map((x) => x.place);
   // The records of one place are weighed together: its dates are the best-supported ones any of its datasets gives.
-  const dated = [main, ...chosen.filter((x) => x !== main)].sort((a, b) => fitRank(a.place) - fitRank(b.place))[0].place;
-  const fit = recordFit(dated, year);
+  const datedHit = [main, ...chosen.filter((x) => x !== main)].sort((a, b) => fitRank(a) - fitRank(b))[0];
+  const dated = datedHit.place;
+  const fit = fitOf(datedHit);
   // The name itself may be later (or earlier) than the date: say so, with the names attested then.
   const yl = (y: number) => (y < 0 ? `${-y} BCE` : `${y} CE`);
   const nameWhen = year !== undefined && !nm.isTitle && ((nm.from !== undefined && year < nm.from - 50) || (nm.to !== undefined && year > nm.to + 50))
@@ -691,17 +728,29 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   // not when the place ended: said as such, and as Shelf's reading of the dataset rather than the dataset's claim.
   const lastYear = dated.to ?? dated.envelope?.to;
   const atEdge = lastYear !== undefined && lastYear >= gazetteerInfo(dated.gazetteer).core[1];
-  const when = nameWhen + (fit === 'earlier' ? (atEdge
+  const startOnly = dated.from !== undefined && dated.to === undefined && dated.envelope === undefined;
+  const institution = kindOf(dated) === 'site' && /monastery|abbey|priory|friary|convent|church|cathedral|castle|hospital|university|college/.test(dated.types.join(' ') + ' ' + (dated.sourceType ?? ''));
+  const when = nameWhen + (fit === 'earlier' && startOnly
+    ? ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from!)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} and records nothing about it in ${yl(year!)} — places usually persist, but that is not a record of it then.`
+    : fit === 'earlier' && institution && dated.to !== undefined && !atEdge
+    // a dissolved monastery or an abandoned castle does not "persist" after its recorded end (A20-004)
+    ? ` ${gazetteerInfo(dated.gazetteer).name} records its end in ${yl(dated.to)}; it is not recorded as existing in ${yl(year!)}.`
+    : fit === 'earlier' ? (atEdge
     ? ` ${gazetteerInfo(dated.gazetteer).name} covers places only up to ${yl(lastYear!)}, the end of its own period, so it has nothing later about this place — that is where the dataset stops, not when the place ended.`
-    : ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${lastYear !== undefined ? yl(lastYear) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.`) : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.` : '');
+    : ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${lastYear !== undefined ? yl(lastYear) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.`) : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? (dated.envelope.basis === 'source' ? ` Its record dates it only to a period, ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'}, not to exact years.` : ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.`) : '');
+  // The grouped records' own starts, when they disagree by a century or more: said, not settled silently by the most
+  // favourable one — they often date different things (a founding, a first mention, town status) (A10-013, A9-016).
+  const starts = chosen.map((x) => ({ g: x.place.gazetteer, y: x.place.from, b: x.place.dateBasis })).filter((x): x is { g: GazetteerId; y: number; b: string | undefined } => x.y !== undefined);
+  const spread = starts.length > 1 ? Math.max(...starts.map((x) => x.y)) - Math.min(...starts.map((x) => x.y)) : 0;
+  const disagree = spread >= 100 ? ` The records disagree on when it begins: ${[...new Map(starts.sort((a, b) => a.y - b.y).map((x) => [x.g, `${gazetteerInfo(x.g).name} from ${yl(x.y)}${x.b ? ` (${x.b})` : ''}`])).values()].join('; ')} — they may date different things.` : '';
   const temporal = temporalSupport(fit);
   // Other places of the name that are not ruled out at the date (namesakes first recorded later don't count as rivals).
-  const liveRivals = groups.filter((g) => g !== chosen && g.some((x) => recordFit(x.place, year) !== 'unattested')).length;
+  const liveRivals = groups.filter((g) => g !== chosen && g.some((x) => fitOf(x) !== 'unattested')).length;
   const fitsBook = !!opts.context?.points.length && contextDistance(opts.context, [main.place.lon, main.place.lat]) < 1500;
   const confidence = placeConfidence({ identity: 'unique', basis, liveRivals, support: temporal, fitsBook });
   const caveat = confidence === 'probable' && basis === 'attested-at-date' ? ' The others may still have existed then, so this is probable, not certain.' : '';
   return {
     status: 'unique', confidence, temporal, basis, place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm, fit,
-    reason: `${why || `The only place in ${where} recorded with the name “${written}”.`}${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}${when}${caveat}`,
+    reason: `${why || `The only place in ${where} recorded with the name “${written}”.`}${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}${when}${disagree}${caveat}`,
   };
 }
