@@ -3,7 +3,8 @@
 // by AI.
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
-import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityConvention, polityDisplayName } from '../../atlas/context';
+import { eventPrecision, sides } from '../../atlas/eventText';
+import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, AT_PLACE_KM, PLACE_EVENT_YEARS, placeEventsFirst, type LookingAt, lookingAt, politiesAt, type Polity, polityConvention, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
 import { dateBasisNote, gazetteerInfo, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, rulerAt, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { formatDate } from '../../world/histdate';
@@ -150,7 +151,7 @@ export function CompareDates({ at, year, onShow }: { at?: { name: string; lat: n
     let dead = false;
     const [lo, hi] = a <= b ? [a, b] : [b, a];
     Promise.all([politiesAt([at.lon, at.lat], a), politiesAt([at.lon, at.lat], b), eventsNear([at.lon, at.lat], 300)]).then(([pa, pb, ev]) => {
-      if (!dead) setRes({ pa, pb, between: ev.filter((e) => e.y >= lo && e.y <= hi).sort((x, y) => x.y - y.y).slice(0, 12) });
+      if (!dead) setRes({ pa, pb, between: placeEventsFirst(ev.filter((e) => e.y >= lo && e.y <= hi)).slice(0, 12) });
     }).catch(() => {});
     return () => { dead = true; };
   }, [at?.lat, at?.lon, a, b]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -173,7 +174,7 @@ export function CompareDates({ at, year, onShow }: { at?: { name: string; lat: n
         <ul className="atlas-facts">
           <li><span>{at.name}, {yearLabel(a)}</span>{names(res.pa)}<small>Cliopatria</small></li>
           <li><span>{at.name}, {yearLabel(b)}</span>{names(res.pb)}<small>Cliopatria</small></li>
-          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${recordedYearLabel(e.y)})`).join('; ') : 'none recorded'}<small>Wikidata</small></li>
+          <li><span>Recorded events within 190 mi in between</span>{res.between.length ? res.between.map((e) => `${e.n} (${recordedYearLabel(e.y)}${e.km > AT_PLACE_KM ? `, ${Math.round(e.km * 0.621)} mi away` : ', here'})`).join('; ') : 'none recorded'}<small>Wikidata, HCED · events here first, then by distance</small></li>
         </ul>
       )}
       <div className="tiny faint">Borders are reconstructions with approximate dates: a change between two years shows the datasets differ, not the exact moment it happened.</div>
@@ -200,7 +201,7 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
     setPol(null);
     setEvents(null);
     politiesAt([place.lon, place.lat], year).then((p) => !dead && setPol(p)).catch(() => !dead && setPol([]));
-    eventsNear([place.lon, place.lat], 30, year, 300).then((e) => !dead && setEvents(e.slice(0, 10))).catch(() => !dead && setEvents([]));
+    eventsNear([place.lon, place.lat], 30, year, PLACE_EVENT_YEARS).then((e) => !dead && setEvents(e.slice(0, 10))).catch(() => !dead && setEvents([]));
     return () => { dead = true; };
   }, [place.key, year]); // eslint-disable-line react-hooks/exhaustive-deps
   const nowNames = place.gaz ? namesAround(place.gaz, year) : place.names;
@@ -237,11 +238,11 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
       </dl>
       {events && events.length > 0 && (
         <div className="mt-8">
-          <div className="eyebrow">Recorded events within 20 miles</div>
+          <div className="eyebrow">Recorded events within 20 miles, {PLACE_EVENT_YEARS} years either side of {yearLabel(year)}</div>
           <div className="col" style={{ gap: 2 }}>
             {events.map((e) => <button key={e.q} className="atlas-war" onClick={() => onEvent(e.q)}>{e.n} <span className="faint">{recordedYearLabel(e.y)}{e.wn ? ` · ${e.wn}` : ''}</span></button>)}
           </div>
-          <div className="tiny faint">Wikidata items with a location and date near here.</div>
+          <div className="tiny faint">Wikidata and Historical Conflict Event Dataset records with a location and date near here; nearest in time first.</div>
         </div>
       )}
       {place.related.length > 0 && (
@@ -313,27 +314,36 @@ export function EventCard({ q, onShow, mentions, onJump, onWar, onClose }: { q: 
     setDet(null);
     allEvents().then((all) => !dead && setEv(all.find((e) => e.q === q) ?? null));
     const c = new AbortController();
-    eventDetails(q, c.signal).then((d) => !dead && setDet(d)).catch(() => !dead && setDet('failed'));
+    // An event only HCED records has no Wikidata item to read.
+    if (q.startsWith('hced:')) setDet('failed');
+    else eventDetails(q, c.signal).then((d) => !dead && setDet(d)).catch(() => !dead && setDet('failed'));
     return () => { dead = true; c.abort(); };
   }, [q]);
+  const hcedOnly = q.startsWith('hced:');
   if (ev === undefined) return <div className="small muted">Loading event…</div>;
   if (ev === null) return <div className="small muted">This event isn’t in the atlas data.</div>;
   return (
     <div className="card tight">
       <div className="row between"><b>{ev.n}</b><button className="btn xs ghost" onClick={onClose} aria-label="Close">✕</button></div>
       <dl className="hmap-facts">
-        <dt>Date</dt><dd>{recordedYearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''}{ev.yp ? ` (known to the ${ev.yp})` : ''}{ev.u ? ' · approximate' : ''}</dd>
-        <dt>Location</dt><dd>{det && det !== 'failed' && det.locationName ? `${det.locationName} · ` : ''}{formatCoords(ev.pos[1], ev.pos[0])}</dd>
+        <dt>Date</dt><dd>{recordedYearLabel(ev.y)}{ev.y2 ? ` – ${yearLabel(ev.y2)}` : ''} <span className="tiny faint">({eventPrecision(ev.yp).replace(/^Date known/, 'known')})</span>{ev.u ? ' · approximate' : ''}</dd>
+        <dt>Location</dt><dd>{det && det !== 'failed' && det.locationName ? `${det.locationName} · ` : ''}{formatCoords(ev.pos[1], ev.pos[0])}{ev.hd ? <span className="tiny faint"> · the Historical Conflict Event Dataset places it {ev.hd} km away — the sources disagree</span> : ''}{ev.dd ? <span className="tiny faint"> · a second Wikidata item places it {ev.dd} km away</span> : ''}</dd>
         <dt>Type</dt><dd>{ev.k}</dd>
-        {ev.wn && <><dt>Part of</dt><dd><button className="why-link" onClick={() => onWar(ev.w!)}>{ev.wn}</button></dd></>}
-        <dt>Participants</dt><dd>{det === null ? <span className="faint">Loading from Wikidata…</span> : det === 'failed' ? <span className="faint">Couldn’t reach Wikidata (offline?)</span> : det.participants.length ? det.participants.join(', ') : <span className="faint">none recorded in Wikidata</span>}</dd>
+        {ev.wn && <><dt>Part of</dt><dd>{ev.w ? <button className="why-link" onClick={() => onWar(ev.w!)}>{ev.wn}</button> : ev.wn}{ev.wo ? <span className="tiny faint"> · {ev.wo === 'sign' ? 'dated outside this war, but inside it with BCE/CE reversed — one date’s era is probably wrong' : 'dated outside this war’s years — one of the two dates is wrong'}</span> : ''}</dd></>}
+        {ev.win && <><dt>Outcome</dt><dd>{sides(ev as unknown as Record<string, unknown>)[0]}</dd></>}
+        {!hcedOnly && <><dt>Participants</dt><dd>{det === null ? <span className="faint">Loading from Wikidata…</span> : det === 'failed' ? <span className="faint">Couldn’t reach Wikidata (offline?)</span> : det.participants.length ? <>{det.participants.join(', ')} <span className="tiny faint">(Wikidata lists them together, without saying who fought on which side)</span></> : <span className="faint">none recorded in Wikidata</span>}</dd></>}
+        {ev.dq?.length ? <><dt>Duplicates</dt><dd className="tiny">Wikidata also has {ev.dq.join(', ')} for this event; it is drawn and counted once.</dd></> : null}
+        {ev.nl ? <><dt>Name</dt><dd className="tiny">Wikidata’s label doesn’t read as an event’s name; it may have been vandalised.</dd></> : null}
         {det && det !== 'failed' && det.description && <><dt>Wikidata says</dt><dd>{det.description}</dd></>}
       </dl>
       <div className="row wrap gap-4">
         <button className="btn sm primary" onClick={() => onShow(ev)}>Show on map</button>
         {mentions.length > 0 && <button className="btn sm" onClick={() => onJump(mentions[0].cfi)}>↩ Jump to passage</button>}
       </div>
-      <SourcesBlock auto={false} sources={[{ name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', record: `https://www.wikidata.org/wiki/${ev.q}`, note: 'Name, date, place and war from the atlas data; participants, location name and description read live from the same item.' }]} />
+      <SourcesBlock auto={false} sources={[
+        ...(hcedOnly ? [] : [{ name: 'Wikidata', license: 'CC0', url: 'https://www.wikidata.org/', record: `https://www.wikidata.org/wiki/${ev.q}`, note: 'Name, date, place and war from the atlas data; participants, location name and description read live from the same item.' }]),
+        ...(ev.h ? [{ name: 'Historical Conflict Event Dataset (Miller et al. 2022)', license: 'CC0', url: 'https://doi.org/10.7910/DVN/6ZFC0V', note: hcedOnly ? 'Recorded only here: year only, located from the battle’s name.' : 'The same battle in this dataset (matched by name and year): winner and loser from it.' }] : []),
+      ]} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 // "no longer recorded" (the datasets record evidence, not foundations or
 // abandonments), a polity boundary that differs between reconstructions, a
 // name recorded for one date and not the other.
-import { type AtlasEvent, eventsNear, type Polity, politiesAt, polityDisplayName } from '../atlas/context';
+import { AT_PLACE_KM, type AtlasEvent, eventsNear, placeEventsFirst, type Polity, politiesAt, polityDisplayName } from '../atlas/context';
 import type { Pos } from '../atlas/data';
 import { existedAround, type GazPlace, gazetteerInfo, namesAround, nearbyPlaces } from '../atlas/gazetteer';
 import { normName } from '../atlas/gazetteer';
@@ -91,8 +91,9 @@ export async function whatChanged(at: Pos, a: HistYear, b: HistYear, radiusKm = 
   }
 
   // Events in between.
-  const ev = (await eventsNear(at, 300).catch(() => [] as (AtlasEvent & { km: number })[])).filter((e) => e.y >= lo && e.y <= hi).sort((x, y) => x.y - y.y);
-  if (ev.length) changes.push({ kind: 'event', text: `${ev.length} recorded event${ev.length === 1 ? '' : 's'} within 190 miles in between: ${ev.slice(0, 6).map((e) => `${e.n} (${yearLabel(e.y)})`).join('; ')}${ev.length > 6 ? '…' : ''}`, source: 'Wikidata' });
+  // The place's own events first, then the nearest — not the six earliest in a 300 km circle (A8-027).
+  const ev = placeEventsFirst((await eventsNear(at, 300).catch(() => [] as (AtlasEvent & { km: number })[])).filter((e) => e.y >= lo && e.y <= hi));
+  if (ev.length) changes.push({ kind: 'event', text: `${ev.length} recorded event${ev.length === 1 ? '' : 's'} within 190 miles in between, those here first: ${ev.slice(0, 6).map((e) => `${e.n} (${yearLabel(e.y)}${e.km > AT_PLACE_KM ? `, ${Math.round(e.km * 0.621)} mi away` : ''})`).join('; ')}${ev.length > 6 ? `… and ${ev.length - 6} more` : ''}`, source: 'Wikidata; Historical Conflict Event Dataset' });
 
   notes.push('Roads and routes are drawn as map tiles — switch between the two dates on the map to see them change.');
   return { a: lo, b: hi, changes, unchanged, notes };

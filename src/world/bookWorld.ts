@@ -131,7 +131,37 @@ export interface WorldProfile {
   centre?: Pos;
   polities: Polity[];
   wars: { q: string; n: string; chapters: number[] }[];
-  events: (AtlasEvent & { chapters: number[] })[];
+  /** Events the book names. `sameName` > 1: that many recorded events share the name and neither the book's dates nor
+   *  its places settle which one is meant (AR-4: "Battle of Panipat" is three battles). */
+  events: (AtlasEvent & { chapters: number[]; sameName?: number })[];
+}
+
+/**
+ * Which of the events a name could mean belong to this book (A8-026, AR-4): one event of that name is that event;
+ * several are narrowed to those within 50 years of the book's period, then to those in the area the book is set;
+ * what is still more than one stays listed, marked as not settled — never every battle of that name across centuries.
+ */
+export function pickNamedEvents<T extends AtlasEvent>(named: T[], period: { earliest?: HistYear; latest?: HistYear }, bbox?: [number, number, number, number]): (T & { sameName?: number })[] {
+  const byName = new Map<string, T[]>();
+  for (const e of named) byName.set(e.n.toLowerCase(), [...(byName.get(e.n.toLowerCase()) ?? []), e]);
+  return [...byName.values()].flatMap((group) => {
+    if (group.length === 1) return group;
+    let fit = group;
+    if (period.earliest !== undefined || period.latest !== undefined) {
+      const lo = (period.earliest ?? period.latest!) - 50;
+      const hi = (period.latest ?? period.earliest!) + 50;
+      fit = fit.filter((e) => (e.y2 ?? e.y) >= lo && e.y <= hi);
+      // Within the period itself, if only one is, before allowing the 50 years' slack.
+      const strict = fit.filter((e) => (e.y2 ?? e.y) >= lo + 50 && e.y <= hi - 50);
+      if (strict.length === 1) fit = strict;
+    }
+    if (fit.length > 1 && bbox) {
+      const [w, so, ea, n] = bbox;
+      const inArea = fit.filter((e) => e.pos[0] >= w - 5 && e.pos[0] <= ea + 5 && e.pos[1] >= so - 5 && e.pos[1] <= n + 5);
+      if (inArea.length) fit = inArea;
+    }
+    return fit.length === 1 ? fit : fit.map((e) => ({ ...e, sameName: fit.length }));
+  });
 }
 
 /** Summarise the built world: places by mentions, where the book is set, the polities there in its period, the wars and events it names. */
@@ -170,6 +200,6 @@ export async function worldProfile(row: BookWorldRow, item?: Pick<Item, 'histSta
     period, places, bbox, centre, polities,
     unresolved: [...unresolved].map(([name, mentions]) => ({ name, mentions })).sort((a, b) => b.mentions - a.mentions),
     wars: wars.filter((w) => warCh.has(w.q)).map((w) => ({ q: w.q, n: w.n, chapters: warCh.get(w.q)! })),
-    events: events.filter((e) => evCh.has(e.q)).map((e) => ({ ...e, chapters: evCh.get(e.q)! })).sort((a, b) => a.y - b.y),
+    events: pickNamedEvents(events.filter((e) => evCh.has(e.q)).map((e) => ({ ...e, chapters: evCh.get(e.q)! })), period, bbox).sort((a, b) => a.y - b.y),
   };
 }

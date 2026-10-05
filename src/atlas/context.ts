@@ -38,7 +38,17 @@ export function polityConvention(name: string): string | undefined {
   if (/\b(?:settlements|tribes|peoples|nationalists|communists|rebels|magnates|warlords|clans)\b/i.test(name)) return 'Cliopatria’s label for a population, movement or faction, not a state with fixed borders';
   return undefined;
 }
-export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
+export interface AtlasEvent {
+  q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string;
+  /** HCED's id: the event is in the Historical Conflict Event Dataset (alone when q is "hced:…"). */ h?: string;
+  /** Winner and loser as HCED names them. */ win?: string; los?: string;
+  /** HCED's own position and its distance from Wikidata's, when they disagree. */ hp?: Pos; hd?: number;
+  /** Other Wikidata items for the same event, and how far apart they place it. */ dq?: string[]; dd?: number;
+  /** Dated outside its own war (1), or inside it with the era reversed ('sign'). */ wo?: 1 | 'sign';
+  /** Wikidata's label doesn't read as an event name. */ nl?: 1;
+}
+/** Which dataset an event comes from, for display. */
+export const eventSource = (e: Pick<AtlasEvent, 'q' | 'h'>) => (e.q.startsWith('hced:') ? 'Historical Conflict Event Dataset' : e.h ? 'Wikidata; Historical Conflict Event Dataset' : 'Wikidata');
 export interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 
 /**
@@ -76,8 +86,18 @@ export async function politiesAt(p: Pos, year: HistYear, edgeKm = 20): Promise<P
 }
 
 let eventsP: Promise<AtlasEvent[]> | undefined;
+/**
+ * Every recorded event: Wikidata's, and the battles only the Historical Conflict Event Dataset records (A8-016) — the
+ * latter keyed "hced:<id>", their war by name only. Battles both record are Wikidata's, carrying HCED's record.
+ */
 export function allEvents(): Promise<AtlasEvent[]> {
-  eventsP ??= pack<FC<Omit<AtlasEvent, 'pos'>>>('wikidata-events.json').then((d) => d.features.map((f) => ({ ...f.properties, pos: (f.geometry as { coordinates: Pos }).coordinates })));
+  eventsP ??= Promise.all([
+    pack<FC<Omit<AtlasEvent, 'pos'>>>('wikidata-events.json'),
+    pack<FC<Omit<AtlasEvent, 'pos' | 'q'> & { w?: string }>>('hced-battles.json').catch(() => ({ features: [] }) as unknown as FC<Omit<AtlasEvent, 'pos' | 'q'>>),
+  ]).then(([wd, hc]) => [
+    ...wd.features.map((f) => ({ ...f.properties, pos: (f.geometry as { coordinates: Pos }).coordinates })),
+    ...hc.features.map((f) => { const { w, ...p } = f.properties as typeof f.properties & { w?: string }; return { ...p, q: `hced:${p.h}`, wn: w, pos: (f.geometry as { coordinates: Pos }).coordinates }; }),
+  ]);
   eventsP.catch(() => { eventsP = undefined; });
   return eventsP;
 }
@@ -92,12 +112,33 @@ export async function eventsNear(p: Pos, radiusKm: number, year?: HistYear, wind
     .sort((a, b) => (year !== undefined ? Math.abs(a.y - year) - Math.abs(b.y - year) : 0) || a.km - b.km);
 }
 
+/**
+ * The years a war is known to have been going on: its recorded start and end; with no end, until its last recorded
+ * event (A8-010); with no start, from its first (A8-011). Undefined when nothing dates it.
+ */
+export function warSpan(w: War, ev: AtlasEvent[]): [HistYear, HistYear] | undefined {
+  const own = ev.filter((e) => e.w === w.q && !e.wo);
+  const first = own.length ? Math.min(...own.map((e) => e.y)) : undefined;
+  const last = own.length ? Math.max(...own.map((e) => e.y2 ?? e.y)) : undefined;
+  const f = w.f ?? first ?? w.t ?? undefined;
+  const t = w.t ?? (last !== undefined ? Math.max(last, f ?? last) : w.f ?? undefined);
+  return f !== undefined && t !== undefined ? [f, t] : undefined;
+}
+
 /** Wars in progress in that year that have a recorded battle or siege within `radiusKm`. */
 export async function warsNear(p: Pos, year: HistYear, radiusKm = 400): Promise<(War & { events: number })[]> {
   const [wars, ev] = await Promise.all([allWars(), allEvents()]);
-  const active = wars.filter((w) => w.f !== null && w.f <= year && (w.t ?? w.f) >= year);
+  const active = wars.filter((w) => { const s = warSpan(w, ev); return !!s && s[0] <= year && year <= s[1]; });
   return active.map((w) => ({ ...w, events: ev.filter((e) => e.w === w.q && km(p, e.pos) <= radiusKm).length })).filter((w) => w.events > 0).sort((a, b) => b.events - a.events);
 }
+
+/** How far either side of the date a place card looks for its events — stated on the card (A8-017). */
+export const PLACE_EVENT_YEARS = 100;
+/** Events at the place itself (within this distance) come before the region's, whatever their date (A8-027). */
+export const AT_PLACE_KM = 30;
+/** Events between two dates around a place: the place's own first, then the rest by distance; dated order within each. */
+export const placeEventsFirst = <T extends AtlasEvent & { km: number }>(ev: T[]) =>
+  [...ev].sort((a, b) => Number(a.km > AT_PLACE_KM) - Number(b.km > AT_PLACE_KM) || (a.km > AT_PLACE_KM ? a.km - b.km : 0) || a.y - b.y);
 
 export const eventsOfWar = async (q: string) => (await allEvents()).filter((e) => e.w === q).sort((a, b) => a.y - b.y);
 

@@ -15,6 +15,7 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py doubt       # A15-002: an approximate position is not a doubted identification
   python3 scripts/atlas-build/patch_index.py zbiva       # SS-1, PA-011: Zbiva's location and dating confidence read
   python3 scripts/atlas-build/patch_index.py dissiloc    # SS-1: DISSILOC localisation precision and editorial status read
+  python3 scripts/atlas-build/patch_index.py events      # EV: events read as events — kinds, scope, duplicates, HCED identity
   python3 scripts/atlas-build/patch_index.py polities    # A16-004, PA-006: polity periods with gaps, per-period labels, shared Wikidata ids
 """
 from __future__ import annotations
@@ -314,8 +315,23 @@ def polities():
     return {'polities': len(rows), 'withGaps': sum(1 for r in rows if r.get('s')), 'sharedIdNotTheirs': shared}
 
 
+def events():
+    """The published Wikidata events re-read with events.py (kind by name, 1945 scope, duplicates, dates outside their
+    war), then HCED matched to them by name and year from its original file (sites.hced_battles)."""
+    import events as ev
+    import sites
+    atlas = os.path.join(ROOT, 'public', 'atlas')
+    path = os.path.join(atlas, 'wikidata-events.json')
+    doc = json.load(open(path, encoding='utf-8'))
+    wars = json.load(open(os.path.join(atlas, 'wikidata-wars.json'), encoding='utf-8'))
+    stats = ev.clean_events(doc['features'], wars)
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(doc, fh, ensure_ascii=False, separators=(',', ':'))
+    return {**stats, 'hced': sites.hced_battles()}
+
+
 if __name__ == '__main__':
-    steps = {'polities': polities, 'dissiloc': dissiloc, 'doubt': doubt, 'zbiva': zbiva, 'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'events': events, 'polities': polities, 'dissiloc': dissiloc, 'doubt': doubt, 'zbiva': zbiva, 'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
         stamp(f'place index: {step}')

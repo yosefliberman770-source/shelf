@@ -487,7 +487,7 @@ export function BookWorldPanel({ row, profile, building, progress, onBuild, onSh
         {profile.polities.length > 0 && <><dt>Political entities then</dt><dd>{profile.polities.slice(0, 8).map((p) => p.n).join(' · ')} <span className="tiny faint">(Cliopatria, around {yearLabel(profile.period.preferred ?? year)})</span></dd></>}
       </dl>
       {profile.wars.length > 0 && <div><div className="eyebrow">Wars the book names</div>{profile.wars.map((w) => <button key={w.q} className="atlas-war" onClick={() => onWar(w.q, w.n)}>⚔ {w.n} <span className="faint">named in {w.chapters.length} section{w.chapters.length === 1 ? '' : 's'}</span></button>)}</div>}
-      {profile.events.length > 0 && <div><div className="eyebrow">Events the book names</div><div className="small">{profile.events.slice(0, 12).map((e) => `${e.n} (${recordedYearLabel(e.y)})`).join(' · ')}</div></div>}
+      {profile.events.length > 0 && <div><div className="eyebrow">Events the book names</div><div className="small">{profile.events.slice(0, 12).map((e) => `${e.n} (${recordedYearLabel(e.y)}${e.sameName ? ` — one of ${e.sameName} events of this name; the book doesn’t settle which` : ''})`).join(' · ')}</div></div>}
       <div>
         <div className="eyebrow">Places in the book ({profile.places.length})</div>
         <div className="col" style={{ gap: 2 }}>

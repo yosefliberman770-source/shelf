@@ -136,14 +136,16 @@ describe('site layers follow the recorded dates', () => {
 });
 
 describe('battles from two datasets are not doubled', () => {
-  it('[rule] no HCED battle repeats a Wikidata battle within 50 km and a year', () => {
-    type F = { geometry: { coordinates: [number, number] }; properties: { y: number; k: string } };
+  it('[rule] no HCED battle repeats a Wikidata battle of the same name in the same years — nearness alone is not identity (A8-001)', () => {
+    type F = { geometry: { coordinates: [number, number] }; properties: { y: number; y2?: number; k: string; n: string } };
     const wd = (JSON.parse(readFileSync(join(PUB, 'atlas/wikidata-events.json'), 'utf8')).features as F[]).filter((f) => f.properties.k === 'battle' || f.properties.k === 'siege');
     const hc = JSON.parse(readFileSync(join(PUB, 'atlas/hced-battles.json'), 'utf8')).features as F[];
     expect(hc.length).toBeGreaterThan(500);
-    const km = (a: [number, number], b: [number, number]) => Math.hypot((a[0] - b[0]) * 111 * Math.cos((a[1] * Math.PI) / 180), (a[1] - b[1]) * 111);
-    const dup = hc.filter((h) => wd.some((w) => Math.abs(w.properties.y - h.properties.y) <= 1 && km(w.geometry.coordinates, h.geometry.coordinates) <= 50));
-    expect(dup).toHaveLength(0);
+    const core = (n: string) => n.toLowerCase().normalize('NFKD').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().replace(/^(?:the )?(?:first |second |third )?(?:battle|siege)s? (?:of |at |on )?(?:the )?/, '').replace(/ /g, '');
+    const byCore = new Map<string, F[]>();
+    for (const w of wd) byCore.set(core(w.properties.n), [...(byCore.get(core(w.properties.n)) ?? []), w]);
+    const dup = hc.filter((h) => (byCore.get(core(h.properties.n)) ?? []).some((w) => (w.properties.y2 ?? w.properties.y) >= h.properties.y - 1 && w.properties.y <= (h.properties.y2 ?? h.properties.y) + 1));
+    expect(dup.map((d) => d.properties.n)).toEqual([]);
   });
 });
 
