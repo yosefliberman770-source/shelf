@@ -21,9 +21,9 @@ const ctx = (lon: number, lat: number) => ({ points: [[lon, lat] as [number, num
 
 describe('a name with no record', () => {
   it('in a region where Shelf holds no dated places, says so instead of listing European datasets (A12-005, PA-015)', async () => {
-    const m = await matchName('Heian-kyō', 1000, { context: ctx(135.77, 35.01) });
+    const m = await matchName('Kororareka', 1300, { context: ctx(174.1, -35.3) });
     expect(m.status).toBe('none');
-    expect(m.reason).toMatch(/no dated place data for Japan & Korea/);
+    expect(m.reason).toMatch(/no dated place data for Oceania/);
     expect(m.reason).not.toMatch(/Mérimée|Viabundus/);
     expect(m.reason).toMatch(/does not mean/);
   });
@@ -58,18 +58,21 @@ describe('when the place data cannot be loaded', () => {
 
 describe('a lone namesake far from the book (A18-003)', () => {
   it('is offered as a possibility, not pinned, when the book is set on another continent', async () => {
-    const alone = await matchName('Seattle');
-    if (alone.status !== 'unique') return; // the index has no single "Seattle" any more: nothing to guard
-    const m = await matchName('Seattle', 1890, { context: ctx(-122.33, 47.61) });
+    // Shelf holds only Perth in Scotland: a book set in Western Australia does not get it pinned.
+    const m = await matchName('Perth', 1890, { context: ctx(115.86, -31.95) });
     expect(m.status).toBe('ambiguous');
     expect(m.place).toBeUndefined();
     expect(m.candidates).toHaveLength(1);
     expect(m.reason).toMatch(/probably a different place/);
   });
   it('is still placed when the book is set near it', async () => {
-    const alone = await matchName('Seattle');
-    if (alone.status !== 'unique' || !alone.place) return;
-    const m = await matchName('Seattle', 1890, { context: ctx(alone.place.lon + 0.5, alone.place.lat) });
+    const m = await matchName('Perth', 1890, { context: ctx(-3.6, 56.6) });
     expect(m.status).toBe('unique');
+  });
+  it('now that Shelf holds the world cities, the right one is chosen by the book’s geography', async () => {
+    for (const [n, lon, lat] of [['Santiago', -70.65, -33.45], ['Wellington', 174.78, -41.29], ['Troy', -73.69, 42.73]] as const) {
+      const m = await matchName(n, 1890, { context: ctx(lon, lat) });
+      expect(m.place?.gazetteer, n).toBe('hurbpop');
+    }
   });
 });

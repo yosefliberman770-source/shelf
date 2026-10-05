@@ -411,7 +411,9 @@ def cassini_places():
     z = zipfile.ZipFile(raw('cassini-roads-cities', 'france_cassini_cities.zip'))
     part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
     prj = z.read(next(n for n in z.namelist() if n.endswith('.prj'))).decode()
-    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='utf-8', encodingErrors='replace')
+    # The DBF has no code page file and is Latin-1 (Windows-1252): read as UTF-8 every accented name came out as "�"
+    # (A19-001). A replacement character left after decoding stops the build.
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='cp1252', encodingErrors='strict')
     tr = _transformer(prj)
     out = []
     for i, rec in enumerate(r.iterRecords()):
@@ -433,7 +435,7 @@ def cassini_roads():
     z = zipfile.ZipFile(raw('cassini-roads-cities', 'france_cassini_roads.zip'))
     part = lambda ext: io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith('.' + ext))))
     prj = z.read(next(n for n in z.namelist() if n.endswith('.prj'))).decode()
-    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='utf-8', encodingErrors='replace')
+    r = shapefile.Reader(shp=part('shp'), shx=part('shx'), dbf=part('dbf'), encoding='cp1252', encodingErrors='strict')  # Latin-1, as the cities
     tr = _transformer(prj)
     out = []
     for i, rec in enumerate(r.iterRecords()):

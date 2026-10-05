@@ -519,7 +519,8 @@ function absenceReason(written: string, year: HistYear | undefined, ctx: GeoCont
 }
 
 const SAME_PLACE_KM = 8;
-const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).join(' and ');
+// Dataset names in a fixed (alphabetical) order, so the same answer always reads the same (A20-003).
+const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).sort((a, b) => a.localeCompare(b)).join(' and ');
 
 /** What kind of entity a gazetteer record is, from its dataset's own type words. */
 export function kindOf(p: GazPlace): EntityKind {
@@ -589,7 +590,15 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   const notLater = all.filter((h) => recordFit(h.place, year) !== 'later');
   if (!notLater.length) return { status: 'none', confidence: 'unresolved', temporal: 'incompatible', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
   const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
-  const pool = typed.length ? typed : notLater;
+  const anyPool = typed.length ? typed : notLater;
+  // A shipwreck is a ship's name, not a place: it never answers a place name read in a book (Florence → a wreck off
+  // Wales, "Russia" in 1700 → a Welsh wreck). It is offered only when nothing else has the name (A20-006, RM-01).
+  const isWreck = (h: { place: GazPlace }) => h.place.types.includes('wreck');
+  const pool = anyPool.some((h) => !isWreck(h)) ? anyPool.filter((h) => !isWreck(h)) : anyPool;
+  if (pool.length && pool.every(isWreck)) {
+    return { status: 'ambiguous', confidence: 'ambiguous', candidates: pool.map((h) => h.place).slice(0, 12), corroborating: [],
+      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are shipwrecks' : 'is a shipwreck'} (a ship of that name), not a place. Shelf may not hold the place meant.` };
+  }
   // Group records that are the same place: different datasets within a few km.
   const groups: { place: GazPlace; isTitle: boolean }[][] = [];
   for (const h of pool) {

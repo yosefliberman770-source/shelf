@@ -165,6 +165,8 @@ def plausibility(src, title, lon, lat, start, end, registry):
     out = []
     if title.strip().lower() in PLACEHOLDER_TITLES:
         out.append('placeholder title')
+    if '\ufffd' in title:
+        out.append('garbled characters (�) in the name: the source was decoded with the wrong encoding')
     reg = registry.get(src)
     if reg:
         box, core = reg['box'], reg['core']
@@ -302,6 +304,98 @@ def places_index(rows, base=None, registry=None):
         log(f'  place index: {len(flagged)} rows kept but flagged as implausible')
     return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected, 'flagged': flagged,
             'duplicateIdsKeptUnderNewKeys': renamed, 'positionsMarkedApproximate': approx}
+
+
+def merge_snapshot_rows(rows):
+    """Evidence-only datasets give one record per estimate year (Reba: Beijing 900, 936, 1000 …). In the place index a
+    city is one place: its records are merged into one row whose evidence period runs from the first estimate to the
+    last, with the estimates kept as its population series (extra.pop, thousands)."""
+    groups, out = defaultdict(list), []
+    for r in rows:
+        e = r[13] or {}
+        if e.get('ev') and e.get('sn') and isinstance(r[3], (int, float)) and isinstance(r[4], (int, float)):
+            groups[(r[0], norm(r[2]), round(r[3], 3), round(r[4], 3))].append(r)
+        else:
+            out.append(r)
+    for g in groups.values():
+        g.sort(key=lambda r: (r[13]['env'][0], str(r[1])))
+        first, ys = list(g[0]), [r[13]['env'][0] for r in g]
+        pop = {}
+        for r in g:
+            m = re.search(r'([\d,]+)\s*$', r[13].get('st', ''))
+            if m:
+                pop[str(r[13]['env'][0])] = round(int(m.group(1).replace(',', '')) / 1000, 1)
+        extra = {k: v for k, v in g[0][13].items() if k not in ('sn', 'st', 'per')}
+        extra.update(env=[min(ys), max(ys), 'source'], st='city with population estimates',
+                     per=f'population estimates {ys[0]}–{ys[-1]} ({len(g)} estimate{"s" if len(g) > 1 else ""}, Chandler 1987 / Modelski 2003)',
+                     **({'pop': pop, 'est': {y: 'estimate' for y in pop}} if pop else {}))
+        first[13] = extra
+        out.append(first)
+    return out
+
+
+def drop_redundant_evidence(rows, km=10):
+    """Rows of evidence-only datasets (extra.ev: population estimates such as Reba's world cities) are kept only where
+    no other dataset places a record of the same name within `km`: Beijing, Delhi, Cuzco become findable, while a city
+    the gazetteers already hold is not doubled (A18-001)."""
+    grid = defaultdict(list)
+    for r in rows:
+        if not (r[13] or {}).get('ev') and isinstance(r[3], (int, float)) and isinstance(r[4], (int, float)) and isinstance(r[2], str):
+            grid[(norm(r[2]), int(r[3] // 1), int(r[4] // 1))].append((r[3], r[4]))
+    out, dropped = [], 0
+    for r in rows:
+        if (r[13] or {}).get('ev'):
+            k = norm(r[2])
+            near = [p for dx in (-1, 0, 1) for dy in (-1, 0, 1) for p in grid.get((k, int(r[3] // 1) + dx, int(r[4] // 1) + dy), [])]
+            if any(math.hypot((p[0] - r[3]) * math.cos(math.radians(r[4])), p[1] - r[4]) * 111 <= km for p in near):
+                dropped += 1
+                continue
+        out.append(r)
+    return out, dropped
+
+
+def _write_merged(base, sub, files):
+    """Write merged index files (cells/name shards) in their canonical order."""
+    for name, rows in files.items():
+        if sub == 'c':
+            rows = sorted(rows, key=_row_order)
+        elif sub == 'n':
+            rows = sorted(rows, key=lambda e: (e[0], e[1], str(e[2]), e[3], e[4]))
+        write_json(os.path.join(base, sub, name), rows)
+
+
+def replace_source_rows(src, rows, base=None, registry=None, keep_others=True):
+    """Replace every record of one dataset in the published index with `rows` (validated as a full build would), leaving
+    all other datasets untouched. For data fixes that touch one source (a corrected encoding, a newly indexed dataset)
+    without a full rebuild. Returns the stats of the new rows."""
+    import tempfile
+    base = base or os.path.join(OUT, 'places')
+    tmp = tempfile.mkdtemp(prefix='index-' + src)
+    try:
+        stats = places_index(rows, os.path.join(tmp, 'p'), registry=registry)
+        new = os.path.join(tmp, 'p')
+        for sub, keep in (('c', lambda r: r[0] != src), ('n', lambda e: e[1] != src)):
+            names = set(os.listdir(os.path.join(base, sub))) | (set(os.listdir(os.path.join(new, sub))) if os.path.isdir(os.path.join(new, sub)) else set())
+            for name in sorted(names):
+                old_p, new_p = os.path.join(base, sub, name), os.path.join(new, sub, name)
+                old_rows = json.load(open(old_p, encoding='utf-8')) if os.path.exists(old_p) else []
+                kept = [r for r in old_rows if keep(r)]
+                added = json.load(open(new_p, encoding='utf-8')) if os.path.exists(new_p) else []
+                if len(kept) == len(old_rows) and not added:
+                    continue
+                if not kept and not added:
+                    os.remove(old_p)
+                    continue
+                _write_merged(base, sub, {name: kept + added})
+        for f in sorted(os.listdir(os.path.join(base, 'i'))):
+            if f.startswith(src + '-'):
+                os.remove(os.path.join(base, 'i', f))
+        if os.path.isdir(os.path.join(new, 'i')):
+            for f in sorted(os.listdir(os.path.join(new, 'i'))):
+                shutil.copyfile(os.path.join(new, 'i', f), os.path.join(base, 'i', f))
+        return stats
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 # ── Vector tiles ──
@@ -507,8 +601,8 @@ def build_world(only=None):
     # The private place index goes with the private tiles into the private data pack (never into public/).
     if sites.private_rows:
         site_stats['privatePlaces'] = places_index(sites.private_rows, os.path.join(sites.PRIVATE_BUILD, 'places'))
-    rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows
-    stats = {'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
+    rows, redundant = drop_redundant_evidence(merge_snapshot_rows(pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows))
+    stats = {'evidenceRowsAlreadyPlaced': redundant, 'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
     # What the index now holds per region and period: the app caps the coverage it claims by these counts.
     import coverage_index
     coverage_index.write()
