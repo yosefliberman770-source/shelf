@@ -94,9 +94,10 @@ def _scapa_period(term):
 def canmore_kind(t):
     t = t.upper()
     for rx, k in ((r'\bCATHEDRAL\b', 'cathedral'), (r'\b(ABBEY|PRIORY|FRIARY|NUNNERY|MONASTERY|PRECEPTORY|COLLEGIATE CHURCH)\b', 'monastery'),
-                  (r'\b(CHURCH|CHAPEL|KIRK|CHURCHYARD|BURIAL GROUND)\b', 'church'), (r'\b(CASTLE|TOWER HOUSE|MOTTE|PEEL|BASTLE)\b', 'castle'),
+                  (r'\b(CHURCH|CHAPEL|KIRK)\b', 'church'), (r'\b(CASTLE|TOWER HOUSE|MOTTE|PEEL|BASTLE)\b', 'castle'),
                   (r'\b(FORT|FORTLET|DUN|BROCH|HILLFORT|FORTIFICATION|BATTERY|RAMPART|ARTILLERY)\b', 'fortification'),
-                  (r'\b(WRECK|CRAFT|BOAT|SHIP|AIRCRAFT)\b', 'wreck'), (r'\b(HARBOUR|PIER|QUAY|DOCK|LIGHTHOUSE|JETTY|SLIPWAY)\b', 'harbour'),
+                  # a ship burial, a boatyard or an aircraft hangar is not a shipwreck (A8-022)
+                  (r'\b(SHIP|BOAT) BURIAL\b', 'site'), (r'\b(WRECK)\b|^(?!.*\b(HANGAR|YARD|BURIAL|FACTORY|SHOP|HOUSE|STATION|BATTERY|SHED)\b).*\b(CRAFT|BOAT|SHIP|AIRCRAFT)\b', 'wreck'), (r'\b(HARBOUR|PIER|QUAY|DOCK|LIGHTHOUSE|JETTY|SLIPWAY)\b', 'harbour'),
                   (r'\bBRIDGE\b|\bFORD\b', 'bridge'), (r'\b(ROAD|TRACK|CAUSEWAY|TURNPIKE)\b', 'road'), (r'\bMARKET\b', 'market'),
                   (r'\b(MILL|KILN|FORGE|SALTPAN|BREWERY|DISTILLERY|TANNERY)\b', 'mill'), (r'\b(QUARRY|MINE|PIT|SHAFT|LEAD WORKS|BLOOMERY)\b', 'mine'),
                   (r'\b(BURGH|TOWN|VILLAGE|TOWNSHIP|SETTLEMENT|FARMSTEAD|CROFT|HAMLET|CLACHAN)\b', 'settlement')):
@@ -150,8 +151,10 @@ IRL_PERIOD = {'early medieval': (400, 1169), 'medieval': (1169, 1550), 'viking/h
 def irl_kind(c):
     c = c.lower()
     for rx, k in ((r'religious house|abbey|priory|friary|nunnery|monastery|preceptory', 'monastery'), (r'cathedral', 'cathedral'),
-                  (r'^church|ecclesiastical|chapel|graveyard|holy well', 'church'), (r'castle|tower house|bawn|fortified house', 'castle'),
-                  (r'^ringfort|promontory fort|hillfort|fort\b', 'fortification'), (r'settlement|town|village|borough', 'settlement'),
+                  (r'^church|ecclesiastical|chapel|holy well', 'church'), (r'castle|tower house|bawn|fortified house', 'castle'),
+                  # a graveyard is a burial place, not a church (A8-023); a ringfort is an enclosed farmstead, a hillfort
+                  # prehistoric: neither is a castle (A11-016) — both drawn with the archaeology
+                  (r'graveyard|burial ground|cemetery', 'site'), (r'^ringfort|promontory fort|hillfort', 'site'), (r'fort\b', 'fortification'), (r'settlement|town|village|borough', 'settlement'),
                   (r'^bridge', 'bridge'), (r'^road|togher|trackway', 'road'), (r'^mill|kiln', 'mill'), (r'quarry|mine', 'mine'),
                   (r'harbour|quay|pier', 'harbour'), (r'wreck', 'wreck'), (r'market', 'market')):
         if re.search(rx, c):

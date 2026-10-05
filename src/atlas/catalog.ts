@@ -6,7 +6,7 @@ import type { ExpressionSpecification, FilterSpecification, LayerSpecification, 
 import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { eventNear, existedIn, type HistYear, ohmExisted, toAstro, yearLabel } from './time';
 import { PRIVATE_TILE_PREFIX, privateHas } from './privateData';
-import { inGroupExpr, type SiteGroup } from './site-types';
+import { inGroupExpr, type SiteGroup, siteGroupExpr } from './site-types';
 
 /** Why a layer can't be shown: each reason is stated as it is, never lumped together as "no data". */
 export type UnavailableKind = 'no-dataset' | 'licence' | 'online-only' | 'not-integrated';
@@ -441,7 +441,8 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
   //     period) — so they never fill the overview map at every date.
   const y = ctx.year;
   // A list of kinds, or a map group from the master list of site types (site-types.ts), which also reads the type text.
-  const kind: ExpressionSpecification = Array.isArray(kinds) ? ['in', ['get', 'k'], ['literal', kinds]] : inGroupExpr(kinds.group);
+  // A list of kinds leaves out records whose type says they are only finds (a coin is not a market, A10-002).
+  const kind: ExpressionSpecification = Array.isArray(kinds) ? ['all', ['in', ['get', 'k'], ['literal', kinds]], ['!=', siteGroupExpr(), 'archaeology']] : inGroupExpr(kinds.group);
   const endOnly: ExpressionSpecification = ['all', ['!', ['has', 'f']], ['has', 't'], ['<', y, ['get', 't']]];
   // A snapshot (a gazetteer or register listing the place in one year: 'sn') says only that it existed then; it is drawn,
   // lighter, within SNAPSHOT_YEARS of that year (a stated display tolerance — the record keeps its one year).
@@ -453,8 +454,11 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
     ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['has', 'ef'], soon('ef')]];
   const inWindow: ExpressionSpecification = ['all', ['<=', ['coalesce', ['get', 'w0'], SITES[0]], y], ['>=', ['coalesce', ['get', 'w1'], SITES[1]], y]];
   const noStart: ExpressionSpecification = ['any', ['!', ['any', ['has', 'f'], ['has', 't'], ['has', 'ef'], ['has', 'et']]], endOnly];
-  const filter = ['all', kind, ctx.showUndated ? ['any', when, recordedSoon] : when] as FilterSpecification;
-  const undatedFilter = ['all', kind, inWindow, noStart] as FilterSpecification;
+  // A shipwreck dated only by a period (a register's "post-medieval") is one sinking somewhere in it, not a place
+  // present for the whole period: drawn only with its own date, or as undated (A8-021).
+  const periodOnlyWreck: ExpressionSpecification = ['all', ['==', ['get', 'k'], 'wreck'], ['!', ['any', ['has', 'f'], ['has', 't']]]];
+  const filter = ['all', kind, ['!', periodOnlyWreck], ctx.showUndated ? ['any', when, recordedSoon] : when] as FilterSpecification;
+  const undatedFilter = ['all', kind, inWindow, ['any', noStart, periodOnlyWreck]] as FilterSpecification;
   // Solid only where its own dates place it at the year; lighter when only an evidence period does.
   const dated: ExpressionSpecification = ['any', ['all', ['has', 'f'], ['<=', ['get', 'f'], y]], ['all', ['!', ['has', 'f']], ['has', 't'], ['==', ['get', 't'], y]]];
   const byPeriod: ExpressionSpecification = ['all', ['!', ['any', ['has', 'f'], ['has', 't']]], ['any', ['has', 'ef'], ['has', 'et']], ['<=', ['coalesce', ['get', 'ef'], -99999], y]];

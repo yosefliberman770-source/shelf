@@ -473,12 +473,34 @@ export function temporalSupport(fit: TimeFit | 'no-year'): TemporalSupport {
  *   unresolved — no defensible candidate (none of that name, or every one began after the date)
  */
 export type PlaceConfidence = 'certain' | 'probable' | 'possible' | 'ambiguous' | 'unresolved';
+/** Records that are not places a book names (A8-040, SS-3): what they are, or undefined for a place. */
+const NOT_A_PLACE: [RegExp, string][] = [
+  [/\b(?:find ?spots?|stray finds?|single finds?|coins?|hoards?|scatter|hack-?silver|metal[- ]detect|activity area)\b/i, 'a find spot'],
+  [/\b(?:graves?|burials?|cemetery|graveyard|churchyard|cist|barrow cemetery)\b/i, 'a burial place'],
+  [/\b(?:battle ?site|battlefield)\b/i, 'a battle site'],
+  [/\b(?:railway|train|petrol|lifeboat|fishing|coastguard|pumping|power) station\b/i, 'a station named after a place'],
+  [/\b(?:oyster|fishery|fishing ground|mussel)\b/i, 'a fishery'],
+];
+export function notAPlace(p: Pick<GazPlace, 'types' | 'sourceType'>): string | undefined {
+  if (p.types.includes('wreck')) return /\b(?:hangar|boat ?yard|shipyard|factory|shop|boat ?house|burial)\b/i.test(p.sourceType ?? '') ? undefined : 'a shipwreck (a ship of that name)';
+  if (p.types.includes('hoard')) return 'a find spot';
+  if (p.types.includes('fishery')) return 'a fishery';
+  if (p.types.includes('battle')) return 'a battle site';
+  const t = p.sourceType ?? '';
+  // only when the type names nothing that is a place (a "settlement; grave" is a settlement)
+  if (!t || /\b(?:settlement|village|town|city|township|farm|church|chapel|abbey|priory|castle|fort|manor|parish|monastery|harbour|port)\b/i.test(t)) return undefined;
+  return NOT_A_PLACE.find(([re]) => re.test(t))?.[1];
+}
+const list = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} or ${xs[xs.length - 1]}`);
+
 export function placeConfidence(a: { identity: MatchStatus; basis?: MatchBasis; liveRivals: number; support: TemporalSupport; fitsBook: boolean }): PlaceConfidence {
   if (a.identity === 'none' || a.support === 'incompatible') return 'unresolved';
   if (a.identity === 'ambiguous') return 'ambiguous';
   // Identity settled without leaning on dates: no rival attested at the date, and not chosen *because* rivals lack dates.
   const settled = a.liveRivals === 0 && (a.basis === 'only' || a.basis === 'context');
   switch (a.support) {
+    // Without a date from the book the record's dates were never checked: a good identification, not a certain one (A12-017, A12-018).
+    case 'no-date': return 'probable';
     case 'not-yet-attested': return 'possible';
     case 'no-evidence': return a.fitsBook ? 'probable' : 'possible';
     case 'persisting':
@@ -604,13 +626,15 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   if (!notLater.length) return { status: 'none', confidence: 'unresolved', temporal: 'incompatible', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
   const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
   const anyPool = typed.length ? typed : notLater;
-  // A shipwreck is a ship's name, not a place: it never answers a place name read in a book (Florence → a wreck off
-  // Wales, "Russia" in 1700 → a Welsh wreck). It is offered only when nothing else has the name (A20-006, RM-01).
-  const isWreck = (h: { place: GazPlace }) => h.place.types.includes('wreck');
-  const pool = anyPool.some((h) => !isWreck(h)) ? anyPool.filter((h) => !isWreck(h)) : anyPool;
-  if (pool.length && pool.every(isWreck)) {
+  // A shipwreck is a ship's name, a find or a grave is an object, a battle site or a railway station is named after
+  // something else, a fishery after the coast it works: none answers a place name read in a book (Florence → a wreck
+  // off Wales, "Holy Island" in 793 → an oyster fishery, a battle → a station named after it). Such a record is
+  // offered only when nothing else has the name, and never as the answer (A20-006, A8-040, SS-3, X-04).
+  const pool = anyPool.some((h) => !notAPlace(h.place)) ? anyPool.filter((h) => !notAPlace(h.place)) : anyPool;
+  if (pool.length && pool.every((h) => notAPlace(h.place))) {
+    const what = [...new Set(pool.map((h) => notAPlace(h.place)!))];
     return { status: 'ambiguous', confidence: 'ambiguous', candidates: pool.map((h) => h.place).slice(0, 12), corroborating: [],
-      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are shipwrecks' : 'is a shipwreck'} (a ship of that name), not a place. Shelf may not hold the place meant.` };
+      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are' : 'is'} ${list(what)}, not a place of that name. Shelf may not hold the place meant.` };
   }
   // Group records that are the same place: different datasets within a few km.
   const groups: { place: GazPlace; isTitle: boolean }[][] = [];

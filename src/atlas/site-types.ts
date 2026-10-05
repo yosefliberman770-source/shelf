@@ -51,13 +51,37 @@ export const SITE_TYPES: SiteType[] = [
  * else it is described ("Church and graveyard", "Chapel, hospital") — the church is the main
  * thing there. Words are matched with spaces around the text, so 'kirke ' is not 'kirkegård'.
  */
-const RELIGIOUS: Word[] = ['church', 'chapel', 'kirk ', 'kirk,', 'kirke ', 'kirke,', 'kirkested', 'abbey', 'priory', 'friary', 'nunnery', 'convent', 'monaster', 'cathedral',
+const RELIGIOUS: Word[] = ['church ', 'church,', 'church;', 'church)', 'church.', 'church·', 'churches', 'chapel', 'kirk ', 'kirk,', 'kirke ', 'kirke,', 'kirkested', 'abbey', 'priory', 'friary', 'nunnery', 'convent', 'monaster', 'cathedral',
   'mosque', 'synagogue', 'religious house', 'ecclesiastical', 'preceptory', 'oratory', 'kościół', 'kaplica', 'kapliczka', 'kapela', 'kapelica', 'cerkev', 'samostan', 'kirkko', 'kirkon', 'klasztor', 'kloster', 'église', 'chapelle', 'cerkiew', 'temple'];
 
 /** Castle words: a castle whose type also names one of these stays a castle, even if it later became a country house. */
 const CASTLE: Word[] = ['castle', 'tower', 'motte', 'fort', 'keep', 'bastle', 'peel', 'zamek', 'burg', 'borg', 'château', 'schloss', 'bawn', 'hall house', 'moat', 'ringwork'];
 /** Country houses filed as castles when nothing in their type says castle. */
 const HOUSE: Word[] = ['country house', 'manor house', 'mansion', 'dwór', 'herrenhaus', 'stately home'];
+
+/**
+ * Prehistoric and early medieval enclosures and forts (A11-016): Iron Age brochs, duns and hillforts, Irish ringforts
+ * and cashels (enclosed farmsteads, c. 500–1000), crannogs. A castle or fortification record of these is drawn with
+ * the archaeology, not in "Castles", unless its type also names a castle.
+ */
+const OLD_FORT: Word[] = ['ringfort', 'ring fort', 'ring-fort', 'cashel', 'hillfort', 'hill fort', 'hill-fort', 'broch', ' dun ', ' dun,', ' dun (', 'galleried dun',
+  'promontory fort', 'contour fort', 'crannog', ' rath ', ' rath,', 'oppidum', 'gradišč', 'grodzisko', 'piliakaln', 'pilskaln', 'linnamägi', 'muinaislinna'];
+const TRUE_CASTLE: Word[] = ['castle', 'motte', 'tower house', 'tower-house', 'keep', 'bastle', 'peel', 'zamek', 'château', 'schloss', 'ringwork', 'bawn'];
+/**
+ * Finds, hoards and scatters (A10-002, A11-013, A8-019): a record whose type names only finds is drawn with the
+ * archaeology, never as a settlement, market, castle or church — a coin is not a market and a hoard is not a house.
+ */
+const FINDS: Word[] = ['findspot', 'find spot', 'stray find', 'single find', 'coin', 'hoard', 'scatter', 'weight (', 'hack-silver', 'hacksilver', 'hack silver',
+  'metal detect', 'activity area', 'artefact', 'artifact', 'cropmark', 'crop mark', 'flint', 'sherd', 'pottery'];
+/** Words that name the record's own kind; a find or a cropmark among them does not move it. */
+const OWN_WORDS: Record<string, Word[]> = {
+  settlement: ['settlement', 'township', 'village', 'town', 'farm', 'croft', 'hamlet', 'dwelling', 'house', 'hut', 'homestead', 'locality', 'city', 'rath', 'crannog'],
+  market: ['market', 'fair', 'forum', 'agora', 'macell'],
+  castle: TRUE_CASTLE, fortification: ['fort', 'battery', 'rampart', 'bastion', 'redoubt', 'earthwork', 'castle', 'tower'],
+};
+/** What a "wreck" record really is when its type says otherwise (A8-022): a ship burial, a boatyard, a hangar. */
+const NOT_WRECK_BURIAL: Word[] = ['ship burial', 'boat burial', 'burial'];
+const NOT_WRECK_WORK: Word[] = ['hangar', 'boatyard', 'boat yard', 'shipyard', 'factory', 'workshop', 'shop', 'boathouse', 'boat house', 'naust', 'slipway', 'battery', 'station'];
 
 /** Kinds whose records may move to another group by their type text. */
 const MOVABLE = ['site', 'building', 'church', 'monastery'];
@@ -91,18 +115,28 @@ const has = (text: string, words: Word[]) => words.some((x) => typeof x === 'str
 export function siteGroup(p: Record<string, unknown>): SiteGroup | undefined {
   const k = String(p.k ?? '');
   const text = textOf(p);
+  if (k === 'wreck') return has(text, NOT_WRECK_BURIAL) ? 'burial' : 'archaeology';
+  if (k in OWN_WORDS && has(text, FINDS) && !has(text, OWN_WORDS[k])) return 'archaeology';
+  if (CHURCHY.includes(k) && has(text, FINDS) && !has(text, RELIGIOUS) && !has(text, wordsOf('burial'))) return 'archaeology';
   if (MOVABLE.includes(k) && !(CHURCHY.includes(k) && has(text, RELIGIOUS))) {
     for (const g of MOVES[k]) if (has(text, wordsOf(g))) return g;
   }
+  if ((k === 'castle' || k === 'fortification') && has(text, OLD_FORT) && !has(text, TRUE_CASTLE)) return 'archaeology';
   if ((k === 'castle' || k === 'fortification') && has(text, HOUSE) && !has(text, CASTLE)) return 'archaeology';
   return KIND_GROUP[k];
 }
+
+/** A wreck record that is not a ship lost at sea (a hangar, a boatyard, a ship burial): its type says so (A8-022). */
+export const notReallyWreck = (p: Record<string, unknown>) => String(p.k ?? '') === 'wreck' && (has(textOf(p), NOT_WRECK_BURIAL) || has(textOf(p), NOT_WRECK_WORK));
+/** Settlement and market records that are only finds (A10-002): moved to the archaeology, out of their kind's layer. */
+export const findOnly = (p: Record<string, unknown>) => { const k = String(p.k ?? ''); return k in OWN_WORDS && has(textOf(p), FINDS) && !has(textOf(p), OWN_WORDS[k]); };
 
 /** The kinds whose records can end up in a group: a layer tests these first, so other records cost it one lookup. */
 export function groupKinds(g: SiteGroup): string[] {
   const ks = new Set(Object.entries(KIND_GROUP).filter(([, x]) => x === g).map(([k]) => k));
   for (const k of MOVABLE) if (MOVES[k].includes(g)) ks.add(k);
-  if (g === 'archaeology') ['castle', 'fortification'].forEach((k) => ks.add(k));
+  if (g === 'archaeology') ['castle', 'fortification', 'settlement', 'market', 'church', 'monastery'].forEach((k) => ks.add(k));
+  if (g === 'burial') ks.add('wreck');
   return [...ks];
 }
 
@@ -123,14 +157,18 @@ export const inGroupExpr = (g: SiteGroup): ExpressionSpecification => ['all', ki
 export function siteGroupExpr(): ExpressionSpecification {
   if (built) return built;
   const cases: (ExpressionSpecification | string)[] = [];
+  cases.push(['all', ['==', ['get', 'k'], 'wreck'], hasExpr(NOT_WRECK_BURIAL)], 'burial');
+  for (const [k, own] of Object.entries(OWN_WORDS)) cases.push(['all', ['==', ['get', 'k'], k], hasExpr(FINDS), ['!', hasExpr(own)]], 'archaeology');
+  cases.push(['all', kindIn(CHURCHY), hasExpr(FINDS), ['!', hasExpr(RELIGIOUS)], ['!', hasExpr(wordsOf('burial'))]], 'archaeology');
   for (const k of MOVABLE) {
     const stays: ExpressionSpecification = CHURCHY.includes(k) ? hasExpr(RELIGIOUS) : ['boolean', false];
     for (const g of MOVES[k]) cases.push(['all', ['==', ['get', 'k'], k], ['!', stays], hasExpr(wordsOf(g))], g);
   }
+  cases.push(['all', kindIn(['castle', 'fortification']), hasExpr(OLD_FORT), ['!', hasExpr(TRUE_CASTLE)]], 'archaeology');
   cases.push(['all', kindIn(['castle', 'fortification']), hasExpr(HOUSE), ['!', hasExpr(CASTLE)]], 'archaeology');
   const byKind = Object.entries(KIND_GROUP).flatMap(([k, g]) => [k, g]);
   const kindOnly = ['match', ['to-string', ['coalesce', ['get', 'k'], '']], ...byKind, ''];
   // The type text is read only for kinds that can move; every other kind is placed by its kind alone.
-  built = ['case', ['!', kindIn([...MOVABLE, 'castle', 'fortification'])], kindOnly, ['let', 'text', TEXT_OF, ['case', ...cases, kindOnly]]] as unknown as ExpressionSpecification;
+  built = ['case', ['!', kindIn([...MOVABLE, 'castle', 'fortification', 'settlement', 'market', 'wreck'])], kindOnly, ['let', 'text', TEXT_OF, ['case', ...cases, kindOnly]]] as unknown as ExpressionSpecification;
   return built;
 }

@@ -42,13 +42,13 @@
   },
   "british-isles": {
    "dated": {
-    "bronze-iron": 2820,
-    "classical": 6271,
-    "early-medieval": 10202,
-    "early-modern": 79818,
-    "long-19th": 55409,
-    "medieval": 19415,
-    "modern": 9663,
+    "bronze-iron": 2815,
+    "classical": 6214,
+    "early-medieval": 9851,
+    "early-modern": 78890,
+    "long-19th": 54560,
+    "medieval": 19047,
+    "modern": 9387,
     "prehistory": 172
    },
    "undated": 4720
