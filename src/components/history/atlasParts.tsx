@@ -20,6 +20,21 @@ import { CONFIDENCE_LABEL } from '../../lib/history/types';
 import { Icon } from '../icons';
 import { EmptyNote } from './worldParts';
 
+/** The place's recorded containers, without raw source codes ("W2890", "Q123") that name nothing to a reader (A16-007). */
+export const containedIn = (p: Pick<ReaderPlace, 'partOf'>) => p.partOf.filter((x) => x?.trim() && !/^(?:[A-Z]{1,2}\d{2,}|Q\d+)$/.test(x.trim()));
+/** Containment is credited to the record's own dataset, and said for what it is (A15-006, A9-008, X-09, X-21): Pleiades'
+ *  "part of" is undated and may mix periods; any other dataset's location fields are usually present-day units. */
+const CONTAINMENT_NOTE = (who: string, pleiades: boolean) => (pleiades
+  ? `${who}; not dated — it may hold for one period only`
+  : `${who}'s own location fields, often present-day administrative units, not historical ones`);
+/** What the related places are, by the dataset that records them (A9-009, A15-007, A15-008, A8-029). */
+export function relatedNote(p: ReaderPlace): string {
+  const src = p.gaz ? gazetteerInfo(p.gaz.gazetteer).name : p.sources[0]?.name ?? 'the source';
+  if (p.gaz?.gazetteer === 'pleiades') return 'Relationships recorded in Pleiades. Pleiades does not date them: successive memberships (one province, then another) are listed together.';
+  if (p.related.some((r) => r.type === 'in diocese')) return `Recorded in ${src}. A diocese from Wikidata is usually the present-day one, not the medieval diocese.`;
+  return `Relationships recorded in ${src}.`;
+}
+
 /** How a listed place relates to the year: only "recorded at it" goes unmarked; an evidence period is not existence (A12-025). */
 const AT_YEAR_NOTE: Record<string, string> = { period: ' · only its evidence period covers this date', earlier: ' · recorded before this date', unattested: ' · first recorded later', undated: ' · undated', near: ' · recorded close to this date' };
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
@@ -213,12 +228,11 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
         <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)}{place.fieldSources ? <span className="tiny faint"> (from {place.fieldSources.position}{place.fieldSources.dates && place.fieldSources.dates !== place.fieldSources.position ? `; dates from ${place.fieldSources.dates}` : ''})</span> : null} · <span className="faint">{place.gaz?.meaningUnknown ? 'as the source gives it (its precision is not documented)' : CERTAINTY_LABEL[place.certainty]}</span></dd>
         {place.gaz?.note && <><dt>Correction</dt><dd className="small">{place.gaz.note}</dd></>}
         {place.gaz?.qa && <><dt>Data check</dt><dd className="small">{place.gaz.qa}</dd></>}
-        {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>
-          {pol && pol.length > 0 && <div>{politiesLine(pol)} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}
-          {place.gaz?.rulers?.length
-            ? (rulerAt(place.gaz, year) ? <div>Ruled by {rulerAt(place.gaz, year)} in {yearLabel(year)} <span className="tiny faint">({gazetteerInfo(place.gaz.gazetteer).name})</span></div> : null)
-            : place.partOf.length > 0 && <div>Part of {place.partOf.join(', ')} <span className="tiny faint">({place.gaz ? gazetteerInfo(place.gaz.gazetteer).name : place.sources[0]?.name})</span></div>}
+        {((pol && pol.length > 0) || (place.gaz?.rulers?.length && rulerAt(place.gaz, year))) && <><dt>Political entity in {yearLabel(year)}</dt><dd>
+          {pol && pol.length > 0 && <div>{politiesLine(pol)} <span className="tiny faint">(Cliopatria)</span></div>}
+          {place.gaz?.rulers?.length && rulerAt(place.gaz, year) ? <div>Ruled by {rulerAt(place.gaz, year)} <span className="tiny faint">({gazetteerInfo(place.gaz.gazetteer).name})</span></div> : null}
         </dd></>}
+        {containedIn(place).length > 0 && <><dt>{place.gaz?.gazetteer === 'pleiades' ? 'Part of' : 'Located in'}</dt><dd>{containedIn(place).join(', ')} <span className="tiny faint">({CONTAINMENT_NOTE(place.gaz ? gazetteerInfo(place.gaz.gazetteer).name : place.sources[0]?.name ?? 'the source', place.gaz?.gazetteer === 'pleiades')})</span></dd></>}
         {place.description && <><dt>Today</dt><dd>{place.description} <span className="tiny faint">(present-day description)</span></dd></>}
       </dl>
       {events && events.length > 0 && (
@@ -238,7 +252,7 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
               ? <button key={i} className="chip" onClick={() => onOpenPlace(r.key!, r.title)}>{relationLabel(r)} {r.title}</button>
               : <span key={i} className="chip">{relationLabel(r)} {r.title}</span>)}
           </div>
-          <div className="tiny faint">Relationships recorded in Pleiades.</div>
+          <div className="tiny faint">{relatedNote(place)}</div>
         </div>
       )}
       <div className="row wrap gap-4 mt-8">

@@ -13,7 +13,7 @@ Rules:
 - If a name clearly refers to a real historical person or place, set real to its specific identity (e.g. "Edward I of England"); otherwise null.
 Return JSON only:
 {"entities":[{"name":"","type":"character|place|organization|family|polity|event|object|date|occupation|region|concept","aliases":[],"titles":[],"gender":"male|female|unknown","real":null,"desc":"one sentence: who/what this is in this passage","facts":[{"t":"fact","p":0,"q":"quote","c":"explicit"}],"p":[0]}],
-"relations":[{"a":"name","b":"name","type":"e.g. sister of, works for, married to, lives at, located in","p":0,"c":"explicit"}],
+"relations":[{"a":"name","b":"name","type":"e.g. sister of, works for, married to, lives at, located in, ceded to","w":"the date the text gives for it, if any (e.g. 1739)","p":0,"c":"explicit"}],
 "events":[{"name":"","when":"","where":"","who":[""],"p":0,"c":"explicit"}]}`;
 
 export function extractionPrompt(book: { title: string; author: string }, chapterTitle: string, text: string, hints: string[]): string {
@@ -77,7 +77,9 @@ export function parseExtraction(data: unknown, paraRange?: [number, number]): Ch
   }
   const relations: RawRelation[] = arr(o.relations ?? o.relationships).map((x) => {
     const r = (x ?? {}) as Record<string, unknown>;
-    return { a: s(r.a ?? r.from ?? r.source), b: s(r.b ?? r.to ?? r.target), type: s(r.type ?? r.relation), detail: s(r.detail) || undefined, para: inRange(num(r.p ?? r.para)), certainty: cert(r.c ?? r.certainty) };
+    // a date the model returns, else a year written in the relation's own words ("ceded to Austria in 1739")
+    const when = s(r.w ?? r.when ?? r.date) || (`${s(r.type ?? r.relation)} ${s(r.detail)}`.match(/\b(?:1[0-9]{3}|[2-9][0-9]{2})\b(?:\s*(?:BC|BCE|AD|CE))?/)?.[0] ?? '');
+    return { a: s(r.a ?? r.from ?? r.source), b: s(r.b ?? r.to ?? r.target), type: s(r.type ?? r.relation), detail: s(r.detail) || undefined, when: when || undefined, para: inRange(num(r.p ?? r.para)), certainty: cert(r.c ?? r.certainty) };
   }).filter((r) => r.a && r.b && r.type && r.a !== r.b);
   const events: RawEvent[] = arr(o.events).map((x) => {
     const r = (x ?? {}) as Record<string, unknown>;
