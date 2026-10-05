@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { containedIn, relatedNote } from '../components/history/atlasParts';
 import { parseExtraction } from '../lib/book/extractPrompt';
-import type { ReaderPlace } from '../lib/book/types';
+import type { ReaderPlace } from './resolve';
 
 const place = (over: Record<string, unknown>) => ({ partOf: [], related: [], sources: [{ name: 'the source' }], ...over }) as unknown as ReaderPlace;
 
