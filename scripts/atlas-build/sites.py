@@ -675,6 +675,16 @@ def hced_battles():
         for k_in, k_out in (('War', 'w'), ('Winner', 'win'), ('Loser', 'los')):
             if r.get(k_in, '').strip():
                 props[k_out] = r[k_in].strip()[:80]
+        # Also kept from the source (A8-008): land or naval, the massacre flag, the dataset's own scale (Lehmann–Zhukov,
+        # 1–4) and the work it cites for the battle.
+        if r.get('Theatre', '').strip() in ('Land', 'Naval', 'Amphibious'):
+            props['th'] = r['Theatre'].strip()
+        if r.get('Massacre', '').strip().lower() == 'yes':
+            props['ms'] = 1
+        if re.fullmatch(r'[1-4]', r.get('Lehmann Zhukov Scale', '').strip()):
+            props['sc'] = int(r['Lehmann Zhukov Scale'].strip())
+        if r.get('Alternative Sources Consulted', '').strip() not in ('', 'NA'):
+            props['cite'] = r['Alternative Sources Consulted'].strip()[:160]
         out.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(lon, 4), round(lat, 4)]}, 'properties': props})
     with open(os.path.join(ATLAS, 'hced-battles.json'), 'w', encoding='utf-8') as fh:
         json.dump({'type': 'FeatureCollection', 'features': out}, fh, ensure_ascii=False, separators=(',', ':'))

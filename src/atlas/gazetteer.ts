@@ -58,6 +58,34 @@ export interface GazPlace {
   /** The record's id in its source (differs from `id` only when several records share one source id). */
   sourceId?: number | string;
   url: string;
+  /** The source's own type wording ("ABBEY (MEDIEVAL)(POSSIBLE)", "Fort?"), kept next to Shelf's mapped kind. */
+  sourceType?: string;
+  /** Doubt the source writes into the type ("possible", "probable", "uncertain"): the kind is not established. */
+  typeDoubt?: 'possible' | 'probable' | 'uncertain';
+  /** The source's own period wording ("Middle Ages", "Roman"). */
+  sourcePeriod?: string;
+  /** The dates as the source writes them ("um 1250", "vor 1271", "nach 1477"), when it qualifies them. */
+  datesAsWritten?: { from?: string; to?: string };
+  /** Who ruled the place, year by year, from the source (Deutsches Städtebuch): [ruler, from, to]. */
+  rulers?: [string, number | null, number | null][];
+}
+
+/** Doubt written into a source's type text. */
+export function typeDoubtOf(st: string | undefined): GazPlace['typeDoubt'] {
+  if (!st) return undefined;
+  if (/\bpossibl|\bmöglich|\bvermutlich|\bwohl\b|\(\?\)|\?$|\?\s*\)/i.test(st)) return 'possible';
+  if (/\bprobabl|\bwahrscheinlich/i.test(st)) return 'probable';
+  if (/\bunidentified|\bunknown|\buncertain|\bunsicher|\bunbekannt/i.test(st)) return 'uncertain';
+  return undefined;
+}
+
+/** A qualified end the source writes as "after X" / "nach X" / "X?": the record continues past it — not an end. */
+const OPEN_END = /^(nach|after|post|seit|since|sp[äa]testens\s+nach)\b|\?\s*$/i;
+
+/** The ruler of a place in a year, from its source's dated list (Deutsches Städtebuch), if it has one. */
+export function rulerAt(p: Pick<GazPlace, 'rulers'>, year: HistYear | undefined): string | undefined {
+  if (!p.rulers?.length || year === undefined) return undefined;
+  return p.rulers.find(([, a, b]) => (a === null || a <= year) && (b === null || year <= b))?.[0];
 }
 
 export interface GazetteerInfo {
@@ -164,6 +192,10 @@ interface RowExtra {
   sid?: number | string;
   /** Why the position is approximate although the source gives a point (too few decimals, shared by many records). */
   pq?: string;
+  /** The source's period wording; dated rulers (Deutsches Städtebuch); Germania Sacra phases [label, from, to, from as written, to as written]. */
+  per?: string;
+  rule?: [string, number | null, number | null][];
+  go?: [string, number | null, number | null, string | null, string | null][];
 }
 type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
@@ -205,7 +237,30 @@ function toPlace(r: Row): GazPlace {
     startKind: extra?.fb === 'founded' ? 'founded' : 'attested',
     population: extra?.pop ? Object.entries(extra.pop).map(([y, v]) => ({ year: Number(y), thousands: v, estimate: extra.est?.[y] })) : undefined,
     note: [extra?.fix, extra?.pq].filter(Boolean).join('; ') || undefined,
+    sourceType: typeof extra?.st === 'string' ? extra.st : undefined,
+    typeDoubt: typeDoubtOf(typeof extra?.st === 'string' ? extra.st : undefined),
+    sourcePeriod: typeof extra?.per === 'string' ? extra.per : undefined,
+    rulers: Array.isArray(extra?.rule) ? extra.rule : undefined,
+    ...phaseDates(extra?.go, to),
   };
+}
+
+/**
+ * Germania Sacra phases carry the source's own wording for each date ("um 1250", "vor 1271", "nach 1477"). The first
+ * phase's start and the last phase's end are what the card shows; an end written "nach X" (or "X?") is not an end,
+ * so the record stays open after it instead of being shown as "ended X".
+ */
+function phaseDates(go: unknown, to: HistYear | null): Partial<GazPlace> {
+  if (!Array.isArray(go) || !go.length) return {};
+  const ph = go as [string, number | null, number | null, string | null, string | null][];
+  const first = [...ph].sort((a, b) => (a[1] ?? Infinity) - (b[1] ?? Infinity))[0];
+  const last = [...ph].sort((a, b) => (b[2] ?? -Infinity) - (a[2] ?? -Infinity))[0];
+  const from = first[3] && String(first[3]) !== String(first[1]) ? String(first[3]) : undefined;
+  const end = last[4] && String(last[4]) !== String(last[2]) ? String(last[4]) : undefined;
+  const out: Partial<GazPlace> = {};
+  if (from || end) out.datesAsWritten = { from, to: end };
+  if (end && OPEN_END.test(end) && to !== null && last[2] === to) out.to = undefined;
+  return out;
 }
 
 /**
@@ -601,7 +656,13 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
       ? `“${nm.name}” is a modern name for this place`
       : `The name “${nm.name}” is recorded ${nm.from !== undefined && year < nm.from ? `only from ${yl(nm.from)}` : `only until ${yl(nm.to!)}`}`}${((then) => (then.length ? `; around ${yl(year)} it is recorded as ${then.join(', ')}` : `; the record’s own name is “${main.place.title}”`))(namesAround(main.place, year).filter((n) => (n.from !== undefined || n.to !== undefined) && normName(n.name) !== k).map((n) => `“${n.name}”`).slice(0, 3))}.`
     : '';
-  const when = nameWhen + (fit === 'earlier' ? ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${dated.to !== undefined ? (dated.to < 0 ? `${-dated.to} BCE` : `${dated.to} CE`) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.` : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.` : '');
+  // An end at the dataset's own boundary (Pleiades stops at 640, the end of its periods) is where the dataset stops,
+  // not when the place ended: said as such, and as Shelf's reading of the dataset rather than the dataset's claim.
+  const lastYear = dated.to ?? dated.envelope?.to;
+  const atEdge = lastYear !== undefined && lastYear >= gazetteerInfo(dated.gazetteer).core[1];
+  const when = nameWhen + (fit === 'earlier' ? (atEdge
+    ? ` ${gazetteerInfo(dated.gazetteer).name} covers places only up to ${yl(lastYear!)}, the end of its own period, so it has nothing later about this place — that is where the dataset stops, not when the place ended.`
+    : ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${lastYear !== undefined ? yl(lastYear) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.`) : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.` : '');
   const temporal = temporalSupport(fit);
   // Other places of the name that are not ruled out at the date (namesakes first recorded later don't count as rivals).
   const liveRivals = groups.filter((g) => g !== chosen && g.some((x) => recordFit(x.place, year) !== 'unattested')).length;

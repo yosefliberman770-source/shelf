@@ -48,8 +48,8 @@ export interface Envelope { from?: HistYear; to?: HistYear; basis: EnvelopeBasis
 export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
   related: 'dated records linked to it (sites at it, roads it lies on, connections)',
   'part-of': 'the dated larger place or region it is recorded as part of',
-  source: 'the period covered by the reference work it comes from',
-  dataset: 'the period the whole dataset covers',
+  source: 'the reference work it comes from',
+  dataset: 'the whole dataset',
   names: 'the dates of its recorded names',
   style: 'its architectural style, as dated in Wikidata (a style is a range of building dates, not this building’s date)',
 };

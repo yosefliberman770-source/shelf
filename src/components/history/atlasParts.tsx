@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
-import { dateBasisNote, existedAround, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
+import { dateBasisNote, existedAround, gazetteerInfo, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, rulerAt, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { CERTAINTY_LABEL, DETECTION_LABEL, type ReaderPlace, type Source } from '../../atlas/resolve';
 import { searchAtlas, type SearchHit } from '../../atlas/search';
 import { deleteBookmark, deleteNote, forgetVisit, saveNote } from '../../atlas/store';
@@ -196,17 +196,21 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
       <div className="row wrap gap-4 mt-4">
         <span className={`chip cert-${place.certainty}`} style={{ minHeight: 22, fontSize: 11 }}>{CERTAINTY_LABEL[place.certainty].split(' — ')[0]}</span>
         {place.why.userChosen ? <span className="chip" style={{ minHeight: 22, fontSize: 11 }}>Your choice</span> : <span className="chip" style={{ minHeight: 22, fontSize: 11 }}>{CONFIDENCE_LABEL[place.status]}</span>}
-        {place.types.slice(0, 2).map((t) => <span key={t} className="chip" style={{ minHeight: 22, fontSize: 11 }}>{t.replace(/-\d$/, '').replace(/-/g, ' ')}</span>)}
+        {place.types.slice(0, 2).map((t, i) => <span key={t} className="chip" style={{ minHeight: 22, fontSize: 11 }}>{i === 0 && place.gaz?.typeDoubt ? `${place.gaz.typeDoubt} ` : ''}{t.replace(/-\d$/, '').replace(/-/g, ' ')}</span>)}
       </div>
       <dl className="hmap-facts">
         {nowNames.length > 0 && <><dt>Names{place.gaz ? ` around ${yearLabel(year)}` : ''}</dt><dd>{nowNames.slice(0, 8).map(nameLine)}</dd></>}
         {otherNames.length > 0 && <><dt>Names at other times</dt><dd>{otherNames.slice(0, 8).map(nameLine)}</dd></>}
-        <dt>Date range</dt><dd>{span(place.from, place.to)}{place.gaz ? <span className="tiny faint"> ({dateBasisNote(place.gaz)})</span> : null}</dd>
+        <dt>Date range</dt><dd>{span(place.from, place.gaz?.datesAsWritten?.to && place.gaz.to === undefined ? undefined : place.to)}{place.gaz ? <span className="tiny faint"> ({dateBasisNote(place.gaz)})</span> : null}
+          {place.gaz?.datesAsWritten && <div className="tiny faint">The source writes: {place.gaz.datesAsWritten.from ?? '…'} – {place.gaz.datesAsWritten.to ?? '…'}</div>}</dd>
+        {(place.gaz?.sourceType || place.gaz?.sourcePeriod) && <><dt>In the source</dt><dd>{[place.gaz.sourceType, place.gaz.sourcePeriod].filter(Boolean).join(' · ')}{place.gaz.typeDoubt ? <span className="tiny faint"> (the source is not sure of the type)</span> : null}</dd></>}
         {place.gaz && <><dt>At {yearLabel(year)}</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place.gaz, year))]}</dd></>}
         <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{CERTAINTY_LABEL[place.certainty]}</span></dd>
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>
           {pol && pol.length > 0 && <div>{politiesLine(pol)} in {yearLabel(year)} <span className="tiny faint">(Cliopatria)</span></div>}
-          {place.partOf.length > 0 && <div>Part of {place.partOf.join(', ')} <span className="tiny faint">(Pleiades)</span></div>}
+          {place.gaz?.rulers?.length
+            ? (rulerAt(place.gaz, year) ? <div>Ruled by {rulerAt(place.gaz, year)} in {yearLabel(year)} <span className="tiny faint">({gazetteerInfo(place.gaz.gazetteer).name})</span></div> : null)
+            : place.partOf.length > 0 && <div>Part of {place.partOf.join(', ')} <span className="tiny faint">({place.gaz ? gazetteerInfo(place.gaz.gazetteer).name : place.sources[0]?.name})</span></div>}
         </dd></>}
         {place.description && <><dt>Today</dt><dd>{place.description} <span className="tiny faint">(present-day description)</span></dd></>}
       </dl>
