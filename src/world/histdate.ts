@@ -103,7 +103,7 @@ const WORDS: Record<string, number> = { first: 1, second: 2, third: 3, fourth: 4
 // Polish (p.n.e.), Scandinavian (f.Kr.), Russian (до н. э.), Hungarian (i. e.).
 const BCE = /(?<![a-z])(bc|bce|b\.\s?c\.?(?:\s?e\.?)?(?![a-z])|v\.\s?chr|a\.\s?chr|a\.\s?c\.?(?![a-z])|av\.?\s?j\.?-?\s?c|av\.\s?n\.\s?è|pr\.\s?n\.\s?l|př\.\s?n\.\s?l|p\.\s?n\.\s?e|f\.\s?kr|до н\.\s?э|i\.\s?e\.)/i;
 const CE = /(?<![a-z])(ad|ce|a\.\s?d\.?|c\.\s?e\.|n\.\s?chr|d\.\s?c\.|ap\.\s?j\.?-?\s?c|n\.\s?e\.|e\.\s?kr|n\.\s?l\.)(?![a-z])/i;
-const CIRCA = /(?<![a-z])(circa|about|around|approximately|approx\.?|um|gegen|vers|environ|około|ок\.?|cca\.?|~)(?![a-z])/i;
+const CIRCA = /(?<![a-z])(circa|about|around|approximately|approx\.?|um|gegen|vers|environ|około|ок\.?|cca\.?|~|probably|perhaps|possibly|prob\.|wohl|vermutlich|vielleicht|peut-être|probablement|forse|probabilmente|prawdopodobnie)(?![a-z])/i;
 const NOT_BEFORE = /\b(not before|nicht vor|non ante|pas avant)\b/i;
 const NOT_AFTER = /\b(not after|nicht nach|non post|pas après)(?![a-z])/i;
 const AFTER = /(?<![a-zà-ÿ])(after|post|nach|après|apres|po|od|from|since|seit)(?![a-zà-ÿ])/i;

@@ -418,7 +418,9 @@ def index_row(x, common, no_index):
     extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
              **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {}),
              **({'ev': 1} if x['src'] in no_index else {}), **({'qa': x['qa']} if x.get('qa') else {}), **({'pq': x['pq']} if x.get('pq') else {})}
-    return [x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
+    # precise (column 5) is how exact the position is; uncertain (column 9) is the source doubting the identification —
+    # never derived from the position (A15-002)
+    return [x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 1 if x.get('doubt') else 0,
             [list(n) for n in x['names'] if n[0] and not (common(n[0]) and generic_name(n[0], x['kind'], x.get('ty', '')))][:6], x['ctx'][:2], [], extra], None
 
 

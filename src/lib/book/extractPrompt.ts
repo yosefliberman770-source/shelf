@@ -26,7 +26,14 @@ ${text}`;
 const s = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '');
 const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : v === undefined || v === null || v === '' ? [] : [v]);
 const num = (v: unknown): number | undefined => { const n = typeof v === 'number' ? v : parseInt(s(v).replace(/[^\d]/g, ''), 10); return Number.isFinite(n) ? n : undefined; };
-const cert = (v: unknown): Certainty => { const c = s(v).toLowerCase(); return c.startsWith('inf') ? 'inferred' : c.startsWith('unc') ? 'uncertain' : 'explicit'; };
+/** The model's certainty word, read for what it says: only a word that means stated outright is "explicit"; anything
+ *  hedged, guessed, implied or unknown is not (A8-035). An empty or unrecognised word is "uncertain", never explicit. */
+export const cert = (v: unknown): Certainty => {
+  const c = s(v).toLowerCase().trim();
+  if (/^(explicit|stated|direct|certain|definite|clear|yes|sure)/.test(c)) return 'explicit';
+  if (/^(infer|implied|implicit|deduc|derived|indirect|context)/.test(c)) return 'inferred';
+  return 'uncertain';
+};
 
 const TYPE_ALIASES: Record<string, EntityType> = {
   person: 'character', people: 'character', character: 'character', human: 'character', animal: 'character',

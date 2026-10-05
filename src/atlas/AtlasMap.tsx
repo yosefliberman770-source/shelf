@@ -552,6 +552,12 @@ const periodLabel = (code?: string) => (code ? code.replace('?', '').split('').m
 const range = (f?: number, t?: number) => (f === undefined && t === undefined ? 'Dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 
 /** What the dot's position is: one of a stack of records the source puts on one point, or approximate (A10-005, A11-008). */
+const DOUBT = /\((?:possible|probable)\)|\b(?:possible|probable|vermutlich|uncertain|unsicher)\b|\?/i;
+/** The source's own doubt about what the record is, said in its own words (A10-001, AR-9). */
+export function doubtNote(props: Record<string, unknown>): string | undefined {
+  const t = `${props.st ?? ''} ${props.ty ?? ''}`;
+  return DOUBT.test(t) ? 'The source itself marks this identification as possible or probable, not certain — drawn hollow.' : undefined;
+}
 export function positionNote(props: Record<string, unknown>): string | undefined {
   const sk = typeof props.sk === 'number' ? props.sk : 0;
   const stack = sk > 1 ? `${sk.toLocaleString()} records in the source share this exact position — the source's reference point (a parish, a grid square, a town), not each site's own location.` : '';
@@ -560,7 +566,7 @@ export function positionNote(props: Record<string, unknown>): string | undefined
 }
 
 function withPosition(info: Info, f: MapGeoJSONFeature): Info {
-  const note = positionNote(f.properties as Record<string, unknown>);
+  const note = [doubtNote(f.properties as Record<string, unknown>), positionNote(f.properties as Record<string, unknown>)].filter(Boolean).join(' ') || undefined;
   return note ? { ...info, caution: [info.caution, note].filter(Boolean).join(' ') } : info;
 }
 

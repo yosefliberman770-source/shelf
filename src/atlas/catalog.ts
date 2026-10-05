@@ -428,6 +428,11 @@ export const SNAPSHOT_YEARS = 25;
 /** Wikidata statements that date evidence for a place, not its beginning (quality.EVIDENCE_BASIS in the build). */
 const EVIDENCE_BASES = ['dated event recorded in Wikidata', 'official opening recorded in Wikidata', 'start of its recorded use (Wikidata)'];
 
+/** The source itself doubts what the record is: "(POSSIBLE)", "(PROBABLE)", "?", "vermutlich", "uncertain" in its type (A11-006, A11-007). */
+const DOUBT_WORDS = ['(possible)', '(probable)', 'possible ', 'probable ', '?', 'vermutlich', 'uncertain', 'unsicher', 'incertain', 'prawdopodob', 'mahdollinen'];
+export const SOURCE_DOUBT: ExpressionSpecification = ['let', 'dt', ['downcase', ['concat', ' ', ['to-string', ['coalesce', ['get', 'st'], '']], ' ', ['to-string', ['coalesce', ['get', 'ty'], '']], ' ']],
+  ['any', ...DOUBT_WORDS.map((w): ExpressionSpecification => ['in', w, ['var', 'dt']])]] as ExpressionSpecification;
+
 /** Records that share one position in their source (sk = how many, from the tiler): drawn larger, and counted from zoom 8. */
 const STACKED: ExpressionSpecification = ['>', ['coalesce', ['get', 'sk'], 1], 1];
 const STACK_SCALE: ExpressionSpecification = ['interpolate', ['linear'], ['coalesce', ['get', 'sk'], 1], 1, 1, 10, 1.5, 100, 2, 1000, 2.6];
@@ -483,8 +488,9 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
       { id: `${id}-pt${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
         // a stack of records on one point is drawn larger (and counted below), an approximate position blurred
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, ['*', opts.radius * 0.6, STACK_SCALE], 10, ['*', opts.radius * 1.4, STACK_SCALE]],
-        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, ['case', STACKED, 1.6, 0.8], 1.4],
-        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5], 'circle-blur': ['case', ['==', ['get', 'u'], 1], 0.6, 0] } },
+        // a record its source marks "(possible)" or "probable" is drawn hollow, never as a definite castle or church (A11-006, A10-001)
+        'circle-color': ['case', SOURCE_DOUBT, C.halo, dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', SOURCE_DOUBT, 1.4, dated, ['case', STACKED, 1.6, 0.8], 1.4],
+        'circle-opacity': ['case', SOURCE_DOUBT, 0.7, dated, 0.9, byPeriod, 0.6, 0.5], 'circle-blur': ['case', ['==', ['get', 'u'], 1], 0.6, 0] } },
       { id: `${id}-stack${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter: ['all', filter, STACKED] as FilterSpecification, minzoom: STACK_LABEL_ZOOM, layout: {
         'text-field': ['concat', '×', ['to-string', ['get', 'sk']]], 'text-font': FONT_BOLD, 'text-size': 9.5, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': C.halo, 'text-halo-color': color, 'text-halo-width': 1.2 } },
       { id: `${id}-label${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter, minzoom: opts.labelZoom, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true, 'text-max-width': 9 }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },

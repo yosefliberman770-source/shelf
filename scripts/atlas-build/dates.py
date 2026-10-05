@@ -24,7 +24,7 @@ WORDS = {'first': 1, 'second': 2, 'third': 3, 'fourth': 4, 'fifth': 5, 'sixth': 
 BCE = re.compile(r'(?<![a-z])(bc|bce|b\.\s?c\.?(?:\s?e\.?)?(?![a-z])|v\.\s?chr|a\.\s?chr|a\.\s?c\.?(?![a-z])|av\.?\s?j\.?-?\s?c|av\.\s?n\.\s?è|pr\.\s?n\.\s?l|př\.\s?n\.\s?l'
                  r'|p\.\s?n\.\s?e|f\.\s?kr|до н\.\s?э|i\.\s?e\.)', re.I)
 CE = re.compile(r'(?<![a-z])(ad|ce|a\.\s?d\.?|c\.\s?e\.|n\.\s?chr|d\.\s?c\.|ap\.\s?j\.?-?\s?c|n\.\s?e\.|e\.\s?kr|n\.\s?l\.)(?![a-z])', re.I)
-CIRCA = re.compile(r'(?<![a-z])(circa|about|around|approximately|approx\.?|um|gegen|vers|environ|około|ок\.?|cca\.?|~)(?![a-z])', re.I)
+CIRCA = re.compile(r'(?<![a-z])(circa|about|around|approximately|approx\.?|um|gegen|vers|environ|około|ок\.?|cca\.?|~|probably|perhaps|possibly|prob\.|wohl|vermutlich|vielleicht|peut-être|probablement|forse|probabilmente|prawdopodobnie)(?![a-z])', re.I)
 NOT_BEFORE = re.compile(r'\b(not before|nicht vor|non ante|pas avant)\b', re.I)
 NOT_AFTER = re.compile(r'\b(not after|nicht nach|non post|pas après)\b', re.I)
 AFTER = re.compile(r'\b(after|post|nach|après|apres|po|od|from|since|seit)\b', re.I)

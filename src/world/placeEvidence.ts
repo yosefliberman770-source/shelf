@@ -202,7 +202,8 @@ export function combineEvidence(input: { written: string; year?: number; local: 
     const named = top.claims.some((c) => c.nameMatch !== 'none');
     const indep = top.families.length;
     const dated = top.dateFit === 'within' || top.dateFit === 'possible';
-    confidence = indep >= 2 && named && (dated || year === undefined) && (top.geoFit ?? 1) === 1 && !top.modernOnly ? 'strong'
+    // present-day reference gazetteers alone say nothing about an ancient year: weak at most (A9-014)
+    confidence = top.modernOnly ? 'weak' : indep >= 2 && named && (dated || year === undefined) && (top.geoFit ?? 1) === 1 ? 'strong'
       : ((indep >= 2 && named) || (named && top.claims.some((c) => c.kind === 'gazetteer') && (dated || year === undefined))) && (top.geoFit ?? 1) === 1 ? 'moderate' : 'weak';
   } else if (status === 'ambiguous') confidence = 'weak';
 
