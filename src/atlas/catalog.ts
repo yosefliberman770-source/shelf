@@ -878,8 +878,8 @@ export const LAYERS: AtlasLayerDef[] = [
     hint: 'Polities Wikidata classes as republics (territory: Cliopatria).', sources: ['cliopatria'], specs: (c) => polityClass('republics', ['==', ['get', 'c'], 'republic'], C.republic, c),
   },
   {
-    id: 'other-states', group: 'political', label: 'Other states & peoples', datasets: ['cliopatria'], defaultOn: true,
-    hint: 'City-states, leagues, confederations and polities whose type isn’t recorded in Wikidata.', sources: ['cliopatria'],
+    id: 'other-states', group: 'political', label: 'States of unrecorded type, groupings & peoples', datasets: ['cliopatria'], defaultOn: true,
+    hint: 'Most Cliopatria polities (about seven in ten) have no Wikidata class, so they are here whatever they were — major kingdoms and empires included. Also city-states, leagues, Cliopatria’s groupings of many small units (“Minor States”) and peoples (“settlements”), which are not single states. Being in this layer says nothing about a polity’s size or importance.', sources: ['cliopatria'],
     specs: (c) => polityClass('other-states', ['!', ['in', ['coalesce', ['get', 'c'], ''], ['literal', ['empire', 'kingdom', 'republic', 'province']]]], C.otherState, c),
   },
   {

@@ -15,6 +15,7 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py doubt       # A15-002: an approximate position is not a doubted identification
   python3 scripts/atlas-build/patch_index.py zbiva       # SS-1, PA-011: Zbiva's location and dating confidence read
   python3 scripts/atlas-build/patch_index.py dissiloc    # SS-1: DISSILOC localisation precision and editorial status read
+  python3 scripts/atlas-build/patch_index.py polities    # A16-004, PA-006: polity periods with gaps, per-period labels, shared Wikidata ids
 """
 from __future__ import annotations
 
@@ -290,8 +291,31 @@ def dissiloc():
     return {'rows': stats['rows'], 'approximate': sum(1 for r in rows if r[5] == 0), 'doubted': sum(1 for r in rows if r[9] == 1)}
 
 
+def polities():
+    """cliopatria/names.json re-derived from the published time slices: each polity's real periods (gaps kept) and label
+    point per period (build.polity_spans), and Wikidata ids shared by two polities flagged (build.polity_shared_ids).
+    Aliases, demonyms and everyday names already in the file are kept."""
+    import build
+    folder = os.path.join(ROOT, 'public', 'atlas', 'cliopatria')
+    path = os.path.join(folder, 'names.json')
+    rows = json.load(open(path, encoding='utf-8'))
+    spans = build.polity_spans(folder)
+    for r in rows:
+        new = spans.get((r['n'], r.get('q', '')))
+        if not new:
+            continue
+        for k in ('s', 'sp'):
+            r.pop(k, None)
+        r.update({k: v for k, v in new.items() if k in ('f', 't', 'x', 'y', 's', 'sp')})
+    shared = build.polity_shared_ids(rows)
+    rows.sort(key=lambda r: (r['f'], r['n']))
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
+    return {'polities': len(rows), 'withGaps': sum(1 for r in rows if r.get('s')), 'sharedIdNotTheirs': shared}
+
+
 if __name__ == '__main__':
-    steps = {'dissiloc': dissiloc, 'doubt': doubt, 'zbiva': zbiva, 'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'polities': polities, 'dissiloc': dissiloc, 'doubt': doubt, 'zbiva': zbiva, 'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
         stamp(f'place index: {step}')
