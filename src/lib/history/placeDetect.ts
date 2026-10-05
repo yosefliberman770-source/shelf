@@ -2,7 +2,7 @@
 // that are already known places (your Knowledge Atlas, X-Ray) or that read
 // like places ("marched to Capua", "the siege of Carthage") are offered, so
 // ordinary capitalised words aren't turned into map links.
-import { placesByName } from '../../atlas/gazetteer';
+import { notAPlace, placesByName } from '../../atlas/gazetteer';
 import { isCommonWord, loadCommonWords, macroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention } from '../../atlas/mention';
 import type { Item } from '../../db/types';
 import { findDatesInText, nearestDate } from './dates';
@@ -16,7 +16,17 @@ export interface PlaceMention {
   evidence: MentionEvidence;
 }
 
-const PLACE_CUE = /\b(?:to|from|at|in|near|toward|towards|into|of|across|through|beyond|around|reached|besieged|entered|left|crossed|captured|took|sacked|founded|conquered|invaded|attacked|abandoned|occupied|garrisoned|siege of|battle of|walls of|city of|port of|island of|kingdom of|province of|river|mount|lake)\s+((?:[A-Z][\p{Ll}'’-]+)(?:\s+(?:[A-Z][\p{Ll}'’-]+|de|del|la|le|of|on|upon|am|an)){0,3})/gu;
+/** One capitalised word of a name, in any alphabet's capitals ("Łódź", "Örebro", "Île") (A17-008). */
+const WORD = String.raw`\p{Lu}[\p{Ll}\p{Lu}'’-]*\p{Ll}[\p{Ll}'’-]*|\p{Lu}\p{Ll}`;
+/** A name: optionally "St", "Saint", "San"… or "The" before it ("St Albans", "The Hague"), up to four words. */
+const NAME = String.raw`(?:(?:St\.?|Ste\.?|Saint|Sainte|San|Santa|Santo|São|The)\s+)?(?:${WORD})(?:\s+(?:${WORD}|(?:de|del|la|le|of|on|upon|am|an)(?!\p{L}))){0,3}`;
+const PLACE_CUE = new RegExp(String.raw`\b(?:to|from|at|in|near|toward|towards|into|of|across|through|beyond|around|reached|besieged|entered|left|crossed|captured|took|sacked|founded|conquered|invaded|attacked|abandoned|occupied|garrisoned|siege of|battle of|walls of|city of|port of|island of|kingdom of|province of|river|mount|lake)\s+(${NAME})`, 'gu');
+/** The rest of a list after a cued name: ", Dijon and Troyes", " and Nagasaki" (A17-005, A12-011). */
+const LIST_ITEM = new RegExp(String.raw`^(?:\s*,\s*(and\s+|or\s+)?|\s+(and|or)\s+)(${NAME})`, 'u');
+/** What may follow the last item of a two-name list for it to be a list, not "…and John followed" (A20-005). */
+const LIST_END = /^(?:\s*[.,;:)!?]|\s*$|\s+(?:in|on|at|with|during|before|after|where|which|were|was|had|to|from|for|until|by|that|the)\b)/u;
+/** Words before a name that make it a person, not a place: "wrote to Henry", "a portrait of Matilda" (A20-007). */
+const PERSON_BEFORE = /\b(?:wrote|writes|write|written|letter|letters|spoke|speak|said|say|says|told|tell|appealed|prayed|swore|pledged|married|turned|listened|replied|answered|complained|confessed|dedicated)\s+(?:to|unto)\s*$|\b(?:portrait|statue|son|daughter|wife|husband|widow|brother|sister|father|mother|heir|nephew|niece|servant|friend|death|life|reign|tomb|cousin|uncle|aunt|grandson|granddaughter|biography|letters)\s+of\s*$/i;
 /** Adjectives that may name a polity or region ("the Aragonese fleet", "Castilian troops"), not at the start of a sentence. */
 // An adjective of place/people used attributively ("the Venetian fleet", "Norman lords"). Which
 // polity it names — if any — is decided from recorded data (screenMentions → matchPolity).
@@ -44,14 +54,22 @@ function insidePersonName(text: string, index: number, name: string, people: str
  */
 export function detectPlaces(text: string, known: string[] = [], people: string[] = []): PlaceMention[] {
   const out = new Map<string, PlaceMention>();
-  const add = (name: string, index: number, isKnown: boolean, demonym = false) => {
+  const add = (name: string, index: number, isKnown: boolean, demonym = false, listOf?: MentionEvidence) => {
     const clean = name.replace(/[’']s$/, '').replace(/\s+(of|on|upon|de|la|le|am|an)$/i, '').trim();
-    if (clean.length < 3 || NOT_PLACE.has(clean.split(' ')[0])) return;
+    const words = clean.split(' ');
+    // "St", "Saint" and "The" begin a name only when another word follows ("St Albans", "The Hague").
+    if (clean.length < 3 || (NOT_PLACE.has(words[0]) && !(words.length > 1 && /^(?:St\.?|Saint|The)$/.test(words[0])))) return;
+    if (!isKnown && PERSON_BEFORE.test(text.slice(Math.max(0, index - 40), index))) return;
     // A person is not a place — but only this occurrence is the person: "Henry of Lancaster" hides nothing when the
     // text later says "he rode to Lancaster" (PA-001). A name is skipped when it *is* a person's name, or when this
     // occurrence sits inside a person's full name written in the text.
     if (people.some((p) => p.toLowerCase() === clean.toLowerCase()) || insidePersonName(text, index, clean, people)) return;
-    const ev = demonym ? { ...mentionEvidence(clean, text, index), demonym: true } : mentionEvidence(clean, text, index);
+    // A list item takes the cue of the list's first name ("marched to Lyon, Dijon and Troyes").
+    const own = mentionEvidence(clean, text, index);
+    const ev0 = listOf ? { ...listOf, multiword: own.multiword, demonym: false } : own;
+    // "reached Edward’s camp": a possessive after a loose cue may be a person's; screened against the gazetteers later.
+    const possessive = /^[’']s\s+\p{Ll}/u.test(text.slice(index + clean.length, index + clean.length + 6));
+    const ev = demonym ? { ...ev0, demonym: true } : possessive ? { ...ev0, possessive: true } : ev0;
     const k = clean.toLowerCase();
     const cur = out.get(k);
     if (cur) {
@@ -65,10 +83,27 @@ export function detectPlaces(text: string, known: string[] = [], people: string[
     const re = new RegExp(`(?<![\\p{L}])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}])`, 'gu');
     for (const m of text.matchAll(re)) add(n, m.index ?? 0, true);
   }
-  for (const m of text.matchAll(PLACE_CUE)) add(m[1], (m.index ?? 0) + m[0].length - m[1].length, false);
+  for (const m of text.matchAll(PLACE_CUE)) {
+    const at = (m.index ?? 0) + m[0].length - m[1].length;
+    add(m[1], at, false);
+    // The rest of a list after the cued name, kept only when it is a real list: joined by "and"/"or", and not running on
+    // into a sentence ("to Paris and John followed").
+    const head = mentionEvidence(m[1].replace(/[’']s$/, ''), text, at);
+    const items: { name: string; index: number }[] = [];
+    let pos = (m.index ?? 0) + m[0].length;
+    let joined = false;
+    for (let li = LIST_ITEM.exec(text.slice(pos)); li && items.length < 12; li = LIST_ITEM.exec(text.slice(pos))) {
+      items.push({ name: li[3], index: pos + li[0].length - li[3].length });
+      pos += li[0].length;
+      if (li[1] || li[2]) { joined = true; break; }
+    }
+    if (joined && (items.length > 1 || LIST_END.test(text.slice(pos)))) for (const it of items) add(it.name, it.index, false, false, head);
+  }
   for (const m of text.matchAll(DEMONYM_CUE)) {
-    // "in English", "English translation": language, not geography.
-    if (NOT_GEOGRAPHIC.test(m[2]) || /\b(?:in|into|from)\s+$/i.test(text.slice(Math.max(0, (m.index ?? 0) - 6), m.index ?? 0))) continue;
+    // "in English", "English translation": language, not geography; "to Norwich in…", "to Munich and": a place after a
+    // place cue, not an adjective (A12-001).
+    if (NOT_GEOGRAPHIC.test(m[2]) || /\b(?:in|into|from|to|at|near|towards?|through|across)\s+$/i.test(text.slice(Math.max(0, (m.index ?? 0) - 9), m.index ?? 0))) continue;
+    if (isCommonWord(m[1]) === true) continue;
     add(m[1], m.index ?? 0, false, true);
   }
   return [...out.values()].sort((a, b) => Number(b.known) - Number(a.known) || a.index - b.index);
@@ -86,7 +121,15 @@ export async function screenMentions(ms: PlaceMention[], year?: number): Promise
   const out: PlaceMention[] = [];
   for (const m of ms) {
     if (m.known) { out.push(m); continue; }
-    if (m.evidence.demonym) { if ((await matchPolity(m.name, year).catch(() => [])).length) out.push(m); continue; }
+    if (m.evidence.demonym) {
+      if ((await matchPolity(m.name, year).catch(() => [])).length) out.push(m);
+      // Not an adjective of any recorded polity, but a recorded place: a town whose name ends like one (Norwich, Helsinki).
+      else if ((await placesByName(m.name).catch(() => [])).length) out.push({ ...m, evidence: { ...m.evidence, demonym: false } });
+      continue;
+    }
+    // "reached Edward’s camp": a possessive name the gazetteers don't know as a place is a person's.
+    // (Records that aren't places — a wreck or a find carrying the name — don't count.)
+    if (m.evidence.possessive && !(await placesByName(m.name).catch(() => [])).some((h) => !notAPlace(h.place))) continue;
     const common = isCommonWord(m.name.split(/\s+/)[0]);
     if (!common || (m.evidence.strength === 'strong' && !m.evidence.loose) || m.evidence.multiword) { out.push(m); continue; }
     const offline = !!macroRegion(m.name) || (await placesByName(m.name).catch(() => [])).length > 0 || (await matchPolity(m.name, year).catch(() => [])).length > 0;

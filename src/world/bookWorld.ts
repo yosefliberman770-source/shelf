@@ -21,7 +21,7 @@ import { type HistDate, UNKNOWN_DATE } from './histdate';
 
 /** 2: mentions carry their textual evidence and are screened; earlier resolutions were made without it.
  *  3: geographic lands, dated polities and importance-ranked places. */
-export const BOOK_WORLD_VERSION = 4;
+export const BOOK_WORLD_VERSION = 5;
 
 /** What the reader page can give us for one section of the book (loaded off-screen, then released). */
 export interface SectionText { href: string; label?: string; text: string; cfiOf: (name: string) => string | undefined }
@@ -37,8 +37,8 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
   let row = await db.bookWorld.get(bookId);
   if (!row || row.version !== BOOK_WORLD_VERSION || row.sectionCount !== count) row = { id: bookId, version: BOOK_WORLD_VERSION, chapters: [], resolved: {}, done: false, sectionCount: count, updatedAt: Date.now() };
   const [wars, events] = await Promise.all([allWars().catch(() => []), allEvents().catch(() => [] as AtlasEvent[])]);
-  const warNames = wars.filter((w) => w.n.length > 8).map((w) => ({ q: w.q, n: w.n.toLowerCase() }));
-  const eventNames = events.filter((e) => e.n.length > 10).map((e) => ({ q: e.q, n: e.n.toLowerCase() }));
+  const warNames = wars.filter((w) => w.n.length > 8).map((w) => ({ q: w.q, n: foldForMatch(w.n) }));
+  const eventNames = events.filter((e) => e.n.length > 10).map((e) => ({ q: e.q, n: foldForMatch(e.n), re: eventForms(e.n) }));
   const how = new Map(names.known.map((k) => [k.name.toLowerCase(), k.detection]));
   for (let i = 0; i < count; i++) {
     if (signal?.aborted) break;
@@ -48,12 +48,12 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
     if (s && s.text.trim().length > 0) {
       // Screened before limiting, and with room for long chapters: places late in a chapter are not dropped first.
       const found = (await screenMentions(detectPlaces(s.text, names.known.map((k) => k.name), names.people))).slice(0, 300);
-      const lower = s.text.toLowerCase();
+      const lower = foldForMatch(s.text);
       row.chapters.push({
         index: i, href: s.href, label: s.label,
         dates: FRONT_BACK_MATTER.test(s.label ?? '') ? [] : narrativeDates(s.text).slice(0, 200),
         wars: warNames.filter((w) => lower.includes(w.n)).map((w) => w.q).slice(0, 20),
-        events: eventNames.filter((e) => lower.includes(e.n)).map((e) => e.q).slice(0, 30),
+        events: eventNames.filter((e) => lower.includes(e.n) || (e.re?.test(lower) ?? false)).map((e) => e.q).slice(0, 30),
         mentions: found.map((m) => ({ name: m.name, count: m.count, cfi: s.cfiOf(m.name), detection: (how.get(m.name.toLowerCase()) as 'known' | 'ai' | undefined) ?? 'cue', evidence: m.evidence })),
       });
     }
@@ -66,6 +66,21 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
   row.chapters.sort((a, b) => a.index - b.index);
   await db.bookWorld.put(row);
   return row;
+}
+
+/** Text and catalogue names compared alike: accents folded, typographic apostrophes and dashes made plain (A8-042). */
+export const foldForMatch = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').replace(/[’‘ʼ]/g, "'").replace(/[–—]/g, '-').toLowerCase().replace(/\s+/g, ' ');
+/**
+ * Other ways a book writes a battle or siege than its catalogue label (A8-031): "the battle at Hastings", "the siege
+ * of Orleans" for "Siege of Orléans", "the Hastings battle" — the event's own place, after its kind. Undefined when the
+ * label isn't "Battle/Siege of <place>" (a war's or treaty's own name is matched as written).
+ */
+export function eventForms(name: string): RegExp | undefined {
+  const m = /^(?:(?:first|second|third|fourth|fifth)\s+)?(battle|siege|sack|fall)\s+(?:of|at)\s+(?:the\s+)?(.{3,40})$/i.exec(name.trim());
+  if (!m) return undefined;
+  const kind = m[1].toLowerCase();
+  const place = foldForMatch(m[2]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\b(?:${kind}s?\\s+(?:of|at|near|for)\\s+(?:the\\s+)?${place}\\b|${place}\\s+${kind}\\b)`);
 }
 
 /** Sections that are about the book, not its subject: their years are printings, editions and sources (A12-023). */

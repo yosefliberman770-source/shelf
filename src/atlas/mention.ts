@@ -32,6 +32,8 @@ export interface MentionEvidence {
   demonym?: boolean;
   /** The cue is a movement or direction ("went to", "near"): strong for an unusual name, not for an ordinary word ("went to Mass"). */
   loose?: boolean;
+  /** Written with a possessive ("Edward’s camp"): may be a person's; kept only when a gazetteer knows the name as a place. */
+  possessive?: boolean;
 }
 
 // ── Cues ──────────────────────────────────────────────────────────────────
@@ -67,7 +69,13 @@ export function mentionEvidence(written: string, passage?: string, index?: numbe
   if (passage && (i === undefined || passage.slice(i, i + written.length) !== written)) i = passage.indexOf(written);
   const before = passage && i !== undefined && i >= 0 ? passage.slice(Math.max(0, i - 60), i) : '';
   const c = cueEvidence(before);
-  return { ...c, multiword, demonym: DEMONYM.test(written) && !multiword };
+  // An adjective of place/people only where the text uses it as one: before a lower-case word ("Norman lords"), not
+  // after a place cue ("rode to Norwich", "to Munich") and not an ordinary English word ("the Church") — so towns ending
+  // in -ich, -i, -ic, -an are names, not adjectives (A12-001, A17-004).
+  const after = passage && i !== undefined && i >= 0 ? passage.slice(i + written.length, i + written.length + 24) : '';
+  const placeCue = c.strength === 'strong' || /^(?:to|from|at|in|into|near|towards?|through|across)$/i.test(c.cue ?? '');
+  const demonym = DEMONYM.test(written) && !multiword && !placeCue && isCommonWord(written) !== true && (!passage || /^\s+\p{Ll}/u.test(after));
+  return { ...c, multiword, demonym };
 }
 
 // ── Ordinary English words ────────────────────────────────────────────────
@@ -222,7 +230,8 @@ function stemMatches(adj: string, core: string): boolean {
     if (stem.length < 4) continue;
     let n = 0;
     while (n < stem.length && n < core.length && stem[n] === core[n]) n++;
-    if (n >= 5 && n >= 0.75 * Math.min(stem.length, core.length)) return true;
+    // Most of both: "Franciscans" shares only "franc" with France and is not French (A12-015).
+    if (n >= 5 && n >= 0.75 * Math.max(stem.length, core.length)) return true;
     // "Norman" → Normandy, "German" → Germany: the whole stem, plus a short ending on the name.
     if (n === stem.length && n >= 4 && core.length - n <= 4) return true;
   }
@@ -251,16 +260,19 @@ export async function matchPolity(written: string, year?: HistYear, opts: { cont
   const w = normName(written.replace(/[’']s$/, ''));
   const k = polityCore(written);
   if (k.length < 3) return [];
+  const commonWord = !/\s/.test(written.trim().replace(/^the\s+/i, '')) && isCommonWord(written.trim().replace(/^the\s+/i, '')) === true;
   const via = (p: PolityName & { core: string }): PolityVia | undefined => {
     if (p.core === k || normName(p.n.replace(/^\(|\)$/g, '')) === w) return 'name';
     if (p.cn && normName(p.cn) === w) return 'alias';
+    // An ordinary English word is not a polity by alias or demonym alone: "the Church" is not the Papal States (A12-015).
+    if (commonWord) return undefined;
     if (p.al?.some((a) => normName(a) === w || polityCore(a) === k)) return 'alias';
     if (p.dm?.some((d) => normName(d) === w)) return 'demonym';
     return undefined;
   };
   // Every route is collected, so the date decides first: "Hungarian" in 1400 is the Kingdom of Hungary
   // (by spelling) rather than the later Hungarian Republic (by name).
-  const isAdj = DEMONYM.test(written.trim());
+  const isAdj = DEMONYM.test(written.trim()) && !commonWord;
   const hits = idx.map((p) => ({ p, via: via(p) ?? (isAdj && stemMatches(written.trim(), p.core) ? 'stem' as const : undefined) }))
     .filter((h): h is { p: PolityName & { core: string }; via: PolityVia } => !!h.via);
   // 'within' only when the polity has an outline in that year — not merely between its first and last years (A16-004).
