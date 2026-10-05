@@ -217,7 +217,7 @@ export function resolveBook(bookId: string, chunks: ChunkInput[], cfiOf: CfiLook
       const k = `${from}|${to}|${r.type.toLowerCase()}`;
       if (seenRel.has(k)) continue;
       seenRel.add(k);
-      relations.push({ from, to, type: r.type, detail: r.detail, certainty: r.certainty ?? 'explicit', loc: { chapter: c.chapter, para: r.para ?? (c.paraEnd ?? 1) - 1, cfi: cfiOf(c.chapter, r.para ?? c.paraStart ?? 0) } });
+      relations.push({ from, to, type: r.type, detail: r.detail, when: r.when, certainty: r.certainty ?? 'explicit', loc: { chapter: c.chapter, para: r.para ?? (c.paraEnd ?? 1) - 1, cfi: cfiOf(c.chapter, r.para ?? c.paraStart ?? 0) } });
     }
     for (const e of c.result.events) {
       events.push({ name: e.name, when: e.when, where: e.where ? entityOf(e.where, c.chapter) : undefined, who: (e.who ?? []).map((w) => entityOf(w, c.chapter)).filter((k): k is string => !!k), certainty: e.certainty ?? 'explicit', loc: { chapter: c.chapter, para: e.para ?? (c.paraEnd ?? 1) - 1, cfi: cfiOf(c.chapter, e.para ?? c.paraStart ?? 0) } });

@@ -271,6 +271,7 @@ export function EntityDetail({ bookId, graph, entityKey, chapter, para, chapterT
                 <div key={i} className="row gap-8 small" style={{ alignItems: 'baseline' }}>
                   <span className="muted">{r.from === e.key ? r.type : `${nameOf(r.from)} is ${r.type}`}</span>
                   <button className="why-link" onClick={() => onOpenEntity(other)}>{r.from === e.key ? nameOf(r.to) : e.name}</button>
+                  {r.when && <span className="tiny faint">({r.when})</span>}
                   {r.certainty !== 'explicit' && <span className="tiny faint">({CERTAINTY[r.certainty].label.toLowerCase()})</span>}
                   {onJump && r.loc.cfi && <button className="why-link tiny" onClick={() => onJump(r.loc.cfi!)}>source</button>}
                 </div>

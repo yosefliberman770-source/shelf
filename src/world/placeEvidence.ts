@@ -13,6 +13,7 @@
 //
 // Missing data is never evidence: a source with no record says nothing about
 // whether a place existed, and an undated record is "unknown", not "outside".
+import { AGREE_KM, familyOf, sameCoordinates } from './families';
 import { km } from '../atlas/data';
 import { GAZETTEERS, gazetteerInfo, type GazetteerId, type GazPlace, placesByName, recordFit } from '../atlas/gazetteer';
 import type { Disagreement } from '../atlas/resolve';
@@ -96,7 +97,8 @@ export function whgFamily(a: WhgAttestation): string {
   if (ns === 'tgn' || ns.startsWith('tgn')) return 'tgn';
   if (ns === 'gn') return 'geonames';
   if (ns === 'wd') return 'wikidata';
-  return ns || `whg:${a.whgId}`;
+  // a record with no namespace is not its own independent source: all of them are one unknown family (A9-020)
+  return ns || 'whg:unknown';
 }
 
 /** Core reference gazetteers weigh less than specialist historical ones. */
@@ -163,8 +165,14 @@ function cluster(claims: Claim[]): EvidenceCluster[] {
   }
   return groups.map((cs) => {
     // Score: the strongest claim from each independent source, added up.
+    // independent families only: Wikidata and its extracts are one, an exact coordinate copy counts with what it copies (A9-012, A9-013)
     const byFamily = new Map<string, number>();
-    for (const c of cs) byFamily.set(c.family, Math.max(byFamily.get(c.family) ?? 0, c.weight));
+    const fam = new Map<Claim, string>();
+    for (const c of cs) {
+      const copy = cs.find((o) => o !== c && fam.has(o) && sameCoordinates(o, c));
+      fam.set(c, copy ? fam.get(copy)! : familyOf(c.family));
+      byFamily.set(fam.get(c)!, Math.max(byFamily.get(fam.get(c)!) ?? 0, c.weight));
+    }
     let spread = 0;
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) spread = Math.max(spread, km([cs[i].lon!, cs[i].lat!], [cs[j].lon!, cs[j].lat!]));
     const lead = [...cs].sort(positionOrder)[0];
@@ -225,7 +233,12 @@ export function combineEvidence(input: { written: string; year?: number; local: 
       if (names.length) statements.push(`Names recorded for it there: ${names.join(', ')}.`);
     }
     if (w.some((c) => c.family === 'pleiades') && top.claims.some((c) => c.family === 'pleiades' && c.kind === 'gazetteer')) statements.push('WHG’s Pleiades record is the same source as Shelf’s Pleiades data, so it is not counted as separate confirmation.');
-    statements.push(top.families.length >= 2 ? `${top.families.length} independent sources agree on this location.` : 'Only one source supports this identification.');
+    // "agree on this location" only when they do: within 2 km, and not when their dates conflict (A9-021)
+    const dateClash = top.claims.some((c) => c.dateFit === 'outside') && top.claims.some((c) => c.dateFit === 'within' || c.dateFit === 'possible');
+    statements.push(top.families.length < 2 ? 'Only one independent source supports this identification.'
+      : top.spreadKm > AGREE_KM ? `${top.families.length} independent sources name a place here, but place it up to ${top.spreadKm.toFixed(1)} km apart.`
+      : dateClash ? `${top.families.length} independent sources agree on this location, but not on its dates.`
+      : `${top.families.length} independent sources agree on this location.`);
     if (input.context?.points.length) statements.push((top.geoFit ?? 1) === 1 ? 'It lies near the other places already identified in this book.' : 'It lies far from the other places already identified in this book, so it needs other evidence.');
     if (top.modernOnly) statements.push(`Only present-day reference gazetteers record it, with no dates — that says nothing about ${yearLabel(year!)}.`);
     if (top.spreadKm >= 2) {

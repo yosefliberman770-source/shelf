@@ -19,6 +19,7 @@ import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
 import { envelopeWords, type HistYear, yearLabel } from './time';
+import { agreeOnLocation, witnesses } from '../world/families';
 import { type HistDate, mergeDates, period, yearRange } from '../world/histdate';
 import type { EvidenceKind } from '../world/evidence';
 import { assessPlace, type Claim, type PlaceEvidence } from '../world/placeEvidence';
@@ -45,7 +46,7 @@ export const CERTAINTY_LABEL: Record<Certainty, string> = {
 
 export interface Source { name: string; url?: string; license?: string; record?: string; note?: string; id?: string; tier?: string; accessed?: string }
 /** Two or more sources saying different things about the same place — kept side by side, never averaged. */
-export interface Disagreement { field: 'location' | 'date' | 'name' | 'affiliation'; claims: { source: string; value: string }[]; note?: string }
+export interface Disagreement { field: 'location' | 'date' | 'name' | 'affiliation' | 'population'; claims: { source: string; value: string }[]; note?: string }
 
 export interface ReaderPlace {
   key: string;
@@ -68,6 +69,8 @@ export interface ReaderPlace {
   to?: HistYear;
   /** The record's dates with their kind and uncertainty (and other sources' dates as conflicts). */
   when?: HistDate;
+  /** Which record each shown field comes from: position, dates, and each type (PR-1, A9-011, X-08). */
+  fieldSources?: { position: string; dates?: string; types: Record<string, string> };
   /** Dated roles (Viabundus: town, toll, fair…). */
   roles?: [string, number | null, number | null][];
   evidence?: EvidenceKind;
@@ -128,14 +131,32 @@ export function fromGaz(p: GazPlace, written: string, why: ReaderPlace['why'], s
     const d = km([p.lon, p.lat], [c.lon, c.lat]);
     if (d >= 2) disagreements.push({ field: 'location', claims: [{ source: gazetteerInfo(p.gazetteer).name, value: `${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}` }, { source: gazetteerInfo(c.gazetteer).name, value: `${c.lat.toFixed(3)}, ${c.lon.toFixed(3)}` }], note: `The two records are ${d.toFixed(1)} km apart — datasets often mark different points of the same town.` });
   }
+  // Population estimates of one place that differ twice over are a disagreement, not two confirmations (A10-015, X-17).
+  for (const c of corroborating) {
+    for (const a of p.population ?? []) {
+      const b = c.population?.find((x) => x.year === a.year);
+      if (b && a.thousands > 0 && b.thousands > 0 && Math.max(a.thousands, b.thousands) / Math.min(a.thousands, b.thousands) >= 2) {
+        disagreements.push({ field: 'population', claims: [{ source: gazetteerInfo(p.gazetteer).name, value: `${a.thousands}k in ${a.year}` }, { source: gazetteerInfo(c.gazetteer).name, value: `${b.thousands}k in ${b.year}` }], note: 'The two population estimates differ more than twofold; neither is preferred.' });
+        break;
+      }
+    }
+  }
   const roles = nameRoles(p, written, year);
   return {
     key: p.key, title: roles.display, kind: kindOf(p), recordTitle: roles.display !== p.title ? p.title : undefined, nameRoles: roles, written, lat: p.lat, lon: p.lon,
     certainty: p.uncertain >= 1 ? 'uncertain' : p.precise ? 'known' : 'approximate',
     from: p.from, to: p.to, when: mergeDates(all.map(gazDate)), names: p.names, partOf: p.partOf, related: p.related, types: [...new Set(all.flatMap((x) => x.types))],
+    fieldSources: {
+      position: gazetteerInfo(p.gazetteer).name,
+      dates: mergeDates(all.map(gazDate))?.source,
+      types: Object.fromEntries([...all].reverse().flatMap((x) => x.types.map((t) => [t, gazetteerInfo(x.gazetteer).name] as const))),
+    },
     roles: p.roles ?? corroborating.find((c) => c.roles)?.roles,
     sources: all.map(src),
-    evidence: p.uncertain >= 1 ? 'historical-uncertainty' : corroborating.length ? 'confirmed' : 'single-source',
+    // the source's doubt is kept whichever record leads (A9-018); "confirmed" needs an independent family that agrees on
+    // the location, not a copy or a sister dataset (A9-001, A9-002, A9-004, A10-016, PR-2)
+    evidence: all.some((x) => x.uncertain >= 1) ? 'historical-uncertainty'
+      : ((ws) => ws.length >= 2 && agreeOnLocation(ws))(witnesses(all.map((x) => ({ family: x.gazetteer, lon: x.lon, lat: x.lat })))) ? 'confirmed' : 'single-source',
     disagreements,
     status, why, gaz: p,
   };

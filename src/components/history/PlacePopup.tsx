@@ -7,7 +7,7 @@ import { dateBasisNote, type GazPlace, GAZETTEERS, matchName, namesAround, normN
 import { CERTAINTY_LABEL, type Detection, DETECTION_LABEL } from '../../atlas/resolve';
 import { yearLabel } from '../../atlas/time';
 import { DATE_SOURCE_LABEL, type DateContext } from '../../lib/history/placeDetect';
-import { politiesLine, span } from './atlasParts';
+import { containedIn, politiesLine, span } from './atlasParts';
 
 export function PlacePopup({ written, place, date, detection, colors, onMap, onClose }: {
   written: string;
@@ -53,7 +53,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
         {place.sourceType && <><dt>In the source</dt><dd>{place.sourceType}{place.typeDoubt ? <span className="tiny" style={{ color: colors.muted }}> (the source is not sure of the type)</span> : null}</dd></>}
         {year !== undefined && <><dt>At this date</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place, year))]}</dd></>}
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && (
-          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${politiesLine(pol)} (${yearLabel(year!)})` : '', place.rulers?.length ? (rulerAt(place, year) ? `ruled by ${rulerAt(place, year)} (${info.name})` : '') : place.partOf.slice(0, 2).join(', ')].filter(Boolean).join(' · ')}</dd></>
+          <><dt>Region / political entity</dt><dd>{[pol?.length ? `${politiesLine(pol)} (${yearLabel(year!)})` : '', place.rulers?.length && rulerAt(place, year) ? `ruled by ${rulerAt(place, year)} (${info.name})` : '', containedIn(place).length ? `located in ${containedIn(place).slice(0, 2).join(', ')} (${info.name}${place.gazetteer === 'pleiades' ? ', undated' : '’s location fields, often present-day units'})` : ''].filter(Boolean).join(' · ')}</dd></>
         )}
       </dl>
       <div className="row wrap" style={{ gap: 6 }}>
@@ -65,7 +65,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
           <div>Matched from: “{written}” → <b><bdi>{place.title}</bdi></b> in {info.name}.</div>
           {reason && <div>{reason}</div>}
           <div>{DETECTION_LABEL[detection]}.</div>
-          <div>{place.meaningUnknown ? 'Position as the source gives it; the source does not document its precision' : CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license})</div>
+          <div>{place.meaningUnknown ? 'Position as the source gives it; the source does not document its precision' : CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license}){place.wikidata ? <> · <a href={place.wikidata} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>matched Wikidata item ↗</a></> : null}</div>
           <div>Matched automatically; the dataset — not AI — supplies the location, names and dates.</div>
         </div>
       )}

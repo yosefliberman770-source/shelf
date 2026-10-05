@@ -51,7 +51,7 @@ export interface RawEntity {
   facts?: RawFact[];
   paras?: number[];
 }
-export interface RawRelation { a: string; b: string; type: string; detail?: string; para?: number; certainty?: Certainty }
+export interface RawRelation { a: string; b: string; type: string; detail?: string; /** a date the text gives for it ("ceded … 1739", A8-045) */ when?: string; para?: number; certainty?: Certainty }
 export interface RawEvent { name: string; when?: string; where?: string; who?: string[]; para?: number; certainty?: Certainty }
 export interface ChunkExtraction { entities: RawEntity[]; relations: RawRelation[]; events: RawEvent[] }
 
@@ -145,6 +145,8 @@ export interface BookRelation {
   to: string;
   type: string;
   detail?: string;
+  /** When the relation held, as the text dates it (A8-045). */
+  when?: string;
   loc: BookLoc;
   certainty: Certainty;
 }
