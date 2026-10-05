@@ -9,6 +9,7 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py wdbce       # A8-009: Wikidata BCE founding dates one year late
   python3 scripts/atlas-build/patch_index.py future      # PA-009: period tables ending in the future ("modern" 1901–2050)
   python3 scripts/atlas-build/patch_index.py meaning     # C8/SS-5: a source with undocumented meaning claims no precision
+  python3 scripts/atlas-build/patch_index.py halc        # PA-010: HALC "estimate within 1 km" is not a precise position
 """
 from __future__ import annotations
 
@@ -172,7 +173,41 @@ def meaning():
     return out
 
 
+def halc():
+    """HALC positions coded 1 (estimated within 1 km) or 9 (a point inside the area) are approximate, with the code's
+    meaning on the record, as the loader now reads them."""
+    import generic
+    spec = json.load(open(os.path.join(ROOT, 'data', 'historical', 'specs', 'halc.json'), encoding='utf-8'))
+    ap = spec['fields']['approx']
+    code = {str(p.get('SHORT_ID')): str(p.get(ap['field'])) for p in generic.read_rows(spec)}
+    have = current_rows('halc')
+    n = 0
+    for r in have:
+        c = code.get(str(r[1]))
+        if c in ap['values']:
+            n += r[5] == 1
+            r[5], r[9] = 0, max(r[9] or 0, 1)
+            if c in ap['note']:
+                r[13] = {**(r[13] or {}), 'pq': ap['note'][c]}
+    world.replace_source_rows('halc', have, BASE)
+    return {'approximate now': n, 'rows': len(have)}
+
+
+def stamp(what: str):
+    """The published data changed: its build date moves to today, so the app drops answers worked out from the old data
+    (bookWorld's data version, the offline data cache) instead of replaying them, and the manifest lists the patch."""
+    import datetime
+    path = os.path.join(HERE, '..', '..', 'public', 'world', 'manifest.json')
+    m = json.load(open(path, encoding='utf-8'))
+    today = datetime.date.today().isoformat()
+    m['built'] = today
+    m['patches'] = sorted(set(m.get('patches', [])) | {f'{today} {what}'})
+    import world
+    world.write_json(path, m)
+
+
 if __name__ == '__main__':
-    steps = {'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
+        stamp(f'place index: {step}')

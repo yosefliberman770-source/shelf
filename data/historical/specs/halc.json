@@ -1,14 +1,69 @@
 {
- "id": "halc-localities", "src": "halc", "public": true, "enabled": true,
+ "id": "halc-localities",
+ "src": "halc",
+ "public": true,
+ "enabled": true,
  "title": "Historical Atlas of the Low Countries (HALC): localities c. 1500 (Stapel, DataverseNL)",
- "licence": "CC BY-SA 4.0", "url": "https://doi.org/10.34894/BTKFHV",
+ "licence": "CC BY-SA 4.0",
+ "url": "https://doi.org/10.34894/BTKFHV",
  "describe": "Every locality of the Low Countries as reconstructed for c. 1500, with its urban status, county/duchy and district, and diocese and deanery. Localities the atlas marks as not in use in 1500 are left out.",
- "layers": ["gazetteer-settlements"],
- "read": {"path": "halc-low-countries/original/HALC Localities.gpkg", "layer": "HALC Localities"},
- "keep": {"field": "TYPE", "values": ["0", "1"]},
- "fields": {"id": "SHORT_ID", "name": "NAME", "type": ["URBAN"], "typeExtra": ["ADM2"], "context": ["ADM2", "DIOCESE"],
-            "typeMap": {"URBAN": {"0": "village / locality (no urban status)", "1": "town (privileged, walled)", "2": "town (privileged)", "3": "town (non-privileged, walled)", "4": "town (non-privileged)", "5": "liberty (urban status, rural character)", "9": "extra muros"}},
-            "kind": "settlement", "approx": {"field": "PRECISION", "values": ["9"]}},
- "dating": {"mode": "snapshot", "year": 1500, "label": "the locality as reconstructed for c. 1500 (HALC)"},
+ "layers": [
+  "gazetteer-settlements"
+ ],
+ "read": {
+  "path": "halc-low-countries/original/HALC Localities.gpkg",
+  "layer": "HALC Localities"
+ },
+ "keep": {
+  "field": "TYPE",
+  "values": [
+   "0",
+   "1"
+  ]
+ },
+ "fields": {
+  "id": "SHORT_ID",
+  "name": "NAME",
+  "type": [
+   "URBAN"
+  ],
+  "typeExtra": [
+   "ADM2"
+  ],
+  "context": [
+   "ADM2",
+   "DIOCESE"
+  ],
+  "typeMap": {
+   "URBAN": {
+    "0": "village / locality (no urban status)",
+    "1": "town (privileged, walled)",
+    "2": "town (privileged)",
+    "3": "town (non-privileged, walled)",
+    "4": "town (non-privileged)",
+    "5": "liberty (urban status, rural character)",
+    "9": "extra muros"
+   }
+  },
+  "kind": "settlement",
+  "approx": {
+   "field": "PRECISION",
+   "values": [
+    "1",
+    "9",
+    "19"
+   ],
+   "note": {
+    "1": "the source estimates this position to within 1 km (HALC precision 1)",
+    "9": "a point placed anywhere inside the locality’s area (HALC precision 9)",
+    "19": "a point placed inside the locality’s area (HALC precision 19)"
+   }
+  }
+ },
+ "dating": {
+  "mode": "snapshot",
+  "year": 1500,
+  "label": "the locality as reconstructed for c. 1500 (HALC)"
+ },
  "datingLabel": "HALC reconstruction for c. 1500"
 }

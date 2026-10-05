@@ -425,6 +425,11 @@ export const BEFORE_RECORD_YEARS = 60;
 /** Years either side of a snapshot listing within which the listed place is drawn (lighter); see sitePoints. */
 export const SNAPSHOT_YEARS = 25;
 
+/** Records that share one position in their source (sk = how many, from the tiler): drawn larger, and counted from zoom 8. */
+const STACKED: ExpressionSpecification = ['>', ['coalesce', ['get', 'sk'], 1], 1];
+const STACK_SCALE: ExpressionSpecification = ['interpolate', ['linear'], ['coalesce', ['get', 'sk'], 1], 1, 1, 10, 1.5, 100, 2, 1000, 2.6];
+export const STACK_LABEL_ZOOM = 8;
+
 function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: string, ctx: LayerCtx, opts: { labelZoom: number; radius: number; sources?: string[] }): LayerSpecification[] {
   // Own dates only (founding / first mention → dissolution, as recorded), or an evidence period (a building-campaign
   // century, a register's period class, a style): shown inside them. Without own evidence at the year nothing is drawn,
@@ -457,9 +462,12 @@ function sitePoints(id: string, kinds: string[] | { group: SiteGroup }, color: s
     const sfx = source === 'medieval-sites' ? '' : source === 'private-sites' ? '-private' : `-${source}`;
     return [
       { id: `${id}-pt${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter, paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, opts.radius * 0.6, 10, opts.radius * 1.4],
-        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, 0.8, 1.4],
-        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5] } },
+        // a stack of records on one point is drawn larger (and counted below), an approximate position blurred
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, ['*', opts.radius * 0.6, STACK_SCALE], 10, ['*', opts.radius * 1.4, STACK_SCALE]],
+        'circle-color': ['case', dated, color, byPeriod, color, C.halo], 'circle-stroke-color': color, 'circle-stroke-width': ['case', dated, ['case', STACKED, 1.6, 0.8], 1.4],
+        'circle-opacity': ['case', dated, 0.9, byPeriod, 0.6, 0.5], 'circle-blur': ['case', ['==', ['get', 'u'], 1], 0.6, 0] } },
+      { id: `${id}-stack${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter: ['all', filter, STACKED] as FilterSpecification, minzoom: STACK_LABEL_ZOOM, layout: {
+        'text-field': ['concat', '×', ['to-string', ['get', 'sk']]], 'text-font': FONT_BOLD, 'text-size': 9.5, 'text-allow-overlap': true, 'text-ignore-placement': true }, paint: { 'text-color': C.halo, 'text-halo-color': color, 'text-halo-width': 1.2 } },
       { id: `${id}-label${sfx}`, type: 'symbol', source, 'source-layer': 'sites', filter, minzoom: opts.labelZoom, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 10.5, 'text-offset': [0, 0.8], 'text-anchor': 'top', 'text-optional': true, 'text-max-width': 9 }, paint: { 'text-color': color, 'text-halo-color': C.halo, 'text-halo-width': 1.3 } },
       ...(ctx.showUndated ? [
         { id: `${id}-undated${sfx}`, type: 'circle', source, 'source-layer': 'sites', filter: undatedFilter, minzoom: UNDATED_MINZOOM, paint: {

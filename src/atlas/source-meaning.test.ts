@@ -65,3 +65,16 @@ describe('what the build found wrong is shown (A19-003, A19-005)', () => {
     expect(p.qa).toMatch(/BCE/);
   });
 });
+
+describe('a source’s precision code means what its codebook says (PA-010, KB-PA-010)', () => {
+  it('[rule] HALC “estimation (within 1000 m)” is an approximate position, and the card says so', async () => {
+    const p = (await getPlace('halc:AM0160'))!;
+    expect(p.precise).toBe(false);
+    expect(p.note).toMatch(/within 1 km/);
+  });
+
+  it('the spec reads every approximate HALC code', () => {
+    const spec = JSON.parse(readFileSync(join(ROOT, 'data/historical/specs/halc.json'), 'utf8'));
+    expect(spec.fields.approx.values).toEqual(expect.arrayContaining(['1', '9']));
+  });
+});

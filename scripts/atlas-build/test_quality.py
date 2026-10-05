@@ -205,5 +205,18 @@ class UndatedEvidence(unittest.TestCase):
         self.assertIsNone(quality.wikidata_evidence([{'prop': 'event', 'v': 'X', 'y': 0}], {}))  # year 0 = no date
 
 
+
+class Stacks(unittest.TestCase):
+    """Points that share a position carry how many records stand there (A11-008, X-24)."""
+
+    def test_shared_positions_are_counted(self):
+        import tiler
+        from shapely.geometry import Point
+        g = lambda lon, lat: Point(*tiler.to_merc(lon, lat))  # noqa: E731
+        geoms = [(g(-3.2, 55.95), {'i': 'a'}, 0), (g(-3.2, 55.95), {'i': 'b'}, 5), (g(-3.2, 55.95), {'i': 'c'}, 9), (g(-3.3, 55.95), {'i': 'd'}, 0)]
+        tiler.mark_stacks(geoms, 11)
+        self.assertEqual([p.get('sk') for _, p, _ in geoms], [3, 3, 3, None])
+
+
 if __name__ == '__main__':
     unittest.main()

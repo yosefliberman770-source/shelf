@@ -50,7 +50,25 @@ def tile_range(z, b):
     return x0, x1, y0, y1
 
 
-def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoom: int, name: str, attribution: str, min_zoom: int = 0):
+def stack_key(xm: float, ym: float, max_zoom: int):
+    """The pixel (of the 4096-unit grid at the deepest zoom, about 5 m at zoom 11) a mercator point falls on."""
+    px = 2 * ORIGIN / (1 << max_zoom) / 4096
+    return int((xm + ORIGIN) // px), int((ORIGIN - ym) // px)
+
+
+def mark_stacks(geoms, max_zoom: int):
+    """Points that share one position (a parish centre, a grid square, a town's coordinates given to every record in it)
+    carry 'sk' = how many records stand there, so the map can show the stack instead of one dot (A11-008, X-24)."""
+    from collections import Counter
+    keys = [stack_key(g.x, g.y, max_zoom) if g.geom_type == 'Point' else None for g, _, _ in geoms]
+    n = Counter(k for k in keys if k is not None)
+    for (g, props, _), k in zip(geoms, keys):
+        if k is not None and n[k] > 1:
+            props['sk'] = n[k]
+
+
+def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoom: int, name: str, attribution: str, min_zoom: int = 0,
+          stacks: bool = True):
     """features: (geojson geometry, properties, minzoom).
 
     Returns {'tiles', 'features', 'rejected'}: geometries with impossible coordinates (see quality.py) are left out
@@ -81,6 +99,8 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
         print(f'  {path}: {len(left_out)} geometries left out ({", ".join(sorted({r["reason"] for r in left_out}))})')
     if undated:
         print(f'  {path}: {len(undated)} features kept without their dates ({", ".join(sorted({r["reason"] for r in undated}))})')
+    if stacks:
+        mark_stacks(geoms, max_zoom)
     fields: dict[str, str] = {}
     for _, p, _ in geoms:
         for k, v in p.items():

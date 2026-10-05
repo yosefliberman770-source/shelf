@@ -67,6 +67,8 @@ export interface EvidenceCluster {
   dateFit: DateFit;
   /** Largest distance between two claims in the group (km). */
   spreadKm: number;
+  /** Whose position the group is drawn at: the most precise offline record, chosen by rule, never by input order (A9-015). */
+  positionFrom: string;
 }
 
 export interface PlaceEvidence {
@@ -140,9 +142,18 @@ const bestFit = (fits: DateFit[]): DateFit => (['within', 'possible', 'unknown',
 const spanText = (s: [number, number][]) => s.length ? s.slice(0, 3).map(([a, b]) => `${a <= -99999 ? '?' : yearLabel(a)}–${b >= 99999 ? '?' : yearLabel(b)}`).join(', ') + (s.length > 3 ? '…' : '') : 'no dates';
 const list = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
 
+/** A fixed order for claims, so the result never depends on the order the sources were read in (A9-015): stronger
+ *  claims first, then an offline record with a precise position, then by id. */
+const claimOrder = (a: Claim, b: Claim) =>
+  b.weight - a.weight || Number(b.gaz?.precise ?? false) - Number(a.gaz?.precise ?? false) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+/** The record whose position a group is drawn at: an offline record before an online one, a precise position before an
+ *  approximate one, then the stronger claim, then the id. */
+const positionOrder = (a: Claim, b: Claim) =>
+  Number(b.kind === 'gazetteer') - Number(a.kind === 'gazetteer') || Number(b.gaz?.precise ?? false) - Number(a.gaz?.precise ?? false) || claimOrder(a, b);
+
 function cluster(claims: Claim[]): EvidenceCluster[] {
   const groups: Claim[][] = [];
-  for (const c of [...claims].sort((a, b) => b.weight - a.weight)) {
+  for (const c of [...claims].sort(claimOrder)) {
     const g = groups.find((x) => km([x[0].lon!, x[0].lat!], [c.lon!, c.lat!]) <= SAME_KM);
     if (g) g.push(c); else groups.push([c]);
   }
@@ -152,8 +163,8 @@ function cluster(claims: Claim[]): EvidenceCluster[] {
     for (const c of cs) byFamily.set(c.family, Math.max(byFamily.get(c.family) ?? 0, c.weight));
     let spread = 0;
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) spread = Math.max(spread, km([cs[i].lon!, cs[i].lat!], [cs[j].lon!, cs[j].lat!]));
-    const lead = cs.find((c) => c.kind === 'gazetteer') ?? cs[0];
-    return { lat: lead.lat!, lon: lead.lon!, title: lead.title, claims: cs, families: [...byFamily.keys()], score: [...byFamily.values()].reduce((a, b) => a + b, 0), dateFit: bestFit(cs.map((c) => c.dateFit)), spreadKm: spread };
+    const lead = [...cs].sort(positionOrder)[0];
+    return { lat: lead.lat!, lon: lead.lon!, title: lead.title, claims: cs, families: [...byFamily.keys()].sort(), score: [...byFamily.values()].reduce((a, b) => a + b, 0), dateFit: bestFit(cs.map((c) => c.dateFit)), spreadKm: spread, positionFrom: lead.source };
   }).sort((a, b) => b.score - a.score);
 }
 
@@ -213,7 +224,7 @@ export function combineEvidence(input: { written: string; year?: number; local: 
     if (input.context?.points.length) statements.push((top.geoFit ?? 1) === 1 ? 'It lies near the other places already identified in this book.' : 'It lies far from the other places already identified in this book, so it needs other evidence.');
     if (top.modernOnly) statements.push(`Only present-day reference gazetteers record it, with no dates — that says nothing about ${yearLabel(year!)}.`);
     if (top.spreadKm >= 2) {
-      statements.push(`The sources place it up to ${top.spreadKm.toFixed(1)} km apart — often different points (centre, site, parish) of the same place.`);
+      statements.push(`The sources place it up to ${top.spreadKm.toFixed(1)} km apart — often different points (centre, site, parish) of the same place. The map uses ${top.positionFrom}'s position (the most precise record).`);
       // Show the two records furthest apart, side by side (only when the gap is more than a few km).
       let pair: [Claim, Claim] | undefined;
       let far = 0;

@@ -539,6 +539,8 @@ def records(spec):
         ap = f.get('approx')
         # a source that does not document what its values mean ("meaning": "unknown", C8) makes no precision claim
         rec['precise'] = not (ap and str(p.get(ap['field'])) in ap['values']) and not p.get('__approx') and spec.get('meaning') != 'unknown'
+        if ap and ap.get('note') and str(p.get(ap['field'])) in ap['note']:
+            rec['pq'] = ap['note'][str(p.get(ap['field']))]  # what the source's precision code means, shown on the card (PA-010)
         uncertain = False
         dt = spec['dating']  # per record (a fallback below may switch this record's mode)
         if dt['mode'] == 'textOrPeriods':
