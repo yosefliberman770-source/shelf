@@ -690,8 +690,12 @@ export default function ReaderPage() {
         if (cancelled || !host.current) return;
         const rendition = book.renderTo(host.current, { width: '100%', height: '100%', flow: 'paginated', spread: 'none', allowScriptedContent: false });
         rendRef.current = rendition;
+        // Set further down; registered on each chapter's document as a non-passive listener,
+        // because epub.js forwards touch events passively (they can't be cancelled there).
+        let onTouchEnd = (_e: TouchEvent) => {};
         rendition.hooks.content.register((contents: Contents) => {
           const doc = contents.document;
+          doc.addEventListener('touchend', (e) => onTouchEnd(e), { passive: false });
           // Some publishers hide text by pushing it far off-screen (e.g.
           // left: -999em), which breaks page layout. Put it back in the flow.
           for (const el of Array.from(doc.querySelectorAll<HTMLElement>('body *'))) {
@@ -752,16 +756,17 @@ export default function ReaderPage() {
           const text = contents.window.getSelection()?.toString().trim() ?? '';
           if (text) { setSelection({ cfi, text, contents }); setNoteDraft(null); setDefine(null); }
         });
-        rendition.on('click', (e: MouseEvent) => {
+        // A tap in the book: an underlined name opens its card; anything else shows or hides the menus.
+        const onTap = (target: EventTarget | null, x: number, y: number) => {
           const all = rendition.getContents() as unknown as Contents[];
           if (all.some((c) => c.window.getSelection()?.toString())) return;
           // Tapped an underlined name? Show who or what it is.
-          const doc = (e.target as Node | null)?.ownerDocument ?? (e.target as Document | null);
+          const doc = (target as Node | null)?.ownerDocument ?? (target as Document | null);
           const hits = doc ? hitsRef.current.get(doc) : undefined;
           const ph = doc ? placeHitsRef.current.get(doc) : undefined;
-          const p = doc && ph?.length ? (hitAt(doc, ph, e.clientX, e.clientY) as PlaceHit | undefined) : undefined;
+          const p = doc && ph?.length ? (hitAt(doc, ph, x, y) as PlaceHit | undefined) : undefined;
           if (p) { openPlacePopRef.current(p, all.find((c) => c.document === doc)); return; }
-          const h = doc && hits?.length ? hitAt(doc, hits, e.clientX, e.clientY) : undefined;
+          const h = doc && hits?.length ? hitAt(doc, hits, x, y) : undefined;
           if (h) { openEntityRef.current(h); return; }
           if (placePopRef.current) { setPlacePop(null); return; }
           setHint(false);
@@ -769,6 +774,11 @@ export default function ReaderPage() {
             if (!p) setChrome((c) => !c);
             return null;
           });
+        };
+        let lastTouchTap = 0;
+        rendition.on('click', (e: MouseEvent) => {
+          if (Date.now() - lastTouchTap < 800) return; // already handled as a touch tap
+          onTap(e.target, e.clientX, e.clientY);
         });
         // Following a link inside the book (e.g. a footnote): remember where you were.
         rendition.on('linkClicked', () => { if (session.current.cfi) setJumpBack(session.current.cfi); jumping.current = true; });
@@ -779,12 +789,29 @@ export default function ReaderPage() {
         // Swipe to turn pages.
         let sx = 0;
         let sy = 0;
-        rendition.on('touchstart', (e: TouchEvent) => { sx = e.changedTouches[0].screenX; sy = e.changedTouches[0].screenY; });
+        let st = 0;
+        rendition.on('touchstart', (e: TouchEvent) => { sx = e.changedTouches[0].screenX; sy = e.changedTouches[0].screenY; st = Date.now(); });
         rendition.on('touchend', (e: TouchEvent) => {
           const dx = e.changedTouches[0].screenX - sx;
           const dy = e.changedTouches[0].screenY - sy;
           if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { userNav.current = true; setChrome(false); setHint(false); if (dx < 0) rendition.next(); else rendition.prev(); }
         });
+        // A short tap is handled here and its default cancelled: otherwise Chrome on Android
+        // treats a tap on book text as "Touch to Search" and opens a Google panel over the page.
+        // Long-press (to select a quote) and links are left to the browser.
+        onTouchEnd = (e: TouchEvent) => {
+          const t = e.changedTouches[0];
+          const dx = t.screenX - sx;
+          const dy = t.screenY - sy;
+          const isTap = e.touches.length === 0 && Math.abs(dx) < 10 && Math.abs(dy) < 10 && Date.now() - st < 500;
+          const onLink = (e.target as Element | null)?.closest?.('a[href]');
+          // With text selected, let the browser's own tap clear the selection as before.
+          const selected = (rendition.getContents() as unknown as Contents[]).some((c) => c.window.getSelection()?.toString());
+          if (!isTap || onLink || selected || !e.cancelable) return;
+          e.preventDefault();
+          lastTouchTap = Date.now();
+          onTap(e.target, t.clientX, t.clientY);
+        };
       } catch (e) {
         console.error(e);
         if (!cancelled) setStatus('error');

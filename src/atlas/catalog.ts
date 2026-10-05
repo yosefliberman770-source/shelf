@@ -4,7 +4,7 @@
 // entry here — the map, panel and attribution read this catalogue.
 import type { ExpressionSpecification, FilterSpecification, LayerSpecification, SourceSpecification } from 'maplibre-gl';
 import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
-import { eventNear, existedIn, type HistYear, ohmExisted } from './time';
+import { eventNear, existedIn, type HistYear, ohmExisted, toAstro, yearLabel } from './time';
 import { PRIVATE_TILE_PREFIX, privateHas } from './privateData';
 import { inGroupExpr, type SiteGroup } from './site-types';
 
@@ -177,6 +177,39 @@ const pmtiles = (c: LayerCtx, file: string, id: DatasetId, maxzoom: number): Sou
 /** Level of detail comes from the tiles themselves: each feature only appears from the zoom its dataset's own attributes warrant. */
 
 // ── Shared sources ────────────────────────────────────────────────────────
+/**
+ * The AWMC outlines of particular moments (names as in awmc-snapshots.json), with one
+ * point to label each at. A multi-part outline (Rome in 117 CE has 72 pieces) would
+ * otherwise get a label on every piece. Roman outlines are labelled over Italy; the
+ * others at the centre of their largest piece.
+ */
+export const AWMC_EXTENTS: { n: string; f: HistYear; at: [number, number]; series?: 'rome' }[] = [
+  { n: 'Roman territory, 60 BCE', f: -60, at: [12.6, 42.4], series: 'rome' },
+  { n: 'Roman Empire at its greatest extent, 117 CE', f: 117, at: [12.6, 42.4], series: 'rome' },
+  { n: 'Roman Empire, 200 CE', f: 200, at: [12.6, 42.4], series: 'rome' },
+  { n: "Alexander's empire (at his death, c. 323 BCE)", f: -323, at: [64.2, 32.3] },
+  { n: 'Achaemenid Persian Empire at its greatest extent (c. 500 BCE)', f: -500, at: [61.6, 32.7] },
+  { n: 'Hasmonean kingdom (greatest extent, c. 76 BCE)', f: -76, at: [35.3, 31.8] },
+  { n: "Herod's kingdom (c. 4 BCE)", f: -4, at: [35.0, 31.6] },
+];
+export const EXTENT_WINDOW = 50;
+
+/**
+ * Which snapshot outlines to draw in a year, and how to label them: each within 50 years
+ * of the moment it depicts, and only the nearest of the Roman outlines. An outline from
+ * another year says so in its label, so it is never read as the border in that year.
+ */
+export function extentsFor(year: HistYear): { n: string; label: string }[] {
+  const gap = (e: { f: HistYear }) => toAstro(e.f) - toAstro(year);
+  const near = AWMC_EXTENTS.filter((e) => Math.abs(gap(e)) <= EXTENT_WINDOW);
+  const rome = near.filter((e) => e.series === 'rome').sort((a, b) => Math.abs(gap(a)) - Math.abs(gap(b)))[0];
+  return near.filter((e) => e.series !== 'rome' || e === rome).map((e) => {
+    const d = gap(e);
+    const note = d === 0 ? '' : `\n(outline from ${Math.abs(d)} year${Math.abs(d) === 1 ? '' : 's'} ${d > 0 ? 'after' : 'before'} ${yearLabel(year)})`;
+    return { n: e.n, label: e.n + note };
+  });
+}
+
 export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification> = {
   'pleiades-places': (c) => pmtiles(c, 'pleiades.pmtiles', 'pleiades', 10),
   itinere: (c) => pmtiles(c, 'itinere.pmtiles', 'itinere', 10),
@@ -210,6 +243,7 @@ export const SOURCE_SPECS: Record<string, (ctx: LayerCtx) => SourceSpecification
   'awmc-shoreline': (c) => ({ type: 'geojson', data: c.base + 'awmc-shoreline.json', attribution: credit('awmc') }),
   'awmc-inland-water': (c) => ({ type: 'geojson', data: c.base + 'awmc-inland-water.json', attribution: credit('awmc') }),
   'awmc-snapshots': (c) => ({ type: 'geojson', data: c.base + 'awmc-snapshots.json', attribution: credit('awmc') }),
+  'awmc-snapshot-labels': () => ({ type: 'geojson', data: { type: 'FeatureCollection', features: AWMC_EXTENTS.map((e) => ({ type: 'Feature', properties: { n: e.n }, geometry: { type: 'Point', coordinates: e.at } })) }, attribution: credit('awmc') }),
   'wikidata-events': (c) => ({ type: 'geojson', data: c.base + 'wikidata-events.json', attribution: credit('wikidata') }),
   'physical-labels': (c) => ({ type: 'geojson', data: c.base + 'physical-labels.json', attribution: credit('physlabels') }),
   reservoirs: (c) => pmtiles(c, 'reservoirs.pmtiles', 'hydrolakes', 10),
@@ -814,13 +848,16 @@ export const LAYERS: AtlasLayerDef[] = [
   },
   {
     id: 'territories', group: 'political', label: 'Imperial extents (snapshots)', datasets: ['awmc'], defaultOn: false,
-    hint: 'AWMC outlines of particular moments — Persian Empire, Alexander’s empire, Rome in 60 BCE, 117 CE and 200 CE, Hasmonean and Herodian kingdoms. Shown within 50 years of the moment each depicts; the label gives its date.', sources: ['awmc-snapshots'],
+    hint: 'AWMC outlines of particular moments — Persian Empire, Alexander’s empire, Rome in 60 BCE, 117 CE and 200 CE, Hasmonean and Herodian kingdoms. Each is shown within 50 years of the moment it depicts (for Rome, only the nearest outline); when it is from another year, its label says how many years before or after your date it is.', sources: ['awmc-snapshots', 'awmc-snapshot-labels'],
     specs: (c) => {
-      const filter = ['all', ['==', ['get', 'k'], 'extent'], ['<=', ['abs', ['-', ['get', 'f'], c.year]], 50]] as FilterSpecification;
+      const shown = extentsFor(c.year);
+      const names = ['literal', shown.map((e) => e.n)] as ExpressionSpecification;
+      const filter = ['all', ['==', ['get', 'k'], 'extent'], ['in', ['get', 'n'], names]] as FilterSpecification;
+      const label = (shown.length ? ['match', ['get', 'n'], ...shown.flatMap((e) => [e.n, e.label]), ['get', 'n']] : ['get', 'n']) as ExpressionSpecification;
       return [
         { id: 'territories-fill', type: 'fill', source: 'awmc-snapshots', filter, paint: { 'fill-color': C.territory, 'fill-opacity': 0.08 } },
         { id: 'territories-edge', type: 'line', source: 'awmc-snapshots', filter, paint: { 'line-color': C.territory, 'line-width': 1.6, 'line-dasharray': [5, 2], 'line-opacity': 0.8 } },
-        { id: 'territories-label', type: 'symbol', source: 'awmc-snapshots', filter, layout: { 'text-field': ['get', 'n'], 'text-font': FONT_ITALIC, 'text-size': 12, 'text-max-width': 10 }, paint: { 'text-color': C.territory, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
+        { id: 'territories-label', type: 'symbol', source: 'awmc-snapshot-labels', filter: ['in', ['get', 'n'], names] as FilterSpecification, layout: { 'text-field': label, 'text-font': FONT_ITALIC, 'text-size': 12, 'text-max-width': 12 }, paint: { 'text-color': C.territory, 'text-halo-color': C.halo, 'text-halo-width': 1.4 } },
       ];
     },
   },
