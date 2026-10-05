@@ -129,9 +129,9 @@ export const gazetteerInfo = (id: GazetteerId) => GAZETTEERS.find((g) => g.id ==
 /** Gazetteers whose period covers the year (all of them when the year is unknown). */
 export const gazetteersFor = (year?: HistYear) => GAZETTEERS.filter((g) => year === undefined || (year >= g.coverage[0] && year <= g.coverage[1]));
 
-/** Lower-case, without accents or a leading "the", so "Lutétia" = "lutetia". Must match norm() in scripts/atlas-build/world.py. */
+/** Lower-case, without accents or a leading "the", so "Lutétia" = "lutetia". Must match norm() in scripts/atlas-build/names.py. */
 export const normName = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/^the\s+/, '').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
-/** Name-index shard for a normalised name. Must match shard() in world.py. */
+/** Name-index shard for a normalised name. Must match shard() in scripts/atlas-build/names.py. */
 export function nameShard(n: string): string {
   let out = '';
   for (const ch of Array.from(n).slice(0, 2)) out += /[a-z0-9]/.test(ch) ? ch : `x${(ch.codePointAt(0)! % 16).toString(16)}`;

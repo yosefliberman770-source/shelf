@@ -28,6 +28,7 @@ import zlib
 from collections import Counter, defaultdict
 from datetime import date
 
+import names
 import quality
 import tiler
 
@@ -42,20 +43,9 @@ def log(*a):
     print(*a, flush=True)
 
 
-def norm(s: str) -> str:
-    """Must match normName() in src/atlas/gazetteer.ts."""
-    s = ''.join(c for c in unicodedata.normalize('NFD', s) if not unicodedata.category(c).startswith('M')).lower()
-    s = re.sub(r'^the\s+', '', s)
-    s = s.replace('’', "'")
-    return re.sub(r'\s+', ' ', s).strip()
-
-
-def shard(n: str) -> str:
-    """Must match nameShard() in src/world/places.ts."""
-    out = ''
-    for ch in list(n)[:2]:
-        out += ch if re.match(r'[a-z0-9]', ch) else 'x%x' % (ord(ch) % 16)
-    return out or '_'
+# Name keys: shared with the app, see names.py.
+norm = names.norm
+shard = names.shard
 
 
 def cell_of(lon, lat):

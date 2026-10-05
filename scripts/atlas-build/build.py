@@ -18,7 +18,7 @@ Sources (see docs/HISTORICAL_ATLAS.md for what each provides and why):
 
 Usage:  python3 scripts/atlas-build/build.py            (downloads into scripts/atlas-build/.cache)
         python3 scripts/atlas-build/england.py          (England layers only)
-Needs:  pip install shapely pyshp pyproj pmtiles mapbox-vector-tile
+Needs:  python3 -m pip install -r scripts/atlas-build/requirements.txt  (pinned versions)
 """
 from __future__ import annotations
 

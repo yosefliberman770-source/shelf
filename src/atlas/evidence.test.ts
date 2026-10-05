@@ -50,7 +50,7 @@ describe('place resolution with combined evidence', () => {
     expect(rome.evidence?.statements.join(' ')).toMatch(/offline gazetteers only/);
   });
 
-  it('lets independent WHG attestations favour one offline candidate — as "likely", with the reasons', async () => {
+  it('[rule] lets independent WHG attestations favour one offline candidate — as "likely", with the reasons', async () => {
     whg = () => new Response(JSON.stringify(ROME_INDEX), { status: 200 });
     const r = await resolvePlace('Rome', { detection: 'cue' });
     expect(r.status).toBe('MEDIUM');

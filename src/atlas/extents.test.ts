@@ -32,7 +32,7 @@ describe('imperial extent snapshots', () => {
     expect(extentsFor(117)).toEqual([{ n: 'Roman Empire at its greatest extent, 117 CE', label: 'Roman Empire at its greatest extent, 117 CE' }]);
   });
 
-  it('draws only the nearest Roman outline where two are within 50 years', () => {
+  it('[rule] draws only the nearest Roman outline where two are within 50 years', () => {
     expect(extentsFor(160).map((e) => e.n)).toEqual(['Roman Empire, 200 CE']);
     expect(extentsFor(150).map((e) => e.n)).toEqual(['Roman Empire at its greatest extent, 117 CE']);
   });

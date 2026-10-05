@@ -181,7 +181,16 @@ describe('nothing private reaches the public site', () => {
   });
   it('a production build, when present, ships nothing private', () => {
     const dist = join(ROOT, 'dist');
-    if (!existsSync(join(dist, 'index.html'))) return;
+    // The deploy workflow runs this again after `vite build` with SHELF_REQUIRE_BUILD=1, so the
+    // files actually published are checked, not skipped for want of a build.
+    if (!existsSync(join(dist, 'index.html'))) {
+      expect(process.env.SHELF_REQUIRE_BUILD, 'SHELF_REQUIRE_BUILD is set but dist/ has no build').toBeFalsy();
+      return;
+    }
+    const files = (function walk(d: string): string[] {
+      return readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : [join(d, e.name).slice(dist.length + 1)]));
+    })(dist);
+    expect(files.filter((f) => /(^|\/)private-pack\/|\.pack$|private-(sites|lines|units)\.pmtiles$|(rural-settlement|local-sites)\.pmtiles$/.test(f))).toEqual([]);
     const tiles = existsSync(join(dist, 'world/tiles')) ? readdirSync(join(dist, 'world/tiles')) : [];
     expect(tiles.filter((f) => /private|rural-settlement|local-sites/.test(f))).toEqual([]);
     const cells = join(dist, 'world/places/c');
