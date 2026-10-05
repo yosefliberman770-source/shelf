@@ -10,6 +10,7 @@
 // never cached, and never break the reader.
 import { db } from '../../db/db';
 import { assessCandidates, norm } from './assess';
+import { choiceKey, contextFingerprint, legacyChoiceKeys, nameKey } from './keys';
 import { mapViewFor, type MapView } from './geometry';
 import { PLACE_PROVIDERS, ProviderUnavailable, wikidataContextAt, wikidataProminence, wikidataProvider } from './providers';
 import type { HistoricalPlace, PlaceCandidate, PlaceProvider, PlaceQuery, PlaceResolution } from './types';
@@ -17,14 +18,27 @@ import type { HistoricalPlace, PlaceCandidate, PlaceProvider, PlaceQuery, PlaceR
 const CACHE_DAYS = 30;
 
 /** Cache key: name + the century being read about + provider ("rome|-3c|whg"). */
-/** Bumped whenever the rules for accepting a match change, so answers cached under the old rules are looked up again. 2: spelling evidence, date and book-geography checks. */
-const RESOLVER_VERSION = 2;
+/** Bumped whenever the rules for accepting a match change, so answers cached under the old rules are looked up again. 2: spelling evidence, date and book-geography checks. 3: names keep their script; the book's geography is part of the key. */
+const RESOLVER_VERSION = 3;
 
-export function cacheKey(name: string, date: number | undefined, provider: string): string {
+/**
+ * The cache key of an online answer: the name (in its own script), the century, the provider, and the context the
+ * lookup weighed (the book's places and nearby names) — an answer chosen with one book's geography is not reused for
+ * another book.
+ */
+export function cacheKey(name: string, date: number | undefined, provider: string, context = 'none'): string {
   const era = date === undefined ? 'any' : `${date < 0 ? '-' : ''}${Math.ceil(Math.abs(date) / 100)}c`;
-  return `${norm(name)}|${era}|${provider}|v${RESOLVER_VERSION}`;
+  return `${nameKey(name)}|${era}|${provider}|${context}|v${RESOLVER_VERSION}`;
 }
-const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
+const contextOf = (q: PlaceQuery) => contextFingerprint(q.contextPoints, q.nearbyPlaceNames);
+/** The reader's choice for a name in a book, also under the key it had before names kept their script. */
+async function readChoice(bookId: string, name: string) {
+  for (const k of [choiceKey(bookId, name), ...legacyChoiceKeys(bookId, name)]) {
+    const c = await db.placeChoices.get(k).catch(() => undefined);
+    if (c) return c;
+  }
+  return undefined;
+}
 
 export class HistoricalPlaceService {
   private providers: PlaceProvider[];
@@ -45,11 +59,11 @@ export class HistoricalPlaceService {
   async resolvePlaceName(q: PlaceQuery, opts: { signal?: AbortSignal; refresh?: boolean } = {}): Promise<PlaceResolution> {
     // 1. A place the reader already picked for this name in this book.
     if (q.bookId && !opts.refresh) {
-      const choice = await db.placeChoices.get(choiceKey(q.bookId, q.name)).catch(() => undefined);
+      const choice = await readChoice(q.bookId, q.name);
       if (choice) return { status: 'HIGH', place: { ...(choice.place as HistoricalPlace), matchedName: q.name }, candidates: [], provider: (choice.place as HistoricalPlace).source, userChosen: true, fromCache: true };
     }
     const provider = await this.provider();
-    const key = cacheKey(q.name, q.date, provider.id);
+    const key = cacheKey(q.name, q.date, provider.id, contextOf(q));
     // 2. A recent lookup of the same name for the same period.
     if (!opts.refresh) {
       const hit = await db.placeCache.get(key).catch(() => undefined);
@@ -97,7 +111,7 @@ export class HistoricalPlaceService {
   private async nearbyPoints(q: PlaceQuery, providerId: string) {
     const pts: { lat: number; lon: number }[] = [];
     for (const n of (q.nearbyPlaceNames ?? []).filter((x) => norm(x) !== norm(q.name)).slice(0, 8)) {
-      const choice = q.bookId ? await db.placeChoices.get(choiceKey(q.bookId, n)).catch(() => undefined) : undefined;
+      const choice = q.bookId ? await readChoice(q.bookId, n) : undefined;
       const p = (choice?.place as HistoricalPlace | undefined) ?? ((await db.placeCache.get(cacheKey(n, q.date, providerId)).catch(() => undefined))?.resolution as PlaceResolution | undefined)?.place;
       if (p?.latitude !== undefined && p.longitude !== undefined) pts.push({ lat: p.latitude, lon: p.longitude });
     }
@@ -110,9 +124,9 @@ export class HistoricalPlaceService {
     const out: (PlaceResolution | undefined)[] = [];
     const todo: { i: number; q: PlaceQuery }[] = [];
     for (const [i, q] of queries.entries()) {
-      const choice = q.bookId ? await db.placeChoices.get(choiceKey(q.bookId, q.name)).catch(() => undefined) : undefined;
+      const choice = q.bookId ? await readChoice(q.bookId, q.name) : undefined;
       if (choice) { out[i] = { status: 'HIGH', place: choice.place as HistoricalPlace, candidates: [], provider: provider.id, userChosen: true, fromCache: true }; continue; }
-      const hit = await db.placeCache.get(cacheKey(q.name, q.date, provider.id)).catch(() => undefined);
+      const hit = await db.placeCache.get(cacheKey(q.name, q.date, provider.id, contextOf(q))).catch(() => undefined);
       if (hit && Date.now() - hit.updatedAt < CACHE_DAYS * 86_400_000) { out[i] = { ...(hit.resolution as PlaceResolution), fromCache: true }; continue; }
       todo.push({ i, q });
     }
@@ -128,7 +142,7 @@ export class HistoricalPlaceService {
         for (const [k, t] of todo.entries()) {
           const res = await this.decide(t.q, results[k] ?? [], provider);
           out[t.i] = res;
-          await db.placeCache.put({ id: cacheKey(t.q.name, t.q.date, provider.id), placeId: res.place?.id, provider: provider.id, dateContext: t.q.date, resolution: res, updatedAt: Date.now() }).catch(() => {});
+          await db.placeCache.put({ id: cacheKey(t.q.name, t.q.date, provider.id, contextOf(t.q)), placeId: res.place?.id, provider: provider.id, dateContext: t.q.date, resolution: res, updatedAt: Date.now() }).catch(() => {});
         }
       }
     }
@@ -156,7 +170,7 @@ export class HistoricalPlaceService {
   }
 
   async forgetChoice(bookId: string, name: string) {
-    await db.placeChoices.delete(choiceKey(bookId, name));
+    for (const k of [choiceKey(bookId, name), ...legacyChoiceKeys(bookId, name)]) await db.placeChoices.delete(k);
   }
 
   /**

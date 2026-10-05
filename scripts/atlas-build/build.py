@@ -105,7 +105,12 @@ def log(*a):
 
 
 def fetch(key: str, url: str) -> str:
-    """Download once into the cache; return the local path."""
+    """The file at a source URL: the raw vault's copy when the vault manifest records that URL (checksummed, and the
+    one the manifest describes), else a download kept in the cache. Return the local path."""
+    vault = inputs.vault_copy(url)
+    if vault:
+        inputs.fetched(key, url, vault)
+        return vault
     os.makedirs(CACHE, exist_ok=True)
     name = key + os.path.splitext(urllib.parse.urlparse(url).path)[1]
     path = os.path.join(CACHE, name)
@@ -731,6 +736,7 @@ def cliopatria():
     cls_path = os.path.join(CACHE, 'cliopatria-classes.json')
     if os.path.exists(cls_path):
         cls = json.load(open(cls_path))
+        inputs.fetched('cliopatria-classes.json', 'Wikidata answers (polity classes), kept since the date given', cls_path)
     else:
         cls = {}
         for i in range(0, len(qids), 300):
@@ -998,6 +1004,7 @@ def reservoirs():
     cache = os.path.join(CACHE, 'wd-reservoirs.json')
     if not os.path.exists(cache):
         json.dump(sparql(WD_RESERVOIRS), open(cache, 'w'))
+    inputs.fetched('wd-reservoirs.json', 'Wikidata query (dam dates), answer kept since the date given', cache)
     dated = []
     for b in json.load(open(cache)):
         y = int(b['y']['value']) if b.get('y') else None
@@ -1072,6 +1079,7 @@ def physical_labels():
     cache = os.path.join(CACHE, 'wd-peaks.json')
     if not os.path.exists(cache):
         json.dump(sparql(WD_PEAKS), open(cache, 'w'))
+    inputs.fetched('wd-peaks.json', 'Wikidata query (peaks), answer kept since the date given', cache)
     peaks = 0
     for b in json.load(open(cache)):
         lon, lat = (float(v) for v in b['coord']['value'].removeprefix('Point(').rstrip(')').split())
@@ -1190,7 +1198,10 @@ def gazetteer():
 
     # Periods for undated places, from the same evidence as the map (built by pleiades()).
     env_path = os.path.join(CACHE, 'pleiades-envelopes.json')
-    envelopes = json.load(open(env_path)) if os.path.exists(env_path) else {}
+    # Written by the pleiades step: without it every undated Pleiades place would silently lose its evidence period.
+    if not os.path.exists(env_path):
+        raise SystemExit('pleiades-envelopes.json is missing: run the "pleiades" step first (python3 scripts/atlas-build/build.py pleiades gazetteer)')
+    envelopes = json.load(open(env_path))
     out = []
     titles = {}
     for pid, p in places.items():
@@ -1233,6 +1244,8 @@ def polity_aliases():
     rows = json.load(open(path, encoding='utf-8'))
     cache_path = os.path.join(CACHE, 'cliopatria-aliases.json')
     cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+    if os.path.exists(cache_path):
+        inputs.fetched('cliopatria-aliases.json', 'Wikidata answers (polity aliases), kept since the date given', cache_path)
     qids = sorted({r['q'] for r in rows if r.get('q')} - set(cache))
     # QLever's copy of Wikidata (University of Freiburg) first: same data, not subject to the
     # query-service rate limits shared build machines hit. Wikidata's own entity API is the fallback.
@@ -1346,6 +1359,8 @@ def polity_common_names():
     # Country records for modern regimes (QLever's copy of Wikidata; cached).
     cache_path = os.path.join(CACHE, 'cliopatria-countries.json')
     countries = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+    if os.path.exists(cache_path):
+        inputs.fetched('cliopatria-countries.json', 'Wikidata answers (countries), kept since the date given', cache_path)
     todo = sorted({r['q'] for r in rows if r.get('q') and r['t'] >= 1800} - set(countries))
     for i in range(0, len(todo), 150):
         chunk = todo[i:i + 150]
@@ -1552,7 +1567,7 @@ def manifest(stats, ran=None):
 # Which downloads (fetch keys) each published dataset is built from.
 DATASET_INPUTS = {'pleiades': ('pleiades_gis',), 'awmc': ('awmc_', 'snap_'), 'cliopatria': ('cliopatria',),
                   'naturalearth': ('ne_land', 'ne_rivers'), 'hydrosheds': ('hydrorivers',), 'osm': ('polders',),
-                  'osmland': ('osm_land', 'osm_water'), 'hydrolakes': ('hydrolakes',), 'physlabels': ('ne_regions',)}
+                  'osmland': ('osm_land', 'osm_water'), 'hydrolakes': ('hydrolakes', 'wd-reservoirs'), 'physlabels': ('ne_regions', 'wd-peaks')}
 
 
 def _packages():

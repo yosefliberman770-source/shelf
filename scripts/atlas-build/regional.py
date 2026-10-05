@@ -376,6 +376,9 @@ NO_PERIODS = {'044': (400, 570, 'Migration period'), '045': (570, 1050, 'Younger
 NO_KIND = {'1200': 'settlement', '1500': 'fortification', '2700': 'church', '1900': 'market', '2000': 'site', '1700': 'site'}
 NO_ZIP = os.path.join(RAW, 'norway-kulturminner', 'original', 'Kulturminner_0000_Norge_4258_Kulturminner_GML.zip')
 NO_CACHE = os.path.join(RAW, 'norway-kulturminner', 'derived-medieval.json')
+# The derived extracts below are reused only for the same source file *and* the same code that made them: a change to
+# a kind or period table, or to the parsing, makes a fresh extract instead of being silently ignored.
+CODE = __import__('hashlib').sha256(open(__file__, 'rb').read()).hexdigest()[:12]
 
 
 def _no_codes(name):
@@ -388,7 +391,7 @@ def norway():
     cached beside it (keyed on the zip's size and date) so later builds are fast."""
     if not inputs.present(NO_ZIP):
         return []
-    stamp = f'{os.path.getsize(NO_ZIP)}-{int(os.path.getmtime(NO_ZIP))}'
+    stamp = f'{os.path.getsize(NO_ZIP)}-{int(os.path.getmtime(NO_ZIP))}-{CODE}'
     if os.path.exists(NO_CACHE):
         c = json.load(open(NO_CACHE, encoding='utf-8'))
         if c.get('stamp') == stamp:
@@ -666,7 +669,7 @@ DK_KIND = {'Borg/Voldsted': 'castle', 'Befæstning': 'fortification', 'Kirke': '
 def denmark():
     if not inputs.present(DK_ZIP):
         return []
-    stamp = f'{os.path.getsize(DK_ZIP)}-{int(os.path.getmtime(DK_ZIP))}'
+    stamp = f'{os.path.getsize(DK_ZIP)}-{int(os.path.getmtime(DK_ZIP))}-{CODE}'
     if os.path.exists(DK_CACHE) and json.load(open(DK_CACHE)).get('stamp') == stamp:
         return json.load(open(DK_CACHE))['items']
     import tempfile
@@ -767,7 +770,7 @@ SE_KIND = [(re.compile(r'kyrk|kapell|begravningsplats'), 'church'), (re.compile(
 def sweden():
     if not inputs.present(SE_GPKG):
         return []
-    stamp = f'{os.path.getsize(SE_GPKG)}-{int(os.path.getmtime(SE_GPKG))}'
+    stamp = f'{os.path.getsize(SE_GPKG)}-{int(os.path.getmtime(SE_GPKG))}-{CODE}'
     if os.path.exists(SE_CACHE) and json.load(open(SE_CACHE)).get('stamp') == stamp:
         return json.load(open(SE_CACHE))['items']
     from shapely import wkb

@@ -9,6 +9,7 @@
 // writes. Nothing is sent to an AI here.
 import { allEvents, allWars, type AtlasEvent, type Polity, politiesAt } from '../atlas/context';
 import type { Pos } from '../atlas/data';
+import { placeDataVersion } from '../atlas/gazetteer';
 import { resolvePlace } from '../atlas/resolve';
 import type { HistYear } from '../atlas/time';
 import { db } from '../db/db';
@@ -87,6 +88,12 @@ export async function resolveBookWorld(row: BookWorldRow, year: HistYear | undef
     // Keep the strongest textual evidence any chapter gave for the name.
     const evidence = !prev?.evidence || (m.evidence && rank[m.evidence.strength] < rank[prev.evidence.strength]) ? m.evidence ?? prev?.evidence : prev.evidence;
     counts.set(m.name, { n: (prev?.n ?? 0) + m.count, detection: m.detection, evidence: evidence as MentionEvidence | undefined });
+  }
+  // Answers kept from an older build of the place data (including "not found") are redone against this one.
+  const dataVersion = await placeDataVersion();
+  if (dataVersion && row.dataVersion !== dataVersion) {
+    row.resolved = {};
+    row.dataVersion = dataVersion;
   }
   // Where the book is set: every name identified offline without doubt, first.
   const namesAll = [...counts.keys()];

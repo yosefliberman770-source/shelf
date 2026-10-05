@@ -323,7 +323,8 @@ def pleiades_importance():
     Returns {pid: (class, [reasons])}. Used only to decide what to draw and name
     first when zoomed out — never shown as a size or rank claim.
     """
-    z = zipfile.ZipFile(os.path.join(CACHE, 'pleiades_gis.zip'))
+    # The checksummed vault copy when the vault records the export (the file the manifest describes), else the cache.
+    z = zipfile.ZipFile(inputs.vault_copy('https://atlantides.org/downloads/pleiades/gis/pleiades_gis_data.zip') or os.path.join(CACHE, 'pleiades_gis.zip'))
 
     def rows(name):
         member = next(n for n in z.namelist() if n.endswith('/' + name))

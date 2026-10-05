@@ -177,6 +177,19 @@ class Inputs(unittest.TestCase):
         self.assertEqual(inputs.finish(allow_missing=True), 0)
         inputs.MISSING.clear()
 
+    def test_files_the_build_derives_are_not_checked_as_sources(self):
+        os.makedirs(os.path.join(self.raw, 'ds', 'derived'))
+        self.write(os.path.join(self.raw, 'ds', 'derived-medieval.json'), '{}')
+        self.write(os.path.join(self.raw, 'ds', 'derived', 'x.shp'), 'x')
+        self.assertEqual(self.problems(), {})
+
+    def test_a_download_comes_from_the_checked_vault_copy(self):
+        """A14-006: the build reads the file the manifest describes, not a second download of the same URL."""
+        self.assertEqual(inputs.vault_copy('https://example.org/a.csv', self.raw, self.manifest), self.f)
+        self.assertIsNone(inputs.vault_copy('https://example.org/other.csv', self.raw, self.manifest))
+        self.write(self.f, 'changed')
+        self.assertIsNone(inputs.vault_copy('https://example.org/a.csv', self.raw, self.manifest))
+
     def test_the_vault_is_fully_recorded(self):
         """Every file in the real raw vault is listed in data/historical/manifest.json (present only on the owner's
         machine and in the build environment; the checksums themselves are verified before each build)."""
@@ -185,6 +198,15 @@ class Inputs(unittest.TestCase):
         with open(inputs.VAULT_MANIFEST, encoding='utf-8') as fh:
             manifest = json.load(fh)
         self.assertEqual([f for f in inputs.vault_files() if f not in manifest], [])
+
+
+class DerivedExtracts(unittest.TestCase):
+    def test_the_nordic_extracts_are_keyed_on_the_code_that_made_them(self):
+        """A14-001: a parser change makes a fresh extract instead of reusing the old one."""
+        import regional
+        src = open(regional.__file__, encoding='utf-8').read()
+        self.assertEqual(src.count("-{CODE}'"), 3)
+        self.assertEqual(len(regional.CODE), 12)
 
 
 class Tiles(unittest.TestCase):

@@ -343,8 +343,15 @@ async function placeByKey(key: string): Promise<GazPlace | undefined> {
   return (await placesInCell(cell)).find((x) => x.key === key);
 }
 
+/** Which build of the place data this is (its build date), so answers kept from an older build can be redone. */
+export async function placeDataVersion(): Promise<string | undefined> {
+  const m = await getJSON<{ built?: string }>(`${import.meta.env.BASE_URL}world/manifest.json`).catch(() => undefined);
+  return m?.built;
+}
+
 /** Every place (in any gazetteer) with this exact name; isTitle = it's the record's main name. */
 export async function placesByName(name: string): Promise<{ place: GazPlace; isTitle: boolean }[]> {
+  void placeDataVersion(); // reading the manifest lets the offline cache notice a new data build (public/sw.js)
   const k = normName(name);
   if (k.length < 2) return [];
   const hits = (await nameEntries(k)).filter((e) => e[0] === k);
@@ -355,6 +362,8 @@ export async function placesByName(name: string): Promise<{ place: GazPlace; isT
     const ps = await placesInCell(cell);
     for (const e of es) { const p = ps.find((x) => x.gazetteer === e[1] && x.id === e[2]); if (p) out.push({ place: p, isTitle: e[4] === 1 }); }
   }));
+  // A fixed order (cells load in any order), so ties between records are broken the same way every time.
+  out.sort((a, b) => a.place.key.localeCompare(b.place.key));
   return out.filter((h) => !h.place.types.every((t) => NOT_A_LOCATION.has(t)));
 }
 
