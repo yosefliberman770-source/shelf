@@ -93,7 +93,33 @@ const WORDS: Record<string, number> = { first: 1, second: 2, third: 3, fourth: 4
  * Returns undefined when nothing is recognised — never a guess.
  */
 export function parseDate(text: string, source?: string): HistDate | undefined {
-  const t = text.trim();
+  // Typographic minus signs (−, –, ‒, —) before a lone year are minus signs, not ranges (PA-014).
+  const t = text.trim().replace(/(^|[\s(\[])[\u2212\u2012\u2013\u2014](?=\d)/g, '$1-');
+  // Hijri years ("AH 600", "600 AH", "1099 H.") are converted, never read as CE (PA-014).
+  const hijri = t.match(/\bA\.?\s?H\.?\s*(\d{1,4})\b|\b(\d{1,4})\s*(?:A\.?\s?H\.?|H\.)(?=\s|$|[,;)])/);
+  if (hijri) {
+    const ah = Number(hijri[1] ?? hijri[2]);
+    const ce = Math.round(ah * 0.970229 + 621.5643);
+    return { ...circa(ce, 1, source), label: `${ah} AH (about ${ce} CE)` };
+  }
+  // A lone negative number is a BCE year ("-500"), as in the build's data.
+  const neg = t.match(/^-(\d{1,4})$/);
+  if (neg) return exactYear(-Number(neg[1]), source);
+  // Catalogue conventions (map libraries): "[18--]" / "18--" a century, "176-?" / "176-" a decade, "c1760", "[1760?]".
+  let c = t.match(/^\[?(\d{2})--\??\]?$/);
+  if (c) return { earliest: Number(c[1]) * 100, latest: Number(c[1]) * 100 + 99, precision: 'century', qualifier: 'between', label: `${c[1]}00s`, source };
+  c = t.match(/^\[?(\d{3})-\??\]?$/);
+  if (c) return { ...decade(Number(c[1]) * 10, source), label: `${c[1]}0s${t.includes('?') ? ' (uncertain)' : ''}` };
+  c = t.match(/^\[?c(\d{3,4})\??\]?$/i) ?? t.match(/^\[(\d{3,4})\?\]$/);
+  if (c) return circa(Number(c[1]), 5, source);
+  // An abbreviated range: "1760-65" is 1760–1765, "1066–87" 1066–1087, "1798-02" 1798–1802 (PA-013).
+  const ab = t.match(/^\[?(\d{3,4})\s*[–—-]\s*(\d{1,2})\]?$/);
+  if (ab && !ERA_BCE.test(t)) {
+    const a = Number(ab[1]);
+    let b = Number(ab[1].slice(0, ab[1].length - ab[2].length) + ab[2]);
+    if (b < a) b += 10 ** ab[2].length;
+    return { earliest: a, latest: b, precision: 'range', qualifier: 'between', source };
+  }
   const bce = ERA_BCE.test(t);
   const sign = (n: number) => (bce ? -n : n);
   let m = t.match(/(\d{1,2})(?:st|nd|rd|th)\s+century/i) ?? t.match(new RegExp(`\\b(${Object.keys(WORDS).join('|')})\\s+century`, 'i'));

@@ -10,11 +10,11 @@
 // roles and a plain account of why it was chosen. Coordinates, names and dates
 // come only from datasets — never from AI.
 import { db } from '../db/db';
-import { norm } from '../lib/history/assess';
+import { choiceKey, legacyChoiceKeys } from '../lib/history/keys';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type PlaceConfidence, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, GAZETTEERS, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type PlaceConfidence, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
@@ -95,12 +95,21 @@ export interface Resolution {
   error?: string;
   /** The combined evidence behind this result, when online sources were consulted. */
   evidence?: PlaceEvidence;
+  /** Shelf's place data could not be loaded: says nothing about the name; never store this answer. */
+  loadFailed?: boolean;
 }
 
 /** The atlas's place-match scale on the reader's confidence scale (certain → HIGH … possible → LOW). */
 export const CONFIDENCE_OF: Record<PlaceConfidence, Confidence> = { certain: 'HIGH', probable: 'MEDIUM', possible: 'LOW', ambiguous: 'AMBIGUOUS', unresolved: 'UNRESOLVED' };
 
-const choiceKey = (bookId: string, name: string) => `${bookId}|${norm(name)}`;
+/** The reader's choice for a name in a book, also under the key it had before names kept their script. */
+async function readChoice(bookId: string, name: string) {
+  for (const k of [choiceKey(bookId, name), ...legacyChoiceKeys(bookId, name)]) {
+    const c = await db.placeChoices.get(k).catch(() => undefined);
+    if (c) return c;
+  }
+  return undefined;
+}
 
 /** A gazetteer record's dates, keeping what kind of date they are. */
 export function gazDate(p: GazPlace): HistDate {
@@ -223,12 +232,19 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   const year = opts.year;
   // 1. The reader's own pick for this name in this book.
   if (opts.bookId) {
-    const c = await db.placeChoices.get(choiceKey(opts.bookId, written)).catch(() => undefined);
+    const c = await readChoice(opts.bookId, written);
     const h = c?.place as HistoricalPlace | undefined;
+    // An offline record is re-read from today's data, never served from the copy saved when it was chosen; a record
+    // that is no longer in the data is not served at all (the name is resolved afresh).
+    const offlineKey = !!h && GAZETTEERS.some((x) => h.id.startsWith(`${x.id}:`));
     if (h) {
       const g = await getPlace(h.id).catch(() => undefined);
+      if (offlineKey && !g) {
+        // fall through: the chosen record has left the data
+      } else {
       const p = g ? fromGaz(g, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true }), 'HIGH', [], year) : fromOnline(h, written, why('You chose this place for this name in this book.', 'Your choice', { userChosen: true }), 'HIGH');
       if (p) return { place: p, status: 'HIGH', candidates: [], reason: p.why.reason };
+      }
     }
   }
   // What the text itself says: how strong the place wording is, what type of entity it implies.
@@ -286,6 +302,7 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   // 4. Period gazetteers, offline — scored by date, entity type and the book's geography.
   let local: Resolution | undefined;
   const m = await matchName(written, year, { context, expected }).catch(() => undefined);
+  if (m?.loadFailed) return { status: 'UNRESOLVED', candidates: [], reason: m.reason, loadFailed: true };
   if (m?.status === 'unique' && m.place) {
     // Identity and dates are weighed together once, in the gazetteer (placeConfidence), and only mapped here.
     const status = CONFIDENCE_OF[m.confidence];

@@ -29,9 +29,12 @@ export function explainEmpty(type: DataType, lon: number, lat: number, year: His
   const what = DATA_TYPES.find((t) => t.id === type)!.label.toLowerCase();
   const where = `${regionLabel(c.region)}, ${periodLabel(c.period)}`;
   const tail = ' This does not mean nothing existed.';
+  const online = c.online !== 'none' ? c.sources.filter((s) => s.access === 'live').slice(0, 2).map((s) => s.name).join(' and ') : '';
+  const onlineNote = online ? ` ${online} may have records; Shelf asks ${online.includes(' and ') ? 'them' : 'it'} only about names you look up while online.` : '';
+  const held = c.measured !== undefined ? ` (Shelf holds ${c.measured.toLocaleString('en')} dated record${c.measured === 1 ? '' : 's'} for ${where})` : '';
   if (c.inShelf === 'none' && c.exists !== 'none') {
     const better = c.sources.filter((s) => s.access === 'catalogued').slice(0, 2).map(withReason).join('; ');
-    return { kind: 'database-limitation', mark: QUALITY_MARK.none, text: `Shelf has no structured ${what} for ${where}. ${better ? `Data exists in ${better}.` : ''}${tail}` };
+    return { kind: 'database-limitation', mark: QUALITY_MARK.none, text: `Shelf has no ${what} data for ${where}${c.measured === 0 ? ' (0 dated records)' : ''}, so an empty map here says nothing about the past.${onlineNote}${better ? ` Data exists in ${better}.` : ''}${tail}` };
   }
   if (c.exists === 'none') {
     const maps = type !== 'maps' && cellAt(lon, lat, year, 'maps').exists !== 'none';
@@ -41,8 +44,14 @@ export function explainEmpty(type: DataType, lon: number, lat: number, year: His
   }
   if (QUALITY_RANK[c.exists] > QUALITY_RANK[c.inShelf]) {
     const better = c.sources.filter((s) => s.access === 'catalogued' && QUALITY_RANK[s.quality] > QUALITY_RANK[c.inShelf]).slice(0, 2).map(withReason).join('; ');
-    return { kind: 'database-limitation', mark: QUALITY_MARK[c.inShelf], text: `Shelf’s data for ${what} in ${where} is ${QUALITY_LABEL[c.inShelf].toLowerCase()}; better data exists in ${better}.${tail}` };
+    return { kind: 'database-limitation', mark: QUALITY_MARK[c.inShelf], text: `Shelf’s data for ${what} in ${where} is ${QUALITY_LABEL[c.inShelf].toLowerCase()}${held}${better ? `; better data exists in ${better}` : ''}.${tail}` };
   }
-  if (c.inShelf === 'limited') return { kind: 'database-limitation', mark: QUALITY_MARK.limited, text: `Shelf’s coverage of ${what} for ${where} is limited (${QUALITY_LABEL.limited.toLowerCase()}).${tail}` };
-  return { kind: 'none-recorded', mark: QUALITY_MARK[c.inShelf], text: `None recorded here in ${c.sources.filter((s) => s.access === 'offline' || s.access === 'live').map((s) => s.name).slice(0, 2).join(', ')} (coverage for ${where}: ${QUALITY_LABEL[c.inShelf].toLowerCase()}). Records can still be incomplete.` };
+  if (c.inShelf === 'limited') return { kind: 'database-limitation', mark: QUALITY_MARK.limited, text: `Shelf’s coverage of ${what} for ${where} is limited${held}.${tail}` };
+  const offline = c.sources.filter((s) => s.access === 'offline').map((s) => s.name).slice(0, 2).join(', ');
+  if (type === 'political' || type === 'administrative') {
+    // An outline layer with no polygon here: the reconstruction draws no border at this spot (islands, frontier zones
+    // and remote areas are often left out). That is not evidence that no one ruled it.
+    return { kind: 'none-recorded', mark: QUALITY_MARK[c.inShelf], text: `No outline in ${offline || 'Shelf’s data'} covers this spot at this date. Historical border reconstructions leave gaps (islands, frontier zones, areas not drawn): this does not mean there was no state here.` };
+  }
+  return { kind: 'none-recorded', mark: QUALITY_MARK[c.inShelf], text: `None recorded here in ${offline || 'Shelf’s data'}${held}. Records are incomplete, so this does not mean nothing existed.` };
 }

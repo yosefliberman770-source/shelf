@@ -12,6 +12,7 @@ import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { getJSON, km, type Pos } from './data';
 import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
+import { placeCoverageAt } from '../world/measured';
 import type { EntityKind } from './mention';
 import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, type HistYear, type StartKind, timeFit, type TimeFit } from './time';
 
@@ -57,6 +58,34 @@ export interface GazPlace {
   /** The record's id in its source (differs from `id` only when several records share one source id). */
   sourceId?: number | string;
   url: string;
+  /** The source's own type wording ("ABBEY (MEDIEVAL)(POSSIBLE)", "Fort?"), kept next to Shelf's mapped kind. */
+  sourceType?: string;
+  /** Doubt the source writes into the type ("possible", "probable", "uncertain"): the kind is not established. */
+  typeDoubt?: 'possible' | 'probable' | 'uncertain';
+  /** The source's own period wording ("Middle Ages", "Roman"). */
+  sourcePeriod?: string;
+  /** The dates as the source writes them ("um 1250", "vor 1271", "nach 1477"), when it qualifies them. */
+  datesAsWritten?: { from?: string; to?: string };
+  /** Who ruled the place, year by year, from the source (Deutsches Städtebuch): [ruler, from, to]. */
+  rulers?: [string, number | null, number | null][];
+}
+
+/** Doubt written into a source's type text. */
+export function typeDoubtOf(st: string | undefined): GazPlace['typeDoubt'] {
+  if (!st) return undefined;
+  if (/\bpossibl|\bmöglich|\bvermutlich|\bwohl\b|\(\?\)|\?$|\?\s*\)/i.test(st)) return 'possible';
+  if (/\bprobabl|\bwahrscheinlich/i.test(st)) return 'probable';
+  if (/\bunidentified|\bunknown|\buncertain|\bunsicher|\bunbekannt/i.test(st)) return 'uncertain';
+  return undefined;
+}
+
+/** A qualified end the source writes as "after X" / "nach X" / "X?": the record continues past it — not an end. */
+const OPEN_END = /^(nach|after|post|seit|since|sp[äa]testens\s+nach)\b|\?\s*$/i;
+
+/** The ruler of a place in a year, from its source's dated list (Deutsches Städtebuch), if it has one. */
+export function rulerAt(p: Pick<GazPlace, 'rulers'>, year: HistYear | undefined): string | undefined {
+  if (!p.rulers?.length || year === undefined) return undefined;
+  return p.rulers.find(([, a, b]) => (a === null || a <= year) && (b === null || year <= b))?.[0];
 }
 
 export interface GazetteerInfo {
@@ -163,6 +192,10 @@ interface RowExtra {
   sid?: number | string;
   /** Why the position is approximate although the source gives a point (too few decimals, shared by many records). */
   pq?: string;
+  /** The source's period wording; dated rulers (Deutsches Städtebuch); Germania Sacra phases [label, from, to, from as written, to as written]. */
+  per?: string;
+  rule?: [string, number | null, number | null][];
+  go?: [string, number | null, number | null, string | null, string | null][];
 }
 type NameEntry = [string, GazetteerId, number | string, string, 0 | 1];
 
@@ -176,6 +209,7 @@ class Lru<V> {
   constructor(private max: number) {}
   get(k: string) { const v = this.m.get(k); if (v !== undefined) { this.m.delete(k); this.m.set(k, v); } return v; }
   set(k: string, v: V) { this.m.set(k, v); if (this.m.size > this.max) this.m.delete(this.m.keys().next().value!); }
+  delete(k: string) { this.m.delete(k); }
 }
 const cells = new Lru<Promise<GazPlace[]>>(120);
 const shards = new Lru<Promise<NameEntry[]>>(40);
@@ -203,20 +237,60 @@ function toPlace(r: Row): GazPlace {
     startKind: extra?.fb === 'founded' ? 'founded' : 'attested',
     population: extra?.pop ? Object.entries(extra.pop).map(([y, v]) => ({ year: Number(y), thousands: v, estimate: extra.est?.[y] })) : undefined,
     note: [extra?.fix, extra?.pq].filter(Boolean).join('; ') || undefined,
+    sourceType: typeof extra?.st === 'string' ? extra.st : undefined,
+    typeDoubt: typeDoubtOf(typeof extra?.st === 'string' ? extra.st : undefined),
+    sourcePeriod: typeof extra?.per === 'string' ? extra.per : undefined,
+    rulers: Array.isArray(extra?.rule) ? extra.rule : undefined,
+    ...phaseDates(extra?.go, to),
   };
 }
 
+/**
+ * Germania Sacra phases carry the source's own wording for each date ("um 1250", "vor 1271", "nach 1477"). The first
+ * phase's start and the last phase's end are what the card shows; an end written "nach X" (or "X?") is not an end,
+ * so the record stays open after it instead of being shown as "ended X".
+ */
+function phaseDates(go: unknown, to: HistYear | null): Partial<GazPlace> {
+  if (!Array.isArray(go) || !go.length) return {};
+  const ph = go as [string, number | null, number | null, string | null, string | null][];
+  const first = [...ph].sort((a, b) => (a[1] ?? Infinity) - (b[1] ?? Infinity))[0];
+  const last = [...ph].sort((a, b) => (b[2] ?? -Infinity) - (a[2] ?? -Infinity))[0];
+  const from = first[3] && String(first[3]) !== String(first[1]) ? String(first[3]) : undefined;
+  const end = last[4] && String(last[4]) !== String(last[2]) ? String(last[4]) : undefined;
+  const out: Partial<GazPlace> = {};
+  if (from || end) out.datesAsWritten = { from, to: end };
+  if (end && OPEN_END.test(end) && to !== null && last[2] === to) out.to = undefined;
+  return out;
+}
+
+/**
+ * The place index could not be read (offline, a server error): different from a name that is not in it. A file that
+ * does not exist (404) is an empty shard or cell — that is "not in the index"; anything else is a failure, reported as
+ * such and never cached, so the next lookup tries again.
+ */
+export class IndexLoadError extends Error {
+  constructor(file: string, cause: unknown) { super(`Shelf's place data could not be loaded (${file}: ${cause instanceof Error ? cause.message : String(cause)})`); this.name = 'IndexLoadError'; }
+}
+const missingIsEmpty = <T>(file: string) => (e: unknown): T[] => {
+  if (e instanceof Error && e.message === '404') return [];
+  throw new IndexLoadError(file, e);
+};
+
 /** A public index file joined with the same file from the private data pack, if one is loaded on this device. */
 async function withPrivate<T>(file: string, pub: Promise<T[]>): Promise<T[]> {
+  // Settled at once, so a failed load is never an unhandled rejection while the private pack is being opened.
+  const settled = pub.then((v) => ({ v }), (e: unknown) => ({ e }));
   await loadPrivateData();
-  const [a, b] = await Promise.all([pub.catch(() => [] as T[]), privateJSON<T[]>(`places/${file}`).catch(() => null)]);
+  const [r, b] = await Promise.all([settled, privateJSON<T[]>(`places/${file}`).catch(() => null)]);
+  const a = 'v' in r ? r.v : missingIsEmpty<T>(file)(r.e);
   return b ? [...a, ...b] : a;
 }
 
 export function placesInCell(cell: string): Promise<GazPlace[]> {
   let p = cells.get(cell);
   if (!p) {
-    p = withPrivate(`c/${cell}.json`, getJSON<Row[]>(`${base()}c/${cell}.json`)).then((rows) => rows.map(toPlace)).catch(() => []);
+    p = withPrivate(`c/${cell}.json`, getJSON<Row[]>(`${base()}c/${cell}.json`)).then((rows) => rows.map(toPlace));
+    p.catch(() => cells.delete(cell)); // a failure is not kept: the next lookup tries again
     cells.set(cell, p);
   }
   return p;
@@ -225,7 +299,8 @@ function nameEntries(norm: string): Promise<NameEntry[]> {
   const s = nameShard(norm);
   let p = shards.get(s);
   if (!p) {
-    p = withPrivate(`n/${s}.json`, getJSON<NameEntry[]>(`${base()}n/${s}.json`)).catch(() => []);
+    p = withPrivate(`n/${s}.json`, getJSON<NameEntry[]>(`${base()}n/${s}.json`));
+    p.catch(() => shards.delete(s));
     shards.set(s, p);
   }
   return p;
@@ -268,8 +343,15 @@ async function placeByKey(key: string): Promise<GazPlace | undefined> {
   return (await placesInCell(cell)).find((x) => x.key === key);
 }
 
+/** Which build of the place data this is (its build date), so answers kept from an older build can be redone. */
+export async function placeDataVersion(): Promise<string | undefined> {
+  const m = await getJSON<{ built?: string }>(`${import.meta.env.BASE_URL}world/manifest.json`).catch(() => undefined);
+  return m?.built;
+}
+
 /** Every place (in any gazetteer) with this exact name; isTitle = it's the record's main name. */
 export async function placesByName(name: string): Promise<{ place: GazPlace; isTitle: boolean }[]> {
+  void placeDataVersion(); // reading the manifest lets the offline cache notice a new data build (public/sw.js)
   const k = normName(name);
   if (k.length < 2) return [];
   const hits = (await nameEntries(k)).filter((e) => e[0] === k);
@@ -280,6 +362,8 @@ export async function placesByName(name: string): Promise<{ place: GazPlace; isT
     const ps = await placesInCell(cell);
     for (const e of es) { const p = ps.find((x) => x.gazetteer === e[1] && x.id === e[2]); if (p) out.push({ place: p, isTitle: e[4] === 1 }); }
   }));
+  // A fixed order (cells load in any order), so ties between records are broken the same way every time.
+  out.sort((a, b) => a.place.key.localeCompare(b.place.key));
   return out.filter((h) => !h.place.types.every((t) => NOT_A_LOCATION.has(t)));
 }
 
@@ -406,11 +490,37 @@ export interface NameMatch {
   fit?: TimeFit | 'no-year';
   /** Which recorded name matched ("Carthage" → recorded name of Carthago). */
   matchedName?: GazName & { isTitle: boolean };
+  /** The place index could not be loaded: nothing is known about the name, and the answer must not be kept. */
+  loadFailed?: boolean;
   reason: string;
 }
 
+/** A lone record this far from every place the book has already placed is probably a namesake, not the place meant. */
+const FAR_NAMESAKE_KM = 2500;
+
+/**
+ * Why a name has no record, in words that do not suggest the place did not exist: which datasets cover the date, and
+ * — when the book's places say where it is set — how much Shelf holds for that region at all.
+ */
+function absenceReason(written: string, year: HistYear | undefined, ctx: GeoContext | undefined): string {
+  const covering = (year === undefined ? GAZETTEERS : gazetteersFor(year)).map((g) => g.name);
+  const list = covering.length > 3 ? `${covering.slice(0, 3).join(', ')} and ${covering.length - 3} other datasets` : covering.join(' and ');
+  const date = year === undefined ? '' : ` for ${year < 0 ? `${-year} BCE` : `${year} CE`}`;
+  const tail = ' This does not mean no such place existed.';
+  if (ctx?.points.length) {
+    const [lon, lat] = ctx.points[0];
+    const cov = placeCoverageAt(lon, lat, year ?? 1500);
+    if (cov.region && cov.count === 0) return `Shelf has no dated place data for ${cov.label}${year === undefined ? '' : ` in ${cov.period}`}, where this book is set, so it cannot say whether “${written}” was there.${tail}`;
+    if (cov.region && cov.count < 100) return `No place called “${written}” in Shelf’s data${date}; it holds only ${cov.count} dated place${cov.count === 1 ? '' : 's'} for ${cov.label} in ${cov.period}, where this book is set.${tail}`;
+  }
+  return covering.length
+    ? `No place called “${written}” in the datasets Shelf holds${date} (${list}). They cover mainly Europe and the Mediterranean.${tail}`
+    : `Shelf holds no place data${date}.${tail}`;
+}
+
 const SAME_PLACE_KM = 8;
-const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).join(' and ');
+// Dataset names in a fixed (alphabetical) order, so the same answer always reads the same (A20-003).
+const srcList = (ids: GazetteerId[]) => [...new Set(ids)].map((id) => gazetteerInfo(id).name).sort((a, b) => a.localeCompare(b)).join(' and ');
 
 /** What kind of entity a gazetteer record is, from its dataset's own type words. */
 export function kindOf(p: GazPlace): EntityKind {
@@ -468,13 +578,27 @@ export interface MatchOptions {
  * one; otherwise the result is ambiguous and the reader decides.
  */
 export async function matchName(written: string, year?: HistYear, opts: MatchOptions = {}): Promise<NameMatch> {
-  const all = await placesByName(written);
-  const names = srcList(GAZETTEERS.map((g) => g.id));
-  if (!all.length) return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], reason: `No place called “${written}” in ${names}.` };
+  let all: { place: GazPlace; isTitle: boolean }[];
+  try {
+    all = await placesByName(written);
+  } catch (e) {
+    if (!(e instanceof IndexLoadError)) throw e;
+    return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], loadFailed: true,
+      reason: `Shelf couldn’t load its place data just now (offline, or a network problem), so it can’t say whether “${written}” is recorded. Try again when the connection is back.` };
+  }
+  if (!all.length) return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], reason: absenceReason(written, year, opts.context) };
   const notLater = all.filter((h) => recordFit(h.place, year) !== 'later');
   if (!notLater.length) return { status: 'none', confidence: 'unresolved', temporal: 'incompatible', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
   const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
-  const pool = typed.length ? typed : notLater;
+  const anyPool = typed.length ? typed : notLater;
+  // A shipwreck is a ship's name, not a place: it never answers a place name read in a book (Florence → a wreck off
+  // Wales, "Russia" in 1700 → a Welsh wreck). It is offered only when nothing else has the name (A20-006, RM-01).
+  const isWreck = (h: { place: GazPlace }) => h.place.types.includes('wreck');
+  const pool = anyPool.some((h) => !isWreck(h)) ? anyPool.filter((h) => !isWreck(h)) : anyPool;
+  if (pool.length && pool.every(isWreck)) {
+    return { status: 'ambiguous', confidence: 'ambiguous', candidates: pool.map((h) => h.place).slice(0, 12), corroborating: [],
+      reason: `The only record${pool.length > 1 ? 's' : ''} called “${written}” in Shelf’s data ${pool.length > 1 ? 'are shipwrecks' : 'is a shipwreck'} (a ship of that name), not a place. Shelf may not hold the place meant.` };
+  }
   // Group records that are the same place: different datasets within a few km.
   const groups: { place: GazPlace; isTitle: boolean }[][] = [];
   for (const h of pool) {
@@ -498,7 +622,17 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
   let why = '';
   let basis: MatchBasis | undefined;
-  if (groups.length === 1) { chosen = groups[0]; basis = 'only'; }
+  if (groups.length === 1) {
+    // The only record of the name, but on the other side of the world from every place the book has already placed:
+    // most likely a namesake of a place Shelf doesn't hold (Santiago de Chile → Santiago in Spain). Offered, not pinned.
+    const d = Math.min(...groups[0].map((x) => contextDistance(opts.context, [x.place.lon, x.place.lat])));
+    if (d !== Infinity && d > FAR_NAMESAKE_KM) {
+      const p = lead(groups[0]).place;
+      return { status: 'ambiguous', confidence: 'ambiguous', candidates: [p], corroborating: [],
+        reason: `The only place called “${written}” in Shelf’s data is ${p.title} (${gazetteerInfo(p.gazetteer).name}), ${Math.round(d).toLocaleString('en')} km from the other places in this book — probably a different place with the same name, which Shelf may not hold.` };
+    }
+    chosen = groups[0]; basis = 'only';
+  }
   else {
     // The book's geography: one candidate clearly nearer the places already identified.
     const ctx = opts.context;
@@ -540,7 +674,13 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
       ? `“${nm.name}” is a modern name for this place`
       : `The name “${nm.name}” is recorded ${nm.from !== undefined && year < nm.from ? `only from ${yl(nm.from)}` : `only until ${yl(nm.to!)}`}`}${((then) => (then.length ? `; around ${yl(year)} it is recorded as ${then.join(', ')}` : `; the record’s own name is “${main.place.title}”`))(namesAround(main.place, year).filter((n) => (n.from !== undefined || n.to !== undefined) && normName(n.name) !== k).map((n) => `“${n.name}”`).slice(0, 3))}.`
     : '';
-  const when = nameWhen + (fit === 'earlier' ? ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${dated.to !== undefined ? (dated.to < 0 ? `${-dated.to} BCE` : `${dated.to} CE`) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.` : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.` : '');
+  // An end at the dataset's own boundary (Pleiades stops at 640, the end of its periods) is where the dataset stops,
+  // not when the place ended: said as such, and as Shelf's reading of the dataset rather than the dataset's claim.
+  const lastYear = dated.to ?? dated.envelope?.to;
+  const atEdge = lastYear !== undefined && lastYear >= gazetteerInfo(dated.gazetteer).core[1];
+  const when = nameWhen + (fit === 'earlier' ? (atEdge
+    ? ` ${gazetteerInfo(dated.gazetteer).name} covers places only up to ${yl(lastYear!)}, the end of its own period, so it has nothing later about this place — that is where the dataset stops, not when the place ended.`
+    : ` ${gazetteerInfo(dated.gazetteer).name} records it for an earlier period only (to ${lastYear !== undefined ? yl(lastYear) : 'the end of its coverage'}); places usually persist, but its later history is outside that dataset.`) : fit === 'undated' ? ' The record has no dates, and nothing linked to it gives a period.' : fit === 'unattested' ? (dated.from === undefined && dated.to === undefined ? ` It has no dates of its own; the period of ${dated.envelope ? ENVELOPE_LABEL[dated.envelope.basis] : 'its evidence'} begins ${dated.envelope?.from !== undefined ? `in ${yl(dated.envelope.from)}` : 'later'} — it may be older, but nothing places it at this date.` : dated.from === undefined ? ` ${gazetteerInfo(dated.gazetteer).name} records only its end (${yl(dated.to!)}), not when it began — nothing places it at this date.` : ` ${gazetteerInfo(dated.gazetteer).name} first records it in ${yl(dated.from)}${dated.dateBasis ? ` (${dated.dateBasis})` : ''} — it may be older, but nothing places it at this date.`) : fit === 'period' && dated.envelope ? ` The record has no dates of its own; ${dated.envelope.from !== undefined ? yl(dated.envelope.from) : '…'}–${dated.envelope.to !== undefined ? yl(dated.envelope.to) : '…'} is the period of ${ENVELOPE_LABEL[dated.envelope.basis]}.` : '');
   const temporal = temporalSupport(fit);
   // Other places of the name that are not ruled out at the date (namesakes first recorded later don't count as rivals).
   const liveRivals = groups.filter((g) => g !== chosen && g.some((x) => recordFit(x.place, year) !== 'unattested')).length;

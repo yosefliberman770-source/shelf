@@ -89,6 +89,17 @@ export interface DateMention { year: number; approximate?: boolean; index: numbe
  * BC" and plain four-digit years like "in 1453". Bare numbers under 1000 are
  * ignored (they're usually counts, not years).
  */
+/** Words that may follow a year in running text ("the battle of 1066 was…"); any other lower-case word after "of N" makes N a count. */
+const AFTER_YEAR = new Set(('the a an and or but nor so yet when while as at in on by to for from with without into onto upon after before until since during about against among between ' +
+  'he she it they we i you his her its their our was were is are had has have would could should might must did does do been being which that who whom whose where').split(' '));
+
+/** "an army of 1200 men", "a fleet of 1500 ships": after "of", a number followed by a noun is a count, not a year (PA-007). */
+function isCountAfterOf(text: string, m: RegExpMatchArray): boolean {
+  if (!/^of\s/i.test(m[0])) return false;
+  const next = text.slice((m.index ?? 0) + m[0].length).match(/^\s+([a-z]+)/);
+  return !!next && !AFTER_YEAR.has(next[1]);
+}
+
 export function findDatesInText(text: string): DateMention[] {
   const out: DateMention[] = [];
   const re = /\b(?:(c\.|ca\.|circa)\s*)?(?:(\d{1,2})(?:st|nd|rd|th)\s+century\s+(B\.?\s?C\.?(?:E\.?)?|A\.?D\.?|C\.?E\.?)|(\d{1,4})\s?(B\.?\s?C\.?(?:E\.?)?|A\.?\s?D\.?|C\.?\s?E\.?)(?![a-z])|(A\.?\s?D\.?)\s?(\d{1,4})|(?:in|by|of|from|until|till|since|after|before|around)\s+(1\d{3}|20[0-2]\d|[5-9]\d{2}))\b/gi;
@@ -97,7 +108,7 @@ export function findDatesInText(text: string): DateMention[] {
     if (m[2]) parsed = parseHistoricalDate(`${m[2]}th century ${m[3]}`);
     else if (m[4]) parsed = parseHistoricalDate(`${m[4]} ${m[5]}`);
     else if (m[7]) parsed = parseHistoricalDate(`AD ${m[7]}`);
-    else if (m[8]) parsed = Number(m[8]) >= 1000 ? { year: Number(m[8]) } : undefined;
+    else if (m[8]) parsed = Number(m[8]) >= 1000 && !isCountAfterOf(text, m) ? { year: Number(m[8]) } : undefined;
     if (parsed) out.push({ ...parsed, approximate: parsed.approximate || !!m[1] || undefined, index: m.index ?? 0, text: m[0] });
   }
   return out;

@@ -393,6 +393,46 @@ def match_english(towns, recs, repair=True):
 
 # ── Build ─────────────────────────────────────────────────────────────────
 
+def index_row(x, common, no_index):
+    """The place-index row for a register or spec record, or (None, reason) when it stays out of name search.
+
+    Out: records with no date (drawn only), sites and buildings (RM-11, later), and records whose whole name is just a
+    word for what they are ("Mill", "Church": the name is the type). A place whose name happens to be an English word
+    (Wells, Newton, Street, Stone, Acre, Drama) is indexed: ordinary words in a book are screened when the text is read,
+    not by removing the places from the index (A23-001). Records of evidence-only datasets (population estimates) are
+    marked 'ev' so the world build keeps only those that no other dataset already places (A18-001)."""
+    lon, lat = x['lon'], x['lat']
+    env = [x['snap'], x['snap'], 'source'] if x.get('snap') else [x['env'][0], x['env'][1], 'source'] if x.get('env') else None
+    if not env:
+        return None, 'no date (drawn only)'
+    if x['kind'] in ('site', 'building'):
+        return None, 'site or building (not in name search yet)'
+    if x.get('generic') or (common(x['name']) and generic_name(x['name'], x['kind'], x.get('ty', ''))):
+        return None, 'the name is only a word for the thing (generic)'
+    extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
+             **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {}),
+             **({'ev': 1} if x['src'] in no_index else {})}
+    return [x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
+            [list(n) for n in x['names'] if n[0] and not (common(n[0]) and generic_name(n[0], x['kind'], x.get('ty', '')))][:6], x['ctx'][:2], [], extra], None
+
+
+GENERIC_TYPE_WORDS = {'mill', 'church', 'chapel', 'castle', 'fort', 'tower', 'farm', 'house', 'hall', 'manor', 'bridge', 'well', 'cross', 'cairn',
+                      'barrow', 'mound', 'enclosure', 'settlement', 'village', 'town', 'harbour', 'harbor', 'quay', 'pier', 'ford', 'kiln',
+                      'quarry', 'mine', 'chapelry', 'abbey', 'priory', 'monastery', 'school', 'inn', 'mansion', 'palace', 'wall', 'dyke', 'dike',
+                      'road', 'track', 'field', 'camp', 'hillfort', 'burial', 'cemetery', 'grave', 'tomb', 'standing stone', 'stone', 'wreck', 'site', 'building'}
+
+
+def generic_name(name, kind, ty):
+    """A name that only says what the thing is: "Mill", "The Church", "Standing Stone" — matched against the record's
+    own kind and type text, or a list of words for kinds of thing. "Wells" (the town) is a name; "Well" for a well is not."""
+    n = name.strip().lower()
+    n = n[4:].strip() if n.startswith('the ') else n
+    if n == (kind or '').lower() or (bool(ty) and n in {w for w in re.split(r'[^a-z]+', ty.lower()) if w}):
+        return True
+    # A settlement called "Stone" or "Barrow" is a town; a non-settlement record called "Stone" is a stone.
+    return n in GENERIC_TYPE_WORDS and (kind or '').lower() not in ('settlement', 'town', 'city', 'village', 'port')
+
+
 def build(rows_only=False):
     recs = wd_records(KINDS + ['city', 'town'])
     log('  wikidata records', len(recs), Counter(r['kind'] for r in recs.values()))
@@ -675,6 +715,16 @@ def hced_battles():
         for k_in, k_out in (('War', 'w'), ('Winner', 'win'), ('Loser', 'los')):
             if r.get(k_in, '').strip():
                 props[k_out] = r[k_in].strip()[:80]
+        # Also kept from the source (A8-008): land or naval, the massacre flag, the dataset's own scale (Lehmann–Zhukov,
+        # 1–4) and the work it cites for the battle.
+        if r.get('Theatre', '').strip() in ('Land', 'Naval', 'Amphibious'):
+            props['th'] = r['Theatre'].strip()
+        if r.get('Massacre', '').strip().lower() == 'yes':
+            props['ms'] = 1
+        if re.fullmatch(r'[1-4]', r.get('Lehmann Zhukov Scale', '').strip()):
+            props['sc'] = int(r['Lehmann Zhukov Scale'].strip())
+        if r.get('Alternative Sources Consulted', '').strip() not in ('', 'NA'):
+            props['cite'] = r['Alternative Sources Consulted'].strip()[:160]
         out.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(lon, 4), round(lat, 4)]}, 'properties': props})
     with open(os.path.join(ATLAS, 'hced-battles.json'), 'w', encoding='utf-8') as fh:
         json.dump({'type': 'FeatureCollection', 'features': out}, fh, ensure_ascii=False, separators=(',', ':'))
@@ -856,7 +906,7 @@ def regional_layers(recs, rows, sites_out):
         n = name.strip().lower()
         return n in COMMON_WORDS or (n.startswith('the ') and n[4:].strip() in COMMON_WORDS)
 
-    reg_stats, reg_index = {}, Counter()
+    reg_stats, reg_index, not_indexed = {}, Counter(), defaultdict(Counter)
     loaders = (('canmore', REG.canmore), ('irlsmr', REG.ireland_smr), ('nid', REG.poland_nid), ('ivillaris', REG.index_villaris),
                ('ottomannfs', REG.ottoman_nfs), ('generalkarte', REG.generalkarte), ('cassini', REG.cassini_places), ('lutsch', REG.lutsch),
                ('sirkd', REG.slovenia_rkd), ('lvmon', REG.latvia_monuments),
@@ -896,14 +946,14 @@ def regional_layers(recs, rows, sites_out):
                 env = [x['env'][0], x['env'][1], 'source']
                 pr.update(ef=x['env'][0], et=x['env'][1], cw=x.get('cw'))
             register_feats.append(_site_props(f"{x['src']}:{x['id']}", x['name'], x['kind'], lon, lat, **pr))
-            # A record whose whole name is an ordinary word ("Mill", "Church") is drawn but not indexed as a place name.
-            if env and x['kind'] not in ('site', 'building') and not common(x['name']) and not x.get('generic') and x['src'] not in no_index:
-                extra = {'k': x['kind'], 'nb': 'label', 'env': env, 'st': x['ty'][:80], **({'per': x['per']} if x.get('per') else {}),
-                         **({'cw': x['cw']} if x.get('cw') else {}), **({'sn': 1} if x.get('snap') else {}), **({'loc': x['loc']} if x.get('loc') else {})}
-                rows.append([x['src'], x['id'], x['name'], lon, lat, 1 if x['precise'] else 0, x['kind'], None, None, 0 if x['precise'] else 1,
-                             [list(n) for n in x['names'] if n[0] and not common(n[0])][:6], x['ctx'][:2], [], extra])
+            row, why = index_row(x, common, no_index)
+            if row:
+                rows.append(row)
                 reg_index[x['src']] += 1
-    stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'tileFeatures': len(register_feats)}
+            elif why:
+                not_indexed[x['src']][why] += 1
+    stats['registers'] = {**reg_stats, 'inPlaceIndex': dict(reg_index), 'notInPlaceIndex': {k: dict(v) for k, v in sorted(not_indexed.items())},
+                          'tileFeatures': len(register_feats)}
 
     # Private data pack (never published): datasets with no licence to republish, or terms that forbid it.
     private, prows = [], []

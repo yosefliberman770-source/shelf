@@ -26,6 +26,15 @@ const NOT_GEOGRAPHIC = /^(?:language|languages|tongue|translation|translations|t
 const NOT_PLACE = new Set(('I Me My He She It They We You His Her Their Our The A An This That These Those Then There Here When Where Why How What Who God Lord Sir Lady Mr Mrs Dr King Queen Prince Emperor Pope Saint St Chapter Book Part Volume Section Figure Table Note Notes Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July August September October November December Christ Jesus Romans Greeks Christians Muslims Jews Senate Consul Consuls Army General Caesar').split(' '));
 const STRENGTH_RANK = { strong: 0, weak: 1, none: 2 } as const;
 
+/** Does the occurrence of `name` at `index` lie inside a person's full name as written in the text? */
+function insidePersonName(text: string, index: number, name: string, people: string[]): boolean {
+  for (const p of people) {
+    if (p.length <= name.length || !p.split(/\s+/).includes(name)) continue;
+    for (let i = text.indexOf(p); i >= 0; i = text.indexOf(p, i + 1)) if (index >= i && index < i + p.length) return true;
+  }
+  return false;
+}
+
 /**
  * Candidate places in a passage, each with the textual evidence for it.
  * `known` names (atlas/X-Ray places) are always included; other names only
@@ -38,7 +47,10 @@ export function detectPlaces(text: string, known: string[] = [], people: string[
   const add = (name: string, index: number, isKnown: boolean, demonym = false) => {
     const clean = name.replace(/[’']s$/, '').replace(/\s+(of|on|upon|de|la|le|am|an)$/i, '').trim();
     if (clean.length < 3 || NOT_PLACE.has(clean.split(' ')[0])) return;
-    if (people.some((p) => p.toLowerCase() === clean.toLowerCase() || p.split(' ').includes(clean))) return;
+    // A person is not a place — but only this occurrence is the person: "Henry of Lancaster" hides nothing when the
+    // text later says "he rode to Lancaster" (PA-001). A name is skipped when it *is* a person's name, or when this
+    // occurrence sits inside a person's full name written in the text.
+    if (people.some((p) => p.toLowerCase() === clean.toLowerCase()) || insidePersonName(text, index, clean, people)) return;
     const ev = demonym ? { ...mentionEvidence(clean, text, index), demonym: true } : mentionEvidence(clean, text, index);
     const k = clean.toLowerCase();
     const cur = out.get(k);

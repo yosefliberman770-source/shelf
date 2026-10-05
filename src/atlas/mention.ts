@@ -76,7 +76,11 @@ let words: Set<string> | undefined;
 let wordsP: Promise<Set<string>> | undefined;
 /** Load the SCOWL lowercase word list (once; ~170 KB compressed). */
 export function loadCommonWords(): Promise<Set<string>> {
-  wordsP ??= fetch(`${atlasBase()}common-words.txt`).then((r) => (r.ok ? r.text() : '')).then((t) => (words = new Set(t.split('\n').filter(Boolean)))).catch(() => (words = new Set()));
+  // A failed load is not remembered as "no ordinary words" (which would switch the screen off): the list stays
+  // unknown (isCommonWord → undefined) and the next call tries again.
+  wordsP ??= fetch(`${atlasBase()}common-words.txt`).then((r) => { if (!r.ok) throw new Error(`${r.status}`); return r.text(); })
+    .then((t) => (words = new Set(t.split('\n').filter(Boolean))))
+    .catch(() => { wordsP = undefined; return new Set<string>(); });
   return wordsP;
 }
 /** Test-only: provide the word list directly. */

@@ -587,6 +587,8 @@ export interface BookWorldRow {
   sectionCount: number;
   done: boolean;
   updatedAt: number;
+  /** The place data the names were resolved against (its build date); a rebuild re-resolves them. */
+  dataVersion?: string;
 }
 
 /** AI usage per day, provider and model (counts only — never content or keys). */

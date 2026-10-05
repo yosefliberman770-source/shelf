@@ -27,6 +27,9 @@ import { LAYERS } from '../../atlas/catalog';
 import { bookPeriod, buildBookWorld, resolveBookWorld, type SectionText, type WorldProfile, worldProfile } from '../../world/bookWorld';
 import { DateControls, type MapBook, type MapRequest } from './HistoricalMapPanel';
 
+/** Place names mapped for one chapter or passage (in reading order); any beyond are counted and stated. */
+const MAX_CHAPTER_PLACES = 150;
+
 type Tab = 'place' | 'chapter' | 'world' | 'events' | 'nearby' | 'maps' | 'search' | 'saved' | 'data';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'place', label: 'Place' },
@@ -410,16 +413,20 @@ function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, 
 }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [showUnresolved, setShowUnresolved] = useState(false);
+  const [omitted, setOmitted] = useState(0);
   const ran = useRef(false);
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
     const how = new Map(names.known.map((k) => [k.name.toLowerCase(), k.detection]));
-    const detected = detectPlaces(text, names.known.map((k) => k.name), names.people).slice(0, 40);
+    // Screened first, then limited: names screened out no longer use up places, and nothing is cut without saying so.
+    const detected = detectPlaces(text, names.known.map((k) => k.name), names.people);
     let dead = false;
     (async () => {
       // Only names the text gives reason to treat as places (not ordinary words after "of"/"at").
-      const found = await screenMentions(detected, year);
+      const all = await screenMentions(detected, year);
+      const found = all.slice(0, MAX_CHAPTER_PLACES);
+      setOmitted(all.length - found.length);
       const base: Row[] = found.map((m) => ({ written: m.name, index: m.index, detection: how.get(m.name.toLowerCase()) ?? 'cue', mention: m.evidence }));
       if (dead) return;
       setRows(base);
@@ -457,6 +464,7 @@ function ChapterPanel({ text, section, year, bookId, bookTitle, chapter, names, 
       <div>
         <b>Places in this {section ? 'passage' : 'chapter'}</b>
         <div className="tiny faint">Only places identified with reasonable confidence are pinned. In reading order.</div>
+        {omitted > 0 && <div className="tiny faint">The first {MAX_CHAPTER_PLACES} place names are mapped; {omitted} more later in this {section ? 'passage' : 'chapter'} are not.</div>}
       </div>
       <div className="col" style={{ gap: 4 }}>
         {ordered.map((r, i) => {
