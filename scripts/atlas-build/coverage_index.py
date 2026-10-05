@@ -48,10 +48,21 @@ def spans(r):
     return out
 
 
+SETTLEMENT = {'settlement', 'urban', 'polis', 'vicus', 'fortified-settlement', 'townhouse-settlement', 'village', 'town', 'towns', 'capitals', 'villages', 'city', 'hamlet'}
+
+
+def klass(types) -> str:
+    """The coarse class a record counts under: a settlement, or another kind of site (monument, find, church…)."""
+    return 'settlement' if set(types or []) & SETTLEMENT else 'site'
+
+
 def measure(index=INDEX):
+    """Coverage as data (AR-2): dated records per region × period, and the same split by source and by class."""
     regions, periods = axes()
     dated = defaultdict(lambda: defaultdict(int))
     undated = defaultdict(int)
+    by_source = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    by_class = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     for f in sorted(glob.glob(os.path.join(index, '*.json'))):
         for r in json.load(open(f, encoding='utf-8')):
             rid = region_of(r[3], r[4], regions)
@@ -64,9 +75,14 @@ def measure(index=INDEX):
             for pid, lo, hi in periods:
                 if any(a <= hi and b >= lo for a, b in ss):
                     dated[rid][pid] += 1
+                    by_source[r[0]][rid][pid] += 1
+                    by_class[klass(r[6])][rid][pid] += 1
+    plain = lambda d: {k: {kk: dict(sorted(vv.items())) for kk, vv in sorted(v.items())} for k, v in sorted(d.items())}
     return {'about': 'Dated records in the public place index per region and period (scripts/atlas-build/coverage_index.py). '
-                     'A record counts in every period its dates or evidence period touch.',
-            'regions': {rid: {'dated': dict(sorted(dated[rid].items())), 'undated': undated[rid]} for rid, _ in regions}}
+                     'A record counts in every period its dates or evidence period touch. "sources" and "classes" split the '
+                     'same counts by the dataset holding the record and by settlement / other site.',
+            'regions': {rid: {'dated': dict(sorted(dated[rid].items())), 'undated': undated[rid]} for rid, _ in regions},
+            'sources': plain(by_source), 'classes': plain(by_class)}
 
 
 def write(index=INDEX, out=OUT):

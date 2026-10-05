@@ -7,6 +7,7 @@ import { complete } from '../../ai/client';
 import { nearbyPlaces } from '../../atlas/gazetteer';
 import type { ReaderPlace } from '../../atlas/resolve';
 import { type HistYear, recordedYearLabel, yearLabel } from '../../atlas/time';
+import { sourceCoverageLabel } from '../../world/coverage';
 import { DATA_TYPES, type DataType, PERIODS, periodLabel, QUALITY_LABEL, QUALITY_MARK, regionAt, regionLabel } from '../../world/axes';
 import type { BookWorldRow } from '../../db/types';
 import { cellAt, cell } from '../../world/coverage';
@@ -272,7 +273,7 @@ export function CoveragePanel({ at, year }: { at?: { lat: number; lon: number };
               <span role="rowheader">{DATA_TYPES.find((d) => d.id === t)!.label}</span>
               {PERIODS.slice(1).map((p) => {
                 const c = cell(region, p.id, t);
-                return <span key={p.id} role="cell" className={year >= p.from && year <= p.to ? 'now' : ''} title={`${QUALITY_LABEL[c.inShelf]} in Shelf · ${QUALITY_LABEL[c.exists]} exists${c.sources.length ? ` · ${c.sources.slice(0, 3).map((s) => s.name).join(', ')}` : ''}`}>{QUALITY_MARK[c.inShelf]}{c.exists !== c.inShelf ? QUALITY_MARK[c.exists] : ''}</span>;
+                return <span key={p.id} role="cell" className={year >= p.from && year <= p.to ? 'now' : ''} title={`${QUALITY_LABEL[c.inShelf]} in Shelf · ${QUALITY_LABEL[c.exists]} exists${c.sources.length ? ` · ${c.sources.slice(0, 3).map((s) => `${s.name} (${sourceCoverageLabel(s)})`).join(', ')}` : ''}`}>{QUALITY_MARK[c.inShelf]}{c.exists !== c.inShelf ? QUALITY_MARK[c.exists] : ''}</span>;
               })}
             </div>
           ))}
@@ -402,7 +403,7 @@ export function PlaceWorldExtras({ place, year, onOpenMaps, onOpenPlace }: { pla
         {cg && cg.length > 0 && <><dt>Chinese administrative records</dt><dd>{cg.slice(0, 4).map((r) => `${r.name} ${r.transcription} (${r.type ?? ''}${r.parent ? `, under ${r.parent}` : ''}; ${formatDate(r.when)})`).join(' · ')} <span className="tiny faint">(CHGIS)</span></dd></>}
         {near && near.length > 0 && <><dt>Nearby places then</dt><dd>{near.map((n, i) => <span key={n.key}>{i ? ', ' : ''}<button className="why-link" onClick={() => onOpenPlace(n.key, n.title)}>{n.title}</button> <span className="tiny faint">{Math.round(n.km / 1.609)} mi</span></span>)}</dd></>}
         {(() => { const kind = same && same.families.length >= 2 && place.evidence === 'single-source' ? 'confirmed' : place.evidence ?? 'single-source'; return <><dt>Evidence</dt><dd>{EVIDENCE[kind].label} — {EVIDENCE[kind].text}{same && same.families.length >= 2 ? ` ${same.families.length} independent sources place it here.` : ''}</dd></>; })()}
-        <dt>Data coverage</dt><dd>{QUALITY_MARK[cov.inShelf]} {QUALITY_LABEL[cov.inShelf]} for places in {regionLabel(cov.region)}, {periodLabel(cov.period)}{cov.exists !== cov.inShelf ? ` (better data exists: ${cov.sources.find((s) => s.access === 'catalogued')?.name})` : ''}.</dd>
+        <dt>Data coverage</dt><dd>{QUALITY_MARK[cov.inShelf]} {QUALITY_LABEL[cov.inShelf]} for places in {regionLabel(cov.region)}, {periodLabel(cov.period)}{cov.exists !== cov.inShelf ? ` (better data exists: ${cov.sources.find((s) => s.access === 'catalogued')?.name})` : ''}.{cov.measured !== undefined ? ` Shelf holds ${cov.measured.toLocaleString('en')} dated places here for this period.` : ''}{cov.sources.some((s) => s.onlineLookup) ? <span className="tiny faint"> Online lookup only: {cov.sources.filter((s) => s.onlineLookup).map((s) => s.name).join(', ')}.</span> : null}</dd>
       </dl>
       {disagreements.length > 0 && (
         <div className="atlas-disagree">

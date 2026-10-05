@@ -17,6 +17,7 @@ import { km } from './data';
 import { type GazName, type GazPlace, GAZETTEERS, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, placesByName, type PlaceConfidence, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { politiesAt, polityConvention } from './context';
+import { relocatePlace } from './keymap';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, polityCore, polityLabelAt, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
 import { envelopeWords, type HistYear, yearLabel } from './time';
@@ -341,7 +342,8 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     // that is no longer in the data is not served at all (the name is resolved afresh).
     const offlineKey = !!h && GAZETTEERS.some((x) => h.id.startsWith(`${x.id}:`));
     if (h) {
-      const g = await getPlace(h.id).catch(() => undefined);
+      // A record from an older data build is found again by its name and position before giving up on it (C3).
+      const g = await getPlace(h.id).catch(() => undefined) ?? (offlineKey ? await relocatePlace(h.id, h.canonicalName, h.longitude !== undefined && h.latitude !== undefined ? [h.longitude, h.latitude] : undefined).catch(() => undefined) : undefined);
       if (offlineKey && !g) {
         // fall through: the chosen record has left the data
       } else {

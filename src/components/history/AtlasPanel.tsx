@@ -3,6 +3,7 @@
 // moved), follows the book's date, and links every place back to the
 // passage it came from. Facts come from named datasets only; AI may find
 // names in the text but never supplies coordinates, dates or borders.
+import { relocatePlace, repairPlaceKeys } from '../../atlas/keymap';
 import type { Map as MLMap } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AtlasMap, type AtlasOverlay, type AtlasPin, type AtlasView } from '../../atlas/AtlasMap';
@@ -97,6 +98,8 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
   const [loading, setLoading] = useState(false);
   const [retry, setRetry] = useState(0);
   const century = known === undefined ? 'none' : Math.ceil(known / 100);
+  // Notes and places met keep pointing at their place when the data is rebuilt (once per data build).
+  useEffect(() => { repairPlaceKeys().catch(() => {}); }, []);
   useEffect(() => {
     if (!target) return;
     let dead = false;
@@ -106,7 +109,8 @@ export function AtlasPanel({ request, book, chapterText, pagePlaces, date, setDa
     (async () => {
       // Already identified (from the text popup, the map, a list): use that record.
       if (target.key) {
-        const p = await getPlace(target.key, target.at).catch(() => undefined);
+        // A key from an older data build is found again by name and position (C3).
+        const p = await getPlace(target.key, target.at).catch(() => undefined) ?? await relocatePlace(target.key, target.written, target.at).catch(() => undefined);
         const name = p ? gazetteerInfo(p.gazetteer).name : '';
         if (p) return { place: fromGaz(p, target.written || p.title, { detection: target.detection, reason: `Chosen directly from the ${name} record.`, method: `${name} record` }), status: 'HIGH', candidates: [], reason: '' } as Resolution;
       }

@@ -1,5 +1,196 @@
 {
- "about": "Dated records in the public place index per region and period (scripts/atlas-build/coverage_index.py). A record counts in every period its dates or evidence period touch.",
+ "about": "Dated records in the public place index per region and period (scripts/atlas-build/coverage_index.py). A record counts in every period its dates or evidence period touch. \"sources\" and \"classes\" split the same counts by the dataset holding the record and by settlement / other site.",
+ "classes": {
+  "site": {
+   "anatolia-levant": {
+    "bronze-iron": 971,
+    "classical": 2784,
+    "early-medieval": 2039,
+    "early-modern": 258,
+    "long-19th": 6220,
+    "medieval": 610,
+    "modern": 14,
+    "prehistory": 99
+   },
+   "arabia": {
+    "bronze-iron": 203,
+    "classical": 452,
+    "early-medieval": 196,
+    "early-modern": 38,
+    "long-19th": 31,
+    "medieval": 49,
+    "modern": 2,
+    "prehistory": 26
+   },
+   "balkans-greece": {
+    "bronze-iron": 3095,
+    "classical": 6064,
+    "early-medieval": 2632,
+    "early-modern": 4067,
+    "long-19th": 48308,
+    "medieval": 3155,
+    "modern": 21212,
+    "prehistory": 65
+   },
+   "british-isles": {
+    "bronze-iron": 2815,
+    "classical": 6214,
+    "early-medieval": 9851,
+    "early-modern": 78890,
+    "long-19th": 54560,
+    "medieval": 19047,
+    "modern": 9387,
+    "prehistory": 172
+   },
+   "central-asia": {
+    "bronze-iron": 193,
+    "classical": 355,
+    "early-medieval": 249,
+    "early-modern": 84,
+    "long-19th": 182,
+    "medieval": 26,
+    "prehistory": 4
+   },
+   "central-europe": {
+    "bronze-iron": 108,
+    "classical": 3981,
+    "early-medieval": 6096,
+    "early-modern": 29557,
+    "long-19th": 20827,
+    "medieval": 36155,
+    "modern": 2373,
+    "prehistory": 15
+   },
+   "china": {
+    "bronze-iron": 8,
+    "classical": 22,
+    "early-medieval": 31,
+    "early-modern": 62,
+    "long-19th": 92,
+    "medieval": 45,
+    "prehistory": 2
+   },
+   "eastern-europe": {
+    "bronze-iron": 540,
+    "classical": 784,
+    "early-medieval": 287,
+    "early-modern": 13655,
+    "long-19th": 11746,
+    "medieval": 3293,
+    "modern": 209,
+    "prehistory": 11
+   },
+   "egypt-north-africa": {
+    "bronze-iron": 1278,
+    "classical": 6189,
+    "early-medieval": 4395,
+    "early-modern": 308,
+    "long-19th": 1382,
+    "medieval": 678,
+    "modern": 18,
+    "prehistory": 83
+   },
+   "france-low-countries": {
+    "bronze-iron": 158,
+    "classical": 2957,
+    "early-medieval": 4166,
+    "early-modern": 7938,
+    "long-19th": 8744,
+    "medieval": 28943,
+    "modern": 1930,
+    "prehistory": 23
+   },
+   "iberia": {
+    "bronze-iron": 282,
+    "classical": 2624,
+    "early-medieval": 2293,
+    "early-modern": 3118,
+    "long-19th": 2153,
+    "medieval": 4592,
+    "modern": 262,
+    "prehistory": 7
+   },
+   "italy": {
+    "bronze-iron": 1867,
+    "classical": 8215,
+    "early-medieval": 6354,
+    "early-modern": 10556,
+    "long-19th": 5827,
+    "medieval": 8786,
+    "modern": 403,
+    "prehistory": 13
+   },
+   "japan-korea": {
+    "classical": 1,
+    "early-medieval": 4,
+    "early-modern": 32,
+    "long-19th": 55,
+    "medieval": 12
+   },
+   "latin-america": {
+    "classical": 3,
+    "early-medieval": 9,
+    "early-modern": 48,
+    "long-19th": 93,
+    "medieval": 19,
+    "modern": 30
+   },
+   "mesopotamia-iran": {
+    "bronze-iron": 195,
+    "classical": 481,
+    "early-medieval": 361,
+    "early-modern": 127,
+    "long-19th": 115,
+    "medieval": 144,
+    "modern": 37,
+    "prehistory": 31
+   },
+   "north-america": {
+    "early-medieval": 1,
+    "early-modern": 15,
+    "long-19th": 119,
+    "medieval": 4
+   },
+   "northern-europe": {
+    "bronze-iron": 213,
+    "classical": 6220,
+    "early-medieval": 8829,
+    "early-modern": 25977,
+    "long-19th": 8294,
+    "medieval": 16905,
+    "modern": 2331,
+    "prehistory": 1
+   },
+   "oceania": {
+    "early-modern": 1,
+    "long-19th": 12
+   },
+   "south-asia": {
+    "bronze-iron": 36,
+    "classical": 560,
+    "early-medieval": 162,
+    "early-modern": 133,
+    "long-19th": 174,
+    "medieval": 90,
+    "prehistory": 6
+   },
+   "southeast-asia": {
+    "early-medieval": 9,
+    "early-modern": 17,
+    "long-19th": 24,
+    "medieval": 14
+   },
+   "sub-saharan-africa": {
+    "bronze-iron": 42,
+    "classical": 100,
+    "early-medieval": 43,
+    "early-modern": 35,
+    "long-19th": 48,
+    "medieval": 21,
+    "prehistory": 2
+   }
+  }
+ },
  "regions": {
   "anatolia-levant": {
    "dated": {
@@ -250,6 +441,1159 @@
     "prehistory": 2
    },
    "undated": 14
+  }
+ },
+ "sources": {
+  "arkas": {
+   "italy": {
+    "classical": 596,
+    "early-medieval": 665,
+    "medieval": 68
+   }
+  },
+  "bridges1250": {
+   "british-isles": {
+    "early-medieval": 10,
+    "medieval": 84
+   }
+  },
+  "buringh": {
+   "balkans-greece": {
+    "early-medieval": 69,
+    "early-modern": 6,
+    "long-19th": 2,
+    "medieval": 44
+   },
+   "british-isles": {
+    "classical": 1,
+    "early-medieval": 85,
+    "early-modern": 15,
+    "long-19th": 2,
+    "medieval": 89,
+    "modern": 2
+   },
+   "central-asia": {
+    "bronze-iron": 1,
+    "early-medieval": 1,
+    "long-19th": 1
+   },
+   "central-europe": {
+    "classical": 3,
+    "early-medieval": 135,
+    "early-modern": 16,
+    "long-19th": 1,
+    "medieval": 206
+   },
+   "eastern-europe": {
+    "classical": 1,
+    "early-medieval": 23,
+    "early-modern": 98,
+    "long-19th": 17,
+    "medieval": 88,
+    "modern": 8
+   },
+   "egypt-north-africa": {
+    "early-medieval": 3,
+    "medieval": 4
+   },
+   "france-low-countries": {
+    "early-medieval": 306,
+    "early-modern": 13,
+    "medieval": 149,
+    "modern": 1
+   },
+   "iberia": {
+    "early-medieval": 233,
+    "early-modern": 5,
+    "long-19th": 2,
+    "medieval": 91,
+    "modern": 1
+   },
+   "italy": {
+    "bronze-iron": 1,
+    "classical": 1,
+    "early-medieval": 320,
+    "early-modern": 16,
+    "long-19th": 1,
+    "medieval": 89
+   },
+   "mesopotamia-iran": {
+    "early-medieval": 1
+   },
+   "northern-europe": {
+    "early-medieval": 11,
+    "early-modern": 12,
+    "medieval": 49
+   }
+  },
+  "canmore": {
+   "british-isles": {
+    "bronze-iron": 2116,
+    "classical": 3298,
+    "early-medieval": 8151,
+    "early-modern": 29357,
+    "long-19th": 25902,
+    "medieval": 8764,
+    "modern": 6886
+   }
+  },
+  "cassini": {
+   "british-isles": {
+    "early-modern": 48,
+    "long-19th": 48
+   },
+   "central-europe": {
+    "early-modern": 25,
+    "long-19th": 25
+   },
+   "france-low-countries": {
+    "early-modern": 2910,
+    "long-19th": 2910
+   },
+   "iberia": {
+    "early-modern": 395,
+    "long-19th": 395
+   },
+   "italy": {
+    "early-modern": 24,
+    "long-19th": 24
+   }
+  },
+  "ceans": {
+   "central-europe": {
+    "bronze-iron": 1,
+    "classical": 2364,
+    "early-medieval": 2037,
+    "early-modern": 1586,
+    "long-19th": 480,
+    "medieval": 2317,
+    "modern": 22
+   }
+  },
+  "daugavahf": {
+   "northern-europe": {
+    "bronze-iron": 5,
+    "classical": 8,
+    "early-medieval": 5,
+    "medieval": 4
+   }
+  },
+  "dissiloc": {
+   "balkans-greece": {
+    "medieval": 2
+   },
+   "british-isles": {
+    "early-modern": 282,
+    "medieval": 285
+   },
+   "central-europe": {
+    "medieval": 49
+   },
+   "egypt-north-africa": {
+    "medieval": 4
+   },
+   "france-low-countries": {
+    "medieval": 487
+   },
+   "iberia": {
+    "medieval": 1033
+   },
+   "italy": {
+    "medieval": 852
+   }
+  },
+  "finreg": {
+   "northern-europe": {
+    "classical": 950,
+    "early-medieval": 950,
+    "early-modern": 1823,
+    "long-19th": 781,
+    "medieval": 1823
+   }
+  },
+  "fiore": {
+   "northern-europe": {
+    "long-19th": 34
+   }
+  },
+  "firelics": {
+   "northern-europe": {
+    "classical": 503,
+    "early-medieval": 503,
+    "medieval": 503
+   }
+  },
+  "frmines": {
+   "british-isles": {
+    "early-modern": 1,
+    "long-19th": 2,
+    "modern": 7
+   },
+   "central-europe": {
+    "early-modern": 1,
+    "long-19th": 1,
+    "modern": 6
+   },
+   "france-low-countries": {
+    "early-modern": 23,
+    "long-19th": 1391,
+    "modern": 1568
+   },
+   "iberia": {
+    "early-modern": 5,
+    "long-19th": 177,
+    "modern": 194
+   },
+   "italy": {
+    "long-19th": 138,
+    "modern": 135
+   },
+   "latin-america": {
+    "long-19th": 13,
+    "modern": 30
+   }
+  },
+  "generalkarte": {
+   "balkans-greece": {
+    "long-19th": 21169,
+    "modern": 21169
+   }
+  },
+  "germaniasacra": {
+   "central-europe": {
+    "early-medieval": 38,
+    "early-modern": 647,
+    "long-19th": 217,
+    "medieval": 788,
+    "modern": 28
+   },
+   "france-low-countries": {
+    "classical": 1,
+    "early-medieval": 64,
+    "early-modern": 1104,
+    "long-19th": 118,
+    "medieval": 1146,
+    "modern": 9
+   },
+   "iberia": {
+    "early-medieval": 5,
+    "early-modern": 27,
+    "long-19th": 18,
+    "medieval": 33
+   },
+   "italy": {
+    "early-medieval": 9,
+    "early-modern": 139,
+    "long-19th": 34,
+    "medieval": 158,
+    "modern": 11
+   },
+   "northern-europe": {
+    "early-modern": 29,
+    "long-19th": 1,
+    "medieval": 28
+   },
+   "sub-saharan-africa": {
+    "early-modern": 1,
+    "medieval": 1
+   }
+  },
+  "gobolitide": {
+   "egypt-north-africa": {
+    "classical": 121,
+    "early-medieval": 85
+   }
+  },
+  "halc": {
+   "british-isles": {
+    "medieval": 742
+   },
+   "central-europe": {
+    "medieval": 104
+   },
+   "france-low-countries": {
+    "medieval": 13730
+   }
+  },
+  "hre": {
+   "central-europe": {
+    "bronze-iron": 5,
+    "classical": 67,
+    "early-medieval": 610,
+    "early-modern": 46,
+    "long-19th": 3,
+    "medieval": 1356,
+    "modern": 2,
+    "prehistory": 1
+   },
+   "france-low-countries": {
+    "classical": 28,
+    "early-medieval": 127,
+    "early-modern": 2,
+    "long-19th": 2,
+    "medieval": 138,
+    "prehistory": 1
+   }
+  },
+  "hrreg": {
+   "balkans-greece": {
+    "bronze-iron": 5,
+    "classical": 8,
+    "early-medieval": 6,
+    "early-modern": 40,
+    "long-19th": 29,
+    "medieval": 26
+   },
+   "italy": {
+    "bronze-iron": 24,
+    "classical": 107,
+    "early-medieval": 135,
+    "early-modern": 862,
+    "long-19th": 253,
+    "medieval": 871,
+    "modern": 1
+   }
+  },
+  "hurbpop": {
+   "anatolia-levant": {
+    "classical": 2,
+    "early-medieval": 5,
+    "early-modern": 5,
+    "long-19th": 7,
+    "medieval": 3
+   },
+   "arabia": {
+    "early-medieval": 3,
+    "early-modern": 7,
+    "long-19th": 8,
+    "medieval": 5
+   },
+   "balkans-greece": {
+    "early-medieval": 1,
+    "early-modern": 2,
+    "long-19th": 2,
+    "medieval": 1
+   },
+   "british-isles": {
+    "early-modern": 1,
+    "long-19th": 9
+   },
+   "central-asia": {
+    "classical": 1,
+    "early-medieval": 3,
+    "early-modern": 7,
+    "long-19th": 14,
+    "medieval": 5
+   },
+   "central-europe": {
+    "early-medieval": 1,
+    "early-modern": 1,
+    "long-19th": 6,
+    "medieval": 1
+   },
+   "china": {
+    "classical": 10,
+    "early-medieval": 25,
+    "early-modern": 61,
+    "long-19th": 92,
+    "medieval": 41
+   },
+   "eastern-europe": {
+    "early-medieval": 1,
+    "early-modern": 5,
+    "long-19th": 15,
+    "medieval": 4
+   },
+   "egypt-north-africa": {
+    "classical": 1,
+    "early-medieval": 4,
+    "early-modern": 9,
+    "long-19th": 14,
+    "medieval": 9
+   },
+   "france-low-countries": {
+    "early-modern": 2,
+    "long-19th": 6,
+    "medieval": 2
+   },
+   "iberia": {
+    "early-medieval": 3,
+    "early-modern": 3,
+    "long-19th": 4,
+    "medieval": 2
+   },
+   "italy": {
+    "long-19th": 1
+   },
+   "japan-korea": {
+    "classical": 1,
+    "early-medieval": 4,
+    "early-modern": 32,
+    "long-19th": 55,
+    "medieval": 12
+   },
+   "latin-america": {
+    "classical": 3,
+    "early-medieval": 9,
+    "early-modern": 48,
+    "long-19th": 80,
+    "medieval": 19
+   },
+   "mesopotamia-iran": {
+    "classical": 1,
+    "early-medieval": 1,
+    "early-modern": 3,
+    "long-19th": 4,
+    "medieval": 3
+   },
+   "north-america": {
+    "early-medieval": 1,
+    "early-modern": 15,
+    "long-19th": 119,
+    "medieval": 4
+   },
+   "oceania": {
+    "early-modern": 1,
+    "long-19th": 12
+   },
+   "south-asia": {
+    "classical": 6,
+    "early-medieval": 29,
+    "early-modern": 123,
+    "long-19th": 174,
+    "medieval": 62
+   },
+   "southeast-asia": {
+    "early-medieval": 2,
+    "early-modern": 14,
+    "long-19th": 24,
+    "medieval": 7
+   },
+   "sub-saharan-africa": {
+    "early-medieval": 4,
+    "early-modern": 31,
+    "long-19th": 48,
+    "medieval": 13
+   }
+  },
+  "inhilldaugar": {
+   "northern-europe": {
+    "early-modern": 92,
+    "long-19th": 16,
+    "medieval": 32
+   }
+  },
+  "irlsmr": {
+   "british-isles": {
+    "early-modern": 240,
+    "medieval": 365
+   }
+  },
+  "ivillaris": {
+   "british-isles": {
+    "early-modern": 22834
+   },
+   "france-low-countries": {
+    "early-modern": 3
+   }
+  },
+  "lorsch": {
+   "central-europe": {
+    "early-medieval": 910,
+    "medieval": 72
+   },
+   "france-low-countries": {
+    "early-medieval": 146,
+    "medieval": 9
+   },
+   "italy": {
+    "early-medieval": 4,
+    "medieval": 2
+   }
+  },
+  "ltkvr": {
+   "central-europe": {
+    "bronze-iron": 19,
+    "classical": 351,
+    "early-medieval": 341,
+    "early-modern": 75,
+    "long-19th": 101,
+    "medieval": 269,
+    "modern": 89
+   },
+   "northern-europe": {
+    "bronze-iron": 143,
+    "classical": 1154,
+    "early-medieval": 1042,
+    "early-modern": 298,
+    "long-19th": 765,
+    "medieval": 728,
+    "modern": 570
+   }
+  },
+  "lutsch": {
+   "balkans-greece": {
+    "early-modern": 271
+   }
+  },
+  "lvmon": {
+   "northern-europe": {
+    "bronze-iron": 61,
+    "classical": 392,
+    "early-medieval": 560,
+    "early-modern": 425,
+    "long-19th": 366,
+    "medieval": 719,
+    "modern": 92
+   }
+  },
+  "merimee": {
+   "british-isles": {
+    "classical": 1,
+    "early-medieval": 7,
+    "medieval": 51
+   },
+   "central-europe": {
+    "early-medieval": 1,
+    "medieval": 5
+   },
+   "france-low-countries": {
+    "classical": 264,
+    "early-medieval": 1102,
+    "medieval": 7830
+   },
+   "iberia": {
+    "classical": 46,
+    "early-medieval": 157,
+    "medieval": 755
+   },
+   "italy": {
+    "classical": 7,
+    "early-medieval": 31,
+    "medieval": 174
+   }
+  },
+  "mjcb": {
+   "anatolia-levant": {
+    "early-medieval": 4,
+    "medieval": 8
+   },
+   "arabia": {
+    "medieval": 1
+   },
+   "balkans-greece": {
+    "early-medieval": 4,
+    "medieval": 122
+   },
+   "egypt-north-africa": {
+    "early-medieval": 1,
+    "medieval": 16
+   },
+   "italy": {
+    "early-medieval": 13,
+    "medieval": 6
+   }
+  },
+  "nid": {
+   "central-europe": {
+    "early-medieval": 19,
+    "early-modern": 12609,
+    "long-19th": 9789,
+    "medieval": 4284,
+    "modern": 1518
+   }
+  },
+  "nismr": {
+   "british-isles": {
+    "classical": 564,
+    "early-medieval": 564,
+    "early-modern": 683,
+    "long-19th": 118,
+    "medieval": 900,
+    "modern": 11
+   }
+  },
+  "nmrw": {
+   "british-isles": {
+    "bronze-iron": 511,
+    "classical": 969,
+    "early-medieval": 102,
+    "early-modern": 23669,
+    "long-19th": 24343,
+    "medieval": 2267,
+    "modern": 2267,
+    "prehistory": 143
+   }
+  },
+  "nokm": {
+   "northern-europe": {
+    "classical": 685,
+    "early-medieval": 3385,
+    "early-modern": 5210,
+    "medieval": 7965
+   }
+  },
+  "nokm2": {
+   "northern-europe": {
+    "classical": 2448,
+    "early-medieval": 2264,
+    "early-modern": 1175,
+    "long-19th": 2184,
+    "medieval": 1867,
+    "modern": 1403
+   }
+  },
+  "nsh": {
+   "balkans-greece": {
+    "early-medieval": 1,
+    "medieval": 1
+   },
+   "central-europe": {
+    "medieval": 1
+   },
+   "northern-europe": {
+    "early-medieval": 22,
+    "early-modern": 60,
+    "medieval": 416
+   }
+  },
+  "ottomannfs": {
+   "anatolia-levant": {
+    "long-19th": 5881
+   },
+   "balkans-greece": {
+    "long-19th": 9253
+   },
+   "egypt-north-africa": {
+    "long-19th": 1100
+   }
+  },
+  "oysters": {
+   "british-isles": {
+    "early-modern": 14,
+    "long-19th": 185,
+    "medieval": 3,
+    "modern": 10
+   },
+   "france-low-countries": {
+    "long-19th": 4
+   }
+  },
+  "piemonte": {
+   "italy": {
+    "classical": 2,
+    "early-medieval": 10,
+    "medieval": 72
+   }
+  },
+  "pleiades": {
+   "anatolia-levant": {
+    "bronze-iron": 962,
+    "classical": 2699,
+    "early-medieval": 1648,
+    "early-modern": 39,
+    "medieval": 82,
+    "prehistory": 99
+   },
+   "arabia": {
+    "bronze-iron": 201,
+    "classical": 449,
+    "early-medieval": 179,
+    "early-modern": 16,
+    "medieval": 26,
+    "prehistory": 26
+   },
+   "balkans-greece": {
+    "bronze-iron": 3078,
+    "classical": 5988,
+    "early-medieval": 2437,
+    "early-modern": 85,
+    "medieval": 179,
+    "prehistory": 65
+   },
+   "british-isles": {
+    "bronze-iron": 181,
+    "classical": 1341,
+    "early-medieval": 747,
+    "early-modern": 1,
+    "medieval": 20,
+    "prehistory": 29
+   },
+   "central-asia": {
+    "bronze-iron": 192,
+    "classical": 348,
+    "early-medieval": 236,
+    "early-modern": 5,
+    "medieval": 10,
+    "prehistory": 4
+   },
+   "central-europe": {
+    "bronze-iron": 71,
+    "classical": 1082,
+    "early-medieval": 505,
+    "medieval": 4,
+    "prehistory": 5
+   },
+   "china": {
+    "bronze-iron": 8,
+    "classical": 12,
+    "early-medieval": 6,
+    "early-modern": 1,
+    "medieval": 4,
+    "prehistory": 2
+   },
+   "eastern-europe": {
+    "bronze-iron": 538,
+    "classical": 766,
+    "early-medieval": 185,
+    "early-modern": 10,
+    "medieval": 17,
+    "prehistory": 11
+   },
+   "egypt-north-africa": {
+    "bronze-iron": 1277,
+    "classical": 6001,
+    "early-medieval": 4024,
+    "early-modern": 34,
+    "medieval": 80,
+    "prehistory": 82
+   },
+   "france-low-countries": {
+    "bronze-iron": 151,
+    "classical": 2383,
+    "early-medieval": 1649,
+    "early-modern": 2,
+    "medieval": 15,
+    "prehistory": 21
+   },
+   "iberia": {
+    "bronze-iron": 276,
+    "classical": 2284,
+    "early-medieval": 1272,
+    "early-modern": 15,
+    "medieval": 85,
+    "prehistory": 4
+   },
+   "italy": {
+    "bronze-iron": 1834,
+    "classical": 6048,
+    "early-medieval": 2896,
+    "early-modern": 44,
+    "medieval": 197,
+    "prehistory": 13
+   },
+   "mesopotamia-iran": {
+    "bronze-iron": 193,
+    "classical": 458,
+    "early-medieval": 313,
+    "early-modern": 12,
+    "medieval": 19,
+    "prehistory": 29
+   },
+   "northern-europe": {
+    "bronze-iron": 4,
+    "classical": 71,
+    "early-medieval": 27,
+    "early-modern": 1,
+    "medieval": 1,
+    "prehistory": 1
+   },
+   "south-asia": {
+    "bronze-iron": 36,
+    "classical": 554,
+    "early-medieval": 133,
+    "early-modern": 10,
+    "medieval": 28,
+    "prehistory": 6
+   },
+   "southeast-asia": {
+    "early-medieval": 7,
+    "early-modern": 3,
+    "medieval": 7
+   },
+   "sub-saharan-africa": {
+    "bronze-iron": 42,
+    "classical": 100,
+    "early-medieval": 39,
+    "early-modern": 3,
+    "medieval": 7,
+    "prehistory": 2
+   }
+  },
+  "plovdiv": {
+   "balkans-greece": {
+    "early-modern": 233,
+    "long-19th": 12,
+    "medieval": 95
+   }
+  },
+  "r3verst": {
+   "balkans-greece": {
+    "long-19th": 6290
+   }
+  },
+  "rohgis": {
+   "balkans-greece": {
+    "long-19th": 8027
+   },
+   "eastern-europe": {
+    "long-19th": 2005
+   }
+  },
+  "scoto": {
+   "italy": {
+    "early-modern": 961
+   }
+  },
+  "sirkd": {
+   "italy": {
+    "classical": 996,
+    "early-medieval": 1374,
+    "early-modern": 2975,
+    "long-19th": 3141,
+    "medieval": 2450,
+    "modern": 57
+   }
+  },
+  "swegeo": {
+   "northern-europe": {
+    "early-modern": 14258
+   }
+  },
+  "tmt1840": {
+   "anatolia-levant": {
+    "long-19th": 39
+   },
+   "balkans-greece": {
+    "long-19th": 230
+   }
+  },
+  "trajansgate": {
+   "balkans-greece": {
+    "early-modern": 2,
+    "long-19th": 2,
+    "medieval": 2
+   }
+  },
+  "tyrolmine": {
+   "central-europe": {
+    "early-modern": 17,
+    "medieval": 210
+   },
+   "france-low-countries": {
+    "early-modern": 2
+   },
+   "italy": {
+    "early-modern": 2,
+    "medieval": 1
+   }
+  },
+  "viabundus": {
+   "central-europe": {
+    "classical": 6,
+    "early-medieval": 702,
+    "early-modern": 286,
+    "long-19th": 22,
+    "medieval": 3509,
+    "modern": 11
+   },
+   "eastern-europe": {
+    "early-modern": 1,
+    "medieval": 2
+   },
+   "france-low-countries": {
+    "classical": 17,
+    "early-medieval": 295,
+    "early-modern": 220,
+    "long-19th": 6,
+    "medieval": 1312,
+    "modern": 4
+   },
+   "northern-europe": {
+    "early-medieval": 33,
+    "early-modern": 622,
+    "long-19th": 8,
+    "medieval": 852,
+    "modern": 5
+   }
+  },
+  "viatariq": {
+   "anatolia-levant": {
+    "early-medieval": 212,
+    "early-modern": 100,
+    "medieval": 323
+   },
+   "egypt-north-africa": {
+    "early-medieval": 211,
+    "early-modern": 103,
+    "long-19th": 2,
+    "medieval": 345,
+    "modern": 2
+   }
+  },
+  "wbohemia": {
+   "central-europe": {
+    "early-medieval": 3,
+    "medieval": 836
+   }
+  },
+  "wdextra": {
+   "anatolia-levant": {
+    "bronze-iron": 1,
+    "classical": 26,
+    "early-medieval": 80,
+    "early-modern": 102,
+    "long-19th": 288,
+    "medieval": 102,
+    "modern": 7
+   },
+   "arabia": {
+    "classical": 2,
+    "early-medieval": 4,
+    "early-modern": 7,
+    "long-19th": 14,
+    "medieval": 5
+   },
+   "balkans-greece": {
+    "bronze-iron": 1,
+    "classical": 27,
+    "early-medieval": 53,
+    "early-modern": 1870,
+    "long-19th": 3282,
+    "medieval": 338,
+    "modern": 37
+   },
+   "british-isles": {
+    "bronze-iron": 1,
+    "classical": 2,
+    "early-medieval": 82,
+    "early-modern": 864,
+    "long-19th": 3929,
+    "medieval": 4233,
+    "modern": 157
+   },
+   "central-asia": {
+    "classical": 3,
+    "early-medieval": 1,
+    "early-modern": 66,
+    "long-19th": 167
+   },
+   "central-europe": {
+    "classical": 3,
+    "early-medieval": 69,
+    "early-modern": 9460,
+    "long-19th": 9154,
+    "medieval": 4528,
+    "modern": 563
+   },
+   "eastern-europe": {
+    "classical": 1,
+    "early-medieval": 4,
+    "early-modern": 10958,
+    "long-19th": 9666,
+    "medieval": 86,
+    "modern": 154
+   },
+   "egypt-north-africa": {
+    "classical": 14,
+    "early-medieval": 25,
+    "early-modern": 129,
+    "long-19th": 257,
+    "medieval": 118,
+    "modern": 8
+   },
+   "france-low-countries": {
+    "bronze-iron": 1,
+    "classical": 8,
+    "early-medieval": 41,
+    "early-modern": 1881,
+    "long-19th": 3743,
+    "medieval": 1385,
+    "modern": 288
+   },
+   "iberia": {
+    "classical": 9,
+    "early-medieval": 110,
+    "early-modern": 1977,
+    "long-19th": 1366,
+    "medieval": 1226,
+    "modern": 24
+   },
+   "italy": {
+    "bronze-iron": 1,
+    "classical": 64,
+    "early-medieval": 236,
+    "early-modern": 4752,
+    "long-19th": 2034,
+    "medieval": 1935,
+    "modern": 58
+   },
+   "mesopotamia-iran": {
+    "classical": 5,
+    "early-medieval": 12,
+    "early-modern": 90,
+    "long-19th": 98,
+    "medieval": 51,
+    "modern": 16
+   },
+   "northern-europe": {
+    "early-medieval": 6,
+    "early-modern": 1577,
+    "long-19th": 4107,
+    "medieval": 1061,
+    "modern": 235
+   }
+  },
+  "wikidata": {
+   "anatolia-levant": {
+    "bronze-iron": 8,
+    "classical": 57,
+    "early-medieval": 90,
+    "early-modern": 12,
+    "long-19th": 5,
+    "medieval": 92,
+    "modern": 7
+   },
+   "arabia": {
+    "bronze-iron": 2,
+    "classical": 1,
+    "early-medieval": 10,
+    "early-modern": 8,
+    "long-19th": 9,
+    "medieval": 12,
+    "modern": 2
+   },
+   "balkans-greece": {
+    "bronze-iron": 11,
+    "classical": 41,
+    "early-medieval": 61,
+    "early-modern": 1558,
+    "long-19th": 10,
+    "medieval": 2345,
+    "modern": 6
+   },
+   "british-isles": {
+    "bronze-iron": 6,
+    "classical": 38,
+    "early-medieval": 103,
+    "early-modern": 881,
+    "long-19th": 22,
+    "medieval": 1244,
+    "modern": 47
+   },
+   "central-asia": {
+    "classical": 3,
+    "early-medieval": 8,
+    "early-modern": 6,
+    "medieval": 11
+   },
+   "central-europe": {
+    "bronze-iron": 12,
+    "classical": 50,
+    "early-medieval": 676,
+    "early-modern": 4780,
+    "long-19th": 1020,
+    "medieval": 17597,
+    "modern": 126,
+    "prehistory": 9
+   },
+   "eastern-europe": {
+    "bronze-iron": 2,
+    "classical": 16,
+    "early-medieval": 74,
+    "early-modern": 2583,
+    "long-19th": 43,
+    "medieval": 3096,
+    "modern": 47
+   },
+   "egypt-north-africa": {
+    "bronze-iron": 1,
+    "classical": 52,
+    "early-medieval": 42,
+    "early-modern": 33,
+    "long-19th": 9,
+    "medieval": 102,
+    "modern": 8,
+    "prehistory": 1
+   },
+   "france-low-countries": {
+    "bronze-iron": 6,
+    "classical": 151,
+    "early-medieval": 430,
+    "early-modern": 1776,
+    "long-19th": 564,
+    "medieval": 2740,
+    "modern": 60,
+    "prehistory": 1
+   },
+   "iberia": {
+    "bronze-iron": 6,
+    "classical": 285,
+    "early-medieval": 513,
+    "early-modern": 691,
+    "long-19th": 191,
+    "medieval": 1367,
+    "modern": 43,
+    "prehistory": 3
+   },
+   "italy": {
+    "bronze-iron": 7,
+    "classical": 183,
+    "early-medieval": 270,
+    "early-modern": 691,
+    "long-19th": 121,
+    "medieval": 1756,
+    "modern": 63
+   },
+   "mesopotamia-iran": {
+    "bronze-iron": 2,
+    "classical": 17,
+    "early-medieval": 34,
+    "early-modern": 22,
+    "long-19th": 13,
+    "medieval": 71,
+    "modern": 21,
+    "prehistory": 2
+   },
+   "northern-europe": {
+    "classical": 9,
+    "early-medieval": 21,
+    "early-modern": 395,
+    "long-19th": 32,
+    "medieval": 857,
+    "modern": 26
+   }
+  },
+  "woodlands": {
+   "central-europe": {
+    "classical": 51,
+    "early-medieval": 19
+   },
+   "france-low-countries": {
+    "classical": 105,
+    "early-medieval": 6
+   },
+   "italy": {
+    "classical": 6
+   }
+  },
+  "zbiva": {
+   "central-europe": {
+    "classical": 4,
+    "early-medieval": 30,
+    "early-modern": 8,
+    "long-19th": 8,
+    "medieval": 19,
+    "modern": 8
+   },
+   "italy": {
+    "classical": 205,
+    "early-medieval": 391,
+    "early-modern": 90,
+    "long-19th": 80,
+    "medieval": 155,
+    "modern": 78
+   }
   }
  }
 }

@@ -6,7 +6,34 @@ import type { HistYear } from '../atlas/time';
 import { PERIODS, type PeriodId, type Quality, type RegionId, periodAt, regionAt, regionLabel } from './axes';
 import MEASURED from './coverage-measured.json';
 
-const BY_REGION = (MEASURED as { regions: Record<string, { dated: Partial<Record<PeriodId, number>>; undated: number }> }).regions;
+type Counts = Record<string, Partial<Record<PeriodId, number>>>;
+const M = MEASURED as { regions: Record<string, { dated: Partial<Record<PeriodId, number>>; undated: number }>; sources?: Record<string, Counts>; classes?: Record<string, Counts> };
+const BY_REGION = M.regions;
+
+/**
+ * The place-index datasets each catalogued source stands for, where the two use different ids (AR-2). A source not
+ * listed here is measured under its own id when the index holds it.
+ */
+export const INDEX_OF: Record<string, string[]> = {
+  wikidata: ['wikidata'], 'wikidata-sites': ['wdextra'], 'finland-heritage': ['finreg'], 'western-bohemia-toponyms': ['wbohemia'],
+  'medieval-bridges': ['bridges1250'],
+};
+const indexIds = (sourceId: string) => INDEX_OF[sourceId] ?? (M.sources?.[sourceId] ? [sourceId] : []);
+/** Is this catalogued source one whose records are in the place index (so its coverage can be measured)? */
+export const inIndex = (sourceId: string) => indexIds(sourceId).length > 0;
+
+/** Dated records one source holds in the index for a region over a span (the busiest period the span touches). */
+export function sourceMeasuredCount(sourceId: string, region: RegionId | undefined, from: HistYear, to: HistYear): number {
+  if (!region) return 0;
+  const ps = PERIODS.filter((p) => p.from <= to && p.to >= from);
+  return Math.max(0, ...ps.map((p) => indexIds(sourceId).reduce((n, id) => n + (M.sources?.[id]?.[region]?.[p.id] ?? 0), 0)));
+}
+
+/** Dated records of one class ("settlement" or "site") in the index for a region over a span. */
+export function classMeasuredCount(klass: 'settlement' | 'site', region: RegionId | undefined, from: HistYear, to: HistYear): number {
+  if (!region) return 0;
+  return Math.max(0, ...PERIODS.filter((p) => p.from <= to && p.to >= from).map((p) => M.classes?.[klass]?.[region]?.[p.id] ?? 0));
+}
 
 /** Dated records in the index for a region over a span of years (the busiest period the span touches). */
 export function measuredCount(region: RegionId | undefined, from: HistYear, to: HistYear): number {

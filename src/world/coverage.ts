@@ -5,10 +5,16 @@
 // keeps two answers apart: what exists anywhere, and what Shelf can use now.
 import type { HistYear } from '../atlas/time';
 import { type DataType, PERIODS, type PeriodId, type Quality, QUALITY_RANK, REGIONS, type RegionId, regionAt, periodAt } from './axes';
-import { measuredCap, measuredCount, MEASURED_TYPES } from './measured';
+import { inIndex, measuredCap, measuredCount, MEASURED_TYPES, sourceMeasuredCount } from './measured';
 import { type SourceEntry, SOURCES } from './registry';
 
-export interface CellSource { id: string; name: string; quality: Quality; access: SourceEntry['access']; tier: SourceEntry['tier']; /** Why a catalogued source isn't used (licence, not yet integrated…), from the registry. */ note?: string }
+export interface CellSource {
+  id: string; name: string; quality: Quality; access: SourceEntry['access']; tier: SourceEntry['tier']; /** Why a catalogued source isn't used (licence, not yet integrated…), from the registry. */ note?: string;
+  /** Dated records this source holds in Shelf's place index here (measured; AR-2). Its quality never exceeds what that count supports. */ measured?: number;
+  /** Consulted online when asked, not held in Shelf: coverage is the source's, not Shelf's. */ onlineLookup?: true;
+}
+/** How a source's coverage is said: an online lookup is never shown as data Shelf holds. */
+export const sourceCoverageLabel = (s: CellSource) => (s.onlineLookup ? 'online lookup' : s.measured !== undefined ? `${s.measured.toLocaleString('en')} dated records in Shelf` : s.access === 'offline' ? 'in Shelf (not counted by place)' : s.access);
 export interface Cell {
   /** Best coverage among all known digital sources. */
   exists: Quality;
@@ -48,8 +54,13 @@ export function sourceQuality(s: SourceEntry, region: RegionId | undefined, from
 export function cellFor(region: RegionId | undefined, from: HistYear, to: HistYear, type: DataType): Cell {
   const sources: CellSource[] = [];
   for (const s of SOURCES) {
-    const q = sourceQuality(s, region, from, to, type);
-    if (q !== 'none') sources.push({ id: s.id, name: s.name, quality: q, access: s.access, tier: s.tier, note: s.note });
+    let q = sourceQuality(s, region, from, to, type);
+    if (q === 'none') continue;
+    // A dataset in the place index: what it declares is capped by what it measurably holds here (AR-2).
+    const measured = s.access === 'offline' && MEASURED_TYPES.has(type) && inIndex(s.id) ? sourceMeasuredCount(s.id, region, from, to) : undefined;
+    if (measured !== undefined && QUALITY_RANK[measuredCap(measured)] < QUALITY_RANK[q]) q = measuredCap(measured);
+    if (q === 'none' && measured === 0) continue;
+    sources.push({ id: s.id, name: s.name, quality: q, access: s.access, tier: s.tier, note: s.note, ...(measured !== undefined ? { measured } : {}), ...(s.access === 'live' ? { onlineLookup: true as const } : {}) });
   }
   sources.sort((a, b) => QUALITY_RANK[b.quality] - QUALITY_RANK[a.quality] || a.tier.localeCompare(b.tier));
   const declared = best(sources.filter((s) => s.access === 'offline').map((s) => s.quality));
