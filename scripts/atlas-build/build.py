@@ -23,6 +23,7 @@ Needs:  python3 -m pip install -r scripts/atlas-build/requirements.txt  (pinned 
 from __future__ import annotations
 
 import dates
+import events
 import csv
 import io
 import json
@@ -597,11 +598,15 @@ def wikidata_events():
         f['properties'].setdefault('w', wq)
         f['properties'].setdefault('wn', r['wlabel']['value'])
         wars.setdefault(wq, {'q': wq, 'n': r['wlabel']['value'], 'f': wd_year((r.get('ws') or {}).get('value')), 't': wd_year((r.get('we') or {}).get('value'))})
-    write('wikidata-events.json', fc(list(feats.values())))
+    # Read as events: kind by name, scope to 1945, duplicates merged, dates outside their war marked (events.py).
+    out = list(feats.values())
+    cleaned = events.clean_events(out, list(wars.values()))
+    log(f'  {cleaned}')
+    write('wikidata-events.json', fc(out))
     with open(os.path.join(OUT, 'wikidata-wars.json'), 'w', encoding='utf-8') as fh:
         json.dump(sorted(wars.values(), key=lambda w: (w['f'] if w['f'] is not None else 9999)), fh, ensure_ascii=False, separators=(',', ':'))
     log(f'  wrote wikidata-wars.json: {len(wars)} wars')
-    return {'events': len(feats), 'wars': len(wars)}
+    return {'events': len(out), 'wars': len(wars), **cleaned}
 
 
 POLITY_CLASSES = [

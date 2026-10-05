@@ -9,6 +9,7 @@ import { isLatinScript, isolate } from './names';
 import { getJSON } from './data';
 import { type EnvelopeBasis, envelopeWords, type HistYear, yearLabel } from './time';
 import { Timeline, type TimelineMark } from './Timeline';
+import { eventCaution, eventNotes, eventPrecision, type Props, sides } from './eventText';
 
 export interface AtlasFocus { name: string; lat: number; lon: number; certainty?: 'known' | 'approximate' | 'uncertain' | 'disputed'; note?: string }
 export interface AtlasPin { name: string; lat: number; lon: number; key?: string }
@@ -621,9 +622,10 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'war-sequence': {
       const y = num('y');
       return {
-        title: str('n') ?? 'Event', lines: [`${str('k') ?? 'event'}${y !== undefined ? ` · ${yearLabel(y)}${num('y2') !== undefined ? ` – ${yearLabel(num('y2')!)}` : ''}${str('yp') ? ` (to the ${str('yp')})` : ''}` : ''}`, ...(str('wn') ? [`Part of: ${str('wn')}`] : [])],
-        link: { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' }, source: credit('wikidata'), event: str('q'),
-        caution: num('u') ? 'The date is only known approximately.' : undefined,
+        title: str('n') ?? 'Event', lines: [`${str('k') ?? 'event'}${y !== undefined ? ` · ${yearLabel(y)}${num('y2') !== undefined ? ` – ${yearLabel(num('y2')!)}` : ''}` : ''}`,
+          eventPrecision(str('yp')), ...(str('wn') ? [`Part of: ${str('wn')}`] : []), ...eventNotes(p as Props)],
+        link: { href: `https://www.wikidata.org/wiki/${str('q')}`, label: 'Wikidata ↗' }, source: str('h') ? `${credit('wikidata')}; ${credit('hced')}` : credit('wikidata'), event: str('q'),
+        caution: eventCaution(p as Props),
       };
     }
     case 'awmc-roads':
@@ -791,11 +793,11 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
     case 'hced-battles': {
       const y = num('y');
       return {
-        title: str('n') ?? 'Battle', lines: [`${str('k') ?? 'battle'}${y !== undefined ? ` · ${yearLabel(y)}` : ''}`, ...(str('w') ? [`War: ${str('w')}`] : []), ...(str('win') ? [`Winner: ${str('win')}${str('los') ? ` · loser: ${str('los')}` : ''}`] : []),
+        title: str('n') ?? 'Battle', lines: [`${str('k') ?? 'battle'}${y !== undefined ? ` · ${yearLabel(y)}${num('y2') !== undefined ? ` – ${yearLabel(num('y2')!)}` : ''}` : ''}`, 'Date known to the year', ...(str('w') ? [`War: ${str('w')}`] : []), ...sides(p as Props),
           ...(str('th') && str('th') !== 'Land' ? [`${str('th')} battle`] : []), ...(num('ms') ? ['Recorded as a massacre'] : []),
           ...(num('sc') ? [`Size on the dataset’s scale (Lehmann–Zhukov): ${num('sc')} of 4`] : []), ...(str('cite') ? [`Source cited: ${str('cite')}`] : [])],
         link: { href: 'https://doi.org/10.7910/DVN/6ZFC0V', label: 'Dataset ↗' }, source: credit('hced'),
-        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors. Shelf found no Wikidata battle within 50 km and a year of it, so it is drawn from this dataset alone — Wikidata may still record it under another name.',
+        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors. Shelf found no Wikidata battle or siege of the same name in those years, so it is drawn from this dataset alone — Wikidata may still record it under another name.',
       };
     }
     case 'thurayya-places':
@@ -948,3 +950,4 @@ function AtlasSources({ enabled }: { enabled: string[] }) {
     </details>
   );
 }
+

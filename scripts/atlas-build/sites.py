@@ -696,33 +696,69 @@ def private_lines():
 
 
 def hced_battles():
-    """HCED battles before 1600 that Wikidata's events lack (no Wikidata battle/siege within 50 km and ±1 year)."""
-    ev = json.load(open(os.path.join(ATLAS, 'wikidata-events.json'), encoding='utf-8'))['features']
-    grid = Grid(1.0)
+    """HCED battles before 1600 that Wikidata's events lack, and HCED's record of those it shares (events.py).
+
+    An HCED battle is the same event as a Wikidata one only when their names agree and their years overlap — nearness
+    alone never merges two events (A8-001, A8-003). A shared battle is drawn once, from Wikidata, carrying HCED's id,
+    winner and loser, and HCED's own position when it lies more than 25 km away (a location disagreement, shown).
+    Year ranges ("1346-1347") are read as ranges, not dropped (A8-002)."""
+    import events
+    path_ev = os.path.join(ATLAS, 'wikidata-events.json')
+    doc = json.load(open(path_ev, encoding='utf-8'))
+    ev = doc['features']
     for f in ev:
-        p = f['properties']
-        if p['k'] in ('battle', 'siege'):
-            grid.add(*f['geometry']['coordinates'][:2], (f['geometry']['coordinates'][:2], p['y'], norm(p['n'])))
-    out, dup = [], 0
+        for k in ('h', 'hp', 'hd', 'win', 'los'):
+            f['properties'].pop(k, None)
+    by_core = defaultdict(list)
+    for f in ev:
+        if f['properties']['k'] in ('battle', 'siege'):
+            by_core[events.core(f['properties']['n']).replace(' ', '')].append(f)
+    out, linked, ranges = [], 0, 0
     path = os.path.join(RAW, 'hced', 'original', 'HCED Data v3.csv')
     for r in csv.DictReader(open(path, encoding='cp1252', errors='replace')):
+        d = dates.parse_dating(r['Year'])
         try:
-            y, lat, lon = int(r['Year']), float(r['Latitude']), float(r['Longitude'])
+            lat, lon = float(r['Latitude']), float(r['Longitude'])
         except ValueError:
             continue
-        if y >= 1600:
+        if not d or d[0] is None:
+            continue
+        y, y2 = d[0], d[1] if d[1] is not None else d[0]
+        if y > events.EVENTS_UNTIL:
             continue
         name = r['Battle'].strip()
         n = norm(name)
-        same = any(abs(wy - y) <= 1 and (dist_km(ll, (lon, lat)) <= 50 or n in wn) for ll, wy, wn in grid.near(lon, lat, 1))
-        if same:
-            dup += 1
-            continue
-        props = {'n': ('Siege of ' if 'siege' in n else 'Battle of ') + name if not re.match(r'(?i)(battle|siege)\b', name) else name,
-                 'k': 'siege' if 'siege' in n else 'battle', 'y': y, 'h': r['ID']}
+        full = ('Siege of ' if 'siege' in n else 'Battle of ') + name if not re.match(r'(?i)(battle|siege)\b', name) else name
+        extra = {}
         for k_in, k_out in (('War', 'w'), ('Winner', 'win'), ('Loser', 'los')):
             if r.get(k_in, '').strip():
-                props[k_out] = r[k_in].strip()[:80]
+                extra[k_out] = r[k_in].strip()[:80]
+        match = [f for f in by_core.get(events.core(full).replace(' ', ''), []) if events.same_event(f, full, y, y2)]
+        if match:
+            # Drawn once, from Wikidata; HCED's own record goes with it.
+            f = min(match, key=lambda f: events.km(f['geometry']['coordinates'], (lon, lat)))
+            p = f['properties']
+            p['h'] = r['ID']
+            for k in ('win', 'los'):
+                if k in extra:
+                    p[k] = extra[k]
+            dk = events.km(f['geometry']['coordinates'], (lon, lat))
+            if dk > events.DISAGREE_KM:
+                p['hp'] = [round(lon, 4), round(lat, 4)]
+                p['hd'] = round(dk)
+            linked += 1
+            continue
+        if y >= 1600:
+            continue
+        props = {'n': full, 'k': 'siege' if 'siege' in n else 'battle', 'y': y, 'h': r['ID']}
+        if y2 > y:
+            props['y2'] = y2
+            ranges += 1
+        if 'w' in extra:
+            props['w'] = extra['w']
+        for k in ('win', 'los'):
+            if k in extra:
+                props[k] = extra[k]
         # Also kept from the source (A8-008): land or naval, the massacre flag, the dataset's own scale (Lehmann–Zhukov,
         # 1–4) and the work it cites for the battle.
         if r.get('Theatre', '').strip() in ('Land', 'Naval', 'Amphibious'):
@@ -734,9 +770,13 @@ def hced_battles():
         if r.get('Alternative Sources Consulted', '').strip() not in ('', 'NA'):
             props['cite'] = r['Alternative Sources Consulted'].strip()[:160]
         out.append({'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [round(lon, 4), round(lat, 4)]}, 'properties': props})
+    out.sort(key=lambda f: (f['properties']['y'], f['properties']['h']))
     with open(os.path.join(ATLAS, 'hced-battles.json'), 'w', encoding='utf-8') as fh:
         json.dump({'type': 'FeatureCollection', 'features': out}, fh, ensure_ascii=False, separators=(',', ':'))
-    return {'added': len(out), 'alreadyInWikidata': dup}
+    with open(path_ev, 'w', encoding='utf-8') as fh:
+        json.dump(doc, fh, ensure_ascii=False, separators=(',', ':'))
+    return {'added': len(out), 'sharedWithWikidata': linked, 'yearRanges': ranges,
+            'locationDisagreements': sum(1 for f in ev if f['properties'].get('hd'))}
 
 
 if __name__ == '__main__':
