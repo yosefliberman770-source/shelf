@@ -820,7 +820,12 @@ def write_app_module(loaded):
                      f"core: [{s.get('core', cov)[0]}, {s.get('core', cov)[1]}] as [number, number], box: [{', '.join(map(str, box))}] as [number, number, number, number], "
                      f"describe: {q(s.get('describe') or s['title'])}, public: {'true' if s.get('public') else 'false'}, layers: {q(s.get('layers') or ['medieval-archaeology'])} as string[] }},")
     lines += ['} as const;', 'export type SpecDatasetId = keyof typeof SPEC_DATASETS;', '']
-    open(APP_MODULE, 'w', encoding='utf-8').write('\n'.join(lines))
+    text = '\n'.join(lines)
+    old = open(APP_MODULE, encoding='utf-8').read() if os.path.exists(APP_MODULE) else None
+    # App source code is rewritten only when the datasets' registry entries actually change, and the build says so.
+    if text != old:
+        open(APP_MODULE, 'w', encoding='utf-8').write(text)
+        print('  updated src/atlas/spec-datasets.ts (dataset registry changed): review and commit it with the data', flush=True)
 
 
 def line_features(spec):

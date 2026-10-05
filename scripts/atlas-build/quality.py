@@ -66,6 +66,8 @@ def date_problem(start, end) -> str | None:
             return 'non-numeric year'
         if v == 0:
             return 'year 0 (there is no year 0)'
+        if isinstance(v, float) and not v.is_integer():
+            return 'fractional year'
         if not MIN_YEAR <= v <= MAX_YEAR:
             return 'year out of range'
     if start is not None and end is not None and end < start:

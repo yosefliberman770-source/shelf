@@ -1,0 +1,138 @@
+"""What the data build read, and whether it was what was recorded. Standard library only.
+
+- verify_vault(): every file in the raw vault must be listed in data/historical/manifest.json, and must still match
+  its recorded size and SHA-256. A file replaced under the same name, a recorded file that is gone, or a new file
+  nobody recorded is reported before anything is built, not discovered later in the map.
+- present(path): an optional input a reader asks for. A missing one is recorded (with the reader that wanted it)
+  instead of silently leaving its dataset out; the build lists them at the end and fails unless allowed.
+- fetched(key, url, path): a download in the build cache, recorded with its checksum and the date it was downloaded,
+  so the published manifest says which version of each source was used and when it was retrieved.
+
+Checksums are cached by (size, modification time), so an unchanged vault costs one stat per file.
+
+  python3 scripts/atlas-build/inputs.py          check the vault now
+"""
+from __future__ import annotations
+
+import datetime
+import hashlib
+import json
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
+HIST = os.path.join(ROOT, 'data', 'historical')
+RAW = os.path.join(HIST, 'raw')
+VAULT_MANIFEST = os.path.join(HIST, 'manifest.json')
+HASH_CACHE = os.path.join(HERE, '.cache', 'hashes.json')
+
+MISSING: list[dict] = []
+FETCHED: dict[str, dict] = {}
+_hashes: dict | None = None
+
+
+def _load_hashes() -> dict:
+    global _hashes
+    if _hashes is None:
+        try:
+            _hashes = json.load(open(HASH_CACHE, encoding='utf-8'))
+        except (OSError, ValueError):
+            _hashes = {}
+    return _hashes
+
+
+def save_hashes():
+    if _hashes is None:
+        return
+    os.makedirs(os.path.dirname(HASH_CACHE), exist_ok=True)
+    with open(HASH_CACHE + '.tmp', 'w', encoding='utf-8') as fh:
+        json.dump(_hashes, fh)
+    os.replace(HASH_CACHE + '.tmp', HASH_CACHE)
+
+
+def sha256(path: str) -> str:
+    """SHA-256 of a file, reused while its size and modification time are unchanged."""
+    st = os.stat(path)
+    key = os.path.relpath(path, ROOT)
+    cached = _load_hashes().get(key)
+    if cached and cached[0] == st.st_size and cached[1] == st.st_mtime_ns:
+        return cached[2]
+    h = hashlib.sha256()
+    with open(path, 'rb') as fh:
+        for block in iter(lambda: fh.read(1 << 20), b''):
+            h.update(block)
+    _hashes[key] = [st.st_size, st.st_mtime_ns, h.hexdigest()]
+    return h.hexdigest()
+
+
+def vault_files(raw: str = RAW) -> list[str]:
+    out = []
+    for d, dirs, files in os.walk(raw):
+        dirs.sort()
+        for f in sorted(files):
+            out.append(os.path.relpath(os.path.join(d, f), raw).replace(os.sep, '/'))
+    return out
+
+
+def verify_vault(raw: str = RAW, manifest_path: str = VAULT_MANIFEST) -> list[dict]:
+    """Problems with the raw vault: recorded files missing or changed, files present but not recorded."""
+    if not os.path.isdir(raw):
+        return [{'path': os.path.relpath(raw, ROOT), 'problem': 'the raw vault is not here (data/historical/raw)'}]
+    manifest = json.load(open(manifest_path, encoding='utf-8'))
+    problems = []
+    for rel, rec in sorted(manifest.items()):
+        p = os.path.join(raw, rel)
+        if not os.path.exists(p):
+            problems.append({'path': rel, 'problem': 'recorded in the manifest but missing'})
+        elif os.path.getsize(p) != rec.get('bytes'):
+            problems.append({'path': rel, 'problem': f"size {os.path.getsize(p)} differs from the recorded {rec.get('bytes')}"})
+        elif rec.get('sha256') and sha256(p) != rec['sha256']:
+            problems.append({'path': rel, 'problem': 'content differs from the recorded checksum (replaced under the same name?)'})
+    for rel in vault_files(raw):
+        if rel not in manifest:
+            problems.append({'path': rel, 'problem': 'not recorded in the manifest (no URL, checksum or date)'})
+    save_hashes()
+    return problems
+
+
+def present(path: str, dataset: str | None = None) -> bool:
+    """True if an optional input exists; otherwise record it as missing (with the reader that wanted it)."""
+    if os.path.exists(path):
+        return True
+    reader = dataset or sys._getframe(1).f_code.co_name
+    rel = os.path.relpath(path, ROOT)
+    MISSING.append({'reader': reader, 'path': rel})
+    print(f'  !! missing input for {reader}: {rel} — this dataset is left out of the build', flush=True)
+    return False
+
+
+def fetched(key: str, url: str, path: str) -> dict:
+    """Record a downloaded source in the build cache: URL, size, checksum, download date (the file's own time)."""
+    rec = {'url': url, 'bytes': os.path.getsize(path), 'sha256': sha256(path),
+           'downloaded': datetime.date.fromtimestamp(os.path.getmtime(path)).isoformat()}
+    FETCHED[key] = rec
+    return rec
+
+
+def finish(allow_missing: bool) -> int:
+    """Report missing optional inputs at the end of a build; the exit code is 2 when any is missing and not allowed."""
+    save_hashes()
+    if not MISSING:
+        return 0
+    print(f'\n{len(MISSING)} input file(s) were missing; their datasets were left out:', flush=True)
+    for m in MISSING:
+        print(f"  - {m['reader']}: {m['path']}", flush=True)
+    if allow_missing:
+        print('  (--allow-missing: build kept)', flush=True)
+        return 0
+    print('  Restore them (see data/historical/README.md), or run again with --allow-missing to build without them.', flush=True)
+    return 2
+
+
+if __name__ == '__main__':
+    found = verify_vault()
+    for p in found:
+        print(f"{p['path']}: {p['problem']}")
+    print(f'{len(found)} problem(s) in the raw vault')
+    sys.exit(1 if found else 0)

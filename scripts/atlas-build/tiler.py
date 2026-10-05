@@ -132,7 +132,7 @@ def build(path: str, layer: str, features: list[tuple[dict, dict, int]], max_zoo
             # the encoder repairs those instead of writing them as they are (its default).
             data = mapbox_vector_tile.encode([{'name': layer, 'features': feats}], default_options={
                 'quantize_bounds': b, 'extents': 4096, 'on_invalid_geometry': on_invalid_geometry_make_valid})
-            tiles.append((zxy_to_tileid(z, x, y), gzip.compress(data)))
+            tiles.append((zxy_to_tileid(z, x, y), gzip.compress(data, mtime=0)))
     tiles.sort()
     allb = [g.bounds for g, _, _ in geoms] or [(0.0, 0.0, 0.0, 0.0)]
     def ll(xm, ym):

@@ -35,6 +35,7 @@ import zipfile
 from collections import Counter, defaultdict
 from datetime import date
 
+import inputs
 from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
 
@@ -114,6 +115,7 @@ def fetch(key: str, url: str) -> str:
         with urllib.request.urlopen(req, timeout=300) as r, open(path + '.part', 'wb') as f:
             f.write(r.read())
         os.replace(path + '.part', path)
+    inputs.fetched(key, url, path)
     return path
 
 
@@ -1409,7 +1411,7 @@ def polity_common_names():
         json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
     # The map labels come from the time slices: add the common name there too.
     folder = os.path.join(OUT, 'cliopatria')
-    for fn in os.listdir(folder):
+    for fn in sorted(os.listdir(folder)):
         if not re.match(r'^-?\d+_-?\d+\.json$', fn):
             continue
         fp = os.path.join(folder, fn)
@@ -1432,7 +1434,7 @@ def polity_names():
     log('Cliopatria names index')
     folder = os.path.join(OUT, 'cliopatria')
     by = {}
-    for fn in os.listdir(folder):
+    for fn in sorted(os.listdir(folder)):
         if not re.match(r'^-?\d+_-?\d+\.json$', fn):
             continue
         for f in json.load(open(os.path.join(folder, fn), encoding='utf-8'))['features']:
@@ -1460,7 +1462,7 @@ def polity_names():
     return {'names': len(rows)}
 
 
-def manifest(stats):
+def manifest(stats, ran=None):
     today = date.today().isoformat()
     m = {
         'version': today,
@@ -1519,13 +1521,68 @@ def manifest(stats):
              'retrieved': today, 'counts': stats.get('physlabels')},
         ],
     }
-    with open(os.path.join(OUT, 'manifest.json'), 'w', encoding='utf-8') as fh:
+    # Each dataset says which input files (URL, checksum) it was built from and when they were downloaded — not the
+    # date of the build. A dataset this run did not rebuild keeps what the previous manifest said about it.
+    previous = {}
+    mpath = os.path.join(OUT, 'manifest.json')
+    if os.path.exists(mpath):
+        previous = {d['id']: d for d in json.load(open(mpath, encoding='utf-8')).get('datasets', [])}
+    for d in m['datasets']:
+        keys = sorted(k for k in inputs.FETCHED if any(k.startswith(p) for p in DATASET_INPUTS.get(d['id'], ())))
+        old = previous.get(d['id'], {})
+        if ran is not None and d['id'] not in ran and old:
+            for k in ('retrieved', 'built', 'inputs', 'counts'):
+                if k in old:
+                    d[k] = old[k]
+            continue
+        d['built'] = today
+        if keys:
+            d['inputs'] = {k: inputs.FETCHED[k] for k in keys}
+            d['retrieved'] = min(inputs.FETCHED[k]['downloaded'] for k in keys)
+        else:
+            # Fetched live (a SPARQL query) or not downloaded by this script: no file date to give.
+            d['retrieved'] = old.get('retrieved') if old.get('retrieved') and old.get('retrieved') != old.get('built') else None
+    m['python'] = sys.version.split()[0]
+    m['packages'] = _packages()
+    with open(mpath, 'w', encoding='utf-8') as fh:
         json.dump(m, fh, ensure_ascii=False, indent=1)
     log('  wrote manifest.json')
 
 
+# Which downloads (fetch keys) each published dataset is built from.
+DATASET_INPUTS = {'pleiades': ('pleiades_gis',), 'awmc': ('awmc_', 'snap_'), 'cliopatria': ('cliopatria',),
+                  'naturalearth': ('ne_land', 'ne_rivers'), 'hydrosheds': ('hydrorivers',), 'osm': ('polders',),
+                  'osmland': ('osm_land', 'osm_water'), 'hydrolakes': ('hydrolakes',), 'physlabels': ('ne_regions',)}
+
+
+def _packages():
+    """The installed versions of the build's Python packages (pinned in requirements.txt)."""
+    import importlib.metadata as md
+    out = {}
+    for line in open(os.path.join(HERE, 'requirements.txt'), encoding='utf-8'):
+        name = line.split('#')[0].split('==')[0].strip()
+        if name:
+            try:
+                out[name] = md.version(name)
+            except md.PackageNotFoundError:
+                out[name] = None
+    return out
+
+
 def main():
-    only = set(sys.argv[1:])
+    args = sys.argv[1:]
+    flags = {a for a in args if a.startswith('--')}
+    only = {a for a in args if not a.startswith('--')}
+    # The raw vault must be what the manifest records before anything is built from it (changed, missing or
+    # unrecorded files are listed); --accept-changed-inputs builds anyway, after you have recorded why.
+    problems = inputs.verify_vault() if (not only or only & {'world'}) else []
+    if problems:
+        for p in problems:
+            log(f"  !! {p['path']}: {p['problem']}")
+        if '--accept-changed-inputs' not in flags:
+            log(f'{len(problems)} problem(s) in data/historical/raw. Record new files with scripts/historical-data/record_vault.py, '
+                'restore changed ones, or run with --accept-changed-inputs.')
+            sys.exit(2)
     stats = {}
     old = {}
     mpath = os.path.join(OUT, 'manifest.json')
@@ -1533,15 +1590,27 @@ def main():
         old = {d['id']: d.get('counts') for d in json.load(open(mpath))['datasets']}
     steps = [('pleiades', pleiades), ('gazetteer', gazetteer), ('awmc', awmc), ('cliopatria', cliopatria), ('polities', polity_names), ('aliases', polity_aliases), ('common', polity_common_names),
              ('wikidata', wikidata_events), ('naturalearth', natural_earth), ('hydrosheds', hydrorivers), ('osm', physical_change), ('osmland', osm_land), ('osmwater', osm_water), ('hydrolakes', reservoirs), ('physlabels', physical_labels)]
+    ran = set()
     for key, fn in steps:
-        stats[key] = fn() if not only or key in only else old.get(key)
+        if not only or key in only:
+            stats[key] = fn()
+            ran.add(key)
+        else:
+            stats[key] = old.get(key)
     if not only or 'world' in only:
         import world
         world.build_world()
     # The manifest keeps counts per dataset; extra steps fold into their dataset.
     stats['pleiades'] = {**(stats.get('pleiades') or {}), 'gazetteer': stats.pop('gazetteer', None)}
     stats['cliopatria'] = {**(stats.get('cliopatria') or {}), 'names': stats.pop('polities', None), 'aliases': stats.pop('aliases', None), 'commonNames': stats.pop('common', None)}
-    manifest(stats)
+    if ran & {'gazetteer'}:
+        ran.add('pleiades')
+    if ran & {'polities', 'aliases', 'common'}:
+        ran.add('cliopatria')
+    if 'osmwater' in ran:
+        ran.add('osmland')
+    manifest(stats, None if not only else ran)
+    sys.exit(inputs.finish(allow_missing='--allow-missing' in flags))
 
 
 if __name__ == '__main__':
