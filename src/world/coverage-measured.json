@@ -1,0 +1,233 @@
+{
+ "about": "Dated records in the public place index per region and period (scripts/atlas-build/coverage_index.py). A record counts in every period its dates or evidence period touch.",
+ "regions": {
+  "anatolia-levant": {
+   "dated": {
+    "bronze-iron": 971,
+    "classical": 2782,
+    "early-medieval": 2034,
+    "early-modern": 253,
+    "long-19th": 6212,
+    "medieval": 607,
+    "modern": 14,
+    "prehistory": 99
+   },
+   "undated": 1300
+  },
+  "arabia": {
+   "dated": {
+    "bronze-iron": 202,
+    "classical": 453,
+    "early-medieval": 193,
+    "early-modern": 31,
+    "long-19th": 23,
+    "medieval": 44,
+    "modern": 2,
+    "prehistory": 26
+   },
+   "undated": 756
+  },
+  "balkans-greece": {
+   "dated": {
+    "bronze-iron": 3094,
+    "classical": 6065,
+    "early-medieval": 2631,
+    "early-modern": 4062,
+    "long-19th": 48235,
+    "medieval": 3154,
+    "modern": 21150,
+    "prehistory": 65
+   },
+   "undated": 2598
+  },
+  "british-isles": {
+   "dated": {
+    "bronze-iron": 2796,
+    "classical": 6244,
+    "early-medieval": 10125,
+    "early-modern": 79587,
+    "long-19th": 55223,
+    "medieval": 19320,
+    "modern": 9639,
+    "prehistory": 172
+   },
+   "undated": 4720
+  },
+  "central-asia": {
+   "dated": {
+    "bronze-iron": 193,
+    "classical": 354,
+    "early-medieval": 246,
+    "early-modern": 77,
+    "long-19th": 168,
+    "medieval": 21,
+    "prehistory": 4
+   },
+   "undated": 346
+  },
+  "central-europe": {
+   "dated": {
+    "bronze-iron": 108,
+    "classical": 3981,
+    "early-medieval": 6095,
+    "early-modern": 29545,
+    "long-19th": 20816,
+    "medieval": 36154,
+    "modern": 2373,
+    "prehistory": 15
+   },
+   "undated": 10925
+  },
+  "china": {
+   "dated": {
+    "bronze-iron": 8,
+    "classical": 12,
+    "early-medieval": 6,
+    "early-modern": 1,
+    "medieval": 4,
+    "prehistory": 2
+   },
+   "undated": 2
+  },
+  "eastern-europe": {
+   "dated": {
+    "bronze-iron": 540,
+    "classical": 784,
+    "early-medieval": 286,
+    "early-modern": 13634,
+    "long-19th": 11718,
+    "medieval": 3289,
+    "modern": 208,
+    "prehistory": 11
+   },
+   "undated": 688
+  },
+  "egypt-north-africa": {
+   "dated": {
+    "bronze-iron": 1278,
+    "classical": 6188,
+    "early-medieval": 4391,
+    "early-modern": 298,
+    "long-19th": 1368,
+    "medieval": 668,
+    "modern": 18,
+    "prehistory": 83
+   },
+   "undated": 1082
+  },
+  "france-low-countries": {
+   "dated": {
+    "bronze-iron": 157,
+    "classical": 2958,
+    "early-medieval": 4166,
+    "early-modern": 7880,
+    "long-19th": 8680,
+    "medieval": 28931,
+    "modern": 1930,
+    "prehistory": 23
+   },
+   "undated": 5833
+  },
+  "iberia": {
+   "dated": {
+    "bronze-iron": 282,
+    "classical": 2624,
+    "early-medieval": 2290,
+    "early-modern": 3105,
+    "long-19th": 2139,
+    "medieval": 4578,
+    "modern": 262,
+    "prehistory": 7
+   },
+   "undated": 4026
+  },
+  "italy": {
+   "dated": {
+    "bronze-iron": 1867,
+    "classical": 8210,
+    "early-medieval": 6347,
+    "early-modern": 10550,
+    "long-19th": 5824,
+    "medieval": 8779,
+    "modern": 401,
+    "prehistory": 13
+   },
+   "undated": 5661
+  },
+  "japan-korea": {
+   "dated": {},
+   "undated": 0
+  },
+  "latin-america": {
+   "dated": {
+    "long-19th": 13,
+    "modern": 30
+   },
+   "undated": 0
+  },
+  "mesopotamia-iran": {
+   "dated": {
+    "bronze-iron": 197,
+    "classical": 480,
+    "early-medieval": 360,
+    "early-modern": 124,
+    "long-19th": 111,
+    "medieval": 141,
+    "modern": 37,
+    "prehistory": 29
+   },
+   "undated": 716
+  },
+  "north-america": {
+   "dated": {},
+   "undated": 0
+  },
+  "northern-europe": {
+   "dated": {
+    "bronze-iron": 213,
+    "classical": 6220,
+    "early-medieval": 8829,
+    "early-modern": 25883,
+    "long-19th": 8291,
+    "medieval": 16905,
+    "modern": 2331,
+    "prehistory": 1
+   },
+   "undated": 824
+  },
+  "oceania": {
+   "dated": {},
+   "undated": 0
+  },
+  "south-asia": {
+   "dated": {
+    "bronze-iron": 36,
+    "classical": 554,
+    "early-medieval": 133,
+    "early-modern": 10,
+    "medieval": 28,
+    "prehistory": 6
+   },
+   "undated": 134
+  },
+  "southeast-asia": {
+   "dated": {
+    "early-medieval": 7,
+    "early-modern": 3,
+    "medieval": 7
+   },
+   "undated": 1
+  },
+  "sub-saharan-africa": {
+   "dated": {
+    "bronze-iron": 42,
+    "classical": 100,
+    "early-medieval": 39,
+    "early-modern": 4,
+    "medieval": 8,
+    "prehistory": 2
+   },
+   "undated": 14
+  }
+ }
+}

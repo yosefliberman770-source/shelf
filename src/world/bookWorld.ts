@@ -44,7 +44,8 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
     if (row.chapters.some((c) => c.index === i)) { onProgress?.(i + 1, count); continue; }
     const s = await load(i).catch(() => undefined);
     if (s && s.text.trim().length > 40) {
-      const found = await screenMentions(detectPlaces(s.text, names.known.map((k) => k.name), names.people).slice(0, 80));
+      // Screened before limiting, and with room for long chapters: places late in a chapter are not dropped first.
+      const found = (await screenMentions(detectPlaces(s.text, names.known.map((k) => k.name), names.people))).slice(0, 300);
       const lower = s.text.toLowerCase();
       row.chapters.push({
         index: i, href: s.href, label: s.label,
@@ -92,6 +93,7 @@ export async function resolveBookWorld(row: BookWorldRow, year: HistYear | undef
   const todo = [...counts].filter(([n]) => !(n in row.resolved)).sort((a, b) => b[1].n - a[1].n);
   let done = 0;
   const onlineBudget = { left: 25 };
+  let failed = false;
   for (const [name, info] of todo) {
     if (signal?.aborted) break;
     let res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', online: false, mention: info.evidence, nearby: namesAll.slice(0, 12) }).catch(() => undefined);
@@ -99,12 +101,15 @@ export async function resolveBookWorld(row: BookWorldRow, year: HistYear | undef
       onlineBudget.left--;
       res = await resolvePlace(name, { year, bookId, detection: info.detection as 'cue', mention: info.evidence, nearby: namesAll.slice(0, 12), signal }).catch(() => undefined);
     }
+    // Shelf's place data didn't load (offline): nothing was learnt about the name, so nothing is stored and it is
+    // looked up again next time, rather than kept as "not found".
+    if (res?.loadFailed) { failed = true; onProgress?.(++done, todo.length); continue; }
     const p = res?.place && (res.status === 'HIGH' || res.status === 'MEDIUM') ? res.place : undefined;
     row.resolved[name] = p ? { key: p.key, title: p.title, lat: p.lat, lon: p.lon, source: p.sources[0]?.name ?? '', status: res!.status } : null;
     onProgress?.(++done, todo.length);
     if (done % 10 === 0) await db.bookWorld.put(row);
   }
-  row.done = !signal?.aborted;
+  row.done = !signal?.aborted && !failed;
   row.updatedAt = Date.now();
   await db.bookWorld.put(row);
   return row;

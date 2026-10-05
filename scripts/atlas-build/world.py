@@ -508,6 +508,9 @@ def build_world(only=None):
         site_stats['privatePlaces'] = places_index(sites.private_rows, os.path.join(sites.PRIVATE_BUILD, 'places'))
     rows = pleiades_rows() + viabundus_rows() + thurayya_rows() + site_rows
     stats = {'places': places_index(rows), 'bySource': dict(sorted(Counter(r[0] for r in rows).items()))}
+    # What the index now holds per region and period: the app caps the coverage it claims by these counts.
+    import coverage_index
+    coverage_index.write()
     if site_stats:
         stats['tiles-sites'] = site_stats
     log('  ', stats)

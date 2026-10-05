@@ -770,7 +770,7 @@ function describe(f: MapGeoJSONFeature, year: HistYear): Info {
       return {
         title: str('n') ?? 'Battle', lines: [`${str('k') ?? 'battle'}${y !== undefined ? ` · ${yearLabel(y)}` : ''}`, ...(str('w') ? [`War: ${str('w')}`] : []), ...(str('win') ? [`Winner: ${str('win')}${str('los') ? ` · loser: ${str('los')}` : ''}`] : [])],
         link: { href: 'https://doi.org/10.7910/DVN/6ZFC0V', label: 'Dataset ↗' }, source: credit('hced'),
-        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors; Wikidata has no record of it.',
+        caution: 'Year only. Located from the battle’s name and checked by the dataset’s authors. Shelf found no Wikidata battle within 50 km and a year of it, so it is drawn from this dataset alone — Wikidata may still record it under another name.',
       };
     }
     case 'thurayya-places':

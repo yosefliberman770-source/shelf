@@ -35,7 +35,9 @@ describe('coverage and source selection', () => {
   it('describes digital coverage per region, period and data type', () => {
     expect(cellAt(12.5, 41.9, 100, 'places').inShelf).toBe('excellent'); // Pleiades, Roman Italy
     expect(cellAt(10.7, 53.9, 1400, 'roads').inShelf).toBe('excellent'); // Viabundus
-    expect(cellAt(120.2, 30.3, 1200, 'administrative').inShelf).toBe('excellent'); // CHGIS (live)
+    // CHGIS is queried online only: it is not data Shelf holds, so it never makes a region "covered" (PA-015).
+    expect(cellAt(120.2, 30.3, 1200, 'administrative').inShelf).toBe('none');
+    expect(cellAt(120.2, 30.3, 1200, 'administrative').online).toBe('excellent');
     expect(cellAt(20, -5, 1400, 'settlements').exists).toBe('none'); // no open structured data
   });
   it('prefers specialist sources and says when better data exists that Shelf can’t use', () => {
@@ -55,6 +57,24 @@ describe('coverage and source selection', () => {
     expect(e.text).toMatch(/does not mean nothing existed/);
     expect(explainEmpty('names', -1, 52, 1900).kind).toBe('database-limitation');
     expect(regionAt(10.7, 53.9)).toBe('central-europe');
+  });
+  it('measures coverage from the place index: an empty map outside Europe is never called covered (PA-015)', () => {
+    for (const [lon, lat, year, where] of [[116.4, 39.9, 1500, 'China'], [151.2, -33.9, 1800, 'Oceania'], [-74, 40.7, 1700, 'North America'], [3.4, 6.5, 1600, 'Sub-Saharan Africa'], [135.8, 35, 1000, 'Japan']] as const) {
+      const c = cellAt(lon, lat, year, 'places');
+      expect(['none', 'limited'], where).toContain(c.inShelf);
+      const e = explainEmpty('places', lon, lat, year);
+      expect(e.kind, where).not.toBe('none-recorded');
+      expect(e.text, where).not.toMatch(/excellent|moderate/);
+      expect(e.text, where).toMatch(/does not mean nothing existed|says nothing about the past/);
+    }
+    // Where Shelf does hold thousands of dated places, "none recorded here" can be said, with the count behind it.
+    const rome = explainEmpty('places', 12.5, 41.9, 100);
+    expect(rome.kind).toBe('none-recorded');
+    expect(rome.text).toMatch(/Shelf holds [\d,]+ dated records/);
+  });
+  it('a gap in border outlines is not "no state" (A11-003)', () => {
+    const e = explainEmpty('political', -9.5, 53.3, 1400);
+    expect(e.text).toMatch(/does not mean there was no state/);
   });
 });
 

@@ -12,6 +12,7 @@ import { SPEC_DATASETS, type SpecDatasetId } from './spec-datasets';
 import { getJSON, km, type Pos } from './data';
 import { loadPrivateData, privateJSON } from './privateData';
 import { contextDistance, type GeoContext } from './geocontext';
+import { placeCoverageAt } from '../world/measured';
 import type { EntityKind } from './mention';
 import { attestedAt, eligibleAt, type Envelope, type EnvelopeBasis, ENVELOPE_LABEL, type HistYear, type StartKind, timeFit, type TimeFit } from './time';
 
@@ -176,6 +177,7 @@ class Lru<V> {
   constructor(private max: number) {}
   get(k: string) { const v = this.m.get(k); if (v !== undefined) { this.m.delete(k); this.m.set(k, v); } return v; }
   set(k: string, v: V) { this.m.set(k, v); if (this.m.size > this.max) this.m.delete(this.m.keys().next().value!); }
+  delete(k: string) { this.m.delete(k); }
 }
 const cells = new Lru<Promise<GazPlace[]>>(120);
 const shards = new Lru<Promise<NameEntry[]>>(40);
@@ -206,17 +208,34 @@ function toPlace(r: Row): GazPlace {
   };
 }
 
+/**
+ * The place index could not be read (offline, a server error): different from a name that is not in it. A file that
+ * does not exist (404) is an empty shard or cell — that is "not in the index"; anything else is a failure, reported as
+ * such and never cached, so the next lookup tries again.
+ */
+export class IndexLoadError extends Error {
+  constructor(file: string, cause: unknown) { super(`Shelf's place data could not be loaded (${file}: ${cause instanceof Error ? cause.message : String(cause)})`); this.name = 'IndexLoadError'; }
+}
+const missingIsEmpty = <T>(file: string) => (e: unknown): T[] => {
+  if (e instanceof Error && e.message === '404') return [];
+  throw new IndexLoadError(file, e);
+};
+
 /** A public index file joined with the same file from the private data pack, if one is loaded on this device. */
 async function withPrivate<T>(file: string, pub: Promise<T[]>): Promise<T[]> {
+  // Settled at once, so a failed load is never an unhandled rejection while the private pack is being opened.
+  const settled = pub.then((v) => ({ v }), (e: unknown) => ({ e }));
   await loadPrivateData();
-  const [a, b] = await Promise.all([pub.catch(() => [] as T[]), privateJSON<T[]>(`places/${file}`).catch(() => null)]);
+  const [r, b] = await Promise.all([settled, privateJSON<T[]>(`places/${file}`).catch(() => null)]);
+  const a = 'v' in r ? r.v : missingIsEmpty<T>(file)(r.e);
   return b ? [...a, ...b] : a;
 }
 
 export function placesInCell(cell: string): Promise<GazPlace[]> {
   let p = cells.get(cell);
   if (!p) {
-    p = withPrivate(`c/${cell}.json`, getJSON<Row[]>(`${base()}c/${cell}.json`)).then((rows) => rows.map(toPlace)).catch(() => []);
+    p = withPrivate(`c/${cell}.json`, getJSON<Row[]>(`${base()}c/${cell}.json`)).then((rows) => rows.map(toPlace));
+    p.catch(() => cells.delete(cell)); // a failure is not kept: the next lookup tries again
     cells.set(cell, p);
   }
   return p;
@@ -225,7 +244,8 @@ function nameEntries(norm: string): Promise<NameEntry[]> {
   const s = nameShard(norm);
   let p = shards.get(s);
   if (!p) {
-    p = withPrivate(`n/${s}.json`, getJSON<NameEntry[]>(`${base()}n/${s}.json`)).catch(() => []);
+    p = withPrivate(`n/${s}.json`, getJSON<NameEntry[]>(`${base()}n/${s}.json`));
+    p.catch(() => shards.delete(s));
     shards.set(s, p);
   }
   return p;
@@ -406,7 +426,32 @@ export interface NameMatch {
   fit?: TimeFit | 'no-year';
   /** Which recorded name matched ("Carthage" → recorded name of Carthago). */
   matchedName?: GazName & { isTitle: boolean };
+  /** The place index could not be loaded: nothing is known about the name, and the answer must not be kept. */
+  loadFailed?: boolean;
   reason: string;
+}
+
+/** A lone record this far from every place the book has already placed is probably a namesake, not the place meant. */
+const FAR_NAMESAKE_KM = 2500;
+
+/**
+ * Why a name has no record, in words that do not suggest the place did not exist: which datasets cover the date, and
+ * — when the book's places say where it is set — how much Shelf holds for that region at all.
+ */
+function absenceReason(written: string, year: HistYear | undefined, ctx: GeoContext | undefined): string {
+  const covering = (year === undefined ? GAZETTEERS : gazetteersFor(year)).map((g) => g.name);
+  const list = covering.length > 3 ? `${covering.slice(0, 3).join(', ')} and ${covering.length - 3} other datasets` : covering.join(' and ');
+  const date = year === undefined ? '' : ` for ${year < 0 ? `${-year} BCE` : `${year} CE`}`;
+  const tail = ' This does not mean no such place existed.';
+  if (ctx?.points.length) {
+    const [lon, lat] = ctx.points[0];
+    const cov = placeCoverageAt(lon, lat, year ?? 1500);
+    if (cov.region && cov.count === 0) return `Shelf has no dated place data for ${cov.label}${year === undefined ? '' : ` in ${cov.period}`}, where this book is set, so it cannot say whether “${written}” was there.${tail}`;
+    if (cov.region && cov.count < 100) return `No place called “${written}” in Shelf’s data${date}; it holds only ${cov.count} dated place${cov.count === 1 ? '' : 's'} for ${cov.label} in ${cov.period}, where this book is set.${tail}`;
+  }
+  return covering.length
+    ? `No place called “${written}” in the datasets Shelf holds${date} (${list}). They cover mainly Europe and the Mediterranean.${tail}`
+    : `Shelf holds no place data${date}.${tail}`;
 }
 
 const SAME_PLACE_KM = 8;
@@ -468,9 +513,15 @@ export interface MatchOptions {
  * one; otherwise the result is ambiguous and the reader decides.
  */
 export async function matchName(written: string, year?: HistYear, opts: MatchOptions = {}): Promise<NameMatch> {
-  const all = await placesByName(written);
-  const names = srcList(GAZETTEERS.map((g) => g.id));
-  if (!all.length) return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], reason: `No place called “${written}” in ${names}.` };
+  let all: { place: GazPlace; isTitle: boolean }[];
+  try {
+    all = await placesByName(written);
+  } catch (e) {
+    if (!(e instanceof IndexLoadError)) throw e;
+    return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], loadFailed: true,
+      reason: `Shelf couldn’t load its place data just now (offline, or a network problem), so it can’t say whether “${written}” is recorded. Try again when the connection is back.` };
+  }
+  if (!all.length) return { status: 'none', confidence: 'unresolved', candidates: [], corroborating: [], reason: absenceReason(written, year, opts.context) };
   const notLater = all.filter((h) => recordFit(h.place, year) !== 'later');
   if (!notLater.length) return { status: 'none', confidence: 'unresolved', temporal: 'incompatible', candidates: [], corroborating: [], reason: `The places called “${written}” in ${srcList(all.map((h) => h.place.gazetteer))} are only recorded after ${year !== undefined ? (year < 0 ? `${-year} BCE` : `${year} CE`) : 'this date'}.` };
   const typed = opts.expected ? notLater.filter((h) => COMPATIBLE[opts.expected!].includes(kindOf(h.place))) : notLater;
@@ -498,7 +549,17 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   let chosen: { place: GazPlace; isTitle: boolean }[] | undefined;
   let why = '';
   let basis: MatchBasis | undefined;
-  if (groups.length === 1) { chosen = groups[0]; basis = 'only'; }
+  if (groups.length === 1) {
+    // The only record of the name, but on the other side of the world from every place the book has already placed:
+    // most likely a namesake of a place Shelf doesn't hold (Santiago de Chile → Santiago in Spain). Offered, not pinned.
+    const d = Math.min(...groups[0].map((x) => contextDistance(opts.context, [x.place.lon, x.place.lat])));
+    if (d !== Infinity && d > FAR_NAMESAKE_KM) {
+      const p = lead(groups[0]).place;
+      return { status: 'ambiguous', confidence: 'ambiguous', candidates: [p], corroborating: [],
+        reason: `The only place called “${written}” in Shelf’s data is ${p.title} (${gazetteerInfo(p.gazetteer).name}), ${Math.round(d).toLocaleString('en')} km from the other places in this book — probably a different place with the same name, which Shelf may not hold.` };
+    }
+    chosen = groups[0]; basis = 'only';
+  }
   else {
     // The book's geography: one candidate clearly nearer the places already identified.
     const ctx = opts.context;

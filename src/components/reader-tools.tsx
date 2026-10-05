@@ -23,6 +23,9 @@ import { Icon, type IconName } from './icons';
 import { type AIMode, type ReadingContext, ReaderAI } from './reader-ai';
 import { VisualExplorer } from './visual';
 
+/** Place chips shown for the rest of the chapter; more are counted and announced. */
+const CHIPS = 60;
+
 export type ToolTab = 'ai' | 'xray' | 'map' | 'visual' | 'explore' | 'entity';
 export interface Focus { name: string; kind?: ConceptKind; conceptId?: string; passage?: string; entry?: XRayEntry; /** An entity from the whole-book analysis. */ graphKey?: string }
 export interface ToolState { tab: ToolTab; focus?: Focus; mode?: AIMode; ctx: ReadingContext; scope?: 'page' | 'chapter' | 'book' }
@@ -227,7 +230,9 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
   // Capitalised words after a weak cue are only candidates: ordinary English
   // words ("Guild", "Mass") are dropped unless the offline data knows them.
   const onPage = useScreened(detectPlaces(ctx.pageText, knownPlaces, people));
-  const inChapter = useScreened(detectPlaces(chapterText(), knownPlaces, people)).filter((p) => !onPage.some((q) => q.name === p.name)).slice(0, 24);
+  // Every place found is counted; the chips stop at CHIPS, and the rest are announced, not silently dropped.
+  const inChapterAll = useScreened(detectPlaces(chapterText(), knownPlaces, people)).filter((p) => !onPage.some((q) => q.name === p.name));
+  const inChapter = inChapterAll.slice(0, CHIPS);
   const open = (name: string, text: string) => {
     const i = text.indexOf(name);
     onOpenMap({ name, passage: i >= 0 ? text.slice(Math.max(0, i - 600), i + 600) : undefined, mentionIndex: i >= 0 ? Math.min(i, 600) : undefined, detection: knownPlaces.includes(name) ? 'known' : 'cue' });
@@ -245,8 +250,9 @@ function PlacesTab({ ctx, chapterText, xrayRows, onOpenMap }: { ctx: ReadingCont
       </div>
       {inChapter.length > 0 && (
         <details>
-          <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>Elsewhere in this chapter ({inChapter.length})</summary>
+          <summary className="small" style={{ cursor: 'pointer', fontWeight: 700 }}>Elsewhere in this chapter ({inChapterAll.length})</summary>
           <div className="row wrap gap-4 mt-8">{inChapter.map((p) => <button key={p.name} className="chip" onClick={() => open(p.name, chapterText())}>📍 {p.name}</button>)}</div>
+          {inChapterAll.length > inChapter.length && <div className="tiny faint mt-4">…and {inChapterAll.length - inChapter.length} more. “Map this chapter” maps them all.</div>}
         </details>
       )}
       <div className="row wrap gap-8">

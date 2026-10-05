@@ -5,14 +5,22 @@
 // keeps two answers apart: what exists anywhere, and what Shelf can use now.
 import type { HistYear } from '../atlas/time';
 import { type DataType, PERIODS, type PeriodId, type Quality, QUALITY_RANK, REGIONS, type RegionId, regionAt, periodAt } from './axes';
+import { measuredCap, measuredCount, MEASURED_TYPES } from './measured';
 import { type SourceEntry, SOURCES } from './registry';
 
 export interface CellSource { id: string; name: string; quality: Quality; access: SourceEntry['access']; tier: SourceEntry['tier']; /** Why a catalogued source isn't used (licence, not yet integrated…), from the registry. */ note?: string }
 export interface Cell {
   /** Best coverage among all known digital sources. */
   exists: Quality;
-  /** Best coverage among sources Shelf uses (offline or live). */
+  /**
+   * Best coverage Shelf holds offline. For places, names and settlements it is capped by what the place index
+   * measurably contains here (src/world/measured.ts): a dataset's declared extent alone never makes a region covered.
+   */
   inShelf: Quality;
+  /** Best coverage among sources Shelf can query online (WHG, CHGIS…), which only help when the phone is online and asked. */
+  online: Quality;
+  /** For measured types: dated records Shelf holds for this region and span. */
+  measured?: number;
   sources: CellSource[];
 }
 
@@ -44,9 +52,14 @@ export function cellFor(region: RegionId | undefined, from: HistYear, to: HistYe
     if (q !== 'none') sources.push({ id: s.id, name: s.name, quality: q, access: s.access, tier: s.tier, note: s.note });
   }
   sources.sort((a, b) => QUALITY_RANK[b.quality] - QUALITY_RANK[a.quality] || a.tier.localeCompare(b.tier));
+  const declared = best(sources.filter((s) => s.access === 'offline').map((s) => s.quality));
+  const measured = MEASURED_TYPES.has(type) ? measuredCount(region, from, to) : undefined;
+  const cap = measured === undefined ? declared : measuredCap(measured);
   return {
     exists: best(sources.filter((s) => s.access !== 'excluded').map((s) => s.quality)),
-    inShelf: best(sources.filter((s) => s.access === 'offline' || s.access === 'live').map((s) => s.quality)),
+    inShelf: QUALITY_RANK[cap] < QUALITY_RANK[declared] ? cap : declared,
+    online: best(sources.filter((s) => s.access === 'live').map((s) => s.quality)),
+    measured,
     sources,
   };
 }

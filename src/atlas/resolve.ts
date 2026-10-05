@@ -95,6 +95,8 @@ export interface Resolution {
   error?: string;
   /** The combined evidence behind this result, when online sources were consulted. */
   evidence?: PlaceEvidence;
+  /** Shelf's place data could not be loaded: says nothing about the name; never store this answer. */
+  loadFailed?: boolean;
 }
 
 /** The atlas's place-match scale on the reader's confidence scale (certain → HIGH … possible → LOW). */
@@ -286,6 +288,7 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   // 4. Period gazetteers, offline — scored by date, entity type and the book's geography.
   let local: Resolution | undefined;
   const m = await matchName(written, year, { context, expected }).catch(() => undefined);
+  if (m?.loadFailed) return { status: 'UNRESOLVED', candidates: [], reason: m.reason, loadFailed: true };
   if (m?.status === 'unique' && m.place) {
     // Identity and dates are weighed together once, in the gazetteer (placeConfidence), and only mapped here.
     const status = CONFIDENCE_OF[m.confidence];
