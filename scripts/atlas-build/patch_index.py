@@ -12,6 +12,9 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py halc        # PA-010: HALC "estimate within 1 km" is not a precise position
   python3 scripts/atlas-build/patch_index.py kinds       # A8-022/A8-023: burial grounds are not churches, ship burials not wrecks
   python3 scripts/atlas-build/patch_index.py archaeology # A8-039: prehistoric evidence is not a town's "first mention"
+  python3 scripts/atlas-build/patch_index.py doubt       # A15-002: an approximate position is not a doubted identification
+  python3 scripts/atlas-build/patch_index.py zbiva       # SS-1, PA-011: Zbiva's location and dating confidence read
+  python3 scripts/atlas-build/patch_index.py dissiloc    # SS-1: DISSILOC localisation precision and editorial status read
 """
 from __future__ import annotations
 
@@ -168,7 +171,7 @@ def meaning():
         have = current_rows(spec['src'])
         n = sum(1 for r in have if r[5] == 1)
         for r in have:
-            r[5], r[9] = 0, max(r[9] or 0, 1)
+            r[5] = 0
         if n:
             world.replace_source_rows(spec['src'], have, BASE)
         out[spec['src']] = n
@@ -188,7 +191,7 @@ def halc():
         c = code.get(str(r[1]))
         if c in ap['values']:
             n += r[5] == 1
-            r[5], r[9] = 0, max(r[9] or 0, 1)
+            r[5] = 0
             if c in ap['note']:
                 r[13] = {**(r[13] or {}), 'pq': ap['note'][c]}
     world.replace_source_rows('halc', have, BASE)
@@ -248,8 +251,47 @@ def archaeology():
     return out
 
 
+def doubt():
+    """Register and spec rows (sites.index_row) marked "uncertain" only because their position is approximate: the
+    uncertain column now means the source doubts the identification, which these sources do not say (A15-002)."""
+    out = {}
+    for f in sorted(os.listdir(os.path.join(BASE, 'c'))):
+        for r in json.load(open(os.path.join(BASE, 'c', f), encoding='utf-8')):
+            e = r[13] if isinstance(r[13], dict) else {}
+            if e.get('nb') == 'label' and r[9] == 1 and r[5] == 0:
+                out.setdefault(r[0], 0)
+                out[r[0]] += 1
+    for src in sorted(out):
+        have = current_rows(src)
+        for r in have:
+            e = r[13] if isinstance(r[13], dict) else {}
+            if e.get('nb') == 'label' and r[9] == 1 and r[5] == 0:
+                r[9] = 0
+        world.replace_source_rows(src, have, BASE)
+    return out
+
+
+def zbiva():
+    """Zbiva re-read with its location (Loconf) and dating (Dateconf) confidence, as the loader now reads them."""
+    import generic
+    spec = json.load(open(os.path.join(ROOT, 'data', 'historical', 'specs', 'zbiva.json'), encoding='utf-8'))
+    recs, _ = generic.records(spec)
+    rows, skipped = rows_from(recs)
+    stats = world.replace_source_rows('zbiva', rows, BASE)
+    return {'rows': stats['rows'], 'approximate': sum(1 for r in rows if r[5] == 0), 'notIndexed': skipped}
+
+
+def dissiloc():
+    """DISSILOC re-read with its localisation precision and editorial status."""
+    import registers
+    recs, _ = registers.dissiloc()
+    rows, skipped = rows_from(recs)
+    stats = world.replace_source_rows('dissiloc', rows, BASE)
+    return {'rows': stats['rows'], 'approximate': sum(1 for r in rows if r[5] == 0), 'doubted': sum(1 for r in rows if r[9] == 1)}
+
+
 if __name__ == '__main__':
-    steps = {'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'dissiloc': dissiloc, 'doubt': doubt, 'zbiva': zbiva, 'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
         stamp(f'place index: {step}')

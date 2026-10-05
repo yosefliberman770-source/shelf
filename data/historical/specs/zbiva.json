@@ -52,16 +52,30 @@
     "1": "dated by radiometric method",
     "2": "dated by artefact typology",
     "3": "dated after peer-reviewed publication"
+   },
+   "Dateconf": {
+    "0": "dating confidence not recorded",
+    "1": "dating confidence low (old publication)",
+    "2": "dating confidence medium (typology, few finds)",
+    "3": "dating confidence high (full modern publication)"
    }
   },
   "typeExtra": [
-   "Datetype"
+   "Datetype",
+   "Dateconf"
   ],
   "approx": {
    "field": "Loconf",
    "values": [
-    "1"
-   ]
+    "0",
+    "1",
+    "2"
+   ],
+   "note": {
+    "0": "the source records no location confidence (Zbiva Loconf 0)",
+    "1": "placed at the nearest settlement, not at the site itself (Zbiva location confidence 1 of 3)",
+    "2": "placed in part of a settlement or from a description (Zbiva location confidence 2 of 3)"
+   }
   }
  },
  "dating": {

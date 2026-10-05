@@ -496,9 +496,11 @@ export function notAPlace(p: Pick<GazPlace, 'types' | 'sourceType'>): string | u
 }
 const list = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} or ${xs[xs.length - 1]}`);
 
-export function placeConfidence(a: { identity: MatchStatus; basis?: MatchBasis; liveRivals: number; support: TemporalSupport; fitsBook: boolean }): PlaceConfidence {
+export function placeConfidence(a: { identity: MatchStatus; basis?: MatchBasis; liveRivals: number; support: TemporalSupport; fitsBook: boolean; sourceDoubt?: boolean }): PlaceConfidence {
   if (a.identity === 'none' || a.support === 'incompatible') return 'unresolved';
   if (a.identity === 'ambiguous') return 'ambiguous';
+  // The source's own doubt ("possible", an uncertain identification) caps the scale: never certain (A15-003).
+  if (a.sourceDoubt) { const c = placeConfidence({ ...a, sourceDoubt: false }); return c === 'certain' ? 'probable' : c; }
   // Identity settled without leaning on dates: no rival attested at the date, and not chosen *because* rivals lack dates.
   const settled = a.liveRivals === 0 && (a.basis === 'only' || a.basis === 'context');
   switch (a.support) {
@@ -747,8 +749,10 @@ export async function matchName(written: string, year?: HistYear, opts: MatchOpt
   // Other places of the name that are not ruled out at the date (namesakes first recorded later don't count as rivals).
   const liveRivals = groups.filter((g) => g !== chosen && g.some((x) => fitOf(x) !== 'unattested')).length;
   const fitsBook = !!opts.context?.points.length && contextDistance(opts.context, [main.place.lon, main.place.lat]) < 1500;
-  const confidence = placeConfidence({ identity: 'unique', basis, liveRivals, support: temporal, fitsBook });
-  const caveat = confidence === 'probable' && basis === 'attested-at-date' ? ' The others may still have existed then, so this is probable, not certain.' : '';
+  const sourceDoubt = main.place.uncertain >= 1 || !!main.place.typeDoubt;
+  const confidence = placeConfidence({ identity: 'unique', basis, liveRivals, support: temporal, fitsBook, sourceDoubt });
+  const caveat = (confidence === 'probable' && basis === 'attested-at-date' ? ' The others may still have existed then, so this is probable, not certain.' : '')
+    + (sourceDoubt ? ` ${gazetteerInfo(main.place.gazetteer).name} itself marks this record as ${main.place.typeDoubt ?? 'uncertain'}, so it is not certain.` : '');
   return {
     status: 'unique', confidence, temporal, basis, place: main.place, candidates: groups.map((g) => lead(g).place).slice(0, 12), corroborating: others, matchedName: nm, fit,
     reason: `${why || `The only place in ${where} recorded with the name “${written}”.`}${others.length ? ` ${srcList(others.map((o) => o.gazetteer))} records it at the same spot.` : ''}${when}${disagree}${caveat}`,

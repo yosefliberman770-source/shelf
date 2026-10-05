@@ -984,7 +984,15 @@ def dissiloc():
                     y = DISSILOC_YEARS.get(r['case'])
                     forms.append((form, y[0] if y else None, None, f"{r['label_language'] or 'form'} in the {r['case']} register"))
         x = {'src': 'dissiloc', 'id': gid, 'name': (head['label'] or '').split(';')[0].strip(), 'kind': kind, 'lon': float(head['longitude']), 'lat': float(head['latitude']),
-             'precise': head['coord_source_type'] == 'original', 'ty': f"{head['location_type']} · named in {', '.join(cases)} inquisition register{'s' if len(cases) > 1 else ''}",
+             # the edition's own localisation precision and editorial status are read (SS-1): an "approximate" or
+             # borrowed position is not precise; an "ambiguous" localisation or a "discouraged" identification is doubted
+             'precise': head['coord_source_type'] == 'original' and head['localisation_precision'] == 'precise',
+             'doubt': head['localisation_precision'] == 'ambiguous' or head['status'] == 'discouraged',
+             **({'pq': f"localisation {head['localisation_precision'] or 'not recorded'} in DISSILOC"
+                 + (f"; position of {head['coord_source_label']}" if head['coord_source_type'] != 'original' and head['coord_source_label'] else '')}
+                if head['localisation_precision'] != 'precise' or head['coord_source_type'] != 'original' else {}),
+             'ty': f"{head['location_type']} · named in {', '.join(cases)} inquisition register{'s' if len(cases) > 1 else ''}"
+                   + (' · identification ambiguous' if head['localisation_precision'] == 'ambiguous' else '') + (' · identification discouraged by the editors' if head['status'] == 'discouraged' else ''),
              'ctx': [], 'names': forms[:6]}
         if yrs:
             lo, hi = min(a for a, _ in yrs), max(b for _, b in yrs)
