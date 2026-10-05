@@ -74,33 +74,66 @@ function spansIn(text: string): DateMention[] {
   return out;
 }
 
-/**
- * Years written in a passage: "in 218 BC", "216 B.C.", "AD 43", "the 3rd century
- * BC" and plain four-digit years like "in 1453". Bare numbers under 1000 are
- * ignored (they're usually counts, not years).
- */
-/** Words that may follow a year in running text ("the battle of 1066 was…"); any other lower-case word after "of N" makes N a count. */
+/** Words that may follow a year in running text ("the battle of 1066 was…"); any other lower-case word after a number makes it a count. */
 const AFTER_YEAR = new Set(('the a an and or but nor so yet when while as at in on by to for from with without into onto upon after before until since during about against among between ' +
-  'he she it they we i you his her its their our was were is are had has have would could should might must did does do been being which that who whom whose where').split(' '));
+  'he she it they we i you his her its their our was were is are had has have would could should might must did does do been being which that who whom whose where ' +
+  'there this these those then also both only even still however').split(' '));
 
-/** "an army of 1200 men", "a fleet of 1500 ships": after "of", a number followed by a noun is a count, not a year (PA-007). */
-function isCountAfterOf(text: string, m: RegExpMatchArray): boolean {
-  if (!/^of\s/i.test(m[0])) return false;
-  const next = text.slice((m.index ?? 0) + m[0].length).match(/^\s+([a-z]+)/);
+/** "an army of 1200 men", "by 300 ships": a number followed by a lower-case noun is a count, not a year (PA-007, TM-4). */
+function isCount(text: string, end: number): boolean {
+  const next = text.slice(end).match(/^\s+([a-z]+)/);
   return !!next && !AFTER_YEAR.has(next[1]);
 }
 
+/** An era word right after a number: the number is read with its era ("in 1000 BC"), never as a CE year. */
+const ERA_AFTER = /^\s?(?:B\.?\s?C\.?|BCE\b|A\.?\s?D\.?|C\.?\s?E\.?(?![a-z])|v\.\s?Chr|a\.\s?C\.)/i;
+const MONTH = '(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\\.?';
+const DATE_RE = new RegExp('\\b(?:' + [
+  String.raw`(?:(c\.|ca\.|circa)\s*)?(?:(\d{1,2})(?:st|nd|rd|th)\s+century\s+(B\.?\s?C\.?(?:E\.?)?|A\.?D\.?|C\.?E\.?))`,
+  String.raw`(\d{1,4})\s?(B\.?\s?C\.?(?:E\.?)?|A\.?\s?D\.?|C\.?\s?E\.?)(?![a-z])`,
+  String.raw`(A\.?\s?D\.?)\s?(\d{1,4})`,
+  String.raw`(in|by|of|from|until|till|since|after|before|around|about|circa|c\.)\s+(?:the\s+year\s+)?(\d{3,4})(?![\d,.]\d)`,
+  String.raw`(?:(\d{1,2})(?:st|nd|rd|th)?\s+)?${MONTH}\s+(?:(\d{1,2})(?:st|nd|rd|th)?,?\s+)?(\d{3,4})(?!\d)`,
+  String.raw`the\s+year\s+(\d{3,4})`,
+  String.raw`(?:the\s+)?(\d{3}0'?s)(?![a-z])`,
+].join('|') + ')', 'gi');
+
+/**
+ * Years written in a passage: "in 218 BC", "216 B.C.", "AD 43", "the 3rd century BC", "in 1453", "in 793", "May 1453",
+ * "14 October 1066", "the year 410", "the 1200s". A number before an era word is read with its era — "in 1000 BC" is
+ * 1000 BCE, never 1000 CE (A12-002). Three-digit years count after a dating word ("in", "by", "around"…), not after
+ * "of" or "from", where they are usually counts (A12-012, A8-030); a number followed by a noun is a count (TM-4).
+ */
 export function findDatesInText(text: string): DateMention[] {
   const out: DateMention[] = spansIn(text);
   const inSpan = (i: number) => out.some((sp) => sp.from !== undefined && i >= sp.index && i < sp.index + sp.text.length);
-  const re = /\b(?:(c\.|ca\.|circa)\s*)?(?:(\d{1,2})(?:st|nd|rd|th)\s+century\s+(B\.?\s?C\.?(?:E\.?)?|A\.?D\.?|C\.?E\.?)|(\d{1,4})\s?(B\.?\s?C\.?(?:E\.?)?|A\.?\s?D\.?|C\.?\s?E\.?)(?![a-z])|(A\.?\s?D\.?)\s?(\d{1,4})|(?:in|by|of|from|until|till|since|after|before|around)\s+(1\d{3}|20[0-2]\d|[5-9]\d{2}))\b/gi;
-  for (const m of text.matchAll(re)) {
+  const re = new RegExp(DATE_RE.source, 'gi');
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const at = m.index;
+    const end = at + m[0].length;
     let parsed: HistoricalDate | undefined;
     if (m[2]) parsed = parseHistoricalDate(`${m[2]}th century ${m[3]}`);
     else if (m[4]) parsed = parseHistoricalDate(`${m[4]} ${m[5]}`);
     else if (m[7]) parsed = parseHistoricalDate(`AD ${m[7]}`);
-    else if (m[8]) parsed = Number(m[8]) >= 1000 && !isCountAfterOf(text, m) ? { year: Number(m[8]) } : undefined;
-    if (parsed && !inSpan(m.index ?? 0) && !inSpan((m.index ?? 0) + m[0].length - 1)) out.push({ ...parsed, approximate: parsed.approximate || !!m[1] || undefined, index: m.index ?? 0, text: m[0] });
+    else if (m[9]) {
+      // "in 1000 BC": the number belongs to its era — scan again from the number itself.
+      if (ERA_AFTER.test(text.slice(end))) { re.lastIndex = at + m[8].length; continue; }
+      const y = Number(m[9]);
+      const ok = (y >= 1000 && y <= 2029) || (y >= 100 && y < 1000 && !/^(?:of|from)$/i.test(m[8]));
+      parsed = ok && !isCount(text, end) ? { year: y } : undefined;
+    } else if (m[12]) {
+      const y = Number(m[12]);
+      parsed = y >= 100 && y <= 2029 && !ERA_AFTER.test(text.slice(end)) ? { year: y } : undefined;
+    } else if (m[13]) {
+      const y = Number(m[13]);
+      parsed = y >= 100 && y <= 2029 && !isCount(text, end) ? { year: y } : undefined;
+    } else if (m[14]) {
+      const d = parseDate(m[14]);
+      if (d?.earliest !== undefined && d.latest !== undefined && !inSpan(at)) out.push({ year: Math.trunc((d.earliest + d.latest) / 2), approximate: true, index: at, text: m[0], from: d.earliest, to: d.latest });
+      continue;
+    }
+    if (parsed && !inSpan(at) && !inSpan(end - 1)) out.push({ ...parsed, approximate: parsed.approximate || !!m[1] || undefined, index: at, text: m[0] });
   }
   return out.sort((a, b) => a.index - b.index);
 }

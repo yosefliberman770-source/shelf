@@ -151,7 +151,9 @@ describe('nothing private reaches the public site', () => {
     ...Object.entries(SPEC_DATASETS).filter(([, d]) => !d.public).map(([k]) => k)];
   it('the public place index holds no record of a private dataset', () => {
     const dir = join(ROOT, 'public/world/places/c');
-    const srcs = new Set(readdirSync(dir).flatMap((f) => (JSON.parse(readFileSync(join(dir, f), 'utf8')) as unknown[][]).map((r) => r[0] as string)));
+    // Each row opens with its dataset id: read just that, not the whole row (this scans every file). The pattern also
+    // catches some name entries, so it can only find more ids than there are, never fewer — safe for this check.
+    const srcs = new Set(readdirSync(dir).flatMap((f) => [...readFileSync(join(dir, f), 'utf8').matchAll(/(?:^\[|\],)\["([^"]+)",/g)].map((m) => m[1])));
     for (const s of PRIVATE_SOURCES) expect(srcs.has(s)).toBe(false);
   });
   it('no private tiles are in public/, and the pack folder is git-ignored', () => {

@@ -171,9 +171,10 @@ def parse_dating(text) -> tuple[int | None, int | None, str] | None:
             end += 10 ** len(b_)
         if a_ < end <= 2100:
             years.append(end)
-    # a decade ("1850s", "the 1850's"): its ten years
+    # a decade ("1850s", "the 1850's"): its ten years; a round hundred ("the 1200s") is that hundred years (A8-046)
     for m in re.finditer(r'(?<![\d.,])(\d{3})0\'?s\b', t):
-        years += [int(m.group(1) + '0'), int(m.group(1) + '9')]
+        start = int(m.group(1) + '0')
+        years += [start, start + 99] if start % 100 == 0 else [start, start + 9]
     if bce:
         years = [-y for y in years]
     if cents and not years:
