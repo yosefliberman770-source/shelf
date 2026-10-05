@@ -28,6 +28,8 @@ import zlib
 from collections import Counter, defaultdict
 from datetime import date
 
+import inputs
+import names
 import quality
 import tiler
 
@@ -42,20 +44,9 @@ def log(*a):
     print(*a, flush=True)
 
 
-def norm(s: str) -> str:
-    """Must match normName() in src/atlas/gazetteer.ts."""
-    s = ''.join(c for c in unicodedata.normalize('NFD', s) if not unicodedata.category(c).startswith('M')).lower()
-    s = re.sub(r'^the\s+', '', s)
-    s = s.replace('’', "'")
-    return re.sub(r'\s+', ' ', s).strip()
-
-
-def shard(n: str) -> str:
-    """Must match nameShard() in src/world/places.ts."""
-    out = ''
-    for ch in list(n)[:2]:
-        out += ch if re.match(r'[a-z0-9]', ch) else 'x%x' % (ord(ch) % 16)
-    return out or '_'
+# Name keys: shared with the app, see names.py.
+norm = names.norm
+shard = names.shard
 
 
 def cell_of(lon, lat):
@@ -156,91 +147,161 @@ def write_json(path, obj):
         json.dump(obj, fh, ensure_ascii=False, separators=(',', ':'))
 
 
-def places_index(rows, base=None):
+def _row_order(r):
+    """A canonical order for index rows: the same records give the same index, whatever order the readers produced them
+    in. Within one source id, the record kept under the bare id is chosen by content (position, title, dates), not by
+    which file or page happened to come first."""
+    def dump(x):
+        return json.dumps(x, ensure_ascii=False, sort_keys=True, default=str)
+    return (str(r[0]) if len(r) > 0 else '', str(r[1]) if len(r) > 1 else '', dump(list(r[3:])), dump(list(r[2:3])))
+
+
+PLACEHOLDER_TITLES = {'unknown', 'n/a', 'na', 'none', 'null', 'untitled', 'unnamed', 'no name', '?', '-'}
+
+
+def plausibility(src, title, lon, lat, start, end, registry):
+    """Reasons a record looks wrong though every value is possible: kept, but flagged (in the build report and on the
+    record as extra.qa) so a swapped pair or a lost minus sign is visible instead of standing as a fact."""
+    out = []
+    if title.strip().lower() in PLACEHOLDER_TITLES:
+        out.append('placeholder title')
+    reg = registry.get(src)
+    if reg:
+        box, core = reg['box'], reg['core']
+        if quality.swapped(lon, lat, box):
+            out.append('latitude and longitude look swapped (outside the dataset’s region, inside it when exchanged)')
+        elif not quality.in_box(lon, lat, box, margin=5):
+            out.append('outside the region the dataset covers')
+        for y in (start, end):
+            if isinstance(y, (int, float)) and y and core[0] > 0 and y < 0 and core[0] <= -y <= core[1]:
+                out.append(f'year {y} is BCE in a dataset of CE dates (a minus sign added?)')
+                break
+            if isinstance(y, (int, float)) and y and core[1] < 0 and y > 0 and core[0] <= -y <= core[1]:
+                out.append(f'year {y} is CE in a dataset of BCE dates (a minus sign lost?)')
+                break
+    return out
+
+
+def places_index(rows, base=None, registry=None):
     """Write the tiled gazetteer index. Rows with an impossible position or dates, and second rows with an id already
     used in their dataset (which the id index could not reach), are left out and returned under 'rejected' with the
-    reason — for every dataset, not case by case."""
+    reason — for every dataset, not case by case. A malformed row is set aside with its reason; it never stops the
+    build. Plausible-but-suspicious rows are kept and listed under 'flagged'.
+
+    The index is written next to the old one and swapped in only when complete, so an interrupted build leaves the
+    previous index intact."""
+    if registry is None:
+        try:
+            registry = quality.dataset_registry(os.path.join(HERE, '..', '..'))
+        except OSError:
+            registry = {}
+    rows = sorted(rows, key=_row_order)
     cells = defaultdict(list)
     names = defaultdict(list)
     ids = defaultdict(dict)
-    rejected, seen_ids, kept, renamed, approx = [], Counter(), 0, 0, 0
+    rejected, flagged, seen_ids, kept, renamed, approx = [], [], Counter(), 0, 0, 0
     # Several records of one dataset at the very same position are placed by a locality or grid point, not each on its own.
-    shared = Counter((r[0], r[3], r[4]) for r in rows)
+    shared = Counter((r[0], r[3], r[4]) for r in rows if len(r) > 4)
     for r in rows:
-        src, pid, title, lon, lat = r[:5]
-        why = quality.position_problem(lon, lat)
-        if why:
-            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': why})
-            continue
-        n_same = seen_ids[(src, str(pid))]
-        seen_ids[(src, str(pid))] += 1
-        if n_same:
-            # One source id, several records (an institution with several seats, several finds at one locality): all are
-            # kept; later ones get a unique key, and the source id stays on the record for its link and provenance.
-            r = list(r)
-            r[13] = {**(r[13] or {}), 'sid': pid}
-            r[1] = pid = f'{pid}~{n_same + 1}'
-            renamed += 1
-        # A position given to under 2 decimals (±1 km or worse) or shared by 3+ records of the dataset is approximate.
-        if r[5] == 1:
-            coarse = min(quality.decimals(lon), quality.decimals(lat)) < 2
-            n_pos = shared[(src, lon, lat)]
-            if coarse or n_pos >= 3:
+        try:
+            src, pid, title, lon, lat = r[:5]
+            if not isinstance(title, str) or not title.strip():
+                rejected.append({'src': src, 'id': pid, 'title': title, 'reason': 'missing title'})
+                continue
+            why = quality.position_problem(lon, lat)
+            if why:
+                rejected.append({'src': src, 'id': pid, 'title': title, 'reason': why})
+                continue
+            n_same = seen_ids[(src, str(pid))]
+            seen_ids[(src, str(pid))] += 1
+            if n_same:
+                # One source id, several records (an institution with several seats, several finds at one locality): all are
+                # kept; later ones get a unique key, and the source id stays on the record for its link and provenance.
                 r = list(r)
-                r[5] = 0
-                r[13] = {**(r[13] or {}), 'pq': (f'position given only to {min(quality.decimals(lon), quality.decimals(lat))} decimal places' if coarse
-                                                 else f'{n_pos} records of this dataset share this exact position (a locality or grid point)')}
-                approx += 1
-        # Impossible dates: the place stays (its position is fine), the dates are removed and the removal stated —
-        # a missing date stays missing rather than becoming a guessed one.
-        if r[7] == 0 or r[8] == 0:
-            # A year 0 is an empty field (there is no year 0): that date goes, the other one stays.
-            r = list(r)
-            r[13] = {**(r[13] or {}), 'fix': f"a year 0 in the source is read as no date ({r[7]}–{r[8]} in the source)"}
-            r[7], r[8] = (None if r[7] == 0 else r[7]), (None if r[8] == 0 else r[8])
-            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': 'year 0 (an empty date field)', 'kept': 'without that date'})
-        dp = quality.date_problem(r[7], r[8])
-        env = (r[13] or {}).get('env')
-        ep = env and quality.date_problem(env[0], env[1])
-        if dp or ep:
-            r = list(r)
-            extra = dict(r[13] or {})
-            if dp:
-                extra['fix'] = f"dates removed: {dp} ({r[7]}–{r[8]} in the source)"
-                r[7] = r[8] = None
-            if ep:
-                extra.pop('env', None)
-                extra['fix'] = (extra.get('fix', '') + '; ' if extra.get('fix') else '') + f"evidence period removed: {ep} ({env[0]}–{env[1]} in the source)"
-            r[13] = extra
-            rejected.append({'src': src, 'id': pid, 'title': title, 'reason': dp or ep, 'kept': 'without dates'})
+                r[13] = {**(r[13] or {}), 'sid': pid}
+                r[1] = pid = f'{pid}~{n_same + 1}'
+                renamed += 1
+            # A position given to under 2 decimals (±1 km or worse) or shared by 3+ records of the dataset is approximate.
+            if r[5] == 1:
+                coarse = min(quality.decimals(lon), quality.decimals(lat)) < 2
+                n_pos = shared[(src, lon, lat)]
+                if coarse or n_pos >= 3:
+                    r = list(r)
+                    r[5] = 0
+                    r[13] = {**(r[13] or {}), 'pq': (f'position given only to {min(quality.decimals(lon), quality.decimals(lat))} decimal places' if coarse
+                                                     else f'{n_pos} records of this dataset share this exact position (a locality or grid point)')}
+                    approx += 1
+            # Impossible dates: the place stays (its position is fine), the dates are removed and the removal stated —
+            # a missing date stays missing rather than becoming a guessed one.
+            if r[7] == 0 or r[8] == 0:
+                # A year 0 is an empty field (there is no year 0): that date goes, the other one stays.
+                r = list(r)
+                r[13] = {**(r[13] or {}), 'fix': f"a year 0 in the source is read as no date ({r[7]}–{r[8]} in the source)"}
+                r[7], r[8] = (None if r[7] == 0 else r[7]), (None if r[8] == 0 else r[8])
+                rejected.append({'src': src, 'id': pid, 'title': title, 'reason': 'year 0 (an empty date field)', 'kept': 'without that date'})
+            dp = quality.date_problem(r[7], r[8])
+            env = (r[13] or {}).get('env')
+            ep = env and quality.date_problem(env[0], env[1])
+            if dp or ep:
+                r = list(r)
+                extra = dict(r[13] or {})
+                if dp:
+                    extra['fix'] = f"dates removed: {dp} ({r[7]}–{r[8]} in the source)"
+                    r[7] = r[8] = None
+                if ep:
+                    extra.pop('env', None)
+                    extra['fix'] = (extra.get('fix', '') + '; ' if extra.get('fix') else '') + f"evidence period removed: {ep} ({env[0]}–{env[1]} in the source)"
+                r[13] = extra
+                rejected.append({'src': src, 'id': pid, 'title': title, 'reason': dp or ep, 'kept': 'without dates'})
+            qa = plausibility(src, title, lon, lat, r[7], r[8], registry)
+            if qa:
+                r = list(r)
+                r[13] = {**(r[13] or {}), 'qa': '; '.join(qa)}
+                flagged.append({'src': src, 'id': pid, 'title': title, 'reason': '; '.join(qa)})
+            c = cell_of(lon, lat)
+            entries = []
+            seen = set()
+            # The title counts as the record's own main name unless the build supplied it from
+            # elsewhere (a Buringh town shown under Wikidata's English name: extra.tn = 0).
+            own_title = not (r[13] and r[13].get('tn') == 0)
+            for i, n in enumerate([title] + [x[0] for x in r[10]]):
+                nn = norm(n)
+                if len(nn) < 2 or nn in seen:
+                    continue
+                seen.add(nn)
+                entries.append((shard(nn), [nn, src, pid, c, 1 if i == 0 and own_title else 0]))
+        except Exception as e:  # noqa: BLE001 — one malformed row is set aside with its reason, never the whole build
+            rejected.append({'src': str(r[0]) if r else None, 'id': str(r[1]) if len(r) > 1 else None, 'title': None,
+                             'reason': f'malformed record ({type(e).__name__}: {e})'})
+            continue
         kept += 1
-        c = cell_of(lon, lat)
         cells[c].append(r)
         k = (zlib.crc32(str(pid).encode()) % 16)
         ids[f'{src}-{k}'][str(pid)] = c
-        seen = set()
-        # The title counts as the record's own main name unless the build supplied it from
-        # elsewhere (a Buringh town shown under Wikidata's English name: extra.tn = 0).
-        own_title = not (r[13] and r[13].get('tn') == 0)
-        for i, n in enumerate([title] + [x[0] for x in r[10]]):
-            nn = norm(n)
-            if len(nn) < 2 or nn in seen:
-                continue
-            seen.add(nn)
-            names[shard(nn)].append([nn, src, pid, c, 1 if i == 0 and own_title else 0])
+        for s, e in entries:
+            names[s].append(e)
     base = base or os.path.join(OUT, 'places')
-    if os.path.exists(base):
-        shutil.rmtree(base)
+    tmp, old = base + '.new', base + '.old'
+    for d in (tmp, old):
+        if os.path.exists(d):
+            shutil.rmtree(d)
     for c, rs in cells.items():
-        write_json(os.path.join(base, 'c', f'{c}.json'), rs)
+        write_json(os.path.join(tmp, 'c', f'{c}.json'), rs)
     for s, es in names.items():
-        write_json(os.path.join(base, 'n', f'{s}.json'), sorted(es, key=lambda e: (e[0], e[1], str(e[2]), e[3], e[4])))
+        write_json(os.path.join(tmp, 'n', f'{s}.json'), sorted(es, key=lambda e: (e[0], e[1], str(e[2]), e[3], e[4])))
     for k, m in ids.items():
-        write_json(os.path.join(base, 'i', f'{k}.json'), m)
+        write_json(os.path.join(tmp, 'i', f'{k}.json'), dict(sorted(m.items())))
+    if os.path.exists(base):
+        os.replace(base, old)
+    os.replace(tmp, base)
+    if os.path.exists(old):
+        shutil.rmtree(old)
     if rejected:
         log(f'  place index: {len(rejected)} rows with problems ({", ".join(sorted({r["reason"] for r in rejected}))})')
-    return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected, 'duplicateIdsKeptUnderNewKeys': renamed,
-            'positionsMarkedApproximate': approx}
+    if flagged:
+        log(f'  place index: {len(flagged)} rows kept but flagged as implausible')
+    return {'cells': len(cells), 'nameShards': len(names), 'rows': kept, 'rejected': rejected, 'flagged': flagged,
+            'duplicateIdsKeptUnderNewKeys': renamed, 'positionsMarkedApproximate': approx}
 
 
 # ── Vector tiles ──
@@ -431,6 +492,10 @@ def tiles_thurayya():
     return {'placeTiles': p, 'routeTiles': r}
 
 
+WORLD_INPUTS = ['pleiades-gazetteer.json', 'pleiades_gis.zip', 'pleiades-places.json', 'viabundus_nodes.csv', 'viabundus_alternativenames.csv',
+                'viabundus_Viabundus-2-edges.geojson', 'thurayya_places.geojson', 'itinere.ndjson']
+
+
 def build_world(only=None):
     log('World: place index')
     import sites  # Europe-wide medieval sites and towns (Wikidata, Germania Sacra, Buringh, HCED)
@@ -458,6 +523,9 @@ def build_world(only=None):
         import england
         stats['england'] = england.build()
     stats['built'] = date.today().isoformat()
+    # The cached source files this index and these tiles were built from, with checksums and download dates.
+    stats['inputs'] = {f: inputs.fetched(f, None, os.path.join(CACHE, f)) for f in WORLD_INPUTS if os.path.exists(os.path.join(CACHE, f))}
+    stats['missingInputs'] = [f for f in WORLD_INPUTS if not os.path.exists(os.path.join(CACHE, f))]
     stats['sources'] = {
         'pleiades': 'Pleiades daily GIS export (CC BY 3.0)',
         'viabundus': 'Viabundus 2, Zenodo 10.5281/zenodo.16611998 (CC BY 4.0)',

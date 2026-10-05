@@ -1,0 +1,9 @@
+# Python packages for the data build (scripts/atlas-build), pinned to the versions the
+# published data was built with. Python 3.11.
+#   python3 -m pip install -r scripts/atlas-build/requirements.txt
+shapely==2.1.2
+pyshp==3.1.6
+pyproj==3.7.2
+pmtiles==3.8.1
+mapbox-vector-tile==2.2.0
+numpy==2.4.6

@@ -26,6 +26,7 @@ written about a place (Wikipedia sitelinks are not used).
 """
 from __future__ import annotations
 
+import inputs
 import csv
 import json
 import math
@@ -62,7 +63,7 @@ EVIDENCE = os.path.join(RAW, 'wikidata-medieval', 'original', 'temporal-evidence
 
 def load_evidence():
     """Extra dated statements Wikidata holds for the snapshot's undated items (empty when not fetched)."""
-    if not os.path.exists(EVIDENCE):
+    if not inputs.present(EVIDENCE):
         return {}, {}
     d = json.load(open(EVIDENCE, encoding='utf-8'))
     by = defaultdict(list)
@@ -629,7 +630,7 @@ def private_lines():
     out = []
     for fn, kind, props, mz, tol in layers:
         path = os.path.join(base, fn + '.geojson')
-        if not os.path.exists(path):
+        if not inputs.present(path):
             continue
         for f in json.load(open(path, encoding='utf-8'))['features']:
             if not f.get('geometry'):

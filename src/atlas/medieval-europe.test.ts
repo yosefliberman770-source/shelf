@@ -91,7 +91,7 @@ describe('towns: English names, estimates, and source errors', () => {
   it('a town whose source position is wrong and cannot be confirmed is left off, not guessed (Minsk)', () => {
     expect(rows.some((x) => x[0] === 'buringh' && String(x[1]).startsWith('Minsk|'))).toBe(false);
   });
-  it('population is interpolated between Buringh’s sample years', () => {
+  it('[rule] population is interpolated between Buringh’s sample years', () => {
     expect(evalExpr(urbanPopulation(1250), { p1200: 44, p1300: 75 })).toBeCloseTo(59.5);
     expect(evalExpr(urbanPopulation(1300), { p1200: 44, p1300: 75 })).toBeCloseTo(75);
     expect(evalExpr(urbanPopulation(1550), { p1500: 94, p1550: 168 })).toBeCloseTo(168);
@@ -124,7 +124,7 @@ describe('site layers follow the recorded dates', () => {
 });
 
 describe('battles from two datasets are not doubled', () => {
-  it('no HCED battle repeats a Wikidata battle within 50 km and a year', () => {
+  it('[rule] no HCED battle repeats a Wikidata battle within 50 km and a year', () => {
     type F = { geometry: { coordinates: [number, number] }; properties: { y: number; k: string } };
     const wd = (JSON.parse(readFileSync(join(PUB, 'atlas/wikidata-events.json'), 'utf8')).features as F[]).filter((f) => f.properties.k === 'battle' || f.properties.k === 'siege');
     const hc = JSON.parse(readFileSync(join(PUB, 'atlas/hced-battles.json'), 'utf8')).features as F[];

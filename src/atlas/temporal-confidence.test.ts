@@ -89,7 +89,7 @@ describe('one scale for identity × dates', () => {
     expect([m.temporal, m.confidence]).toEqual(['approximate', 'probable']);
     expect((await offline('Dunmere', 1100)).status).toBe('MEDIUM');
   });
-  it('5. period-level dates (an attestation period) cover the year: certain; after it: probable (places persist)', async () => {
+  it('[rule] 5. period-level dates (an attestation period) cover the year: certain; after it: probable (places persist)', async () => {
     expect((await matchName('Eskdale', 100)).confidence).toBe('certain');
     const later = await matchName('Eskdale', 1100);
     expect([later.temporal, later.confidence]).toEqual(['persisting', 'probable']);
@@ -210,13 +210,13 @@ describe('the index: every key resolves, several records of one source id stay d
 });
 
 describe('sources: specialist, aggregator and incidental records of one place', () => {
-  it('the specialist record leads; Wikidata and an out-of-region record corroborate, and are not dropped', async () => {
+  it('[rule] the specialist record leads; Wikidata and an out-of-region record corroborate, and are not dropped', async () => {
     const m = await matchName('Hansestadt', 1400);
     expect(m.place?.gazetteer).toBe('viabundus');
     expect(m.corroborating.map((c) => c.gazetteer).sort()).toEqual(['nsh', 'wikidata']);
     expect(m.confidence).toBe('certain');
   });
-  it('Wikidata’s earlier first mention still counts as evidence for the place (weighed together, not overridden)', async () => {
+  it('[rule] Wikidata’s earlier first mention still counts as evidence for the place (weighed together, not overridden)', async () => {
     const m = await matchName('Hansestadt', 1150);
     expect(m.place?.gazetteer).toBe('viabundus'); // the specialist still leads…
     expect(m.temporal).toBe('attested'); // …but the place is recorded in 1150, by Wikidata's first mention
@@ -246,7 +246,7 @@ describe('undated and later-recorded sites on the map: kept, but never clutterin
     expect(drawn('religious-houses', church, 68, true, 10)).toBe(false);
     expect(spec('religious-houses', 1200, false, 'undated')).toBeUndefined();
   });
-  it('a church first recorded in 1200 appears 60 years before its first record, not earlier', () => {
+  it('[rule] a church first recorded in 1200 appears 60 years before its first record, not earlier', () => {
     const later = { ...church, f: 1200, fb: 'first mention' };
     expect(drawn('religious-houses', later, 1100, true)).toBe(false);
     expect(drawn('religious-houses', later, 1100, true, 12)).toBe(false);
@@ -254,7 +254,7 @@ describe('undated and later-recorded sites on the map: kept, but never clutterin
     expect(drawn('religious-houses', later, 1140, false)).toBe(false);
     expect(drawn('religious-houses', later, 1300, false)).toBe(true);
   });
-  it('a period from its architectural style: drawn inside it; 60 years before it on request; not earlier', () => {
+  it('[rule] a period from its architectural style: drawn inside it; 60 years before it on request; not earlier', () => {
     const gothic = { ...church, ef: 1140, per: 'period of its architectural style (Wikidata)' };
     expect(drawn('religious-houses', gothic, 1300, false)).toBe(true);
     expect(drawn('religious-houses', gothic, 1100, true)).toBe(true);

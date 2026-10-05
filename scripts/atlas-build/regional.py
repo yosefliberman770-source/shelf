@@ -20,6 +20,7 @@ Everything is returned to sites.py, which writes the tiles and place-index rows.
 """
 from __future__ import annotations
 
+import inputs
 import csv
 import glob
 import html as htmlmod
@@ -60,7 +61,7 @@ RANGE_YEARS = {0: 0, 1: 5, 2: 25, 3: 50, 4: 100}
 
 def princes_townspeople():
     """Towns of the Deutsches Städtebuch with their dated history. Returns a list of dicts."""
-    if not os.path.exists(os.path.join(PT, 'city_locations.tab')):
+    if not inputs.present(os.path.join(PT, 'city_locations.tab')):
         return []
     towns = {}
     for r in _tab(os.path.join(PT, 'city_locations.tab')):
@@ -153,7 +154,7 @@ def century_span(text):
 
 
 def merimee():
-    if not os.path.exists(MERIMEE):
+    if not inputs.present(MERIMEE):
         return []
     r = csv.reader(open(MERIMEE, encoding='utf-8'), delimiter='|')
     h = next(r)
@@ -193,7 +194,7 @@ FIN_KIND = [(r'kirkko', 'church'), (r'puolustus', 'fortification'), (r'kylänpai
 
 
 def finland():
-    if not os.path.exists(FIN_ZIP):
+    if not inputs.present(FIN_ZIP):
         return []
     z = zipfile.ZipFile(FIN_ZIP)
     tmp = os.path.join(HERE, '.cache', 'fin_points.gpkg')
@@ -222,7 +223,7 @@ WB = os.path.join(RAW, 'western-bohemia-toponyms', 'original', 'DATASET_Western_
 
 
 def western_bohemia():
-    if not os.path.exists(WB):
+    if not inputs.present(WB):
         return []
     out = []
     for r in csv.DictReader(open(WB, encoding='utf-8-sig'), delimiter=';'):
@@ -243,7 +244,7 @@ BRIDGES = os.path.join(RAW, 'medieval-bridges', 'original', 'gis', 'Bridges1250.
 
 
 def bridges():
-    if not os.path.exists(BRIDGES):
+    if not inputs.present(BRIDGES):
         return []
     tr = Transformer.from_crs('EPSG:27700', 'EPSG:4326', always_xy=True)
     out = []
@@ -304,7 +305,7 @@ def markets_fairs():
     out = defaultdict(lambda: {'grants': []})
     for fn, country in (('MFEngland.txt', 'England'), ('MFWales.txt', 'Wales')):
         p = os.path.join(path, fn)
-        if not os.path.exists(p):
+        if not inputs.present(p):
             continue
         for r in csv.DictReader(open(p, encoding='latin-1')):
             try:
@@ -346,7 +347,7 @@ def _af_works(text):
 
 def atlas_fontium():
     path = os.path.join(RAW, 'atlas-fontium-poland', 'original', 'miejscowosci.geojson')
-    if not os.path.exists(path):
+    if not inputs.present(path):
         return []
     out = []
     for ft in json.load(open(path, encoding='utf-8'))['features']:
@@ -385,7 +386,7 @@ def _no_codes(name):
 def norway():
     """Viking-age and medieval monuments of Norway. The 2.8 GB GML is streamed from its zip once; the extract is
     cached beside it (keyed on the zip's size and date) so later builds are fast."""
-    if not os.path.exists(NO_ZIP):
+    if not inputs.present(NO_ZIP):
         return []
     stamp = f'{os.path.getsize(NO_ZIP)}-{int(os.path.getmtime(NO_ZIP))}'
     if os.path.exists(NO_CACHE):
@@ -508,7 +509,7 @@ def _dt_year(date):
 
 def dicotopo():
     base = os.path.join(RAW, 'dicotopo', 'original')
-    if not os.path.exists(os.path.join(base, 'insee-coords.tsv')):
+    if not inputs.present(os.path.join(base, 'insee-coords.tsv')):
         return []
     coords = {}
     for line in open(os.path.join(base, 'insee-coords.tsv'), encoding='utf-8').read().splitlines()[1:]:
@@ -562,7 +563,7 @@ SAGA_PERIOD = (870, 1100)  # the settlement and saga age the sagas narrate (they
 
 
 def nordic():
-    if not os.path.exists(NSH_ZIP):
+    if not inputs.present(NSH_ZIP):
         return []
     out, seen = [], set()
     with zipfile.ZipFile(NSH_ZIP) as z:
@@ -615,7 +616,7 @@ def darmc():
 
     def sheet(fn, idx):
         p = os.path.join(DARMC, fn)
-        if not os.path.exists(p):
+        if not inputs.present(p):
             return []
         ws = openpyxl.load_workbook(p, read_only=True, data_only=True).worksheets[idx]
         rows = ws.iter_rows(values_only=True)
@@ -663,7 +664,7 @@ DK_KIND = {'Borg/Voldsted': 'castle', 'Befæstning': 'fortification', 'Kirke': '
 
 
 def denmark():
-    if not os.path.exists(DK_ZIP):
+    if not inputs.present(DK_ZIP):
         return []
     stamp = f'{os.path.getsize(DK_ZIP)}-{int(os.path.getmtime(DK_ZIP))}'
     if os.path.exists(DK_CACHE) and json.load(open(DK_CACHE)).get('stamp') == stamp:
@@ -764,7 +765,7 @@ SE_KIND = [(re.compile(r'kyrk|kapell|begravningsplats'), 'church'), (re.compile(
 
 
 def sweden():
-    if not os.path.exists(SE_GPKG):
+    if not inputs.present(SE_GPKG):
         return []
     stamp = f'{os.path.getsize(SE_GPKG)}-{int(os.path.getmtime(SE_GPKG))}'
     if os.path.exists(SE_CACHE) and json.load(open(SE_CACHE)).get('stamp') == stamp:

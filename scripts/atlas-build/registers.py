@@ -10,6 +10,7 @@ Nothing is dated from a dataset's overall period. Records without dates stay und
 """
 from __future__ import annotations
 
+import inputs
 import csv
 import gzip
 import io
@@ -1247,7 +1248,7 @@ def wikidata_extra():
     out, skipped = [], Counter()
     for src_kind, kind in WD_EXTRA:
         path = os.path.join(d, f'{src_kind}.tsv')
-        if not os.path.exists(path):
+        if not inputs.present(path):
             continue
         prec = {}
         pp = os.path.join(d, f'{src_kind}.precision.tsv')
@@ -1409,7 +1410,7 @@ def amcr():
     out, skipped = [], Counter()
     for f, what in (('archeologicky_zaznam_lokalita', 'site'), ('archeologicky_zaznam_akce', 'fieldwork')):
         path = os.path.join(base, f + '.xml.gz')
-        if not os.path.exists(path):
+        if not inputs.present(path):
             continue
         for r in _gz_records(path):
             if '403 Forbidden' in r:

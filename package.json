@@ -11,6 +11,9 @@
     "build": "tsc -b && vite build",
     "start": "node --env-file-if-exists=.env server/index.ts",
     "test": "vitest run",
+    "test:answers": "vitest run -t \"^(?!.*\\[rule\\])\"",
+    "test:rules": "vitest run -t \"\\[rule\\]\"",
+    "test:build": "python3 -m unittest discover -s scripts/atlas-build -p 'test_*.py'",
     "typecheck": "tsc -b"
   },
   "engines": {
