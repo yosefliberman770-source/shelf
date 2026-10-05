@@ -31,5 +31,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'server/**/*.test.ts'],
+    // Several tests read the real map data or validate every layer in every era; they take
+    // 1–4 s here and longer on CI runners, too close to the 5 s default.
+    testTimeout: 30_000,
   },
 });
