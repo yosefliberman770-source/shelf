@@ -21,7 +21,7 @@ import { type HistDate, UNKNOWN_DATE } from './histdate';
 
 /** 2: mentions carry their textual evidence and are screened; earlier resolutions were made without it.
  *  3: geographic lands, dated polities and importance-ranked places. */
-export const BOOK_WORLD_VERSION = 3;
+export const BOOK_WORLD_VERSION = 4;
 
 /** What the reader page can give us for one section of the book (loaded off-screen, then released). */
 export interface SectionText { href: string; label?: string; text: string; cfiOf: (name: string) => string | undefined }
@@ -44,13 +44,14 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
     if (signal?.aborted) break;
     if (row.chapters.some((c) => c.index === i)) { onProgress?.(i + 1, count); continue; }
     const s = await load(i).catch(() => undefined);
-    if (s && s.text.trim().length > 40) {
+    // Every section with text is read, however short: a one-line section can be a dated heading (A8-043).
+    if (s && s.text.trim().length > 0) {
       // Screened before limiting, and with room for long chapters: places late in a chapter are not dropped first.
       const found = (await screenMentions(detectPlaces(s.text, names.known.map((k) => k.name), names.people))).slice(0, 300);
       const lower = s.text.toLowerCase();
       row.chapters.push({
         index: i, href: s.href, label: s.label,
-        dates: findDatesInText(s.text).map((d) => d.year).slice(0, 200),
+        dates: FRONT_BACK_MATTER.test(s.label ?? '') ? [] : narrativeDates(s.text).slice(0, 200),
         wars: warNames.filter((w) => lower.includes(w.n)).map((w) => w.q).slice(0, 20),
         events: eventNames.filter((e) => lower.includes(e.n)).map((e) => e.q).slice(0, 30),
         mentions: found.map((m) => ({ name: m.name, count: m.count, cfi: s.cfiOf(m.name), detection: (how.get(m.name.toLowerCase()) as 'known' | 'ai' | undefined) ?? 'cue', evidence: m.evidence })),
@@ -65,6 +66,20 @@ export async function buildBookWorld(bookId: string, count: number, load: (i: nu
   row.chapters.sort((a, b) => a.index - b.index);
   await db.bookWorld.put(row);
   return row;
+}
+
+/** Sections that are about the book, not its subject: their years are printings, editions and sources (A12-023). */
+export const FRONT_BACK_MATTER = /^\s*(?:copyright|contents|table of contents|index|bibliography|references|works cited|sources|notes|endnotes|acknowledg|about the (?:author|publisher)|also by|further reading|colophon|title page|imprint|praise for)/i;
+/** Lines that date the book itself ("© 2003", "First published 1998", "Reprinted 2005", "ISBN …"). */
+const ABOUT_THE_BOOK = /©|\(c\)\s*\d{4}|copyright|isbn|first published|published (?:in|by)|reprinted|reprint|printing|printed|edition|all rights reserved|library of congress|cataloging|press,|publishers?/i;
+/** The years a section writes about its subject: years on a line that dates the book itself are left out (A12-023). */
+export function narrativeDates(text: string): number[] {
+  return findDatesInText(text).filter((d) => {
+    const lineStart = text.lastIndexOf('\n', d.index) + 1;
+    const lineEnd = text.indexOf('\n', d.index);
+    const line = text.slice(Math.max(lineStart, d.index - 160), lineEnd < 0 ? d.index + 160 : Math.min(lineEnd, d.index + 160));
+    return !ABOUT_THE_BOOK.test(line);
+  }).map((d) => d.year);
 }
 
 /** The book's period, from the dates it writes: the middle 80% of them, never a single exact year. */

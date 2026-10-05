@@ -205,7 +205,8 @@ export function parseDating(text: string): Parsed | undefined {
     if (end <= a) end += 10 ** x[2].length;
     if (a < end && end <= 2100) years.push(end);
   }
-  for (const x of t.matchAll(/(?<![\d.,])(\d{3})0'?s\b/g)) years.push(Number(`${x[1]}0`), Number(`${x[1]}9`));
+  // A decade ("1850s"); a round hundred ("the 1200s") is that hundred years, not its first decade (A8-046).
+  for (const x of t.matchAll(/(?<![\d.,])(\d{3})0'?s\b/g)) { const a = Number(`${x[1]}0`); years.push(a, a % 100 === 0 ? a + 99 : a + 9); }
   if (bce) years = years.map((y) => -y);
   if (cents.length && !years.length) return [Math.min(...cents.map((c) => c[0])), Math.max(...cents.map((c) => c[1])), 'century'];
   if (!years.length) return undefined;
@@ -251,6 +252,7 @@ export function parseDate(text: string, source?: string): HistDate | undefined {
     return { earliest: a, latest: b, precision: 'century', qualifier: 'during', label: t, source };
   }
   if (b! - a! === 9 && a! % 10 === 0 && /\d0'?s\b/.test(t)) return decade(a!, source);
+  if (b! - a! === 99 && a! % 100 === 0 && /\d00'?s\b/.test(t)) return { earliest: a, latest: b, precision: 'century', qualifier: 'during', label: `${a}s`, source };
   return { earliest: a, latest: b, precision: 'range', qualifier: 'between', source };
 }
 
