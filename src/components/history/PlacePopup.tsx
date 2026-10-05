@@ -65,7 +65,7 @@ export function PlacePopup({ written, place, date, detection, colors, onMap, onC
           <div>Matched from: “{written}” → <b><bdi>{place.title}</bdi></b> in {info.name}.</div>
           {reason && <div>{reason}</div>}
           <div>{DETECTION_LABEL[detection]}.</div>
-          <div>{place.meaningUnknown ? 'Position as the source gives it; the source does not document its precision' : CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license})</div>
+          <div>{place.meaningUnknown ? 'Position as the source gives it; the source does not document its precision' : CERTAINTY_LABEL[cert]}. <a href={place.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>View the {info.name} record ↗</a> ({info.license}){place.wikidata ? <> · <a href={place.wikidata} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>matched Wikidata item ↗</a></> : null}</div>
           <div>Matched automatically; the dataset — not AI — supplies the location, names and dates.</div>
         </div>
       )}

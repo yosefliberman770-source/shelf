@@ -210,7 +210,7 @@ export function PlaceHistory({ place, year, bookId, mentions, onJump, onOpenPlac
           {place.when?.conflicts?.length ? <div className="tiny faint">Other records date it differently: {place.when.conflicts.slice(0, 3).map((d) => `${formatDate(d)}${d.source ? ` (${d.source})` : ''}`).join('; ')}</div> : null}</dd>
         {(place.gaz?.sourceType || place.gaz?.sourcePeriod) && <><dt>In the source</dt><dd>{[place.gaz.sourceType, place.gaz.sourcePeriod].filter(Boolean).join(' · ')}{place.gaz.typeDoubt ? <span className="tiny faint"> (the source is not sure of the type)</span> : null}</dd></>}
         {place.gaz && <><dt>At {yearLabel(year)}</dt><dd>{TEMPORAL_LABEL[temporalSupport(recordFit(place.gaz, year))]}</dd></>}
-        <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)} · <span className="faint">{place.gaz?.meaningUnknown ? 'as the source gives it (its precision is not documented)' : CERTAINTY_LABEL[place.certainty]}</span></dd>
+        <dt>Coordinates</dt><dd>{formatCoords(place.lat, place.lon)}{place.fieldSources ? <span className="tiny faint"> (from {place.fieldSources.position}{place.fieldSources.dates && place.fieldSources.dates !== place.fieldSources.position ? `; dates from ${place.fieldSources.dates}` : ''})</span> : null} · <span className="faint">{place.gaz?.meaningUnknown ? 'as the source gives it (its precision is not documented)' : CERTAINTY_LABEL[place.certainty]}</span></dd>
         {place.gaz?.note && <><dt>Correction</dt><dd className="small">{place.gaz.note}</dd></>}
         {place.gaz?.qa && <><dt>Data check</dt><dd className="small">{place.gaz.qa}</dd></>}
         {(place.partOf.length > 0 || (pol && pol.length > 0)) && <><dt>Historical region</dt><dd>

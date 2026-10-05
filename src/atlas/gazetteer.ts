@@ -53,6 +53,8 @@ export interface GazPlace {
   startKind?: StartKind;
   /** Estimated inhabitants in thousands per sample year (Buringh), with how each was estimated. */
   population?: { year: number; thousands: number; estimate?: string }[];
+  /** The Wikidata item the build matched this record to (a separate identification, not the record's source). */
+  wikidata?: string;
   /** A correction the build made to the source, stated. */
   note?: string;
   /** What the build's checks found wrong in the source record (swapped position, at sea, garbled name, reused id). */
@@ -244,7 +246,9 @@ function toPlace(r: Row): GazPlace {
     datasetPeriod: from === null && to === null && (!!extra?.period || extra?.env?.[2] === 'dataset'),
     uncertain: unc, names: names.map(([name, a, b, lang]) => ({ name, from: a ?? undefined, to: b ?? undefined, lang: lang || undefined })),
     partOf, related: related.map(([rid, type, t, rev]) => ({ title: t, key: `${src}:${rid}`, type, reverse: rev === 1 })),
-    roles: extra?.roles, sourceId: extra?.sid ?? id, url: extra?.q && src !== 'wikidata' ? `https://www.wikidata.org/wiki/${extra.q}` : info.record(extra?.sid ?? id),
+    // the record link goes to the cited source's own record; a matched Wikidata item is a separate link (A10-008, X-10)
+    roles: extra?.roles, sourceId: extra?.sid ?? id, url: info.record(extra?.sid ?? id),
+    wikidata: extra?.q && src !== 'wikidata' ? `https://www.wikidata.org/wiki/${extra.q}` : undefined,
     dateBasis: extra?.fb,
     // Only an explicit founding / construction date means "did not exist before". Attestation periods
     // (Pleiades), first recorded roles (Viabundus), first mentions and tenure dates mean evidence begins then.
@@ -384,11 +388,11 @@ export async function placesByName(name: string): Promise<{ place: GazPlace; isT
 }
 
 /** Places whose names start with the text (search). Title matches first. */
-export async function searchPlaces(q: string, limit = 20): Promise<{ place: GazPlace; matched: string }[]> {
+export async function searchPlaces(q: string, limit = 20): Promise<{ place: GazPlace; matched: string; also?: GazPlace[] }[]> {
   const k = normName(q);
   if (k.length < 2) return [];
-  const es = (await nameEntries(k)).filter((e) => e[0].startsWith(k)).sort((a, b) => Number(b[0] === k) - Number(a[0] === k) || b[4] - a[4]).slice(0, limit * 2);
-  const out: { place: GazPlace; matched: string }[] = [];
+  const es = (await nameEntries(k)).filter((e) => e[0].startsWith(k)).sort((a, b) => Number(b[0] === k) - Number(a[0] === k) || b[4] - a[4]).slice(0, limit * 6);
+  const out: { place: GazPlace; matched: string; also?: GazPlace[] }[] = [];
   const seen = new Set<string>();
   for (const e of es) {
     const key = `${e[1]}:${e[2]}`;
@@ -396,8 +400,12 @@ export async function searchPlaces(q: string, limit = 20): Promise<{ place: GazP
     const p = (await placesInCell(e[3])).find((x) => x.key === key);
     if (!p) continue;
     seen.add(key);
-    out.push({ place: p, matched: e[0] });
+    // one place, one result: other datasets' records of the same name within a few km are listed with it, not as
+    // separate results that use up the list ("London" four times, A12-028, ID-2)
+    const same = out.find((o) => normName(o.place.title) === normName(p.title) && km([o.place.lon, o.place.lat], [p.lon, p.lat]) <= SAME_PLACE_KM);
+    if (same) { (same.also ??= []).push(p); continue; }
     if (out.length >= limit) break;
+    out.push({ place: p, matched: e[0] });
   }
   return out;
 }
