@@ -18,7 +18,7 @@ import { type GazName, type GazPlace, GAZETTEERS, gazetteerInfo, existedAround, 
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
 import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
-import { ENVELOPE_LABEL, type HistYear, yearLabel } from './time';
+import { envelopeWords, type HistYear, yearLabel } from './time';
 import { type HistDate, mergeDates, period, yearRange } from '../world/histdate';
 import type { EvidenceKind } from '../world/evidence';
 import { assessPlace, type Claim, type PlaceEvidence } from '../world/placeEvidence';
@@ -114,7 +114,7 @@ async function readChoice(bookId: string, name: string) {
 /** A gazetteer record's dates, keeping what kind of date they are. */
 export function gazDate(p: GazPlace): HistDate {
   const name = gazetteerInfo(p.gazetteer).name;
-  if (p.envelope) return period(p.envelope.from, p.envelope.to, `No dates of its own — the period of ${ENVELOPE_LABEL[p.envelope.basis]}`, name);
+  if (p.envelope) return period(p.envelope.from, p.envelope.to, ((w) => w[0].toUpperCase() + w.slice(1))(envelopeWords(p.envelope.basis)), name);
   if (p.gazetteer === 'pleiades') return period(p.from, p.to, 'Pleiades periods', name);
   return yearRange(p.from, p.to, { source: name, qualifier: p.to === undefined && p.from !== undefined ? 'after' : 'between' });
 }
@@ -281,7 +281,7 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     const alt = macro.kind === 'region' && livePolity ? polityPlace(livePolity, 'LOW') : undefined;
     const period = year === undefined ? undefined : await matchName(written, year).catch(() => undefined);
     const regions = (period?.candidates ?? []).filter((c) => kindOf(c) === 'region' && existedAround(c, year!, 50))
-      .map((c) => fromGaz(c, written, why(`${gazetteerInfo(c.gazetteer).name} records a ${(c.types[0] ?? 'region').replace(/-\d$/, '')} named “${c.title}”${c.from !== undefined || c.to !== undefined ? ` around ${yearLabel(year!)}` : ` (no dates of its own; within the period of ${ENVELOPE_LABEL[c.envelope!.basis]})`}.`, `${gazetteerInfo(c.gazetteer).name} name match`), 'LOW', [], year));
+      .map((c) => fromGaz(c, written, why(`${gazetteerInfo(c.gazetteer).name} records a ${(c.types[0] ?? 'region').replace(/-\d$/, '')} named “${c.title}”${c.from !== undefined || c.to !== undefined ? ` around ${yearLabel(year!)}` : ` (${envelopeWords(c.envelope!.basis)})`}.`, `${gazetteerInfo(c.gazetteer).name} name match`), 'LOW', [], year));
     const candidates = [...regions, ...(alt ? [alt] : [])];
     const note = candidates.length ? ` It could also mean ${candidates.map((c) => `“${c.recordTitle ?? c.title}”${c.types[0] ? ` (${c.types[0].replace(/-\d$/, '')})` : ''}`).join(' or ')} — choose it if that fits the passage.` : '';
     return { place: { ...place, why: { ...place.why, reason: place.why.reason + note } }, status: 'HIGH', candidates, reason: place.why.reason + note };

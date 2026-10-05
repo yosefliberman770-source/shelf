@@ -59,7 +59,20 @@ export function toOhmDate(year: number): string {
   return y < 0 ? `-${abs}` : abs;
 }
 
-export interface DateMention { year: number; approximate?: boolean; index: number; text: string }
+export interface DateMention { year: number; approximate?: boolean; index: number; text: string; /** a written span ("between 1270 and 1290") */ from?: number; to?: number }
+
+/** Spans written in a passage: "between 1270 and 1290", "1270–90", "the 12th–13th centuries", "218–201 BC" — read
+ *  whole by the shared date grammar, never as their first year or their last century (A12-008). */
+const SPAN_RE = /\bbetween\s+(?:c\.\s*)?\d{3,4}\s+and\s+\d{3,4}(?:\s*(?:BC|BCE|B\.C\.|AD|CE))?|\b\d{3,4}\s*[–—-]\s*\d{2,4}(?:\s*(?:BC|BCE|B\.C\.?|AD|CE))?(?![\d-])|\b\d{1,2}(?:st|nd|rd|th)\s*[–—-]\s*\d{1,2}(?:st|nd|rd|th)\s+centur(?:y|ies)(?:\s+(?:BC|BCE|B\.C\.?|AD|CE))?/gi;
+function spansIn(text: string): DateMention[] {
+  const out: DateMention[] = [];
+  for (const m of text.matchAll(SPAN_RE)) {
+    const d = parseDate(m[0]);
+    if (!d || d.earliest === undefined || d.latest === undefined || d.earliest === d.latest) continue;
+    out.push({ year: Math.trunc((d.earliest + d.latest) / 2) || d.latest, approximate: true, index: m.index ?? 0, text: m[0], from: d.earliest, to: d.latest });
+  }
+  return out;
+}
 
 /**
  * Years written in a passage: "in 218 BC", "216 B.C.", "AD 43", "the 3rd century
@@ -78,7 +91,8 @@ function isCountAfterOf(text: string, m: RegExpMatchArray): boolean {
 }
 
 export function findDatesInText(text: string): DateMention[] {
-  const out: DateMention[] = [];
+  const out: DateMention[] = spansIn(text);
+  const inSpan = (i: number) => out.some((sp) => sp.from !== undefined && i >= sp.index && i < sp.index + sp.text.length);
   const re = /\b(?:(c\.|ca\.|circa)\s*)?(?:(\d{1,2})(?:st|nd|rd|th)\s+century\s+(B\.?\s?C\.?(?:E\.?)?|A\.?D\.?|C\.?E\.?)|(\d{1,4})\s?(B\.?\s?C\.?(?:E\.?)?|A\.?\s?D\.?|C\.?\s?E\.?)(?![a-z])|(A\.?\s?D\.?)\s?(\d{1,4})|(?:in|by|of|from|until|till|since|after|before|around)\s+(1\d{3}|20[0-2]\d|[5-9]\d{2}))\b/gi;
   for (const m of text.matchAll(re)) {
     let parsed: HistoricalDate | undefined;
@@ -86,9 +100,9 @@ export function findDatesInText(text: string): DateMention[] {
     else if (m[4]) parsed = parseHistoricalDate(`${m[4]} ${m[5]}`);
     else if (m[7]) parsed = parseHistoricalDate(`AD ${m[7]}`);
     else if (m[8]) parsed = Number(m[8]) >= 1000 && !isCountAfterOf(text, m) ? { year: Number(m[8]) } : undefined;
-    if (parsed) out.push({ ...parsed, approximate: parsed.approximate || !!m[1] || undefined, index: m.index ?? 0, text: m[0] });
+    if (parsed && !inSpan(m.index ?? 0) && !inSpan((m.index ?? 0) + m[0].length - 1)) out.push({ ...parsed, approximate: parsed.approximate || !!m[1] || undefined, index: m.index ?? 0, text: m[0] });
   }
-  return out;
+  return out.sort((a, b) => a.index - b.index);
 }
 
 /**

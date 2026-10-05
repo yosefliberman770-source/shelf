@@ -57,6 +57,9 @@ export const clampYear = (y: HistYear) => Math.max(MIN_YEAR, Math.min(MAX_YEAR, 
 /** Why a record without dates is still bounded in time. */
 export type EnvelopeBasis = 'related' | 'part-of' | 'source' | 'dataset' | 'names' | 'style';
 export interface Envelope { from?: HistYear; to?: HistYear; basis: EnvelopeBasis }
+/** How a record without exact dates is described: a register's own period class is the record's own dating (A20-008),
+ *  anything else is a period borrowed from elsewhere. */
+export const envelopeWords = (basis: EnvelopeBasis) => (basis === 'source' ? 'no exact dates — its own record dates it only to a period' : `no dates of its own — the period of ${ENVELOPE_LABEL[basis]}`);
 export const ENVELOPE_LABEL: Record<EnvelopeBasis, string> = {
   related: 'dated records linked to it (sites at it, roads it lies on, connections)',
   'part-of': 'the dated larger place or region it is recorded as part of',
@@ -85,7 +88,7 @@ export type TimeFit = 'within' | 'near' | 'period' | 'earlier' | 'later' | 'unat
 /** What a record's start date means: when the thing began, or only when evidence for it begins. */
 export type StartKind = 'founded' | 'attested';
 
-export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envelope; startKind?: StartKind }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear] } = {}): TimeFit {
+export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envelope; startKind?: StartKind }, year: HistYear, opts: { slack?: number; window?: [HistYear, HistYear]; firstRecordOnly?: boolean } = {}): TimeFit {
   if (span.from === undefined && span.to === undefined) {
     const e = span.envelope;
     if (!e) return 'undated';
@@ -102,6 +105,12 @@ export function timeFit(span: { from?: HistYear; to?: HistYear; envelope?: Envel
     if (year === span.to) return 'within';
     if (Math.abs(year - span.to) <= slack) return 'near';
     return year > span.to ? 'earlier' : 'unattested';
+  }
+  if (opts.firstRecordOnly && span.from !== undefined && span.to === undefined && span.startKind !== 'founded' && year > span.from + slack) {
+    // Only a first record is given ("first recorded 1200"): it is evidence for that date, not for every later year up to
+    // the dataset's end — later on the place is persisting, not attested (A15-005). A founding with no recorded end is
+    // different: the thing began then and nothing says it ended.
+    return 'earlier';
   }
   const lo = span.from ?? opts.window?.[0] ?? -Infinity;
   const hi = span.to ?? opts.window?.[1] ?? Infinity;

@@ -22,6 +22,12 @@ export const COLLECTION: Record<MapCollection, { name: string; rights: string; u
   gis: { name: 'University map libraries (georeferenced layers)', rights: 'Public layers; see the record for the holder’s terms', url: 'https://hgl.harvard.edu/' },
 };
 
+/** What a collection's map date is (A10-009): when the map was made or published, a year read from its title (often the
+ *  year it depicts, not when it was drawn), or the time span a catalogue gives for the layer. */
+export type MapDateMeaning = 'made' | 'title' | 'catalogue';
+export const MAP_DATE_MEANING: Record<MapCollection, MapDateMeaning> = { loc: 'made', rumsey: 'made', allmaps: 'title', gis: 'catalogue' };
+const MEANING_WORDS: Record<MapDateMeaning, string> = { made: 'made or published', title: 'year in its title (may be the year shown, not when it was drawn)', catalogue: 'time span its catalogue gives' };
+
 export interface HistMap {
   id: string;
   title: string;
@@ -444,4 +450,5 @@ export function relevance(m: HistMap, opts: { q?: string; bbox?: [number, number
   return { score, why };
 }
 
-export const mapDateLabel = (m: HistMap) => (m.date.precision === 'unknown' ? 'date not in the record' : m.date.preferred !== undefined ? yearLabel(m.date.preferred) : m.date.label ?? `${m.date.earliest}–${m.date.latest}`);
+export const mapDateLabel = (m: HistMap) => (m.date.precision === 'unknown' ? 'date not in the record'
+  : `${m.date.preferred !== undefined ? yearLabel(m.date.preferred) : m.date.label ?? `${m.date.earliest}–${m.date.latest}`} (${MEANING_WORDS[MAP_DATE_MEANING[m.collection]]})`);

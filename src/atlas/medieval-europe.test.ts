@@ -118,8 +118,10 @@ describe('site layers follow the recorded dates', () => {
     expect(layerFilter('castles', 1100)({ k: 'castle', f: 1197 })).toBe(false);
     expect(layerFilter('castles', 1300)({ k: 'castle', f: 1197 })).toBe(true);
   });
-  it('and not after its recorded end', () => {
-    expect(layerFilter('castles', 1700)({ k: 'castle', f: 1197, t: 1600 })).toBe(false);
+  it('its recorded end ends its use, not its ruins: drawn faint for a century after, then not (A8-024)', () => {
+    expect(layerFilter('castles', 1650)({ k: 'castle', f: 1197, t: 1600 })).toBe(true);
+    expect(layerFilter('castles', 1750)({ k: 'castle', f: 1197, t: 1600 })).toBe(false);
+    expect(layerFilter('religious-houses', 1650)({ k: 'monastery', f: 1197, t: 1600 })).toBe(false); // a dissolved house is not a ruin by default
   });
   it('an undated castle is not evidence for any year: hidden unless undated records are asked for', () => {
     expect(layerFilter('castles', 1300)({ k: 'castle' })).toBe(false);

@@ -76,10 +76,12 @@ describe('one scale for identity × dates', () => {
     expect(m.reason).toMatch(/may be older, but nothing places it at this date/);
     expect((await offline('Alderwick', 1100)).status).toBe('LOW');
   });
-  it('2. first attestation before the book date: certain', async () => {
+  it('2. first attestation long before the book date: probable — the record is evidence for its own date, not every later year (A15-005)', async () => {
     const m = await matchName('Birchford', 1100);
-    expect([m.temporal, m.confidence]).toEqual(['attested', 'certain']);
-    expect((await offline('Birchford', 1100)).status).toBe('HIGH');
+    expect([m.temporal, m.confidence]).toEqual(['persisting', 'probable']);
+    expect(m.reason).toMatch(/first records it in 1000 CE.*places usually persist/);
+    expect((await offline('Birchford', 1100)).status).toBe('MEDIUM');
+    expect((await matchName('Birchford', 1030)).confidence).toBe('certain'); // within 50 years of the record
   });
   it('3. exact-date evidence: certain', async () => {
     expect((await matchName('Coldharbour', 1100)).confidence).toBe('certain');

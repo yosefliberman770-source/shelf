@@ -11,6 +11,7 @@ Each step re-reads one source with today's code and replaces only that dataset's
   python3 scripts/atlas-build/patch_index.py meaning     # C8/SS-5: a source with undocumented meaning claims no precision
   python3 scripts/atlas-build/patch_index.py halc        # PA-010: HALC "estimate within 1 km" is not a precise position
   python3 scripts/atlas-build/patch_index.py kinds       # A8-022/A8-023: burial grounds are not churches, ship burials not wrecks
+  python3 scripts/atlas-build/patch_index.py archaeology # A8-039: prehistoric evidence is not a town's "first mention"
 """
 from __future__ import annotations
 
@@ -229,8 +230,26 @@ def kinds():
     return gone
 
 
+def archaeology():
+    """Town records whose "first mention" is thousands of years BCE: relabelled as archaeological evidence."""
+    import sites
+    out = {}
+    for src in ('hre', 'buringh'):
+        have = current_rows(src)
+        n = 0
+        for r in have:
+            e = r[13] if isinstance(r[13], dict) else None
+            if e and 'first mention' in str(e.get('fb', '')) and r[7] is not None and r[7] < sites.EARLIEST_WRITTEN:
+                e['fb'] = sites.ARCH_EVIDENCE
+                n += 1
+        if n:
+            world.replace_source_rows(src, have, BASE)
+        out[src] = n
+    return out
+
+
 if __name__ == '__main__':
-    steps = {'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
+    steps = {'archaeology': archaeology, 'kinds': kinds, 'halc': halc, 'meaning': meaning, 'cassini': cassini, 'hurbpop': hurbpop, 'words': words, 'wdbce': wdbce, 'future': future}
     for step in sys.argv[1:] or steps:
         print(step, json.dumps(steps[step](), ensure_ascii=False))
         stamp(f'place index: {step}')

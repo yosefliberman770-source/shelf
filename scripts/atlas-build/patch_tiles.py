@@ -2,6 +2,7 @@
 
   python3 scripts/atlas-build/patch_tiles.py stacks medieval-sites spec-sites registers
   python3 scripts/atlas-build/patch_tiles.py approx spec-sites halc   # 'u' = 1 on the points the place index marks approximate
+  python3 scripts/atlas-build/patch_tiles.py archaeology hre-towns    # prehistoric evidence is not a "first mention" (A8-039)
 
 stacks: every point that shares its position with others gets 'sk' = the number of records there (tiler.mark_stacks),
 measured on the deepest zoom's 4096-unit grid as the tiler does. Each tile is decoded and written back with the same
@@ -130,7 +131,17 @@ def stamp(what: str):
 
 if __name__ == '__main__':
     step, args = sys.argv[1], sys.argv[2:]
-    if step == 'approx':
+    if step == 'archaeology':
+        import sites
+
+        def relabel(p):
+            if 'first mention' in str(p.get('fb', '')) and isinstance(p.get('f'), (int, float)) and p['f'] < sites.EARLIEST_WRITTEN:
+                p['fb'] = sites.ARCH_EVIDENCE
+                return True
+            return False
+        for n in args:
+            print(n, json.dumps({'relabelled': _rewrite(n, relabel)}))
+    elif step == 'approx':
         print(args[0], json.dumps(approx(args[0], args[1])))
     else:
         for n in args:
