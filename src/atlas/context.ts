@@ -21,10 +21,23 @@ export interface Polity {
   /** Area of the outline, km². */ a?: number;
   /** The everyday English name when `n` is a formal title ("Third Hellenic Republic" → Greece). */ cn?: string;
   /** Groupings containing this point that the polity belongs to, without parentheses. */ partOf?: string[];
+  /** The point is inside, but this close (km) to the outline's edge: the simplified outline can't settle who held it (A16-005). */ border?: number;
 }
+/** Within this distance of an outline's edge, the outline alone doesn't say which side a place was on. */
+export const BORDER_KM = 15;
 
 /** A polity's name for display: Cliopatria's parentheses removed from groupings. */
 export const polityDisplayName = (p: Pick<Polity, 'n' | 'cn'>) => p.cn ?? p.n.replace(/^\(|\)$/g, '');
+/**
+ * Cliopatria names some areas by a convention, not a state: many small units under one label ("Holy Roman Empire
+ * Minor States", "Mayan City-States"), a population or movement ("Viking settlements", "Hungarian Nationalists").
+ * Said as such, never as a ruler (A11-004, X-22).
+ */
+export function polityConvention(name: string): string | undefined {
+  if (/\b(?:minor states|city-states|states|kingdoms|principalities|chiefdoms|lordships)\b/i.test(name) && !/^(?:united|confederate|papal|federated|the united) /i.test(name) && !/^(?:kingdom|state|states|principality) of /i.test(name)) return 'Cliopatria’s label for many small units drawn as one area, not a single state';
+  if (/\b(?:settlements|tribes|peoples|nationalists|communists|rebels|magnates|warlords|clans)\b/i.test(name)) return 'Cliopatria’s label for a population, movement or faction, not a state with fixed borders';
+  return undefined;
+}
 export interface AtlasEvent { q: string; n: string; k: 'battle' | 'siege' | 'campaign' | 'revolt' | 'expedition' | 'coup' | 'treaty' | string; y: HistYear; /** End year, for events that lasted. */ y2?: HistYear; pos: Pos; w?: string; wn?: string; u?: number; yp?: string }
 export interface War { q: string; n: string; f: HistYear | null; t: HistYear | null }
 
@@ -42,15 +55,23 @@ export async function politiesAt(p: Pos, year: HistYear, edgeKm = 20): Promise<P
   const now = fc.features.filter((f) => f.properties.f <= year && f.properties.t >= year && f.geometry?.type !== 'Point');
   const seen = new Set<string>();
   const uniq = (xs: Polity[]) => xs.filter((x) => (seen.has(x.n) ? false : (seen.add(x.n), true)));
-  const containing = now.filter((f) => contains(f.geometry, p)).map((f) => f.properties);
+  const containingF = now.filter((f) => contains(f.geometry, p));
+  const containing = containingF.map((f) => f.properties);
   // Hierarchy: groupings are reported as what the polity is part of, not as
   // rival polities. Independent polities that overlap here are an overlap in the source (see Polity.x / xr).
   const groups = containing.filter((x) => x.g);
   const members = containing.filter((x) => !x.g).sort((a, b) => (a.op ? 1 : 0) - (b.op ? 1 : 0) || (a.a ?? Infinity) - (b.a ?? Infinity));
-  const withParents = members.map((x) => ({ ...x, partOf: groups.filter((g) => (x.m ?? '').split(';').includes(g.n)).map(polityDisplayName) }));
-  const inside = uniq(withParents.length ? withParents : groups);
-  if (inside.length || !edgeKm) return inside;
+  // A grouping with the member's own name ("(Holy Roman Empire)" around "Holy Roman Empire") adds nothing to say.
+  const withParents = members.map((x) => ({ ...x, partOf: groups.filter((g) => (x.m ?? '').split(';').includes(g.n)).map(polityDisplayName).filter((n) => n !== polityDisplayName(x)) }));
   const rings = (g: Feature['geometry']) => ({ type: 'MultiLineString', coordinates: g?.type === 'Polygon' ? g.coordinates : g?.type === 'MultiPolygon' ? (g.coordinates as Pos[][][]).flat() : [] });
+  // The outline that contains the point (not an outlying piece of the same polity).
+  const geom = new Map(containingF.map((f) => [f.properties.n, f.geometry]));
+  const inside = uniq(withParents.length ? withParents : groups).map((x) => {
+    const g = geom.get(x.n);
+    const d = g ? distanceToLine(rings(g), p) : Infinity;
+    return d < BORDER_KM ? { ...x, border: Math.round(d) } : x;
+  });
+  if (inside.length || !edgeKm) return inside;
   return uniq(now.filter((f) => !f.properties.g).map((f) => ({ f, d: distanceToLine(rings(f.geometry), p) })).filter((x) => x.d <= edgeKm).sort((a, b) => a.d - b.d).slice(0, 1).map((x) => ({ ...x.f.properties, edge: true })));
 }
 

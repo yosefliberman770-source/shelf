@@ -1317,9 +1317,10 @@ def polity_aliases():
         if c['dm']:
             r['dm'] = c['dm']
             n_dm += 1
+    shared = polity_shared_ids(rows)
     with open(path, 'w', encoding='utf-8') as fh:
         json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
-    log(f'  {n_al} polities with aliases, {n_dm} with demonyms')
+    log(f'  {n_al} polities with aliases, {n_dm} with demonyms; {shared} hold a Wikidata id shared with another polity')
     return {'aliases': n_al, 'demonyms': n_dm}
 
 
@@ -1438,38 +1439,114 @@ def polity_common_names():
     return {'commonNames': len(common)}
 
 
-def polity_names():
-    """cliopatria/names.json: every polity name once, with its full date range
-    (from the slices already built), for historical search."""
-    log('Cliopatria names index')
-    folder = os.path.join(OUT, 'cliopatria')
+def polity_spans(folder):
+    """Per polity (name, Wikidata id), from the time slices: when it really has an outline and where
+    its label sits then. A name's full range can bridge centuries with no outline (the Kingdom of
+    Portugal has none 1582–1639; "Kingdom of Italy" covers 587 and 1946), so the pieces are kept:
+      's'  — the spans with an outline, when there is more than one (a gap between them);
+      'sp' — [from, to, lon, lat]: Cliopatria's own label point for each period, consecutive
+             periods at the same point merged — the label follows the polity's home territory
+             instead of jumping to its largest outline (Portugal's 1885 outline is Angola);
+      x/y  — the label point it holds for the most years.
+    """
     by = {}
     for fn in sorted(os.listdir(folder)):
         if not re.match(r'^-?\d+_-?\d+\.json$', fn):
             continue
         for f in json.load(open(os.path.join(folder, fn), encoding='utf-8'))['features']:
             p = f['properties']
-            if p.get('lbl') or p.get('op'):
+            if p.get('op'):
                 continue
             k = (p['n'], p.get('q', ''))
-            cur = by.get(k)
+            cur = by.setdefault(k, {'n': p['n'], 'f': p['f'], 't': p['t'], **({'q': p['q']} if p.get('q') else {}), **({'c': p['c']} if p.get('c') else {}),
+                                    **({'g': 1} if p.get('g') else {}), **({'m': p['m']} if p.get('m') else {}), 'spans': set(), 'labels': {}, 'area': {}})
+            if p.get('lbl'):
+                x, y = f['geometry']['coordinates'][:2]
+                cur['labels'][(p['f'], p['t'])] = (round(x, 2), round(y, 2))
+                continue
+            cur['f'] = min(cur['f'], p['f'])
+            cur['t'] = max(cur['t'], p['t'])
+            cur['spans'].add((p['f'], p['t']))
             g = shape(f['geometry'])
-            c = g.representative_point()
-            if not cur:
-                by[k] = {'n': p['n'], 'f': p['f'], 't': p['t'], **({'q': p['q']} if p.get('q') else {}), **({'c': p['c']} if p.get('c') else {}), **({'g': 1} if p.get('g') else {}), **({'m': p['m']} if p.get('m') else {}),
-                         'x': round(c.x, 2), 'y': round(c.y, 2), 'area': g.area}
+            if g.area > cur['area'].get((p['f'], p['t']), (0,))[0]:
+                c = g.representative_point()
+                cur['area'][(p['f'], p['t'])] = (g.area, round(c.x, 2), round(c.y, 2))
+    out = {}
+    for k, cur in by.items():
+        if not cur['spans']:
+            continue
+        merged = []
+        for f, t in sorted(cur['spans']):
+            if merged and f <= merged[-1][1] + 1:
+                merged[-1][1] = max(merged[-1][1], t)
             else:
-                cur['f'] = min(cur['f'], p['f'])
-                cur['t'] = max(cur['t'], p['t'])
-                if g.area > cur['area']:
-                    cur.update(x=round(c.x, 2), y=round(c.y, 2), area=g.area)
-    rows = sorted(by.values(), key=lambda r: (r['f'], r['n']))
+                merged.append([f, t])
+        pts = []
+        for f, t in sorted(cur['spans']):
+            xy = cur['labels'].get((f, t)) or cur['area'][(f, t)][1:]
+            if pts and pts[-1][1] + 1 >= f and abs(pts[-1][2] - xy[0]) < 0.3 and abs(pts[-1][3] - xy[1]) < 0.3:
+                pts[-1][1] = max(pts[-1][1], t)
+            else:
+                pts.append([f, t, xy[0], xy[1]])
+        best = max(pts, key=lambda e: e[1] - e[0])
+        row = {k2: v for k2, v in cur.items() if k2 not in ('spans', 'labels', 'area')}
+        row.update(x=best[2], y=best[3])
+        if len(merged) > 1:
+            row['s'] = merged
+        if len(pts) > 1:
+            row['sp'] = pts
+        out[k] = row
+    return out
+
+
+def polity_shared_ids(rows):
+    """A Wikidata id is evidence about a polity, never its key (ID-1, PA-006, A9-007). Cliopatria gives
+    some ids to two different polities (Austria-Hungary's to "Hungarian Nationalists", Assyria's to
+    Syria, the County of Portugal's to modern Portugal). Wikidata's aliases and demonyms then belong
+    only to the polity the id names — the one whose own name is among them, or is the start of one
+    ("Holy Roman Empire" in "Holy Roman Empire of the German Nation"); the others keep the id with 'qx'
+    (shared, not theirs to be sure of) and get no aliases, demonyms or Wikidata link. When no polity's
+    name is among them (the Roman Republic's aliases are Italian), nothing tells them apart and all keep them."""
+    norm = lambda x: re.sub(r'^the ', '', normalize_name(x))
+    groups = {}
     for r in rows:
-        del r['area']
+        if r.get('q'):
+            groups.setdefault(r['q'], []).append(r)
+    flagged = 0
+    for q, rs in groups.items():
+        if len(rs) < 2 or len({normalize_name(r['n']) for r in rs}) == 1:
+            continue
+        al = sorted({a for r in rs for a in r.get('al', [])})
+        dm = sorted({d for r in rs for d in r.get('dm', [])})
+        names = {norm(a) for a in al}
+        named = lambda x: bool(x) and (norm(x) in names or any((a + ' ').startswith(norm(x) + ' ') for a in names))
+        owners = [r for r in rs if named(r['n']) or named(r.get('cn'))]
+        for r in rs:
+            own = not owners or r in owners
+            if own:
+                r.pop('qx', None)
+                if al:
+                    r['al'] = al
+                if dm:
+                    r['dm'] = dm
+            else:
+                r.pop('al', None)
+                r.pop('dm', None)
+                r['qx'] = 1
+                flagged += 1
+    return flagged
+
+
+def polity_names():
+    """cliopatria/names.json: every polity name once, with its full date range, the periods it
+    really has an outline and its label point in each (polity_spans), for historical search."""
+    log('Cliopatria names index')
+    folder = os.path.join(OUT, 'cliopatria')
+    rows = sorted(polity_spans(folder).values(), key=lambda r: (r['f'], r['n']))
     with open(os.path.join(folder, 'names.json'), 'w', encoding='utf-8') as fh:
         json.dump(rows, fh, ensure_ascii=False, separators=(',', ':'))
     log(f'  wrote cliopatria/names.json: {len(rows)} polities')
-    return {'names': len(rows)}
+    return {'names': len(rows), 'withGaps': sum(1 for r in rows if r.get('s'))}
 
 
 def manifest(stats, ran=None):

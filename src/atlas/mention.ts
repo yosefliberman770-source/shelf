@@ -169,16 +169,38 @@ export interface PolityName {
   /** English aliases Wikidata records for the polity ("Venetian Republic", "Byzantium"). */ al?: string[];
   /** Demonyms Wikidata records for it (P1549: "Venetian", "English"). */ dm?: string[];
   /** Its everyday English name when `n` is a formal title. */ cn?: string;
+  /** The spans it really has an outline, when there is a gap between them (A16-004): f–t alone would bridge it. */ s?: [HistYear, HistYear][];
+  /** Cliopatria's label point per period [from, to, lon, lat], so the point follows the polity at the date (A12-006). */ sp?: [HistYear, HistYear, number, number][];
+  /** Its Wikidata id is shared with another polity and may not be its own: no aliases, demonyms or link come from it (ID-1, PA-006). */ qx?: 1;
+}
+/** Did the polity have an outline in that year? Its first and last years alone can bridge centuries with none. */
+export const polityAlive = (p: Pick<PolityName, 'f' | 't' | 's'>, year: HistYear) => p.f <= year && year <= p.t && (!p.s || p.s.some(([f, t]) => f <= year && year <= t));
+/** Years from the date to the nearest period the polity has an outline (0 when it has one then). */
+export function polityGap(p: Pick<PolityName, 'f' | 't' | 's'>, year: HistYear): number {
+  if (polityAlive(p, year)) return 0;
+  return Math.min(...(p.s ?? [[p.f, p.t]]).map(([f, t]) => (year < f ? f - year : year > t ? year - t : 0)));
+}
+/** Where the polity's label sits at that date (the nearest period's label when it has none then). */
+export function polityLabelAt(p: Pick<PolityName, 'x' | 'y' | 'sp'>, year?: HistYear): [number, number] | undefined {
+  if (p.sp?.length && year !== undefined) {
+    const e = p.sp.find(([f, t]) => f <= year && year <= t) ?? [...p.sp].sort((a, b) => Math.min(Math.abs(a[0] - year), Math.abs(a[1] - year)) - Math.min(Math.abs(b[0] - year), Math.abs(b[1] - year)))[0];
+    return [e[2], e[3]];
+  }
+  return p.x !== undefined && p.y !== undefined ? [p.x, p.y] : undefined;
 }
 /** Words that name a political form, not a polity ("Kingdom of Aragon" → Aragon). */
 const FORM = '(?:grand |great |holy |united |old |new |late |early |second |first |third )?(?:kingdom|kingdoms|crown|county|duchy|grand duchy|empire|republic|principality|emirate|caliphate|sultanate|khanate|khaganate|tsardom|despotate|margraviate|march|lordship|earldom|electorate|state|states|city-states|confederation|confederacy|league|dominion|colony|protectorate|viceroyalty|governorate|bishopric|archbishopric|prince-bishopric|theme|satrapy|province|dynasty|realm|commonwealth|territory|federation)';
 const LEAD = new RegExp(`^(?:the )?${FORM}(?: of(?: the)?)? `);
 const TRAIL = new RegExp(` ${FORM}$`);
+const MODIFIER = /^(?:grand|great|holy|united|old|new|late|early|second|first|third)$/;
 /** The core name of a polity: "(Kingdom of Aragon)" → "aragon", "Byzantine Empire" → "byzantine". */
 export function polityCore(name: string): string {
-  let s = normName(name.replace(/^\(|\)$/g, ''));
+  const whole = normName(name.replace(/^\(|\)$/g, ''));
+  let s = whole;
   for (let i = 0; i < 2; i++) s = s.replace(LEAD, '').replace(TRAIL, '').trim();
-  return s;
+  // Only a modifier of the form is left ("United Kingdom" → "united", "Holy Roman Empire" → "holy roman"
+  // is fine): that names nothing, so the whole name is the core — "United Kingdom" is not "United States" (A16-002).
+  return MODIFIER.test(s) ? whole : s;
 }
 
 let polP: Promise<(PolityName & { core: string })[]> | undefined;
@@ -241,8 +263,10 @@ export async function matchPolity(written: string, year?: HistYear, opts: { cont
   const isAdj = DEMONYM.test(written.trim());
   const hits = idx.map((p) => ({ p, via: via(p) ?? (isAdj && stemMatches(written.trim(), p.core) ? 'stem' as const : undefined) }))
     .filter((h): h is { p: PolityName & { core: string }; via: PolityVia } => !!h.via);
-  const fit = (p: PolityName): PolityMatch['fit'] => (year === undefined ? 'undated-year' : p.f <= year && year <= p.t ? 'within' : p.f - 50 <= year && year <= p.t + 50 ? 'near' : 'outside');
-  const gap = (p: PolityName) => (year === undefined ? 0 : year < p.f ? p.f - year : year > p.t ? year - p.t : 0);
+  // 'within' only when the polity has an outline in that year — not merely between its first and last years (A16-004).
+  // 'near' (within 50 years of one) is a date mismatch to say, never a match (A16-003).
+  const fit = (p: PolityName): PolityMatch['fit'] => (year === undefined ? 'undated-year' : polityAlive(p, year) ? 'within' : polityGap(p, year) <= 50 ? 'near' : 'outside');
+  const gap = (p: PolityName) => (year === undefined ? 0 : polityGap(p, year));
   // Which polities' territory holds the book's places at this date (from the Cliopatria outlines).
   const pts = year !== undefined ? (opts.context?.points ?? []).slice(0, 12) : [];
   // With the usual 20 km edge allowance: simplified outlines put coastal cities (Constantinople) just outside their own state.

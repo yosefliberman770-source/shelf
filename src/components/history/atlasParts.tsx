@@ -3,7 +3,7 @@
 // by AI.
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
-import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityDisplayName } from '../../atlas/context';
+import { AROUND_KINDS, type AtlasEvent, aroundKind, allEvents, eventDetails, type EventDetails, eventsNear, eventsOfWar, linesNear, type LookingAt, lookingAt, politiesAt, type Polity, polityConvention, polityDisplayName } from '../../atlas/context';
 import { MILE_KM } from '../../atlas/data';
 import { dateBasisNote, gazetteerInfo, type GazPlace, nearbyPlaces, namesAround, recordFit, relationLabel, rulerAt, TEMPORAL_LABEL, temporalSupport } from '../../atlas/gazetteer';
 import { formatDate } from '../../world/histdate';
@@ -39,7 +39,7 @@ export function relatedNote(p: ReaderPlace): string {
 const AT_YEAR_NOTE: Record<string, string> = { period: ' · only its evidence period covers this date', earlier: ' · recorded before this date', unattested: ' · first recorded later', undated: ' · undated', near: ' · recorded close to this date' };
 export const span = (f?: number, t?: number) => (f === undefined && t === undefined ? 'dates not recorded' : `${f !== undefined ? yearLabel(f) : '?'} – ${t !== undefined ? yearLabel(t) : '?'}`);
 const polityType = (c?: string) => (c ? ` (${c})` : '');
-export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (a detached piece of its outline in the source)' : ''}`;
+export const polityName = (p: Polity) => `${p.edge ? 'at the edge of ' : ''}${polityDisplayName(p)}${polityType(p.c)}${p.partOf?.length ? `, part of ${p.partOf.join(' and ')}` : ''}${p.op ? ' (a detached piece of its outline in the source)' : ''}${polityConvention(p.n) ? ` (${polityConvention(p.n)})` : ''}${p.border !== undefined ? ` — ${p.border < 1 ? 'on' : `${p.border} km from`} the edge of its outline, which is simplified, so the outline can’t settle who held this spot` : ''}`;
 /**
  * Polities at a spot as one phrase. More than one independent polity there means the source's
  * outlines overlap: explained by a recorded relationship when there is one, otherwise stated as

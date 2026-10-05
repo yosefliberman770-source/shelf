@@ -14,9 +14,10 @@ import { choiceKey, legacyChoiceKeys } from '../lib/history/keys';
 import { historicalPlaces } from '../lib/history/placeService';
 import type { Confidence, HistoricalPlace, PlaceQuery } from '../lib/history/types';
 import { km } from './data';
-import { type GazName, type GazPlace, GAZETTEERS, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, type PlaceConfidence, type Relation } from './gazetteer';
+import { type GazName, type GazPlace, GAZETTEERS, gazetteerInfo, existedAround, getPlace, kindOf, matchName, normName, placesByName, type PlaceConfidence, type Relation } from './gazetteer';
 import { bookGeoContext, contextDistance, type GeoContext } from './geocontext';
-import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, type PolityMatch, viaDemonym } from './mention';
+import { politiesAt, polityConvention } from './context';
+import { type EntityKind, isCommonWord, loadCommonWords, macroRegion, type MacroRegion, matchPolity, type MentionEvidence, mentionEvidence, plausibleMention, polityCore, polityLabelAt, type PolityMatch, viaDemonym } from './mention';
 import { nameRoles, type NameRoles, pickDisplay } from './names';
 import { envelopeWords, type HistYear, yearLabel } from './time';
 import { agreeOnLocation, witnesses } from '../world/families';
@@ -218,18 +219,99 @@ export function fromMacro(m: MacroRegion, written: string, why: ReaderPlace['why
 }
 
 /** A political entity (Cliopatria): dated, with a reconstructed territory; its point is only a label position. */
-export function fromPolity(pm: PolityMatch, written: string, why: ReaderPlace['why'], status: Confidence): ReaderPlace | undefined {
+export function fromPolity(pm: PolityMatch, written: string, why: ReaderPlace['why'], status: Confidence, year?: HistYear): ReaderPlace | undefined {
   const p = pm.polity;
-  if (p.x === undefined || p.y === undefined) return undefined;
+  // The label point at the date being read about: a polity's largest outline can be far from home (Portugal's 1885 one is Angola).
+  const at = polityLabelAt(p, year);
+  if (!at) return undefined;
   const name = p.n.replace(/^\(|\)$/g, '');
+  const gaps = p.s && p.s.length > 1 ? ` Cliopatria has outlines for it only in ${p.s.map(([f, t]) => `${yearLabel(f)}–${yearLabel(t)}`).join(', ')}.` : '';
   return {
-    // Shown by its everyday name ("Greece"); the source's formal title stays as the record title.
-    key: `polity:${p.q ?? normName(p.n)}:${p.f}`, title: p.cn ?? name, recordTitle: p.cn ? name : undefined, kind: 'polity', written, lat: p.y, lon: p.x, certainty: 'approximate',
-    polity: { n: name, f: p.f, t: p.t, q: p.q }, from: p.f, to: p.t, when: yearRange(p.f, p.t, { source: 'Cliopatria', qualifier: 'between' }),
+    // Shown by its everyday name ("Greece"); the source's formal title stays as the record title. A Wikidata id shared
+    // with another polity is not its key (ID-1): the key is the name.
+    key: `polity:${p.q && !p.qx ? p.q : normName(p.n)}:${p.f}`, title: p.cn ?? name, recordTitle: p.cn ? name : undefined, kind: 'polity', written, lat: at[1], lon: at[0], certainty: 'approximate',
+    polity: { n: name, f: p.f, t: p.t, q: p.qx ? undefined : p.q }, from: p.f, to: p.t, when: yearRange(p.f, p.t, { source: 'Cliopatria', qualifier: 'between' }),
     names: [], partOf: [], related: [], types: ['polity'],
-    sources: [{ name: 'Cliopatria (Seshat Global History Databank)', url: 'https://github.com/Seshat-Global-History-Databank/cliopatria', license: 'CC BY 4.0', record: p.q ? `https://www.wikidata.org/wiki/${p.q}` : undefined, note: 'Territory reconstructed by Cliopatria; the point is only where its label sits.' }],
+    sources: [{ name: 'Cliopatria (Seshat Global History Databank)', url: 'https://github.com/Seshat-Global-History-Databank/cliopatria', license: 'CC BY 4.0', record: p.q && !p.qx ? `https://www.wikidata.org/wiki/${p.q}` : undefined,
+      note: `Territory reconstructed by Cliopatria; the point is only where its label sits${year !== undefined ? ` in ${yearLabel(year)}` : ''}.${gaps}${p.qx ? ' Cliopatria gives it a Wikidata id that another polity also holds, so no Wikidata names or link are used for it.' : ''}` }],
     evidence: 'single-source', status, why,
   };
+}
+
+/**
+ * A country's name at a date when no polity of that name had an outline then ("Egypt" in 1300, "Germany" in 1500,
+ * "Turkey" in 1900): the land the name refers to, and who held it at the date — never a later or earlier state
+ * given as if it existed (ID-5, A12-007, A16-003, C5). The land is placed where Cliopatria labels the latest
+ * polity of that name; who held it is read from the outlines at that point and date.
+ */
+export async function landAt(polities: PolityMatch[], written: string, year: HistYear, why: (reason: string, method: string) => ReaderPlace['why']): Promise<Resolution | undefined> {
+  // Only a later (or current) state of that name says what land the name means at the date: an ancient polity with a
+  // matching alias does not ("The United Kingdom", Wikidata's alias for Israel's United Monarchy, is not Britain in 1850).
+  const named = polities.filter((x) => (x.via === 'name' || x.via === 'alias') && x.fit !== 'within' && !x.polity.g && x.polity.t >= year);
+  if (!named.length) return undefined;
+  const w = normName(written);
+  // The state whose everyday name is the word itself first ("China" → the People's Republic, not Taiwan's Republic of China).
+  const latest = [...named].sort((a, b) => Number(normName(b.polity.cn ?? '') === w) - Number(normName(a.polity.cn ?? '') === w) || b.polity.t - a.polity.t || Number(!!a.polity.qx) - Number(!!b.polity.qx))[0].polity;
+  const at = polityLabelAt(latest, latest.t);
+  if (!at) return undefined;
+  const holders = await politiesAt(at, year).catch(() => []);
+  const recorded = named.slice(0, 3).map((x) => `${x.polity.cn ?? x.polity.n.replace(/^\(|\)$/g, '')} (${(x.polity.s ?? [[x.polity.f, x.polity.t]]).map(([f, t]) => `${yearLabel(f)}–${yearLabel(t)}`).join(', ')})`).join('; ');
+  const near = named.filter((x) => x.fit === 'near').map((x) => `${x.polity.n} is recorded only from ${yearLabel(x.polity.f)}${x.polity.f > year ? '' : ` to ${yearLabel(x.polity.t)}`}, not at this date.`).join(' ');
+  const held = holders.filter((h) => !h.g).map((h) => `${h.edge ? 'at the edge of ' : ''}${h.cn ?? h.n.replace(/^\(|\)$/g, '')}${h.partOf?.length ? `, part of ${h.partOf.join(' and ')}` : ''}${polityConvention(h.n) ? ` (${polityConvention(h.n)})` : ''}`);
+  const reason = `No polity called “${written}” has an outline in ${yearLabel(year)} in Cliopatria (it records ${recorded}). ${near ? `${near} ` : ''}`
+    + (held.length ? `Shown as the land of that name: in ${yearLabel(year)} the spot where Cliopatria labels ${latest.cn ?? latest.n} lay in ${held.join(' and ')}.`
+      : `Shown as the land of that name. In ${yearLabel(year)} Cliopatria has no outline there — it lies between outlines, so who held it then isn’t recorded.`);
+  const title = written.trim();
+  const place: ReaderPlace = {
+    key: `land:${normName(title)}`, title, kind: 'region', written, lat: at[1], lon: at[0], certainty: 'approximate',
+    names: [], partOf: holders.filter((h) => !h.g).map((h) => h.cn ?? h.n.replace(/^\(|\)$/g, '')), related: [], types: ['region'],
+    sources: [{ name: 'Cliopatria (Seshat Global History Databank)', url: 'https://github.com/Seshat-Global-History-Databank/cliopatria', license: 'CC BY 4.0', note: 'The land is placed at the label point of the latest polity of that name; who held it comes from the outlines at the date.' }],
+    evidence: 'single-source', status: held.length ? 'MEDIUM' : 'LOW', why: why(reason, 'Country name → the land at the date (Cliopatria outlines)'),
+  };
+  const holderPlaces = holders.filter((h) => !h.g).map((h) => fromPolity({ polity: { ...h, x: at[0], y: at[1], core: polityCore(h.n) }, via: 'name', fit: 'within' }, written, why(`${h.n} held this land in ${yearLabel(year)} (Cliopatria).`, 'Polity holding the land (Cliopatria)'), 'LOW', year)).filter((x): x is ReaderPlace => !!x);
+  const namePlaces = named.filter((x) => x.fit === 'near').map((x) => fromPolity(x, written, why(`${x.polity.n} is recorded ${yearLabel(x.polity.f)}–${yearLabel(x.polity.t)} — not at the date being read about.`, 'Polity name (Cliopatria)'), 'LOW', year)).filter((x): x is ReaderPlace => !!x);
+  return { place, status: place.status, candidates: [...holderPlaces, ...namePlaces], reason };
+}
+
+/**
+ * The one candidate inside the country or region the text names right after the place ("York in England",
+ * "Boston, Lincolnshire"): a continent/sea/land region by its extent, a polity by its outline at the date.
+ */
+async function qualifierPick(written: string, passage: string, cands: GazPlace[], year?: HistYear): Promise<{ place: GazPlace; area: string } | undefined> {
+  const esc = written.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const hit = new RegExp(`\\b${esc}(,| in)\\s+(?:the\\s+)?(\\p{Lu}[\\p{L}'’-]+(?:\\s+\\p{Lu}[\\p{L}'’-]+)?)`, 'u').exec(passage);
+  if (!hit) return undefined;
+  const area = hit[2];
+  const inside: GazPlace[] = [];
+  const macro = macroRegion(area);
+  if (macro) {
+    const [w, so, e, n] = macro.bbox;
+    inside.push(...cands.filter((c) => c.lon >= w && c.lon <= e && c.lat >= so && c.lat <= n));
+  } else if (year !== undefined) {
+    const matches = await matchPolity(area, year);
+    let pols = matches.filter((x) => x.fit === 'within' && (x.via === 'name' || x.via === 'alias')).map((x) => x.polity.n.replace(/^\(|\)$/g, ''));
+    // A country name with no state of that name at the date ("Egypt" in 1200): whoever held that land then.
+    if (!pols.length) pols = ((await landAt(matches, area, year, (reason, method) => ({ detection: 'cue', reason, method })))?.candidates ?? []).filter((c) => c.polity && c.polity.f <= year && year <= c.polity.t).map((c) => c.polity!.n);
+    if (!pols.length) return undefined;
+    for (const c of cands) {
+      const at = await politiesAt([c.lon, c.lat], year).catch(() => []);
+      const bare = (n: string) => n.replace(/^\(|\)$/g, '');
+      // The state itself, not a grouping it belongs to: "(Kingdom of England)" also spans its colonies.
+      if (at.some((h) => !h.g && (pols.includes(bare(h.n)) || pols.includes(h.n)))) inside.push(c);
+    }
+  }
+  // Several records of one town (each dataset's own copy) count as one place.
+  return inside.length && inside.every((c) => km([c.lon, c.lat], [inside[0].lon, inside[0].lat]) <= 5) ? { place: inside[0], area } : undefined;
+}
+
+/** A polity named after a city ("Sultanate of Malacca" for "Malacca") whose outline at the date no longer holds that city. */
+async function lostNamesake(pm: PolityMatch, written: string, year: HistYear): Promise<boolean> {
+  const w = normName(written);
+  if (pm.via !== 'name' || pm.polity.core !== w || normName(pm.polity.n.replace(/^\(|\)$/g, '')) === w) return false;
+  const cities = (await placesByName(written).catch(() => [])).filter((x) => x.isTitle && kindOf(x.place) === 'settlement' && x.place.precise);
+  if (!cities.length) return false;
+  const held = await Promise.all(cities.slice(0, 3).map((c) => politiesAt([c.place.lon, c.place.lat], year).catch(() => [])));
+  return held.every((hs) => !hs.some((h) => h.n === pm.polity.n || (h.m ?? '').split(';').includes(pm.polity.n)));
 }
 
 /** A gazetteer place as the online service's record type, so a reader's pick can be remembered per book. */
@@ -283,15 +365,17 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
   // A polity is only "the" answer when it existed at the date. Without a date
   // its existence can't be checked, so it is at most a possibility (LOW),
   // unless the words themselves name a polity (a demonym, "the Kingdom of …").
-  const livePolity = polities.find((x) => x.fit === 'within' || x.fit === 'near' || (x.fit === 'undated-year' && (expected === 'polity' || !!mention?.demonym)));
+  // Only a polity with an outline at the date: one recorded 24 years later is a date mismatch, not the answer (A16-003).
+  const livePolity = polities.find((x) => x.fit === 'within' || (x.fit === 'undated-year' && (expected === 'polity' || !!mention?.demonym)));
   // Two different polities fit the words and the date equally, and the book's places don't separate them.
   // (The book's places settle it only when one polity's territory holds them and the other's doesn't.)
-  const rivals = livePolity ? polities.filter((x) => x.fit === livePolity.fit && x.via === livePolity.via && !x.polity.n.startsWith('(') && x.polity.q !== livePolity.polity.q
+  const same = (a: PolityMatch['polity'], b: PolityMatch['polity']) => (a.q && b.q && !a.qx && !b.qx ? a.q === b.q : a.n === b.n);
+  const rivals = livePolity ? polities.filter((x) => x.fit === livePolity.fit && x.via === livePolity.via && !x.polity.n.startsWith('(') && !same(x.polity, livePolity.polity)
     && !(livePolity.holdsBook && x.holdsBook === false)) : [];
   const possiblePolity = livePolity ?? polities.find((x) => x.fit === 'undated-year');
   const polityPlace = (pm: PolityMatch, status: Confidence) => fromPolity(pm, written, why(viaDemonym(pm.via)
     ? `“${written}” is an adjective for ${pm.polity.n.replace(/^\(|\)$/g, '')}, a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}.`
-    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : pm.fit === 'undated-year' ? ' — the date being read about isn’t known, so whether it existed then can’t be checked' : ''}${pm.via === 'alias' ? ' (matched through a name Wikidata records for it)' : ''}.`, pm.via === 'demonym' ? 'Recorded demonym → polity (Wikidata, Cliopatria)' : pm.via === 'stem' ? 'Adjective → polity by spelling (Cliopatria)' : pm.via === 'alias' ? 'Alias → polity (Wikidata, Cliopatria)' : 'Polity name (Cliopatria)'), status);
+    : `${pm.polity.n.replace(/^\(|\)$/g, '')} is a polity Cliopatria records ${yearLabel(pm.polity.f)}–${yearLabel(pm.polity.t)}${pm.fit === 'within' ? ', which includes the date being read about' : pm.fit === 'undated-year' ? ' — the date being read about isn’t known, so whether it existed then can’t be checked' : ''}${pm.via === 'alias' ? ' (matched through a name Wikidata records for it)' : ''}.`, pm.via === 'demonym' ? 'Recorded demonym → polity (Wikidata, Cliopatria)' : pm.via === 'stem' ? 'Adjective → polity by spelling (Cliopatria)' : pm.via === 'alias' ? 'Alias → polity (Wikidata, Cliopatria)' : 'Polity name (Cliopatria)'), status, year);
 
   const macro = macroRegion(written);
   if (macro && expected !== 'settlement' && expected !== 'polity') {
@@ -332,8 +416,26 @@ export async function resolvePlace(written: string, opts: { year?: HistYear; boo
     const alsoPolity = livePolity ? polityPlace(livePolity, 'LOW') : undefined;
     return { place, status, candidates: [...m.candidates.filter((c) => c.key !== m.place!.key).map((c) => fromGaz(c, written, place.why, 'LOW', [], year)), ...(alsoPolity ? [alsoPolity] : [])], reason: m.reason };
   }
+  // "…to York in England", "Boston, Lincolnshire": a country or region named with the place settles which one (A12-019).
+  if (m?.status === 'ambiguous' && opts.passage) {
+    const q = await qualifierPick(written, opts.passage, m.candidates, year).catch(() => undefined);
+    if (q) {
+      const place = fromGaz(q.place, written, why(`${m.reason} The text places “${written}” in ${q.area}, and only this one lies there${year !== undefined ? ` in ${yearLabel(year)}` : ''}.`, `${gazetteerInfo(q.place.gazetteer).name} name match + the area named in the text`), 'MEDIUM', [], year);
+      return { place, status: 'MEDIUM', candidates: m.candidates.filter((c) => c.key !== q.place.key).map((c) => fromGaz(c, written, place.why, 'LOW', [], year)), reason: place.why.reason };
+    }
+  }
   if (m?.status === 'ambiguous') local = { status: 'AMBIGUOUS', candidates: m.candidates.map((c) => fromGaz(c, written, why(m.reason, `${gazetteerInfo(c.gazetteer).name} name match`), 'AMBIGUOUS', [], year)), reason: m.reason };
-  // No settlement of that name: a polity valid at the date is the answer.
+  // No settlement of that name: a polity valid at the date is the answer — unless the name is a city's and the
+  // polity named after it no longer held that city (ID-4: "Malacca" in 1700 is not the Sultanate of Malacca).
+  if (!local && livePolity && year !== undefined && await lostNamesake(livePolity, written, year)) {
+    const place = polityPlace(livePolity, 'LOW');
+    return { status: 'LOW', candidates: place ? [place] : [], reason: `${livePolity.polity.n} is named after ${written}, but in ${yearLabel(year)} Cliopatria’s outline for it doesn’t include ${written} — it is offered only as a possibility.` };
+  }
+  // No polity of that name at the date: the land the name refers to, and who held it then.
+  if (!local && !livePolity && year !== undefined) {
+    const land = await landAt(polities, written, year, why);
+    if (land) return land;
+  }
   if (!local && livePolity) {
     const place = polityPlace(livePolity, 'MEDIUM');
     if (place) return { place, status: 'MEDIUM', candidates: [], reason: place.why.reason };
